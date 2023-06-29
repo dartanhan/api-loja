@@ -1,0 +1,98 @@
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #cecece;
+}
+.h-custom {
+    height: calc(100% - 73px);
+}
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
+.border-lable-flt {
+    display: block;
+    position: relative;
+}
+.border-lable-flt label, .border-lable-flt > span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: text;
+    font-size: 85%;
+    opacity: 1;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+    top: -.5em;
+    left: 0.75rem;
+    z-index: 3;
+    line-height: 1;
+    padding: 0 1px;
+    font-family:"Courier New", Courier, monospace;
+}
+.border-lable-flt label::after, .border-lable-flt > span::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    background: white;
+    height: 2px;
+    top: 50%;
+    left: -.2em;
+    right: -.2em;
+    z-index: -1;
+}
+.border-lable-flt .form-control::-webkit-input-placeholder {
+    opacity: 1;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+}
+.border-lable-flt .form-control:placeholder-shown:not(:focus)::-webkit-input-placeholder {
+    opacity: 0;
+}
+.border-lable-flt .form-control:placeholder-shown:not(:focus) + * {
+    font-size: 100%;
+    opacity: .5;
+    top: .5em;
+}
+
+.input-group .border-lable-flt {
+    display: table-cell;
+}
+.input-group .border-lable-flt .form-control {
+    border-radius: 0.25rem;
+}
+.input-group .border-lable-flt:not(:last-child), .input-group .border-lable-flt:not(:last-child) .form-control {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-right: 0;
+}
+.input-group .border-lable-flt:not(:first-child), .input-group .border-lable-flt:not(:first-child) .form-control {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.form-control:focus {
+    color: #804000;
+    background-color: #fff;
+    border-color: #000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 102, 51, 0.25);
+}
+
+.select-custom{
+    background-color: #4f5050;
+    color: #fff;
+    font-weight: bold
+}
+.card{
+    font-size: 85%;
+    font-family:"Courier New", Courier, monospace;
+    opacity: 10;
+}
+
+.bg-pink{
+    background-color:#DB9DBE!important
+}
+a.bg-primary:focus,a.bg-primary:hover,button.bg-primary:focus,button.bg-primary:hover{color:#fff!important}

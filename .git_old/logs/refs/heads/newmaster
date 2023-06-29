@@ -1,0 +1,22 @@
+0000000000000000000000000000000000000000 be223e41e5cd2f2b16358f4ba7c26663eb691f95 Dartanhan <dartanhan.lima@gmail.com> 1655312402 -0300	branch: Created from refs/remotes/origin/newmaster
+be223e41e5cd2f2b16358f4ba7c26663eb691f95 43a4961c8b543a8e06f0450b4f40a0c168d7b308 Dartanhan <dartanhan.lima@gmail.com> 1655317834 -0300	commit: Correção do projeto e novas melhorias
+43a4961c8b543a8e06f0450b4f40a0c168d7b308 f0f004b679a4fb716f244da7107ceca1ff2c696a Dartanhan <dartanhan.lima@gmail.com> 1655500595 -0300	commit: Ajustes e criação nova tela de dashbord.blade.php
+f0f004b679a4fb716f244da7107ceca1ff2c696a 6fcd214023c565b3d2d6dd6b017a975920445b5c Dartanhan <dartanhan.lima@gmail.com> 1655592271 -0300	commit: Ajuste na tela dashboard.blade.php, crição dos filtros para pesquisa por data
+6fcd214023c565b3d2d6dd6b017a975920445b5c 2a430ab475549d24bed77bbd70abee93a703a07d Dartanhan <dartanhan.lima@gmail.com> 1655758141 -0300	commit: Ajuste final Dashboard , correção do bootstrap, jquery e navegação da tela
+2a430ab475549d24bed77bbd70abee93a703a07d b32c35398dcc764f9faa58357805a2707e15156a Dartanhan <dartanhan.lima@gmail.com> 1655772802 -0300	commit: Ajuste dos menus para acesso aos itens de configurações , acerto tela de categorias , CRUD
+b32c35398dcc764f9faa58357805a2707e15156a ae5f3f18422f67597faac4e6ebc7fecb1452b203 Dartanhan <dartanhan.lima@gmail.com> 1660425423 -0300	commit: Nova versão tele produtos
+ae5f3f18422f67597faac4e6ebc7fecb1452b203 d8270c1cb5bc842a62d0de2e83bdd54813b2537b Dartanhan <dartanhan.lima@gmail.com> 1660687886 -0300	commit: Correção da API Troca, Produto,Venda! Ajuste tela de produtos exibição de imagens por produtos..
+d8270c1cb5bc842a62d0de2e83bdd54813b2537b 94cd474e94c3335b26d0313ed9cd5ea51661b962 Dartanhan <dartanhan.lima@gmail.com> 1661199765 -0300	commit: Ajuste no envio das imagens dos produtos resize automático.
+94cd474e94c3335b26d0313ed9cd5ea51661b962 212a5cc672d964eb9f092cf8192ae15d36bce4da Dartanhan <dartanhan.lima@gmail.com> 1661205016 -0300	commit: Adição preview de imagem na tela de produtos ao passar o maouse na imagem.
+212a5cc672d964eb9f092cf8192ae15d36bce4da 9625f111afd31151c707b6d764135e47bc70fd84 Dartanhan <dartanhan.lima@gmail.com> 1662570222 -0300	commit: Adição Tela estoque, correção tempo sessão JWT, correção exluir item venda
+9625f111afd31151c707b6d764135e47bc70fd84 4fedfb464470fb7e100384d06c82c349515c1565 Dartanhan <dartanhan.lima@gmail.com> 1663336922 -0300	commit: Addição de Alterar Venda(Forma de Pagamento) na tela de listagem de vendas no dia no dashboard
+4fedfb464470fb7e100384d06c82c349515c1565 0f3742b7ff58a297c51bd3dfc93452b31cc86cfd Dartanhan <dartanhan.lima@gmail.com> 1664235221 -0300	commit: Adição tela produtos mais vendidos por categoria, detalhes das vendas
+0f3742b7ff58a297c51bd3dfc93452b31cc86cfd c5d39c6f24b68e43768d03dda375ddaca129d9de Dartanhan <dartanhan.lima@gmail.com> 1664889099 -0300	commit: Ajustes tela produtos mais vendidos
+c5d39c6f24b68e43768d03dda375ddaca129d9de 36832308b720470b92e09024ad73122d5ae0365a Dartanhan <dartanhan.lima@gmail.com> 1672095530 -0300	commit: Sinconização de API com novas alterações
+36832308b720470b92e09024ad73122d5ae0365a 12487f58c4d123ca897401c99f86ebc8fd8929ff Dartanhan <dartanhan.lima@gmail.com> 1679316698 -0300	commit: correção troca sistema PDV
+12487f58c4d123ca897401c99f86ebc8fd8929ff a67ab842d2df2c14cd2ee8d09a65c3054f9eebf4 Dartanhan <dartanhan.lima@gmail.com> 1679316735 -0300	commit: correção troca sistema PDV
+a67ab842d2df2c14cd2ee8d09a65c3054f9eebf4 83c38f751bf56440bd76d0789159cbddf31e1c3e Dartanhan <dartanhan.lima@gmail.com> 1682286534 -0300	commit: Adição de tipos de atacados
+83c38f751bf56440bd76d0789159cbddf31e1c3e a44149901ca477f707833810eeac1ad255444b0a Dartanhan <dartanhan.lima@gmail.com> 1682617958 -0300	commit: Ajuste de inclusão de opção de 5un,10un e Lista na veda
+a44149901ca477f707833810eeac1ad255444b0a 2db4f7e03865f780fcbf4db610ccc1fe2f0cf0ae Dartanhan <dartanhan.lima@gmail.com> 1683053811 -0300	commit: Adição do novo chart visão ANO a ANO no dashboard.blade.php
+2db4f7e03865f780fcbf4db610ccc1fe2f0cf0ae fabd3a0aec2b5cfb64776404193f5a2b9adf1652 Dartanhan <dartanhan.lima@gmail.com> 1684871830 -0300	commit: ajuste de perfil usuário , add formato de cashback
+fabd3a0aec2b5cfb64776404193f5a2b9adf1652 cc58cc072dd55c5c712a9dd83b3498634ae06979 Dartanhan <dartanhan.lima@gmail.com> 1688042355 -0300	commit: ajustes tela produtos

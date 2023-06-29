@@ -1,0 +1,60 @@
+.table.dataTable  {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 14px;
+    font-variant: all-small-caps;
+}
+
+thead{
+    font-size: 12px;
+    /*font-variant: all-small-caps;*/
+    background-color: #212529;
+    color: #ffffff;
+    border-color:  #212529;
+
+}
+.my-error-class {
+    color:#FF0000;  /* red */
+}
+.my-valid-class {
+    color:#000000; /* green */
+}
+.red{
+    background-color: red !important; /* red */
+    color:#ffffff; /* white */
+}
+.blue{
+    background-color: #7abaff !important; /* red */
+    color:#ffffff !important; /* white */
+}
+td.details-control {
+    background: url('details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('details_close.png') no-repeat center center;
+}
+.px-80 {
+    width: 80px !important;
+}
+.px-90 {
+    width: 90px !important;
+    padding: unset;
+}
+.px-130 {
+    width: 130px !important;
+}
+.px-100 {
+    width: 95px !important;
+    padding: unset;
+}
+.px-150 {
+    width: 150px !important;
+}
+.tblVariacao{
+    border:0;
+    border-spacing: 1px;
+    border-collapse: separate;
+}
+table.dataTable tbody td {
+    vertical-align: middle;
+}
