@@ -34,7 +34,6 @@ Route::group(['middleware' => ['apiJwt'], 'prefix' => 'auth'], function() {
     Route::apiResource('fluxoapi','Api\FluxoController');
     Route::apiResource('trocaapi','Api\TrocaController');
     Route::Resource('clienteapi','Api\ClienteController');
-    Route::apiResource('nfceapi','Api\NfceController');
     Route::apiResource('cashbackapi','Api\CashBackController');
 
 });
