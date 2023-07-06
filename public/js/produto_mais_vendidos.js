@@ -401,8 +401,8 @@ $(document).ready(function() {
      * Formata Valor Moeda
      * */
     let number_format = function(number, decimals, dec_point, thousands_sep) {
-// *     example: number_format(1234.56, 2, ',', ' ');
-// *     return: '1 234,56'
+        // *     example: number_format(1234.56, 2, ',', ' ');
+    // *     return: '1 234,56'
         let num = (number + '').replace(',', '').replace(' ', '');
         let n = !isFinite(+num) ? 0 : +num,
             pre = !isFinite(+decimals) ? 0 : Math.abs(decimals),

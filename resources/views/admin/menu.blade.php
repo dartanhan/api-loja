@@ -90,6 +90,11 @@
                                     </a>
                                     <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
                                         <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
+                                            Mais Vendidos por Categorias
+                                    </a>
+
+                                     <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                             Mais Vendidos
                                     </a>
                                 </nav>
