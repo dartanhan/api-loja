@@ -19,7 +19,8 @@
     <script src="{{URL::asset('assets/dashboard/js/scripts.js')}}"></script>
     <script src="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
     <link href="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
-
+    <script src="{{URL::asset('js/url.js')}}"></script>
+    
     @stack("styles")
 
 </head>

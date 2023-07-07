@@ -2,8 +2,9 @@
 $(function () {
     Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
     Chart.defaults.global.defaultFontColor = '#292b2c';
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
 
+    const url = fncUrl();
+    
     let table;
     let total = "";
     let labels = [];

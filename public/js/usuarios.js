@@ -1,6 +1,7 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
+
     let metodo = '',titulo = '',url,json,fila,id,nome,login,status,token;
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -13,7 +14,7 @@ $(document).ready(function() {
 
     let table = $('#table').DataTable({
           "createdRow": function(row, data, dataIndex) {
-              if (data.status === `INATIVO`) {
+              if (data.status === 'INATIVO') {
                   $(row).addClass('red');
               }
           },

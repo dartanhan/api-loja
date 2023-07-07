@@ -52,9 +52,9 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://127.0.0.1'),
+    'url' => env('APP_URL', ''),
 
-    'asset_url' => env('ASSET_URL', 'http://127.0.0.1/api-loja/public'),
+    'asset_url' => env('ASSET_URL', ''),
 
     /*
     |--------------------------------------------------------------------------
@@ -176,7 +176,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        Intervention\Image\ImageServiceProvider::class
+        Intervention\Image\ImageServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class
     ],
 
     /*

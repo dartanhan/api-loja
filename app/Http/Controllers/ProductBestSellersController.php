@@ -8,23 +8,40 @@ use App\Http\Models\VendasProdutos;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use NumberFormatter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Throwable;
 use Yajra\DataTables\DataTables;
+use OpenApi\Annotations\AbstractAnnotation as OA;
 
-
+/**
+ * @OA\Info(
+ *     title="My First API",
+ *     version="0.1"
+ * )
+ */
 class ProductBestSellersController extends Controller
 {
-
-    protected $request,$sales,$salesProduct,$cat;
+/**
+     * @OA\Get(
+     *     path="/api/data.json",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
+     */
+    
+    protected $request,$sales,$salesProduct,$cat,$formatter;
 
     public function __construct(Request $request, Vendas $sales, VendasProdutos $salesProduct, Categoria $cat){
         $this->request = $request;
         $this->sales = $sales;
         $this->salesProduct = $salesProduct;
         $this->cat = $cat;
+        $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
     }
     /**
      * Display a listing of the resource.
@@ -45,9 +62,8 @@ class ProductBestSellersController extends Controller
     public function cards($data){
 
         try{
-            $dataCarbon = ($data == "") ?  CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m")) : $data;
-           // $date =  Date("Y-m");
-            //  $datefim = Date("Y-m-t");
+            $dataCarbon = ($data == "") ?  Carbon::now()->format("Y-m") : $data;
+
 
             $ret = $this->salesProduct
                 ->Join('loja_categorias as c','c.id','=' ,'loja_vendas_produtos.categoria_id')
@@ -204,6 +220,11 @@ class ProductBestSellersController extends Controller
 
 
     /**
+     * @OA\Info(
+     *  title="Lista produtos mais vendidos agrupado por 3 últmos meses",
+     *  version="1.5.0"
+     * )
+     * 
      * Show the form for editing the specified resource.
      *
      * @param $date
@@ -213,7 +234,8 @@ class ProductBestSellersController extends Controller
     {
         try {
 
-            $ret =  $this->salesProduct
+         //   die(Carbon::now()->subDays(90)->format("Y-m"));
+           /* $ret =  $this->salesProduct
                 ->join('loja_produtos_variacao as lpv', 'loja_vendas_produtos.codigo_produto','=', 'lpv.subcodigo')
                 ->join('loja_produtos_new as pn', 'lpv.products_id','=', 'pn.id')
                 ->select(
@@ -228,7 +250,53 @@ class ProductBestSellersController extends Controller
                 ->orderBy("quantidade","desc")
                 ->get();
 
-            return  DataTables::of($ret)->make(true);
+            return  DataTables::of($ret)->make(true);*/
+
+            $ret =  $this->salesProduct
+                ->join('loja_produtos_variacao as lpv', 'loja_vendas_produtos.codigo_produto','=', 'lpv.subcodigo')
+                ->join('loja_produtos_new as pn', 'lpv.products_id','=', 'pn.id')
+                ->select(
+                    "loja_vendas_produtos.codigo_produto",
+                    "loja_vendas_produtos.descricao",
+                    "lpv.quantidade",
+                    "lpv.estoque",
+                    DB::raw("sum(loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade) as valor_produto_total"),
+                    DB::raw("sum(loja_vendas_produtos.quantidade) as qtd_tot_mes"),
+                )
+                ->where(DB::raw('DATE_FORMAT(loja_vendas_produtos.created_at, "%Y-%m")'),$date)
+                ->whereNotIn("loja_vendas_produtos.troca", [1])
+                ->groupBy("loja_vendas_produtos.codigo_produto","loja_vendas_produtos.descricao","lpv.quantidade","lpv.estoque")
+                //->orderBy("qtd_tot_mes","desc")
+                ->get();
+
+                $responseArray = [];
+
+                foreach ($ret as $key => $value) {
+                    $medias = $this->salesProduct
+                    ->select(
+                        'codigo_produto',
+                        DB::raw("sum(loja_vendas_produtos.quantidade) as tot_3_meses"),
+                        DB::raw("sum(loja_vendas_produtos.quantidade)/3 as qtd_media")
+                    )->whereBetween(DB::raw('DATE_FORMAT(loja_vendas_produtos.created_at, "%Y-%m")'), array( Carbon::now()->subDays(90)->format("Y-m"), Carbon::now()->format("Y-m")))
+                    ->where('codigo_produto' , $value->codigo_produto)
+                    ->groupBy('codigo_produto')
+                    ->first();
+                   
+
+                    $responseArray[$key]['falta_comprar'] = (round($medias->qtd_media) - $value->estoque - $value->quantidade < 0)
+                                                                ? 0
+                                                                : round($medias->qtd_media) - intVal($value->estoque) - intVal($value->quantidade);
+                    $responseArray[$key]['estoque'] = intVal($value->estoque);
+                    $responseArray[$key]['codigo_produto'] = $value->codigo_produto;
+                    $responseArray[$key]['descricao'] = $value->descricao;
+                    $responseArray[$key]['qtd_atual'] = intVal($value->quantidade);
+                    $responseArray[$key]['qtd_total_mes'] = intVal($value->qtd_tot_mes);
+                    $responseArray[$key]['valor_produto_total'] = $this->formatter->formatCurrency($value->valor_produto_total, 'BRL');
+                    $responseArray[$key]['qtd_media_3_meses'] = round($medias->qtd_media);
+                    $responseArray[$key]['tot_3_meses'] = round($medias->tot_3_meses);
+                }
+
+                return datatables($responseArray)->toJson();
 
 
         }catch (Throwable $e){

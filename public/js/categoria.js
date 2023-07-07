@@ -2,10 +2,11 @@
 $(document).ready(function() {
 
     let metodo = '', titulo = '';
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
     let fila,url;
     let status,nome,token,json,quantidade,categoria,id;
 
+    const urlApi = fncUrl();
+    
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',

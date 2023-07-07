@@ -1,7 +1,7 @@
 /* globals Chart:false, feather:false */
 
-let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
 $(document).ready(function() {
+    const urlApi = fncUrl();
 
     let metodo = '', titulo = '', url,fila,id,nome,token,json,status,table,table2;
 

@@ -1,12 +1,13 @@
 $(document).ready(function() {
+    let json,id,grid,table;
+    
     const fileInput = document.getElementById('file');
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
-    let json,id,grid,table;
-
+    const url = fncUrl();
+    
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',

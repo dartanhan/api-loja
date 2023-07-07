@@ -1,7 +1,7 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
 
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
 
     let ctxBar = document.getElementById("myChartRD");
     let newCtxCharBar = new Chart(ctxBar);

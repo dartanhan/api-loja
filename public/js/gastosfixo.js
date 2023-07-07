@@ -2,10 +2,12 @@
 $(document).ready(function() {
 
     feather.replace();
+    
+    const urlApi = fncUrl();
+
     $('#valor').maskMoney();
 
     let metodo = '', titulo = '';
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
     let fila = "";
     let descricao = "";
     let valor = "";

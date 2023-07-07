@@ -3,9 +3,10 @@ $(document).ready(function() {
 
     feather.replace();
 
-    let token = '', produto_id = '', fila='', json = '', id='', nome='', resposta = '';
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
 
+    let token = '', produto_id = '', fila='', json = '', id='', nome='', resposta = '';
+    
 	  let table = $('#table').DataTable({
           "ajax":{
               "method": 'get',

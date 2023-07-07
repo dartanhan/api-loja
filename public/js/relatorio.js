@@ -2,9 +2,10 @@
 $(document).ready(function() {
 
     feather.replace();
-    var metodo = '',titulo = '';
+    
+    const urlApi = fncUrl();
 
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    var metodo = '',titulo = '';
 
     $('.dateini').datepicker({
 

@@ -3,8 +3,7 @@ $(document).ready(function() {
 
     feather.replace();
 
-    let urlApi = window.location.protocol + "//" + window.location.hostname + "/api-loja/public/api";
-    //console.log(urlApi);
+    const urlApi = fncUrl();
 
     $('.datames').datepicker({
         format: 'mm/yyyy',

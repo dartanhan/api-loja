@@ -2,9 +2,11 @@
 $(document).ready(function() {
 
     feather.replace();
+    
+    const url = fncUrl();
 
     let token = '', produto_id = '', fila='', json = '', id='', nome='', resposta = '';
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    
 
     $('#formFiltro').on('submit', function(e) {
         //$('form[name="formFiltro"]').submit(function (e) {

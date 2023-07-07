@@ -7,6 +7,7 @@ use App\Http\Controllers\PdvController;
 use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\SwaggerController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -25,8 +26,8 @@ use Illuminate\Support\Facades\Route;
     Route::get('/', 'AuthController@dashboard')->name('admin');
     Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
-
-    Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
+    
+Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');

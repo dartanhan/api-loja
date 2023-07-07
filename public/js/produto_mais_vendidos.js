@@ -1,6 +1,7 @@
-$(document).ready(function() {
+$(function() {
+    const url = fncUrl();
+
     let json = '', table = '';
-    let url = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
     let now = new Date();
     let yearMonth = moment(now).format('YYYY-MM');
 
@@ -78,7 +79,7 @@ $(document).ready(function() {
      * ########################################################
      * */
 
-    let fncDataCards = async function(data,limpar) {
+   /* let fncDataCards = async function(data,limpar) {
         await fetch(url+ "/productbestsellers/cards/"+data)
             .then(function (response) {
                 return response.json()
@@ -132,14 +133,14 @@ $(document).ready(function() {
                 'error'
             )
         }
-    }
+    }*/
 
     /***
      * #########################################################
      * ###########   ACIONA O FILTRO DE DATAS   ################
      * ########################################################
      * */
-    $("#form").submit(function(evt){
+  /*  $("#form").submit(function(evt){
         evt.preventDefault();
 
     }).validate({
@@ -174,7 +175,7 @@ $(document).ready(function() {
                 success:  function (response) {
                     //console.log(response);
                     if (response.success) {
-                        fncCards(response,formData);
+                       // fncCards(response,formData);
                         fncTable(formData);
                     }
                 },
@@ -193,11 +194,19 @@ $(document).ready(function() {
                 }
             });
         }
-    });
+    });*/
 
-    let fncTable = function(data){
+    let fncTable = async function(data){
+       // console.log(data);
+       const date = new Date();
+       const dia = date.getDate() > 10 ? date.getDate() : "0"+date.getDate();
+       const mesCorrente = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()+1); 
+       const mesPassado = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()-1); 
+       const ano = date.getFullYear();
+       
+      $(".card-header").html("<i class=\"fas fa-table me-1\"></i> Mais Vendidos - Período de " + dia +"/"+mesCorrente+"/"+ano +" à " + dia +"/"+mesPassado+"/"+ano);
         $('#datatable').DataTable().destroy();
-      table = $('#datatable').DataTable({
+        table = await $('#datatable').DataTable({
             "ajax":{
                 "method": 'get',
                 "processing": true,
@@ -206,21 +215,19 @@ $(document).ready(function() {
                 "url": url + "/productbestsellers/"+data+"/edit"
             },
             "columns": [
-                {
-                    "className":      'details-control',
-                    "orderable":      false,
-                    "data":           null,
-                    "defaultContent": ''
-                },
-                { "data": "id" , "defaultContent": ""},
                 { "data": "codigo_produto" , "defaultContent": ""},
                 { "data": "descricao" , "defaultContent": ""},
-                { "data": "quantidade" , "defaultContent": ""},
-                { "data": "data", "defaultContent": "" },
+                { "data": "qtd_atual" , "defaultContent": ""},
+                { "data": "estoque" , "defaultContent": ""},
+                { "data": "qtd_total_mes", "defaultContent": "" },
+                { "data": "valor_produto_total", "defaultContent": "" },
+                { "data": "qtd_media_3_meses", "defaultContent": "" },
+                { "data": "tot_3_meses", "defaultContent": "" },
+                { "data": "falta_comprar", "defaultContent": "" },
             ],
               "columnDefs": [
                   {
-                      "targets": [ 1 ],
+                      "targets": [ ],
                       "visible": false,
                       "searchable":true
                   }
@@ -228,14 +235,14 @@ $(document).ready(function() {
             language: {
                 "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
             },
-            order: [[ 4, "desc" ]],
+            order: [[ 6, "desc" ]],
         });
     }
 
     /**
      * Add event listener for opening and closing details
      */
-    $('#datatable tbody').on('click', 'td.details-control', function (event) {
+   /* $('#datatable tbody').on('click', 'td.details-control', function (event) {
         event.preventDefault();
 
         let tr = $(this).closest('tr');
@@ -329,15 +336,16 @@ $(document).ready(function() {
             });
 
         }
-    } );
+    } );*/
 
     /***
      * #########################################################
      * ###########      ONLOAD   ##############################
      * ########################################################
      * */
-    fncDataCards(yearMonth,false).then();
-    fncTable(yearMonth);
+   // fncDataCards(yearMonth,false).then();
+   fncTable(yearMonth);
+   
 
     /**
      * #########################################################################
@@ -390,7 +398,7 @@ $(document).ready(function() {
     /**
      * Retonar ao mês corrente
      * */
-    $(".btn-limpar").click(function () {
+    $(".btn-limpar").on( "click", function() { 
         $('input[name=mes_ano]').val("");
         $('.btn-limpar').html('<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Aguarde...');
         fncDataCards(yearMonth,true).then();

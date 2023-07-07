@@ -7,27 +7,52 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid  px-4" style="padding-top: 10px;padding-right: 10px">
+    <div class="container-fluid px-4">
+        <h2 class="mt-4">Mais Vendidos por Categorias <span id="filterLabel"></span></h2>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <form id="form" name="form">
+                        @csrf
+                        <div class="row date" id="data_mes_ano">
+                            <div class="col-auto input-group-sm">
+                                <i class="fas fa-table me-1"></i>
+                                Vendas no Mês
+                            </div>
+                            <div class="col-auto input-group-sm" id="mes_ano" data-date="{{date("m/Y")}}" data-date-format="mm/yyyy">
+                                <label for="data" class="visually-hidden">Filtro por Data</label>
+                                <input type="text" class="form-control input-group-sm" placeholder="Filtro por Mês/Ano" aria-label="Filtro por Mês/Ano" name="mes_ano" id="mes_ano">
+                                <span class="add-on"><i class="icon-th"></i></span>
+                            </div>
+                            <div class="col-auto input-group-sm">
+                                <button class="btn bgBtn btn-enviar" type="submit" id="btn-enviar">Filtrar</button>
+                                <button class="btn bgBtn btn-limpar" type="button">Limpar</button>
+                                <span id="load"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <div class="row"  id="cards">
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-table me-1"></i>
-                    Mais Vendidos 
+                    Vendas
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="datatable" class="table compact table-striped table-bordered table-hover">
                             <thead class="text-center">
                             <tr>
+                                <th data-sortable="true">#</th>
+                                <th data-sortable="true">id</th>
                                 <th data-sortable="true">Código</th>
-                                <th data-sortable="true">Descrição</th>
-                                <th data-sortable="true">Qtd Atual</th>
-                                <th data-sortable="true">Qtd Estoque</th>
-                                <th data-sortable="true">Qtd Vendida Mês</th>
-                                <th data-sortable="true">Valor Tot Mês</th>
-                                <th data-sortable="true">Qtd Média 3 Meses</th>
-                                <th data-sortable="true">Média 3 Meses</th>
-                                <th data-sortable="true">Falta Comprar</th>
+                                <th data-sortable="true">Produto</th>
+                                <th data-sortable="true">Qtd</th>
+                                <th data-sortable="true">Data</th>
                             </tr>
                             </thead>
                             <tbody class="text-center"></tbody>

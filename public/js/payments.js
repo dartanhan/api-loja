@@ -1,6 +1,7 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
+    
     let metodo = '', titulo = '', url,fila,id,nome,token,json;
 
     const swalWithBootstrapButtons = Swal.mixin({

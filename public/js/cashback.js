@@ -1,7 +1,7 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
     let metodo = '',titulo = '', id ='',url,json,fila,valor,taxa,token;
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
 
     $('#taxa').maskMoney();
     $('#valor').maskMoney();

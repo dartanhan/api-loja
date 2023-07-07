@@ -2,9 +2,10 @@
 $(document).ready(function() {
     let metodo = '',titulo = '', token = '', produto_id = '', fila='', json = '', id='', nome='',imgUrl = '';
     let resposta = '',url;
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
     let img = '../public/img';
 
+    const urlApi = fncUrl();
+    
     //$('.file-upload').file_upload();
     $('#valorproduto').maskMoney();
 	$('#valordinheiro').maskMoney();

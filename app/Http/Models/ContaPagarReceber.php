@@ -4,7 +4,7 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class contaPagarReceber extends Model
+class ContaPagarReceber extends Model
 {
     public $table = 'loja_gastos';
 

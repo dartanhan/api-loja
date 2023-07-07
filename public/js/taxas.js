@@ -1,8 +1,9 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
-    let metodo = '',titulo = '', id ='',url,json,fila,nome,taxa,token;
-    let urlApi = window.location.protocol +"//"+ window.location.hostname + "/api-loja/admin";
+    const urlApi = fncUrl();
 
+    let metodo = '',titulo = '', id ='',url,json,fila,nome,taxa,token;
+    
     $('#valor_taxa').maskMoney();
 
     const swalWithBootstrapButtons = Swal.mixin({
