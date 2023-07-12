@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
+/**
+ * @OA\Info(
+ *   title="API Laravel Swagger Documentação - KN Cosméticos",
+ *   version="1.0.0",
+ *   contact={
+ *     "email": "dartanhan.lima@gmail.com"
+ *   }
+ * )
+ * 
+ */
 class AuthController extends Controller
 {
     /**

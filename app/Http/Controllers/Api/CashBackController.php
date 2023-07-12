@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
+
 class CashBackController extends Controller
 {
 
@@ -24,6 +25,14 @@ class CashBackController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      tags={"cashbackapi"},
+     *     path="/api/auth/cashbackapi",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
      * Display a listing of the resource.
      *
      * @return JsonResponse
@@ -33,17 +42,18 @@ class CashBackController extends Controller
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
+     * @OA\Post(
+     *      tags={"cashbackapi"},
+     *     path="/api/auth/cashbackapi",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
+     
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -55,6 +65,15 @@ class CashBackController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      tags={"cashbackapi"},
+     *     path="/api/auth/cashbackapi/{cashbackapi} ",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
+     
      * Display the specified resource.
      *
      * @param $param
@@ -75,21 +94,21 @@ class CashBackController extends Controller
         }
 
     }
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\\ClienteModel  $clienteModel
-     * @return JsonResponse
-     */
-    public function edit($id)
-    {
-    }
+   
 
     /**
+     * @OA\Put(
+     *      tags={"cashbackapi"},
+     *     path="/api/auth/cashbackapi/{cashbackapi}",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\\ClienteModel  $clienteModel
+     * @param  ClienteModel  $clienteModel
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, ClienteModel $clienteModel)
@@ -97,10 +116,18 @@ class CashBackController extends Controller
         //
     }
 
-    /**
+ /**
+     * @OA\Delete(
+     *      tags={"cashbackapi"},
+     *     path="/api/auth/cashbackapi/{cashbackapi}",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\\ClienteModel  $clienteModel
+     * @param  ClienteModel  $clienteModel
      * @return \Illuminate\Http\Response
      */
     public function destroy(ClienteModel $clienteModel)

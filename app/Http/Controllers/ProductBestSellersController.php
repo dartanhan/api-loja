@@ -16,24 +16,10 @@ use Throwable;
 use Yajra\DataTables\DataTables;
 use OpenApi\Annotations\AbstractAnnotation as OA;
 
-/**
- * @OA\Info(
- *     title="My First API",
- *     version="0.1"
- * )
- */
+
 class ProductBestSellersController extends Controller
 {
-/**
-     * @OA\Get(
-     *     path="/api/data.json",
-     *     @OA\Response(
-     *         response="200",
-     *         description="The data"
-     *     )
-     * )
-     */
-    
+
     protected $request,$sales,$salesProduct,$cat,$formatter;
 
     public function __construct(Request $request, Vendas $sales, VendasProdutos $salesProduct, Categoria $cat){
@@ -43,10 +29,22 @@ class ProductBestSellersController extends Controller
         $this->cat = $cat;
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
     }
+ 
     /**
+     * @OA\Get(
+     *     tags={"ProductBestSellers "},
+     *      summary="Get a autentication user token",
+     *      description="This endpoints return a new token user authentication for use on protected endpoints",
+     *     path="admin/productbestsellers",
+     *     @OA\Response(
+     *         response="200",
+     *         description="The data"
+     *     )
+     * )
      * Display a listing of the resource.
      *
      */
+
     public function index()
     {
         return view('admin.produto_mais_vendidos');
@@ -220,12 +218,7 @@ class ProductBestSellersController extends Controller
 
 
     /**
-     * @OA\Info(
-     *  title="Lista produtos mais vendidos agrupado por 3 últmos meses",
-     *  version="1.5.0"
-     * )
-     * 
-     * Show the form for editing the specified resource.
+    * Show the form for editing the specified resource.
      *
      * @param $date
      * @return JsonResponse

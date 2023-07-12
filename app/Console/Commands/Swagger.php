@@ -1,5 +1,7 @@
 <?php
-use Symfony\Component\Console\Command\Command;
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
 
 class Swagger extends Command {
     protected  $signature = 'swagger';
@@ -8,7 +10,7 @@ class Swagger extends Command {
 
     public function handle(){
         $openapi = \OpenApi\Generator::scan([config('swagger.sources')]);
-        file_put_contents('public/docs/swagger.json', $openapi->toJson());
+        file_put_contents('docs/swagger.json', $openapi->toJson());
         $this->info('Api doc gerado com sucesso!');
         return Command::SUCCESS;
     }

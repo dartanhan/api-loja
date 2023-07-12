@@ -1,0 +1,88 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Laravel Swagger Documentação - KN Cosméticos",
+        "contact": {
+            "email": "dartanhan.lima@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/auth/cashbackapi": {
+            "get": {
+                "tags": [
+                    "cashbackapi"
+                ],
+                "operationId": "7a06ce4649758c96781a2e6fa4046166",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "cashbackapi"
+                ],
+                "operationId": "ee24a4e9cba0c8c812f1ab28770b73e2",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            }
+        },
+        "/api/auth/cashbackapi/{cashbackapi} ": {
+            "get": {
+                "tags": [
+                    "cashbackapi"
+                ],
+                "operationId": "bcdaa17d01b0f608ed5a75c685a1e65d",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            }
+        },
+        "/api/auth/cashbackapi/{cashbackapi}": {
+            "put": {
+                "tags": [
+                    "cashbackapi"
+                ],
+                "operationId": "c77b17e2e21e3f5d8baf847cb30981ff",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "cashbackapi"
+                ],
+                "operationId": "9eda2f1235d2c8f076e51fef9e2bf20e",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            }
+        },
+        "admin/productbestsellers": {
+            "get": {
+                "tags": [
+                    "ProductBestSellers "
+                ],
+                "summary": "Get a autentication user token",
+                "description": "This endpoints return a new token user authentication for use on protected endpoints",
+                "operationId": "9d9bd7a4b7f5f2f9720692ad5b57a086",
+                "responses": {
+                    "200": {
+                        "description": "The data"
+                    }
+                }
+            }
+        }
+    }
+}
