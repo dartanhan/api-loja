@@ -26,7 +26,7 @@ class CashBackController extends Controller
 
     /**
      * @OA\Get(
-     *      tags={"cashbackapi"},
+     *      tags={"CashBackAPI"},
      *     path="/api/auth/cashbackapi",
      *     @OA\Response(
      *         response="200",
@@ -46,7 +46,7 @@ class CashBackController extends Controller
 
     /**
      * @OA\Post(
-     *      tags={"cashbackapi"},
+     *      tags={"CashBackAPI"},
      *     path="/api/auth/cashbackapi",
      *     @OA\Response(
      *         response="200",
@@ -66,7 +66,7 @@ class CashBackController extends Controller
 
     /**
      * @OA\Get(
-     *      tags={"cashbackapi"},
+     *      tags={"CashBackAPI"},
      *     path="/api/auth/cashbackapi/{cashbackapi} ",
      *     @OA\Response(
      *         response="200",
@@ -98,7 +98,7 @@ class CashBackController extends Controller
 
     /**
      * @OA\Put(
-     *      tags={"cashbackapi"},
+     *      tags={"CashBackAPI"},
      *     path="/api/auth/cashbackapi/{cashbackapi}",
      *     @OA\Response(
      *         response="200",
@@ -118,7 +118,7 @@ class CashBackController extends Controller
 
  /**
      * @OA\Delete(
-     *      tags={"cashbackapi"},
+     *      tags={"CashBackAPI"},
      *     path="/api/auth/cashbackapi/{cashbackapi}",
      *     @OA\Response(
      *         response="200",

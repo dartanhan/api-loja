@@ -11,7 +11,7 @@
         "/api/auth/cashbackapi": {
             "get": {
                 "tags": [
-                    "cashbackapi"
+                    "CashBackAPI"
                 ],
                 "operationId": "7a06ce4649758c96781a2e6fa4046166",
                 "responses": {
@@ -22,7 +22,7 @@
             },
             "post": {
                 "tags": [
-                    "cashbackapi"
+                    "CashBackAPI"
                 ],
                 "operationId": "ee24a4e9cba0c8c812f1ab28770b73e2",
                 "responses": {
@@ -35,7 +35,7 @@
         "/api/auth/cashbackapi/{cashbackapi} ": {
             "get": {
                 "tags": [
-                    "cashbackapi"
+                    "CashBackAPI"
                 ],
                 "operationId": "bcdaa17d01b0f608ed5a75c685a1e65d",
                 "responses": {
@@ -48,7 +48,7 @@
         "/api/auth/cashbackapi/{cashbackapi}": {
             "put": {
                 "tags": [
-                    "cashbackapi"
+                    "CashBackAPI"
                 ],
                 "operationId": "c77b17e2e21e3f5d8baf847cb30981ff",
                 "responses": {
@@ -59,7 +59,7 @@
             },
             "delete": {
                 "tags": [
-                    "cashbackapi"
+                    "CashBackAPI"
                 ],
                 "operationId": "9eda2f1235d2c8f076e51fef9e2bf20e",
                 "responses": {
