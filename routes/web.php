@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
     
-    Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
+Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');
@@ -115,12 +115,12 @@ use Illuminate\Support\Facades\Route;
 
 });
 
-Route::resource('/usuario','UserSystemController');
+/*Route::resource('/usuario','UserSystemController');
 Route::resource('/relatorio','RelatorioController');
 Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
 Route::resource('produto','ProdutoController');
 Route::get('/fluxo/chart/{id}','FluxoController@chartFluxo');
-Route::resource('/fluxo','FluxoController');
+Route::resource('/fluxo','FluxoController');*/
 //Route::post('/importProduct', 'ProductController@importProduct')->name('importProduct');
 /*
 Route::resource('/conferenciames','ConferenciaController');

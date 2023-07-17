@@ -11729,3 +11729,12 @@ body {
 .bg-card-desp-fixas{
     background-color: rgba(238,97,96,0.75);
 }
+
+.lnkClass{
+  text-decoration: none;
+  color: #000;
+}
+.lnkClass:hover, .lnkClass:focus {
+  color: #DB9DBE;
+  text-decoration: underline;
+}

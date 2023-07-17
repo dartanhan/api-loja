@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     let json,id,grid,table;
     
     const fileInput = document.getElementById('file');
@@ -16,7 +16,7 @@ $(document).ready(function() {
         buttonsStyling: false
     });
 
-    $('#codigo_produto').focus();
+    $('#codigo_produto').trigger("focus");
     $('#adicionarCampo').prop('disabled', true);
     $('#GerarCodigo').prop('disabled', false);
     $('#btnLote').prop('disabled', false);
@@ -44,7 +44,15 @@ $(document).ready(function() {
             },
             { "data" : "id", "defaultContent": ""},
             { "data": "codigo_produto", "defaultContent": "" },
-            { "data": "descricao" , "defaultContent": ""},
+            { "data":  "defaultContent",
+                    render: function ( data, type, row ) {
+                        //console.log(row.descricao);
+                        return "<a class='lnkClass' href='#' "+
+                        " data-toggle=\"modal\" " +
+                        " data-target=\"#divModal\" onclick=\"modalNfceProduto("+row.id+",'"+row.descricao+"')\" >"+ row.descricao + "</a>";
+
+                    }
+            },
             { "data": "categoria" , "defaultContent": ""},
             { "data": "created", "defaultContent": "" },
             { "data": "updated" , "defaultContent": ""},
@@ -54,7 +62,7 @@ $(document).ready(function() {
                                 "<div class='btn-group'>" +
                                     "<i class=\"bi-pencil-square btnUpdateProduct\" " +
                                     "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                    "               title='Atualizar Produto' data-id=\""+row.id+"\" >" +
+                                    "               title='Atualizar Produto' data-id=\""+row.id+"\">" +
                                     "</i>"+
                                    /* "<i class=\"bi-image btnImageProduct\" " +
                                     "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
@@ -132,15 +140,15 @@ $(document).ready(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                             console.log(response.data.products);
+                            // console.log(response.data.products);
                             if (response.success) {
                                 let arrayProducts = JSON.stringify(response.data.products);
 
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='./public/storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='./public/storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
+                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -168,7 +176,7 @@ $(document).ready(function() {
                             }
                         },
                         error: function (response) {
-                            json = $.parseJSON(response.responseText);
+                            json = $jQuery.parseJSON(response.responseText);
                             $("#modal-title").addClass("alert alert-danger");
                             $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
                             Swal.fire(
@@ -181,6 +189,7 @@ $(document).ready(function() {
 
         }
     } );
+
 
     /**
      * GERAR CÓDIGO PRODUTO
@@ -203,7 +212,7 @@ $(document).ready(function() {
                 if(response.success === true){
                     //console.log(response);
                     $('#codigo_produto').val(response.data);
-                    $('#codigo_produto').focus();
+                    $('#codigo_produto').trigger("focus");
 
                     $('#subcodigo0').val(response.id);
                     $('#adicionarCampo').prop('disabled', false);
@@ -219,8 +228,9 @@ $(document).ready(function() {
     /***
      * Salva imagem
      * */
-    $("#formImage").submit(function(e){
-        e.preventDefault();
+    
+    $(".formImage").on('submit',function (event) {
+        event.preventDefault();
 
     }).validate({
         errorClass: "my-error-class",
@@ -268,7 +278,7 @@ $(document).ready(function() {
                         }
                     },
                     error: function (response) {
-                        json = $.parseJSON(response.responseText);
+                        json = $jQuery.parseJSON(response.responseText);
                         $("#modal-title").addClass("alert alert-danger");
                         $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
                         Swal.fire(
@@ -278,7 +288,7 @@ $(document).ready(function() {
                         )
                     },
                     complete:function(response){
-                        json = $.parseJSON(response.responseText);
+                        json = $jQuery.parseJSON(response.responseText);
                         if(json.success) {
                             window.setTimeout(function () {
                                 $('#divModalImage').modal('hide');
@@ -291,8 +301,8 @@ $(document).ready(function() {
     /***
      * Salva o produto
      * **/
-    $("#form").submit(function(evt){
-        evt.preventDefault();
+    $( "#form" ).on( "submit", function( event ) {
+        event.preventDefault();
         }).validate({
             errorClass: "my-error-class",
             validClass: "my-valid-class",
@@ -508,12 +518,12 @@ $(document).ready(function() {
                 if(response.data.length > 0){
                     $.each(response.data, function (idx, value) {
                         grid += "<div class=\"col\">";
-                        grid += "<img src='./public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
+                        grid += "<img src='.,/public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
                         grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
                         grid += "</div>";
                     });
                 }else{
-                    grid = "<img src='./public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"/>";
+                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"/>";
                 }
                 $("#pictures").html(grid);
             },
@@ -603,21 +613,6 @@ $(document).ready(function() {
 
     /*** Fim */
 
-    /**************************************
-     ******* FUNÇÕES ONLAOD SISTEMA *******
-     **************************************
-     * */
-    code();
-    //fnc_preview();
-    $('#data_validade input').datepicker({
-        'language' : 'pt-BR',
-        'todayBtn': true,
-        'todayHighlight':true,
-        'weekStart':0,
-        'orientation':'bottom',
-        'autoclose':true
-    });
-
     /**
      * Upload em Lote
      * */
@@ -625,14 +620,7 @@ $(document).ready(function() {
         const selectedFile = fileInput.files[0];
 
         document.getElementById('arquivo').value = selectedFile.name;
-    }
-
-    /**
-     * Exibe os primeiros campos dos inputs da variação ao carregar a página.
-     * */
-    $(document).ready( function(event){
-        fnc_variacao(0,1,null,null, '');
-    });
+    } 
 
     /**
      * Ao clicar em Adiconar Variação, faz append dos campos na div
@@ -717,7 +705,7 @@ $(document).ready(function() {
         if(i > 0){
             icon_remove =  "<div class=\"col-md-1\" style='padding:unset;left: -6px;width: 10px' >"+
                 "<a href=\"javascript:void(0)\" onclick=\"removeCampo('div_pai" + i + "')\" " +
-                "title=\"Remover linha\"><img src=\"./public/img/minus.png\" border=\"0\" />" +
+                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\" />" +
                 "</a>"+
                 "</div>" ;
         }
@@ -865,7 +853,25 @@ $(document).ready(function() {
             });
     });
 
+    /**************************************
+     ******* FUNÇÕES ONLAOD SISTEMA *******
+     **************************************
+     * */
+     code();
+     //fnc_preview();
+     $('#data_validade input').datepicker({
+         'language' : 'pt-BR',
+         'todayBtn': true,
+         'todayHighlight':true,
+         'weekStart':0,
+         'orientation':'bottom',
+         'autoclose':true
+     });
 
+    /**
+     * Exibe os primeiros campos dos inputs da variação ao carregar a página.
+     * */
+     fnc_variacao(0,1,null,null, '');
 });
 
 
@@ -994,3 +1000,9 @@ $(document).ready(function() {
 
     }
 
+    function modalNfceProduto(param_id, param_desc){
+        console.log(param_id + " - "+ param_desc);
+
+       $("#exampleModaldivModalLabel").html("<i class=\"bi bi-cast\"></i> Atualização do Produto");
+       
+    }

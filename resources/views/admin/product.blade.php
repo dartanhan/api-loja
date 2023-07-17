@@ -177,6 +177,41 @@
         </div>
     </div>
 
+    <!-- Modal Campos NFCe dos Produtos-->
+    <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <form method="post" autocomplete="off" id="formProdutos" name="formProdutos" enctype="multipart/form-data" action="#">
+                    @csrf
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="exampleModalLabel"> </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="row">
+                                <div class="col">
+                                    <input type="text" class="form-control" placeholder="First name">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" placeholder="Last name">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">
+                            <i class="bi bi-cursor-fill"></i> Enviar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Fechar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 @push("scripts")
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>

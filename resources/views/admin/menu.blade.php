@@ -14,6 +14,11 @@
                             Dashboard
                         </a>
                         
+                        <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
+                            Produtos
+                        </a>
+
                         <div class="sb-sidenav-menu-heading">Interface</div>
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -47,14 +52,7 @@
                                     <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
                                         Gastos Fixos
                                 </a>
-                                <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                                    Produtos
-                                </a>
-                                <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                                    Produtos New
-                                </a>
+                                
                                 <a class="nav-link {{ Route::current()->getName() === 'tarifa.index' ? 'active' : '' }}" href="{{route('tarifa.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-percent"></i></div>
                                         Tarifas

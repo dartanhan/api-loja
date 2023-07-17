@@ -349,4 +349,10 @@ class ProdutoController extends Controller
         }
         return Response::json(array('success' => true, "data" => $ret), 200);
     }
+
+    public function teste(){
+        $user_data = Usuario::where("user_id",auth()->user()->id)->first();
+
+        return view('admin.teste', compact('user_data'));
+    }
 }
