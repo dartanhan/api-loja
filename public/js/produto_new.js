@@ -44,15 +44,7 @@ $(function() {
             },
             { "data" : "id", "defaultContent": ""},
             { "data": "codigo_produto", "defaultContent": "" },
-            { "data":  "defaultContent",
-                    render: function ( data, type, row ) {
-                        //console.log(row.descricao);
-                        return "<a class='lnkClass' href='#' "+
-                        " data-toggle=\"modal\" " +
-                        " data-target=\"#divModal\" onclick=\"modalNfceProduto("+row.id+",'"+row.descricao+"')\" >"+ row.descricao + "</a>";
-
-                    }
-            },
+            { "data": "descricao", "defaultContent":""},
             { "data": "categoria" , "defaultContent": ""},
             { "data": "created", "defaultContent": "" },
             { "data": "updated" , "defaultContent": ""},
@@ -64,15 +56,15 @@ $(function() {
                                     "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                     "               title='Atualizar Produto' data-id=\""+row.id+"\">" +
                                     "</i>"+
-                                   /* "<i class=\"bi-image btnImageProduct\" " +
-                                    "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                    "               title='Imagens Produto' data-bs-toggle=\"modal\" " +
-                                    "               data-bs-target=\"#divModalImage\" data-id-products=\""+row.id+"\" " +
-                                    "               data-subcodigo='"+row.codigo_produto+"'>" +*/
-                                    "</i>" +
-                                    //"<i class=\"bi-trash\" style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Produto'></i>&nbsp;"+
-                        "</div>" +
-                    "</div>"
+                                    "<i class=\"bi-trash btnModalNfceProduto\" "+
+                                    " style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" "+
+                                    " title='Remover Produto' "+
+                                    " data-toggle='modal' " +
+                                    " data-target='#divModal' "+
+                                    " data-id='"+row.id+"' "+
+                                    " data-descricao='"+row.descricao+"'></i>&nbsp;" +
+                                "</div>" +
+                            "</div>";
                 }
             }
 
