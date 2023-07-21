@@ -66,6 +66,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('/payment','PaymentController');
 
+    Route::resource('/origem','OrigemNfceController');
+
     Route::get('/pdv', [PdvController::class,'index'])->name('admin.pdv');
 
     Route::get('/relatorio/chartDay/{dataini}/{datafim}/{store_id}',[RelatorioController::class,'chartDay'])->name('chartDay');

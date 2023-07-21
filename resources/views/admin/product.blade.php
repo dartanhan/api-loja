@@ -53,17 +53,7 @@
                                         </select>
                                         <label for="label-qtd">STATUS</label>
                                     </div>
-                                    <!--div class="form-group border-lable-flt col-md-2 format-font">
-                                        <select name="fornecedor_id" id="fornecedor_id"
-                                                class="form-select format-font" title="Fornecedor do Produto" required>
-                                            <option value="" class="select-custom">FORNECEDOR?</option>
-                                            @foreach($suppliers as $supplier)
-                                                <option value="{{$supplier->id}}" > {{ strtoupper($supplier->nome)  }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label for="label-qtd">FORNECEDOR</label>
-                                    </div-->
-                                    <div class="form-group border-lable-flt col-md-2 format-font">
+                                    <div class="form-group border-lable-flt col-xs-2 format-font">
                                             <select id="categoria_id" name="categoria_id" class="form-select format-font"
                                                     title="Categoria do Produto" required>
                                                 <option value="" class="select-custom">CATEGORIA?</option>
@@ -73,6 +63,25 @@
                                             </select>
                                             <label for="label-qtd">CATEGORIA</label>
                                     </div>
+                                    <div class="form-group border-lable-flt col-md-2 format-font">
+                                        <input type="text" name="ncm" id="ncm" class="form-control format-font" placeholder="{{ __('NCM') }}"  required>
+                                        <label for="label-ncm">{{ __('NCM') }}</label>
+                                    </div>
+                                    <div class="form-group border-lable-flt col-md-2 format-font">
+                                        <input type="text" name="cest" id="cest" class="form-control format-font" placeholder="{{ __('CEST') }}"  required>
+                                        <label for="label-cest">{{ __('CEST') }}</label>
+                                    </div>
+                                    <div class="form-group border-lable-flt col-md-6 format-font">
+                                        <select name="origem" id="origem"
+                                                class="form-select format-font" title="Origem do Produto" required>
+                                            <option value="" class="select-custom">ORIGEM?</option>
+                                            @foreach($origem_nfces as $origem_nfce)
+                                                <option value="{{$origem_nfce->codigo}}" > {{ strtoupper($origem_nfce->codigo)  }} - {{ strtoupper($origem_nfce->descricao)  }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="label-qtd">ORIGEM DO PRODUTO</label>
+                                    </div>
+
                                     <div id="tbl"></div>
                                 </div>
                             </div>
@@ -171,41 +180,6 @@
                         <a href="{{URL::asset('/storage/atualizar_produto.xlsx')}}" class="btn btn-primary">Template</a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Enviar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Campos NFCe dos Produtos-->
-    <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <form method="post" autocomplete="off" id="formProdutos" name="formProdutos" enctype="multipart/form-data" action="#">
-                    @csrf
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="exampleModalLabel"> </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="row">
-                                <div class="col">
-                                    <input type="text" class="form-control" placeholder="First name">
-                                </div>
-                                <div class="col">
-                                    <input type="text" class="form-control" placeholder="Last name">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">
-                            <i class="bi bi-cursor-fill"></i> Enviar
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                            <i class="bi bi-x-circle"></i> Fechar
-                        </button>
                     </div>
                 </form>
             </div>

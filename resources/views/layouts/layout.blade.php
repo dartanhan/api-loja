@@ -13,9 +13,9 @@
     <script src="{{URL::asset('assets/jquery/jquery-3.6.0.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.modal.min.js')}}"></script>
     <script src="{{URL::asset('assets/font-awesome/all.min.js')}}"></script>
+    <script src="{{URL::asset('assets/bootstrap/js/popper.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap.min.js')}}"></script>
     <script src="{{URL::asset('js/bootstrap/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{URL::asset('assets/bootstrap/js/popper.min.js')}}"></script>
     <script src="{{URL::asset('assets/dashboard/js/scripts.js')}}"></script>
     <script src="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
     <link href="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />

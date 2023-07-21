@@ -61,6 +61,19 @@
                                     <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
                                         Usuários
                                 </a>
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages2" aria-expanded="false" aria-controls="collapsePages2">
+                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                                    Dados da NFCe
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="collapsePages2" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion2">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link {{ Route::current()->getName() === 'origem.index' ? 'active' : '' }}" href="{{route('origem.index')}}">
+                                            <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
+                                                Origem da Mercadoria
+                                        </a>
+                                    </nav>
+                                </div>
                             </nav>
                         </div>
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">

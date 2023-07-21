@@ -55,14 +55,7 @@ $(function() {
                                     "<i class=\"bi-pencil-square btnUpdateProduct\" " +
                                     "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                     "               title='Atualizar Produto' data-id=\""+row.id+"\">" +
-                                    "</i>"+
-                                    "<i class=\"bi-trash btnModalNfceProduto\" "+
-                                    " style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" "+
-                                    " title='Remover Produto' "+
-                                    " data-toggle='modal' " +
-                                    " data-target='#divModal' "+
-                                    " data-id='"+row.id+"' "+
-                                    " data-descricao='"+row.descricao+"'></i>&nbsp;" +
+                                    "</i>&nbsp;"+
                                 "</div>" +
                             "</div>";
                 }
@@ -181,7 +174,6 @@ $(function() {
 
         }
     } );
-
 
     /**
      * GERAR CÓDIGO PRODUTO
@@ -331,6 +323,15 @@ $(function() {
                 },
                 validade: {
                     required: true
+                },
+                origem: {
+                    required: true
+                },
+                ncm: {
+                    required: true
+                },
+                cest: {
+                    required: true
                 }
             },
             messages: {
@@ -366,6 +367,12 @@ $(function() {
                 },
                 validade: {
                     required: "Informe a data de validade?"
+                },
+                ncm: {
+                    required: "Informe o número NCM do produto?"
+                },
+                cest: {
+                    required: "Informe o número CEST do produto?"
                 }
             }, submitHandler: function(form,event) {
                 event.preventDefault();
@@ -406,6 +413,9 @@ $(function() {
                             $("#descricao").val('');
                             $("#fornecedor_id").val('');
                             $("#categoria_id").val('');
+                            $("#origem").val('');
+                            $("#ncm").val('');
+                            $("#cest").val('');
                             $('#GerarCodigo').prop('disabled', false);
                             $('#btnLote').prop('disabled', false);
                             $('#btnSalvar').html("<i class=\"fas fa-check\"></i> Salvar");
@@ -520,7 +530,7 @@ $(function() {
                 $("#pictures").html(grid);
             },
             error:function(response){
-                json = $.parseJSON(response.responseText);
+                json = $jQuery.parseJSON(response.responseText);
                 $("#modal-title").addClass( "alert alert-danger" );
                 $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
                 Swal.fire(
@@ -583,7 +593,7 @@ $(function() {
                         table.ajax.reload(null, false);
                     },
                     error: function (response) {
-                        json = $.parseJSON(response.responseText);
+                        json = $jQuery.parseJSON(response.responseText);
                         Swal.fire(
                             'error!',
                             json.message,
@@ -591,7 +601,7 @@ $(function() {
                         )
                     },
                     complete:function(response){
-                        json = $.parseJSON(response.responseText);
+                        json = $jQuery.parseJSON(response.responseText);
                         if(json.success) {
                             window.setTimeout(function () {
                                 $('#divModalImage').modal('hide');
@@ -845,6 +855,7 @@ $(function() {
             });
     });
 
+    
     /**************************************
      ******* FUNÇÕES ONLAOD SISTEMA *******
      **************************************
@@ -990,11 +1001,4 @@ $(function() {
                 parm.value = vr.substr(0, 2) + '/' + vr.substr(2, 2) + '/' + vr.substr(4, 7);
         }
 
-    }
-
-    function modalNfceProduto(param_id, param_desc){
-        console.log(param_id + " - "+ param_desc);
-
-       $("#exampleModaldivModalLabel").html("<i class=\"bi bi-cast\"></i> Atualização do Produto");
-       
     }

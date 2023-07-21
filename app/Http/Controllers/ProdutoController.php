@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Models\Categoria;
 use App\Http\Models\Cor;
 use App\Http\Models\Fornecedor;
+use App\Http\Models\OrigemNfce;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoControle;
 use App\Http\Models\ProdutoImagem;
@@ -25,11 +26,11 @@ use Throwable;
 
 class ProdutoController extends Controller
 {
-    protected $request,$produto,$fornecedor,$category,$cor,$produtoImage,$produtoVariation,$produtoControle;
+    protected $request,$produto,$fornecedor,$category,$cor,$produtoImage,$produtoVariation,$produtoControle,$origem_nfce;
 
     public function __construct(Request $request, Produto $produto,Fornecedor $fornecedor, Categoria $category,
                                 Cor $cor, ProdutoImagem $produto_image, ProdutoVariation $produtoVariation,
-                                ProdutoControle $produtoControle){
+                                ProdutoControle $produtoControle, OrigemNfce  $origem_nfce ){
         $this->request = $request;
         $this->produto = $produto;
         $this->fornecedor = $fornecedor;
@@ -38,6 +39,7 @@ class ProdutoController extends Controller
         $this->produtoImage = $produto_image;
         $this->produtoVariation = $produtoVariation;
         $this->produtoControle = $produtoControle;
+        $this->origem_nfce =  $origem_nfce;
     }
 
     /**
@@ -51,10 +53,11 @@ class ProdutoController extends Controller
             $suppliers = $this->fornecedor->where('status',true)->orderBy('nome', 'ASC')->get();
             $categories = $this->category->where('status',true)->orderBy('nome', 'ASC')->get();
             $cores = $this->cor->where('status',true)->orderBy('nome', 'ASC')->get();
+            $origem_nfces = $this->origem_nfce->orderBy('codigo', 'ASC')->get();
 
             $user_data = Usuario::where("user_id",auth()->user()->id)->first();
 
-            return view('admin.product', compact('suppliers','categories','cores','user_data'));
+            return view('admin.product', compact('origem_nfces','categories','cores','user_data'));
         }
 
         return redirect()->route('admin.login');
@@ -132,7 +135,9 @@ class ProdutoController extends Controller
                 $rules = [
                             'codigo_produto' => 'required|unique:'.$this->produto->table.'|max:15',
                             'descricao' => 'required|max:155',
-                            //'fornecedor_id' => 'required|max:5',
+                            'origem' => 'required|max:5',
+                            'cest' => 'required|max:15',
+                            'ncm' => 'required|max:15',
                             'categoria_id' => 'required|max:5',
                     ];
 
@@ -141,7 +146,9 @@ class ProdutoController extends Controller
                 $rules = [
                             'codigo_produto' => 'required|max:15|unique:'.$this->produto->table.',codigo_produto,'. $this->request->input("id"),
                             'descricao' => 'required|max:155',
-                            //'fornecedor_id' => 'required|max:5',
+                            'origem' => 'required|max:5',
+                            'cest' => 'required|max:15',
+                            'ncm' => 'required|max:15',
                             'categoria_id' => 'required|max:5',
                         ];
             }
@@ -153,7 +160,9 @@ class ProdutoController extends Controller
                 'codigo_produto.max'=> 'Código do produto deve ser menos que 15 caracteres!',
                 'descricao.required'=> 'Descrição do produto é obrigatório!',
                 'descricao.max'=> 'Descrição limtado a 155 caracteres!',
-               // 'fornecedor_id.required'=> 'O Fornecedor é obrigatório!',
+                'origem.required'=> 'A origem é obrigatório!',
+                'cest.required'=> 'O cest é obrigatório!',
+                'ncm.required'=> 'O ncm é obrigatório!',
                 'categoria_id.required'=> 'A Categoria é obrigatória!',
            //     'cor_id.required'=> 'A Cor é obrigatória!'
             ]);
@@ -168,7 +177,9 @@ class ProdutoController extends Controller
             $data["codigo_produto"] = $this->request->input("codigo_produto");
             $data["descricao"] = $this->request->input("descricao");
             $data["status"] = $this->request->input("status");
-           // $data["fornecedor_id"] = $this->request->input("fornecedor_id");
+            $data["origem"] = $this->request->input("origem");
+            $data["ncm"] = $this->request->input("ncm");
+            $data["cest"] = $this->request->input("cest");
             $data["categoria_id"] = $this->request->input("categoria_id");
             $data["cor_id"] = 1;
 
@@ -224,11 +235,11 @@ class ProdutoController extends Controller
                 /***
                     Salva as alterações do produto para controle de contas à pagar
                  */
-                $produtoControle = new ProdutoControle();
-                $produtoControle->products_variation_id = $controle->id;
-                $produtoControle->valor_custo = $controle->valor_produto;
-                $produtoControle->quantidade = $controle->quantidade;
-                $produtoControle->save();
+               // $produtoControle = new ProdutoControle();
+                //$produtoControle->products_variation_id = $controle->id;
+               //$produtoControle->valor_custo = $controle->valor_produto;
+                //$produtoControle->quantidade = $controle->quantidade;
+                //$produtoControle->save();
 
                 /**
                  * UPLOAD DE IMAGENS
