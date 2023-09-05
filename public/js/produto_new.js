@@ -1,13 +1,13 @@
 $(function() {
     let json,id,grid,table;
-    
+
     const fileInput = document.getElementById('file');
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
     const url = fncUrl();
-    
+
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
@@ -46,6 +46,11 @@ $(function() {
             { "data": "codigo_produto", "defaultContent": "" },
             { "data": "descricao", "defaultContent":""},
             { "data": "categoria" , "defaultContent": ""},
+            { "data": "status" ,
+                render: function ( data, type, row ) {
+                    return "<span class=\"badge bg-success\">"+row.status+"</span>";
+                }
+            },
             { "data": "created", "defaultContent": "" },
             { "data": "updated" , "defaultContent": ""},
             {"data": "defaultContent",
@@ -161,7 +166,7 @@ $(function() {
                             }
                         },
                         error: function (response) {
-                            json = $jQuery.parseJSON(response.responseText);
+                            json = $.parseJSON(response.responseText);
                             $("#modal-title").addClass("alert alert-danger");
                             $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
                             Swal.fire(
@@ -212,7 +217,7 @@ $(function() {
     /***
      * Salva imagem
      * */
-    
+
     $(".formImage").on('submit',function (event) {
         event.preventDefault();
 
@@ -262,7 +267,7 @@ $(function() {
                         }
                     },
                     error: function (response) {
-                        json = $jQuery.parseJSON(response.responseText);
+                        json = $.parseJSON(response.responseText);
                         $("#modal-title").addClass("alert alert-danger");
                         $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
                         Swal.fire(
@@ -272,7 +277,7 @@ $(function() {
                         )
                     },
                     complete:function(response){
-                        json = $jQuery.parseJSON(response.responseText);
+                        json = $.parseJSON(response.responseText);
                         if(json.success) {
                             window.setTimeout(function () {
                                 $('#divModalImage').modal('hide');
@@ -530,7 +535,7 @@ $(function() {
                 $("#pictures").html(grid);
             },
             error:function(response){
-                json = $jQuery.parseJSON(response.responseText);
+                json = $.parseJSON(response.responseText);
                 $("#modal-title").addClass( "alert alert-danger" );
                 $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
                 Swal.fire(
@@ -593,7 +598,7 @@ $(function() {
                         table.ajax.reload(null, false);
                     },
                     error: function (response) {
-                        json = $jQuery.parseJSON(response.responseText);
+                        json = $.parseJSON(response.responseText);
                         Swal.fire(
                             'error!',
                             json.message,
@@ -601,7 +606,7 @@ $(function() {
                         )
                     },
                     complete:function(response){
-                        json = $jQuery.parseJSON(response.responseText);
+                        json = $.parseJSON(response.responseText);
                         if(json.success) {
                             window.setTimeout(function () {
                                 $('#divModalImage').modal('hide');
@@ -622,7 +627,7 @@ $(function() {
         const selectedFile = fileInput.files[0];
 
         document.getElementById('arquivo').value = selectedFile.name;
-    } 
+    }
 
     /**
      * Ao clicar em Adiconar Variação, faz append dos campos na div
@@ -855,7 +860,7 @@ $(function() {
             });
     });
 
-    
+
     /**************************************
      ******* FUNÇÕES ONLAOD SISTEMA *******
      **************************************

@@ -200,11 +200,11 @@ $(function() {
        // console.log(data);
        const date = new Date();
        const dia = date.getDate() > 10 ? date.getDate() : "0"+date.getDate();
-       const mesCorrente = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()+1); 
-       const mesPassado = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()-1); 
+       const mesCorrente = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()+1);
+       const mesPassado = date.getMonth() > 10 ? date.getMonth() + 1 : "0"+(date.getMonth()-1);
        const ano = date.getFullYear();
-       
-      $(".card-header").html("<i class=\"fas fa-table me-1\"></i> Mais Vendidos - Período de " + dia +"/"+mesCorrente+"/"+ano +" à " + dia +"/"+mesPassado+"/"+ano);
+
+        $(".card-header").html("<i class=\"fas fa-table me-1\"></i> Mais Vendidos - Período de " + dia +"/"+mesPassado+"/"+ano +" à " + dia +"/"+mesCorrente+"/"+ano);
         $('#datatable').DataTable().destroy();
         table = await $('#datatable').DataTable({
             "ajax":{
@@ -345,7 +345,7 @@ $(function() {
      * */
    // fncDataCards(yearMonth,false).then();
    fncTable(yearMonth);
-   
+
 
     /**
      * #########################################################################
@@ -398,7 +398,7 @@ $(function() {
     /**
      * Retonar ao mês corrente
      * */
-    $(".btn-limpar").on( "click", function() { 
+    $(".btn-limpar").on( "click", function() {
         $('input[name=mes_ano]').val("");
         $('.btn-limpar').html('<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Aguarde...');
         fncDataCards(yearMonth,true).then();

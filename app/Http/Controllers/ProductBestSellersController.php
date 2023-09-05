@@ -29,7 +29,7 @@ class ProductBestSellersController extends Controller
         $this->cat = $cat;
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
     }
- 
+
     /**
      * @OA\Get(
      *     tags={"ProductBestSellers "},
@@ -254,9 +254,10 @@ class ProductBestSellersController extends Controller
                     "lpv.quantidade",
                     "lpv.estoque",
                     DB::raw("sum(loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade) as valor_produto_total"),
-                    DB::raw("sum(loja_vendas_produtos.quantidade) as qtd_tot_mes"),
+                    DB::raw("sum(loja_vendas_produtos.quantidade) as qtd_tot_mes")
                 )
-                ->where(DB::raw('DATE_FORMAT(loja_vendas_produtos.created_at, "%Y-%m")'),$date)
+                ->where(DB::raw('DATE_FORMAT(loja_vendas_produtos.created_at, "%Y-%m")'),Carbon::now()->subDays(30)->format("Y-m"))
+                ->where(array('lpv.status' => 1, 'pn.status' => 1)) //somente ativos
                 ->whereNotIn("loja_vendas_produtos.troca", [1])
                 ->groupBy("loja_vendas_produtos.codigo_produto","loja_vendas_produtos.descricao","lpv.quantidade","lpv.estoque")
                 //->orderBy("qtd_tot_mes","desc")
@@ -274,7 +275,7 @@ class ProductBestSellersController extends Controller
                     ->where('codigo_produto' , $value->codigo_produto)
                     ->groupBy('codigo_produto')
                     ->first();
-                   
+
 
                     $responseArray[$key]['falta_comprar'] = (round($medias->qtd_media) - $value->estoque - $value->quantidade < 0)
                                                                 ? 0

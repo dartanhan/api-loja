@@ -82,9 +82,11 @@ class ProdutoController extends Controller
                     'loja_produtos_new.codigo_produto',
                     'loja_produtos_new.descricao',
                     'loja_categorias.nome as categoria',
-                    'loja_produtos_new.status',
+                    (DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status')),
                     (DB::raw("DATE_FORMAT(loja_produtos_new.created_at, '%d/%m/%Y %H:%i:%s') as created")),
                     (DB::raw("DATE_FORMAT(loja_produtos_new.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
+
+
                     /*(DB::raw("FORMAT(loja_produtos_variacao.valor_varejo, 2) as valor_varejo")),
 
                     'loja_produtos_variacao.valor_atacado',
@@ -106,6 +108,7 @@ class ProdutoController extends Controller
                     'loja_categorias.id as categoria_id'*/
 
                 )->where('block',0)
+                ->where('loja_produtos_new.status',1) //somente ativos
                 ->orderBy('loja_produtos_new.id', 'DESC')
                 ->get();
 
