@@ -117,6 +117,7 @@ $(function() {
                                     "<th>ATA.10UN</th>" +
                                     "<th>VAL.LISTA</th>" +
                                     "<th>PRODUTO</th>" +
+                                    "<th>STATUS</th>" +
                                     "<th>AÇÃO</th>" +
                                 "</tr>" +
                             "</thead>";
@@ -130,7 +131,7 @@ $(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                            // console.log(response.data.products);
+                             console.log(response.data.products);
                             if (response.success) {
                                 let arrayProducts = JSON.stringify(response.data.products);
 
@@ -152,6 +153,7 @@ $(function() {
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_lista) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
+                                        "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image btnImageProduct\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                         "               title='Imagens Produto' data-bs-toggle=\"modal\" " +

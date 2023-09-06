@@ -4,6 +4,7 @@ namespace App\Http\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @method static create($data)
@@ -20,6 +21,10 @@ class Produto extends Model
     function products() {
         return  $this->hasMany(ProdutoVariation::class,'products_id', 'id')
             ->leftJoin('loja_produtos_imagens', 'loja_produtos_variacao.id', '=', 'loja_produtos_imagens.produto_variacao_id')
-            ->select("loja_produtos_variacao.*","loja_produtos_imagens.path","loja_produtos_imagens.id as id_image","loja_produtos_imagens.produto_variacao_id");
+            ->where('loja_produtos_variacao.status', 1)
+            ->select("loja_produtos_variacao.*",
+                            "loja_produtos_imagens.path","loja_produtos_imagens.id as id_image",
+                            "loja_produtos_imagens.produto_variacao_id",
+                            (DB::raw('IF((loja_produtos_variacao.status = 1), "ATIVO", "INATIVO") as status')));
     }
 }
