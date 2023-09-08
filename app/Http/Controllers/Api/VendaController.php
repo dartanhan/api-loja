@@ -83,12 +83,12 @@ class VendaController extends Controller
                 ->where('loja_produtos_variacao.subcodigo', '=', $codigo_produto)->first();
 
             if ($variations) {
-                if ($variations->quantidade == 0) {
-                    return Response::json(array('success' => false, 'message' => 'Produto sem estoque para venda!'),
+                if ($variations->status == 0) {
+                    return Response::json(array('success' => false, 'message' => 'Produto Inativado para Venda!'),
                         201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                } else if ($variations->status == 0) {
-                    return Response::json(array('success' => false, 'message' => 'Produto Bloqueado para venda!'),
-                        201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                }else if ($variations->quantidade == 0) {
+                    return Response::json(array('success' => false, 'message' => 'Produto sem Eestoque para Venda!'),
+                       201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
 
                 $products = DB::table('loja_produtos_new')->where('loja_produtos_new.id', '=', $variations->products_id)->first();
