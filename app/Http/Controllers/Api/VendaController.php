@@ -87,7 +87,7 @@ class VendaController extends Controller
                     return Response::json(array('success' => false, 'message' => 'Produto Inativado para Venda!'),
                         201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }else if ($variations->quantidade == 0) {
-                    return Response::json(array('success' => false, 'message' => 'Produto sem Eestoque para Venda!'),
+                    return Response::json(array('success' => false, 'message' => 'Produto sem Estoque para Venda!'),
                        201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
                 }
 
@@ -123,7 +123,7 @@ class VendaController extends Controller
 
                         $storage = $this->request->getHttpHost() === 'administracao.knesmalteria.com.br' ?
                                                                     'https://'.$this->request->getHttpHost()."/public/storage/"  :
-                                                                    'http://'.$this->request->getHttpHost()."/api-loja/public/storage/"  ;
+                                                                    'http://'.$this->request->getHttpHost()."/api-loja-new-git/public/storage/"  ;
 
                         $result =  Storage::exists($variations->path);
 
@@ -228,6 +228,7 @@ class VendaController extends Controller
         DB::beginTransaction();
         try {
             $dados  = $this->request->all();
+
             $affected = "";
 
             // Convert JSON string to Array
@@ -235,9 +236,10 @@ class VendaController extends Controller
 
             //Salvo a venda
             $sale = $this->vendas->create(["codigo_venda" =>  $dados["codigo_venda"],
-                                           "loja_id" =>  2,//$dados["loja_id"],
+                                           "loja_id" =>  $dados["loja_id"],
                                            "valor_total" =>  $dados["valor_total"],
-                                            "id_cliente" =>  $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
+                                            "usuario_id" =>  isset($dados["usuario_id"]) ? $dados["usuario_id"] : 3,
+                                            "cliente_id" =>  $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
                                             "tipo_venda_id" => $dados["tipoEntregaCliente"]]);
 
             //Pega o total de produtos no array
@@ -339,11 +341,11 @@ class VendaController extends Controller
                     ->update(['loja_produtos_quantidade.quantidade' => $qtd]);*/
             }
             //Salva valor cashback
-            if($sale->id_cliente) {
+            if($sale->cliente_id) {
                 //Se tiver valor de cashback, entendo que foi usado, seta status true
                 if ($dados["clienteModel"]["cashback"] > 0){
                     DB::table('loja_vendas_cashback')
-                        ->where('cliente_id', '=',$sale->id_cliente)
+                        ->where('cliente_id', '=',$sale->cliente_id)
                         ->update(['status' => 1]);
                 }
 
@@ -357,20 +359,20 @@ class VendaController extends Controller
                 $valor_cashback = ($sale->valor_total * $taxa) / 100;
 
                 $this->cashbackVendas = new VendasCashBack();
-                $this->cashbackVendas->cliente_id = $sale->id_cliente;
+                $this->cashbackVendas->cliente_id = $sale->cliente_id;
                 $this->cashbackVendas->venda_id = $sale->id;
                 $this->cashbackVendas->valor = $valor_cashback;
                 $this->cashbackVendas->save();
 
                 //Pega total cashback do cliente pelo ID
-                //$cashBackTotal = $this->cashbackVendas::where('cliente_id', $sale->id_cliente)->where('status', 0)->sum('valor');
+                //$cashBackTotal = $this->cashbackVendas::where('cliente_id', $sale->cliente_id)->where('status', 0)->sum('valor');
 
                 //Monta estrutura para salvar o valor total do cashback
-                //$data["cliente_id"] = $sale->id_cliente;
+                //$data["cliente_id"] = $sale->cliente_id;
                 //$data["valor_total"] = $cashBackTotal;
 
                 //Se tiver atualiza, caso não cria
-                //$matchThese = array('cliente_id' => $sale->id_cliente);
+                //$matchThese = array('cliente_id' => $sale->cliente_id);
                 //$this->cashBackValor::updateOrCreate($matchThese, $data);
 
             }

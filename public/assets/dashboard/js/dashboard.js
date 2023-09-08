@@ -4,7 +4,7 @@ $(function () {
     Chart.defaults.global.defaultFontColor = '#292b2c';
 
     const url = fncUrl();
-    
+
     let table;
     let total = "";
     let labels = [];
@@ -348,26 +348,6 @@ $(function () {
      * */
 
     let fncDataDatatable = async function(dataOne, dataTwo) {
-        /*   fetch(url + "/relatorio/dailySalesList", {
-              headers: {
-                  "Content-Type": "application/json; charset=UTF-8",
-                  "Accept": "application/json",
-                  "X-Requested-With": "XMLHttpRequest",
-                  "X-CSRF-Token": $("meta[name='csrf-token']").attr("content")
-              },
-              method: 'POST',
-              body: JSON.stringify({
-                  dataOne: dataOne,
-                  dataTwo: dataTwo,
-                  id: fncIdStore()
-              }),
-
-          })
-              .then(function (response) {
-                  //  console.log(response);
-                  return response.json()
-              })
-              .then(function (response) {*/
 
         $('#datatablesSimple').DataTable().destroy();
         await $('#datatablesSimple').DataTable({
@@ -383,6 +363,7 @@ $(function () {
             },
             "columns": [
                 {"data": "codigo_venda"},
+                {"data": "usuario"},
                 {"data": "nome_pgto"},
                 {
                     "data": "sub_total",
@@ -421,12 +402,11 @@ $(function () {
                 }
             ],
             language: {
-                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+                "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[5, "desc"]]
+            "order": [[6, "desc"]]
 
         });//fim datatables
-        // });
     }
 
     /**

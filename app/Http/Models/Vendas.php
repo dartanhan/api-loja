@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Vendas extends Model
 {
     public $table = 'loja_vendas';
-    protected $fillable = ['codigo_venda','loja_id','valor_total','troca','id_cliente','tipo_venda_id','created_at','created_at'];
+    protected $fillable = ['codigo_venda','loja_id','valor_total','troca','cliente_id','tipo_venda_id','usuario_id','created_at','created_at'];
 
     function vendas() {
         return  $this->hasMany('App\Http\Models\VendasProdutos');

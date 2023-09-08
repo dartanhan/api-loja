@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Usuario extends Model
 {
     public $table = 'loja_usuarios';
-    protected $fillable = ['nome','login','senha','status','admin','loja_id','sexo'];
+    protected $fillable = ['id','nome','login','senha','status','admin','loja_id','sexo'];
 
 }

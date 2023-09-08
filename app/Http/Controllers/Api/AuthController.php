@@ -18,7 +18,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
  *     "email": "dartanhan.lima@gmail.com"
  *   }
  * )
- * 
+ *
  */
 class AuthController extends Controller
 {

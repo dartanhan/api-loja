@@ -163,8 +163,7 @@
         </div>
         <div class="card mb-4">
             <div class="card-header">
-                <i class="fas fa-table me-1"></i>
-                Vendas no dia
+                <i class="fas fa-table me-1"></i>Vendas no dia
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -172,6 +171,7 @@
                         <thead class="text-center">
                         <tr>
                             <th data-sortable="true">Venda</th>
+                            <th data-sortable="false" style="width: 100px">Vendedor</th>
                             <th data-sortable="true">Forma Pagamento</th>
                             <th data-sortable="true">Sub Total</th>
                             <th data-sortable="true">Desconto</th>

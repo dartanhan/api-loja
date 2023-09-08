@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Cashback extends Model
 {
     public $table = 'loja_cashback';
-    protected $fillable = ['taxa','valor','created_at','updated_at'];
+    protected $fillable = ['taxa','valor','status','created_at','updated_at'];
    // protected $dates = ['created_at','updated_at'];
 
     //data formatada d/m/Y H:i:s

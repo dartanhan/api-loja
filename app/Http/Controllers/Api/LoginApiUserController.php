@@ -70,6 +70,7 @@ class LoginApiUserController extends Controller
                     if(Hash::check($this->request->input('password'), $this->usuario[0]->senha)){
                         if($this->usuario[0]->status === 1){
 
+                            $data['id'] = $this->usuario[0]->id;
                             $data['login'] = $this->usuario[0]->login;
                             $data['nome'] = $this->usuario[0]->nome;
                             $data['sexo'] = $this->usuario[0]->sexo;

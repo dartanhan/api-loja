@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 
 class CashBackController extends Controller
@@ -53,7 +54,7 @@ class CashBackController extends Controller
      *         description="The data"
      *     )
      * )
-     
+
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -73,7 +74,7 @@ class CashBackController extends Controller
      *         description="The data"
      *     )
      * )
-     
+
      * Display the specified resource.
      *
      * @param $param
@@ -81,20 +82,24 @@ class CashBackController extends Controller
      */
     public function show($param)
     {
+        try{
+            // $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->where( 'status', 1)->sum('valor');
+            $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->sum('valor');
 
-        $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->where( 'status', 0)->sum('valor');
+            $this->vendasCashBackModel = new VendasCashBack();
 
-        $this->vendasCashBackModel = new VendasCashBack();
+            $this->vendasCashBackModel->cliente_id = $param;
+            $this->vendasCashBackModel->valor_total = $cashBackTotal;
 
-        $this->vendasCashBackModel->cliente_id = $param;
-        $this->vendasCashBackModel->valor_total = $cashBackTotal;
-
-        if ($this->vendasCashBackModel) {
-            return Response::json($this->vendasCashBackModel, 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            if ($this->vendasCashBackModel) {
+                return Response::json($this->vendasCashBackModel, 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }
+        }catch (Throwable $th){
+            return Response::json(array("success" => false , 'message' => $th->getMessage()), 500, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
     }
-   
+
 
     /**
      * @OA\Put(

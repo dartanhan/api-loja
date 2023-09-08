@@ -556,6 +556,7 @@ class RelatorioController extends Controller
     }
 
     /**
+     * Retona as vendas diárias
      * @return JsonResponse
      */
     public function dailySalesList()
@@ -584,6 +585,8 @@ class RelatorioController extends Controller
                 "loja_lojas.nome as loja",
                 "loja_vendas.codigo_venda",
                 "loja_vendas.id as venda_id",
+                "loja_vendas.usuario_id as usuario_id",
+                "loja_usuarios.nome",
                 "loja_vendas_produtos_descontos.valor_desconto",
                 (DB::raw(("loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"))),
                 "loja_forma_pagamentos.nome as nome_pgto",
@@ -592,6 +595,7 @@ class RelatorioController extends Controller
                 ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
                 ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
+                ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'loja_vendas.usuario_id')
                 ->where('loja_vendas.loja_id', $this->request->id)
                //  ->whereDate('loja_vendas.created_at', Carbon::today())
                // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('1'))
@@ -614,6 +618,7 @@ class RelatorioController extends Controller
                 $data['sub_total'] =  $listSale->sub_total;
                 $data['nome_pgto'] =  $this->formName($listSale->venda_id);//$listSale->nome_pgto;
                 $data['id_pgto'] =  $listSale->id_pgto;
+                $data['usuario'] =  ($listSale->usuario_id == "") ? 'Karla' : $listSale->nome;
 
                 $return[] = $data;
             }
