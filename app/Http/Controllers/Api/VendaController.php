@@ -121,7 +121,7 @@ class VendaController extends Controller
                         $data['path'] = $variations->path;
 
 
-                        $storage = $this->request->getHttpHost() === 'administracao.knesmalteria.com.br' ?
+                        $storage = $this->request->getHttpHost() === 'administracao3.knesmalteria.com.br' ?
                                                                     'https://'.$this->request->getHttpHost()."/public/storage/"  :
                                                                     'http://'.$this->request->getHttpHost()."/api-loja-new-git/public/storage/"  ;
 
