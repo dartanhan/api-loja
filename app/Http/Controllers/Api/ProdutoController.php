@@ -60,7 +60,7 @@ class ProdutoController extends Controller
                         "loja_produtos_variacao.valor_varejo",
                         "loja_produtos_variacao.valor_atacado",
                         "loja_produtos_variacao.quantidade")
-                ->where('loja_produtos_new.status',1)
+                ->where('loja_produtos_variacao.status',1)
                 ->get();
 
             if($product){
