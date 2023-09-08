@@ -1,5 +1,5 @@
 $(function() {
-    let json,id,grid,table;
+    let json,id,grid,table,asyncData;
 
     const fileInput = document.getElementById('file');
 
@@ -23,65 +23,74 @@ $(function() {
     /**
      * DATATABLES
      * */
-
-     table = $('#table').DataTable({
-        "ajax":{
-            "method": 'get',
-            "processing": true,
-            "serverSide": true,
-            "url": url + "/produto/create",
-            "data":'',
-            "dataSrc":"",
-            cache: false,
-        },
-
-        "columns": [
-            {
-                "className":      'details-control',
-                "orderable":      false,
-                "data":           null,
-                "defaultContent": ''
-            },
-            { "data" : "id", "defaultContent": ""},
-            { "data": "codigo_produto", "defaultContent": "" },
-            { "data": "descricao", "defaultContent":""},
-            { "data": "categoria" , "defaultContent": ""},
-            { "data": "status" ,
-                render: function ( data, type, row ) {
-                    return "<span class=\"badge bg-success\">"+row.status+"</span>";
+    function getdata(){
+        const getDados = async () => {
+            const data = await fetch(url + "/produto/create", {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
                 }
-            },
-            { "data": "created", "defaultContent": "" },
-            { "data": "updated" , "defaultContent": ""},
-            {"data": "defaultContent",
-                render: function ( data, type, row ) {
-                    return "<div class='text-center'>" +
-                                "<div class='btn-group'>" +
-                                    "<i class=\"bi-pencil-square btnUpdateProduct\" " +
-                                    "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                    "               title='Atualizar Produto' data-id=\""+row.id+"\">" +
-                                    "</i>&nbsp;"+
-                                "</div>" +
+            });
+
+            asyncData = await data.json();
+            initialiseTable();
+            return asyncData;
+        };
+        getDados();
+    }
+    function initialiseTable() {
+        table = $('#table').DataTable({
+            data:asyncData,
+            "columns": [
+                {
+                    "className": 'details-control',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": ''
+                },
+                {"data": "id", "defaultContent": ""},
+                {"data": "codigo_produto", "defaultContent": ""},
+                {"data": "descricao", "defaultContent": ""},
+                {"data": "categoria", "defaultContent": ""},
+                {
+                    "data": "status",
+                    render: function (data, type, row) {
+                        return "<span class=\"badge bg-success\">" + row.status + "</span>";
+                    }
+                },
+                {"data": "created", "defaultContent": ""},
+                {"data": "updated", "defaultContent": ""},
+                {
+                    "data": "defaultContent",
+                    render: function (data, type, row) {
+                        return "<div class='text-center'>" +
+                            "<div class='btn-group'>" +
+                            "<i class=\"bi-pencil-square btnUpdateProduct\" " +
+                            "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                            "               title='Atualizar Produto' data-id=\"" + row.id + "\">" +
+                            "</i>&nbsp;" +
+                            "</div>" +
                             "</div>";
+                    }
                 }
-            }
 
-        ],
-        scrollX:true,
-        select: false,
-        "columnDefs": [
-            {
-                "targets": [  ],
-                "visible": false,
-                "searchable":false
-            }
-        ],
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
-        },
-        "order": [[ 0, "desc" ]],
-        //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
-    });
+            ],
+            scrollX: true,
+            select: false,
+            "columnDefs": [
+                {
+                    "targets": [],
+                    "visible": false,
+                    "searchable": false
+                }
+            ],
+            language: {
+                "url": "../public/Portuguese-Brasil.json"
+            },
+            "order": [[0, "desc"]],
+            //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
+        });
+    }
 
     /**
      * Add event listener for opening and closing details
@@ -101,7 +110,6 @@ $(function() {
             // Open this row
            // row.child( format(row.data()) ).show();
             tr.addClass('shown');
-            //console.log("abriu.." + row.data().id);
 
             let tmpRow  ="<table class='table table-striped table-condensed'>" +
                             "<thead class=\"text-center\">" +
@@ -131,7 +139,7 @@ $(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                             console.log(response.data.products);
+                           //  console.log(response.data.products);
                             if (response.success) {
                                 let arrayProducts = JSON.stringify(response.data.products);
 
@@ -198,10 +206,7 @@ $(function() {
             cache: false,
             dataType:'json',
             success: function(response){
-                //console.log(response);
-                //$('#product_code').val(response);
                 if(response.success === true){
-                    //console.log(response);
                     $('#codigo_produto').val(response.data);
                     $('#codigo_produto').trigger("focus");
 
@@ -238,7 +243,7 @@ $(function() {
         }, submitHandler:  function(form,event) {
             event.preventDefault();
 
-                let formData = new FormData($(formImage)[0]);
+                let formData = new FormData($(form)[0]);
 
                 $.ajax({
                     url: url + "/image",
@@ -256,7 +261,7 @@ $(function() {
                         //$('#load').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
                     },
                     success:  function (response) {
-                        // console.log(response);
+
                         if (response.success) {
                             Swal.fire({
                                 title: "Sucesso!",
@@ -265,7 +270,9 @@ $(function() {
                                 showConfirmButton: false,
                                 timer: 1500
                             });
-                            table.ajax.reload(null, false);
+                            //table.ajax.reload(null, false);
+                            table.destroy();
+                            getdata();
                         }
                     },
                     error: function (response) {
@@ -577,7 +584,9 @@ $(function() {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        table.ajax.reload(null, false);
+                        //table.ajax.reload(null, false);
+                        table.destroy();
+                        getdata();
                     },
                     error: function (response) {
                         json = $.parseJSON(response.responseText);
@@ -867,7 +876,9 @@ $(function() {
                         showConfirmButton: false,
                         timer: 1500
                     });
-                    table.ajax.reload(null, false);
+                    //.ajax.reload(null, false);
+                    table.destroy();
+                    getdata();
 
                     $("#id").val('');
                     $("#tbl").html('');
@@ -900,6 +911,7 @@ $(function() {
      ******* FUNÇÕES ONLAOD SISTEMA *******
      **************************************
      * */
+     getdata();
      code();
      //fnc_preview();
      $('#data_validade input').datepicker({
@@ -922,8 +934,6 @@ $(function() {
  *  Formatting function for row details - modify as you need
  */
     function format ( d ) {
-        // `d` is the original data object for the row
-        //console.log(d);
 
         return '<table class="table table-striped table-condensed">'+
             '<tr>'+
@@ -969,8 +979,6 @@ $(function() {
      * OnkeyPress
      * */
     function formatMoneyPress(parm) {
-        //  console.log(parm.value);
-        //  var elemento = document.getElementById(el);
         let valor = parm.value;
 
         valor = valor + '';
@@ -1007,7 +1015,6 @@ $(function() {
  * REMOVE OS INPUTS DINAMICOS DAS VARIAÇÕES
  * */
     function removeCampo(parm) {
-        //console.log("campo remove " + parm);
         document.getElementById(parm).remove();
     }
 
@@ -1015,7 +1022,6 @@ $(function() {
      * Formata data de yyyy/mm/dd para dd/mm/yyyy
      * */
     function getFormattedDate(parm) {
-        //console.log(parm);
         let d = parm.split('-');
         return  d[2] + '/' + d[1] + '/' + d[0];
     }
