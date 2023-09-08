@@ -180,7 +180,7 @@ class ProdutoController extends Controller
             $data["codigo_produto"] = $this->request->input("codigo_produto");
             $data["descricao"] = $this->request->input("descricao");
             $data["status"] = $this->request->input("status");
-            $data["origem"] = $this->request->input("origem");
+            $data["origem_id"] = $this->request->input("origem");
             $data["ncm"] = $this->request->input("ncm");
             $data["cest"] = $this->request->input("cest");
             $data["categoria_id"] = $this->request->input("categoria_id");
@@ -298,14 +298,14 @@ class ProdutoController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Retorna os produtos inativos
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return void
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -313,11 +313,20 @@ class ProdutoController extends Controller
      *
      * @param Request $request
      * @param int $id
-     * @return void
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        try {
+            $produto =  $this->produto->find($id);
+            $produto->status = 1;
+            $produto->update(); // Salve as alterações no banco de dados
+
+            return Response::json(array('success' => true, "message" => 'Produto ativado com sucesso!'), 200);
+
+        } catch (Throwable $e) {
+            return Response::json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -354,9 +363,11 @@ class ProdutoController extends Controller
      */
     public function getProducts(int $id){
         try {
+
             $ret =  $this->produto::with('products')
-                ->select("id","codigo_produto","descricao","status","block","fornecedor_id","categoria_id")
+                ->select("id","codigo_produto","descricao","status","block","fornecedor_id","categoria_id","ncm",'cest',"origem_id")
                 ->where('id',$id)->first();
+
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 500);
@@ -364,9 +375,5 @@ class ProdutoController extends Controller
         return Response::json(array('success' => true, "data" => $ret), 200);
     }
 
-    public function teste(){
-        $user_data = Usuario::where("user_id",auth()->user()->id)->first();
 
-        return view('admin.teste', compact('user_data'));
-    }
 }

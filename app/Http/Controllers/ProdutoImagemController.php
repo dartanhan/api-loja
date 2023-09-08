@@ -51,7 +51,7 @@ class ProdutoImagemController extends Controller
      */
     public function store()
     {
-         //dd($this->request->all());
+        // dd($this->request->all());
         //dd($this->request->allFiles()['images'][0]);
 
         try {
@@ -73,7 +73,7 @@ class ProdutoImagemController extends Controller
 
                 File::makeDirectory($path , 0775, true, true);
                 $image_resize = Image::make($file->path());
-                $image_resize->resize(350,3550)->save($path .'/'.$image_name);
+                $image_resize->resize(350,350)->save($path .'/'.$image_name);
 
                 $productsImages = new ProdutoImagem();
                 $productsImages->produto_variacao_id = $this->request->products_variation_id;

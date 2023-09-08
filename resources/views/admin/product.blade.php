@@ -76,7 +76,7 @@
                                                 class="form-select format-font" title="Origem do Produto" required>
                                             <option value="" class="select-custom">ORIGEM?</option>
                                             @foreach($origem_nfces as $origem_nfce)
-                                                <option value="{{$origem_nfce->codigo}}" > {{ strtoupper($origem_nfce->codigo)  }} - {{ strtoupper($origem_nfce->descricao)  }}</option>
+                                                <option value="{{$origem_nfce->id}}" > {{ strtoupper($origem_nfce->codigo)  }} - {{ strtoupper($origem_nfce->descricao)  }}</option>
                                             @endforeach
                                         </select>
                                         <label for="label-qtd">ORIGEM DO PRODUTO</label>

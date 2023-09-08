@@ -220,19 +220,19 @@ $(function() {
      * Salva imagem
      * */
 
-    $(".formImage").on('submit',function (event) {
+    $("#formImage").on('submit',function (event) {
         event.preventDefault();
 
     }).validate({
         errorClass: "my-error-class",
         validClass: "my-valid-class",
         rules: {
-            images: {
+            arquivo: {
                 required: true
             }
         },
         messages: {
-            images: {
+            arquivo: {
                 required: "Informe a imagem do Produto?"
             }
         }, submitHandler:  function(form,event) {
@@ -258,7 +258,7 @@ $(function() {
                     success:  function (response) {
                         // console.log(response);
                         if (response.success) {
-                            swalWithBootstrapButtons.fire({
+                            Swal.fire({
                                 title: "Sucesso!",
                                 text: response.message,
                                 icon: 'success',
@@ -289,170 +289,148 @@ $(function() {
                 });
             }
     });
+
+
+
+
     /***
      * Salva o produto
      * **/
+
     $( "#form" ).on( "submit", function( event ) {
         event.preventDefault();
-        }).validate({
-            errorClass: "my-error-class",
-            validClass: "my-valid-class",
-            rules: {
-                codigo_produto: {
-                    required: true
-                },
-                descricao: {
-                    required: true
-                },
-                fornecedor: {
-                    required: false
-                },
-                categoria: {
-                    required: true
-                },
-                subcodigo: {
-                    required: true
-                },
-                variacao0: {
-                    required: true
-                },
-                valor_varejo0: {
-                    required: true
-                },
-                valor_atacado0: {
-                    required: true
-                },
-                valor_produto0: {
-                    required: true
-                },
-                quantidade: {
-                    required: true
-                },
-                validade: {
-                    required: true
-                },
-                origem: {
-                    required: true
-                },
-                ncm: {
-                    required: true
-                },
-                cest: {
-                    required: true
-                }
+    }).validate({
+        errorClass: "my-error-class",
+        validClass: "my-valid-class",
+        rules: {
+            codigo_produto: {
+                required: true
             },
-            messages: {
-                codigo_produto: {
-                    required: "Informe o código do Produto?"
-                },
-                descricao: {
-                    required: "Informe a Descrição do Produto?"
-                },
-                fornecedor: {
-                    required: "Informe o Fornecedor?"
-                },
-                categoria: {
-                    required: "Informe a Categoria?"
-                },
-                subcodigo: {
-                    required: "Informe o subCodigo?"
-                },
-                variacao0: {
-                    required: "Informe a variação?"
-                },
-                valor_varejo0: {
-                    required: "Informe o valor do Varejo?"
-                },
-                valor_atacado0: {
-                    required: "Informe o valor do Atacado?"
-                },
-                valor_produto0: {
-                    required: "Informe o valor Pago?"
-                },
-                quantidade: {
-                    required: "Informe a quantidade do produto?"
-                },
-                validade: {
-                    required: "Informe a data de validade?"
-                },
-                ncm: {
-                    required: "Informe o número NCM do produto?"
-                },
-                cest: {
-                    required: "Informe o número CEST do produto?"
-                }
-            }, submitHandler: function(form,event) {
-                event.preventDefault();
-                let formData = new FormData($(form)[0]);
-
-                $.ajax({
-                    url: url + "/produto",
-                    type: 'POST',
-                    data: formData,
-                    async: false,
-                    cache: false,
-                    contentType: false,
-                    enctype: 'multipart/form-data',
-                    processData: false,
-                    dataType:'json',
-                    beforeSend: function () {
-                        $("#modal-title").removeClass( "alert alert-danger" );
-                        $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
-                        $("#modal-title").addClass( "alert alert-info" );
-                    },
-                    success: function (response) {
-                        // console.log(response);
-                        if(response.success) {
-                            swalWithBootstrapButtons.fire({
-                                title: "Sucesso!",
-                                text: response.message,
-                                icon: 'success',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                            table.ajax.reload(null, false);
-                            //$('form[name="form"]')[0].reset();
-                            //$("#tblVariacao").html('');
-                            //$("#tblVariacao").append(camposformVariacao(0,null,1));
-                            $("#id").val('');
-                            $("#tbl").html('');
-                            $("#tbl").append(fnc_variacao(0,null,1,null,1));
-                            $("#descricao").val('');
-                            $("#fornecedor_id").val('');
-                            $("#categoria_id").val('');
-                            $("#origem").val('');
-                            $("#ncm").val('');
-                            $("#cest").val('');
-                            $('#GerarCodigo').prop('disabled', false);
-                            $('#btnLote').prop('disabled', false);
-                            $('#btnSalvar').html("<i class=\"fas fa-check\"></i> Salvar");
-                            code();
-                        }
-                    },
-                    error: function(response){
-                        json = $.parseJSON(response.responseText);
-                        $("#modal-title").addClass( "alert alert-danger" );
-                        $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
-                        Swal.fire(
-                            'error!',
-                            json.message,
-                            'error'
-                        )
-                    },
-                    /*complete:function(response){
-                        //console.log(metodo  + "ssssss");
-                        json = $.parseJSON(response.responseText);
-                        if(json.success) {
-                            $('#nome').val('');//POG não submit form com pistola
-                            window.setTimeout(function () {
-                                $('#divModal').modal('hide');
-                                //geraCodigo();
-                            }, 1500);
-                        }
-                    }*/
-                });
+            descricao: {
+                required: true
+            },
+            fornecedor: {
+                required: false
+            },
+            categoria: {
+                required: true
+            },
+            subcodigo: {
+                required: true
+            },
+            variacao0: {
+                required: true
+            },
+            valor_varejo0: {
+                required: true
+            },
+            valor_atacado0: {
+                required: true
+            },
+            valor_produto0: {
+                required: true
+            },
+            quantidade: {
+                required: true
+            },
+            validade: {
+                required: true
+            },
+            origem: {
+                required: true
+            },
+            ncm: {
+                required: true
+            },
+            cest: {
+                required: true
             }
+        },
+        messages: {
+            codigo_produto: {
+                required: "Informe o código do Produto?"
+            },
+            descricao: {
+                required: "Informe a Descrição do Produto?"
+            },
+            fornecedor: {
+                required: "Informe o Fornecedor?"
+            },
+            categoria: {
+                required: "Informe a Categoria?"
+            },
+            subcodigo: {
+                required: "Informe o subCodigo?"
+            },
+            variacao0: {
+                required: "Informe a variação?"
+            },
+            valor_varejo0: {
+                required: "Informe o valor do Varejo?"
+            },
+            valor_atacado0: {
+                required: "Informe o valor do Atacado?"
+            },
+            valor_produto0: {
+                required: "Informe o valor Pago?"
+            },
+            quantidade: {
+                required: "Informe a quantidade do produto?"
+            },
+            validade: {
+                required: "Informe a data de validade?"
+            },
+            ncm: {
+                required: "Informe o número NCM do produto?"
+            },
+            cest: {
+                required: "Informe o número CEST do produto?"
+            }
+        }, submitHandler: function(form,event) {
+            event.preventDefault();
+                let formData = "";
+                let update = ($("#id").val() === "") ? false : true;
+
+                if(update){
+                    let selectElements  = document.querySelectorAll('select[name="status_variacao[]"]');
+
+                    let valorSelecionado ="";
+
+                    selectElements.forEach(function(select) {
+                         valorSelecionado = select.value;
+                    });
+                    console.log(selectElements.length + " - " + valorSelecionado);
+
+                    if(selectElements.length === 1 && valorSelecionado === "0"){
+                        Swal.fire({
+                            title: 'Atenção!',
+                            icon: 'question',
+                            text: 'Ao desativar essa última variação, o produto também será desativado!',
+                            showDenyButton: false,
+                            showCancelButton: true,
+                            confirmButtonText: 'Salvar!',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                /***
+                                 * seta o status do produto para INATIVO
+                                 * */
+                                $("#status").val(0);
+
+                                formData = new FormData($(form)[0]);
+                                fnc_enviaForm(formData);
+                            }
+                        })
+                    }else{
+                        formData = new FormData($(form)[0]);
+                        fnc_enviaForm(formData);
+                    }
+                }else{
+                    formData = new FormData($(form)[0]);
+                    fnc_enviaForm(formData);
+                }
+        }
     });
+
 
     /***
      * Editar o produto
@@ -460,22 +438,24 @@ $(function() {
     $("#table").on("click",".btnUpdateProduct" , async function(event){
         event.preventDefault();
         //Linha da datatable clicada + coluna escondida
-        let line = $('#table').DataTable().row($(this).closest("tr")).data();
-
-        id =  parseInt(line['id']);
+        //let line = $('#table').DataTable().row($(this).closest("tr")).data();
+        //id =  parseInt(line['id']);
+        id = $(this).data('id');
 
         await fetch(url + "/produto/getProducts/"+id).then( function (response) {
-           // console.log()
             return response.json()
         }).then( function (response) {
-           // console.log(JSON.stringify(response.data));
+            //console.log(JSON.stringify(response.data));
 
             $('#id').val(response.data.id);
             $('#codigo_produto').val(response.data.codigo_produto);
             $('#descricao').val(response.data.descricao);
             $('#status').val(response.data.status);
-            //$('#fornecedor_id').val(response.data.fornecedor_id);
             $('#categoria_id').val(response.data.categoria_id);
+            $('#ncm').val(response.data.ncm);
+            $('#cest').val(response.data.cest);
+            $('#origem').val(response.data.origem_id);
+
 
             $('#codigo_produto').prop('readonly', true);
             $('#GerarCodigo').prop('disabled', true);
@@ -491,7 +471,7 @@ $(function() {
                 //console.log(index);
 
                 //$("#tblVariacao").append(camposVariacao(arrayProducts));
-                let selected = arrayItem.status === 1 ? '' : 'selected';
+                let selected = arrayItem.status === 'ATIVO' ? '' : 'selected';
 
                 //$("#tblVariacao").append(camposformVariacao(index,arrayItem,selected));
                 $("#tbl").append(fnc_variacao(index,'',index,arrayItem,selected));
@@ -527,7 +507,7 @@ $(function() {
                 if(response.data.length > 0){
                     $.each(response.data, function (idx, value) {
                         grid += "<div class=\"col\">";
-                        grid += "<img src='.,/public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
+                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
                         grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
                         grid += "</div>";
                     });
@@ -590,7 +570,7 @@ $(function() {
                         //console.log(response.message);
                         //table.ajax.reload();
                         //$("#alert-success").html(response.message).fadeIn('slow').fadeOut(3000);
-                        swalWithBootstrapButtons.fire({
+                        Swal.fire({
                             title: "Sucesso!",
                             text: response.message,
                             icon: 'success',
@@ -707,7 +687,6 @@ $(function() {
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
 
 
-
         /**
          * Adiciona o icone de remover do segundo em diante
          * */
@@ -733,7 +712,7 @@ $(function() {
                                 "<div class=\"col-md-2\" style='left: -12px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
-                                            "class=\"form-control format-font format-font\" placeholder=\"VARIAÇÃO\" " +
+                                            "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
                                             "value=\'" + variacao + "\'/>" +
                                         "<label for=\"label-variacao\">VARIAÇÃO</label>"+
                                     "</span>"+
@@ -821,7 +800,7 @@ $(function() {
                                 "<div class=\"col-md-2\" style='padding:unset;left: -4px;width: 78px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<SELECT type=\"text\" name=\"status_variacao[]\"  id=\"status_variacao"+i+"\""+
-                                            "class=\"form-control\" placeholder=\"STATUS\" required/>"+
+                                            "class=\"form-control status_variacao\" placeholder=\"STATUS\" required/>"+
                                             "<option value=\"1\" "+selected+">ATIVO</option>"+
                                             "<option value=\"0\" "+selected+">INATIVO</option>"+
                                             "</select>"+
@@ -862,7 +841,61 @@ $(function() {
             });
     });
 
+    let fnc_enviaForm = function (formData) {
+        $.ajax({
+            url: url + "/produto",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            dataType:'json',
+            beforeSend: function () {
+                $("#modal-title").removeClass( "alert alert-danger" );
+                $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
+                $("#modal-title").addClass( "alert alert-info" );
+            },
+            success: function (response) {
+                // console.log(response);
+                if(response.success) {
+                    Swal.fire({
+                        title: "Sucesso!",
+                        text: response.message,
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    table.ajax.reload(null, false);
 
+                    $("#id").val('');
+                    $("#tbl").html('');
+                    $("#tbl").append(fnc_variacao(0,null,1,null,1));
+                    $("#descricao").val('');
+                    $("#fornecedor_id").val('');
+                    $("#categoria_id").val('');
+                    $("#origem").val('');
+                    $("#ncm").val('');
+                    $("#cest").val('');
+                    $('#GerarCodigo').prop('disabled', false);
+                    $('#btnLote').prop('disabled', false);
+                    $('#btnSalvar').html("<i class=\"fas fa-check\"></i> Salvar");
+                    code();
+                }
+            },
+            error: function(response){
+                json = $.parseJSON(response.responseText);
+                $("#modal-title").addClass( "alert alert-danger" );
+                $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
+                Swal.fire(
+                    'error!',
+                    json.message,
+                    'error'
+                )
+            },
+        });
+    }
     /**************************************
      ******* FUNÇÕES ONLAOD SISTEMA *******
      **************************************

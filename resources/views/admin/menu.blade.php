@@ -8,16 +8,28 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                             Home
                         </a>
-                        
+
                         <a class="nav-link {{ Route::current()->getName() === 'admin.dashboard' ? 'active' : '' }}" href="{{route('admin.dashboard')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        
-                        <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
                             <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
                             Produtos
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
+                                    Produtos Ativos
+                                </a>
+                                <a class="nav-link {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
+                                    Produtos Inativos
+                                </a>
+                            </nav>
+                        </div>
 
                         <div class="sb-sidenav-menu-heading">Interface</div>
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
@@ -52,7 +64,7 @@
                                     <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
                                         Gastos Fixos
                                 </a>
-                                
+
                                 <a class="nav-link {{ Route::current()->getName() === 'tarifa.index' ? 'active' : '' }}" href="{{route('tarifa.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-percent"></i></div>
                                         Tarifas

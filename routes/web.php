@@ -6,6 +6,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PdvController;
 use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SwaggerController;
 
@@ -26,7 +27,7 @@ use Illuminate\Support\Facades\Route;
     Route::get('/', 'AuthController@dashboard')->name('admin');
     Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
-    
+
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
@@ -35,7 +36,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::get('/produto/pictures/{id}',[ProdutoController::class,'pictures'])->name('pictures');
     Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
-    Route::resource('produto','ProdutoController');
+   Route::resource('produto','ProdutoController');
+
+    Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');
+    Route::resource('produtoInativo','ProdutoInativoController');
 
     Route::get('/product/code','ProductController@code')->name('product.code');
     Route::post('/importProduct', 'ProductController@importProduct')->name('import-product');
