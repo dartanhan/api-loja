@@ -35,7 +35,7 @@
                         <tr>
                             <th>Id</th>
                             <th>Categoria</th>
-                            <th>Quantidade</th>
+                            <th>Imagem</th>
                             <th>Status</th>
                             <th>Data Criação</th>
                             <th>Data Atualização</th>
@@ -51,7 +51,7 @@
         <div class="modal fade" id="divModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content ">
-                    <form id="form" name="form" class="needs-validation form-floating" novalidate method="post">
+                    <form id="form" name="form" class="needs-validation form-floating" novalidate method="post" enctype="multipart/form-data">
                         <div class="modal-header ">
                             <div class="alert col-md-11 alert-secondary" role="alert" id="modal-title"></div>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -62,18 +62,18 @@
                                 <input type="hidden" name="metodo" id="metodo">
                                 <div class="modal-body">
                                     <div class="row">
-                                        <div class="col-md-12 mb-3">
+                                        <div class="col-md-8 mb-3">
                                             <input type="text" class="form-control" id="nome" name="nome" title="Nome da Categoria" placeholder="Nome da Categoria">
                                         </div>
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <select class="form-select" id="status" name="status" required>
                                                 <option value="1">Ativo</option>
                                                 <option value="0">Inativo</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-2">
-                                            <input type="number" class="form-control" id="quantidade" name="quantidade" title="Quantidade" placeholder="Quantidade" >
-                                        </div>
+                                    </div>
+                                    <div>
+                                        <input type="file"  id="image" name="image" title="Imagem" placeholder="Imagem" >
                                     </div>
                                 </div>
                         </div>
@@ -91,10 +91,16 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
     <script src="{{URL::asset('js/categoria.js')}}"></script>
+    <script src="{{URL::asset('js/filePond.js')}}"></script>
 @endpush
 @push("styles")
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/DataTables-1.10.18/css/dataTables.bootstrap4.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/dataTableRender.css')}}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
 @endpush

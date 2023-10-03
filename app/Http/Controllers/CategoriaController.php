@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Models\Categoria;
+use App\Http\Models\TemporaryFile;
 use App\Http\Models\Usuario;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -10,6 +11,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Throwable;
@@ -48,7 +50,7 @@ class CategoriaController extends Controller
             foreach ($this->categoria::all() as $value){
                 $data['id'] =  $value->id;
                 $data['nome'] =  $value->nome;
-                $data['quantidade'] =  $value->quantidade;
+                $data['imagem'] =  $value->imagem;
                 $data['status'] =  $value->status == 1 ? "ATIVO" : "INATIVO";
                 $data['created_at'] =  date('d/m/Y H:i:s', strtotime($value->created_at));
                 $data['updated_at'] =  date('d/m/Y H:i:s', strtotime($value->updated_at));
@@ -78,15 +80,14 @@ class CategoriaController extends Controller
             $validator  = Validator::make($this->request->all(),[
                 'nome' => 'required|unique:'.$this->categoria->table.'|max:155',
                 'status' => 'required|max:1',
-                'quantidade' => 'required|max:5'
+                'image' => 'required'
             ],[
                 'nome.unique'  => 'Categoria já cadastrado!',
                 'nome.required'=> 'Categoria é obrigatório!',
                 'nome.max'=> 'Categoria deve ser menos que 155 caracteres!',
                 'status.required'  => 'Status é obrigatório!',
                 'status.max'  => 'Status deve ser 1 caracter!',
-                'quantidade.required'=> 'Quantidade é obrigatório!',
-                'quantidade.max'=> 'Quantidade deve ser menos que 5 caracteres!',
+                'image.required'=> 'Imagem é obrigatório!',
             ]);
 
             if ($validator->fails()) {
@@ -94,9 +95,23 @@ class CategoriaController extends Controller
                 return Response::json(array('success' => false,'message' => $error), 400);
             }
 
-            //OK
-            $this->categoria::create($this->request->all());
 
+            $cat = Categoria::create([
+                'nome' => $this->request->input('nome'),
+                'status' =>  $this->request->input('status')
+            ]);
+
+            $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+
+            if($temp_file){
+                Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$cat->id."/".$temp_file->file);
+
+                Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+                $temp_file->delete();
+            }
+
+            $this->categoria->where('id', $cat->id)
+                ->update(['imagem' => $temp_file->file]);
 
         }catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
@@ -135,7 +150,7 @@ class CategoriaController extends Controller
 
             $validator = Validator::make($this->request->all(), [
                 'nome' => 'required|max:155|unique:' . $this->categoria->table . ',nome,' . $this->request->input('id'),
-                'quantidade' => 'required|max:5',
+                'image' => 'required',
                 'status' => 'required|max:1'
             ],[
                 'nome.unique'  => 'Categoria já cadastrado!',
@@ -143,20 +158,27 @@ class CategoriaController extends Controller
                 'nome.max'=> 'Categoria deve ser menos que 155 caracteres!',
                 'status.required'  => 'Status é obrigatório!',
                 'status.max'  => 'Status deve ser 1 caracter!',
-                'quantidade.required'=> 'Quantidade é obrigatório!',
-                'quantidade.max'=> 'Quantidade deve ser menos que 5 caracteres!',
+                'image.required'=> 'Imagem é obrigatório!'
             ]);
 
             if ($validator->fails()) {
                 $error = $validator->errors()->first();
                 return Response::json(array('success' => false,'message' => $error), 400);
             }
-
-            //OK
             $this->categoria = $this->categoria::find($this->request->input('id'));
 
+            $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+
+            if($temp_file){
+                Storage::deleteDirectory('categorias/'.$this->request->input('id'));
+                Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
+
+                Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+                $temp_file->delete();
+            }
+
             $this->categoria->nome = $this->request->input('nome');
-            $this->categoria->quantidade = $this->request->input('quantidade');
+            $this->categoria->imagem = $temp_file->file;
             $this->categoria->status = $this->request->input('status');
 
             $this->categoria->save();
@@ -182,6 +204,10 @@ class CategoriaController extends Controller
     {
         try{
             $category = $this->categoria::find($id)->delete();
+
+            if(!Storage::deleteDirectory('categorias/'.$id)){
+                return Response::json(array("success" => false, "message" => utf8_encode("Não foi possivel deletar a imagem da categoria id: [ {$id} ]")), 200);
+            }
 
             if(!$category)
                 return Response::json(array("success" => false, "message" => utf8_encode("Categoria não localizado para deleção com o id: [ {$id} ]")), 200);

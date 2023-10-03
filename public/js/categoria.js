@@ -6,7 +6,7 @@ $(document).ready(function() {
     let status,nome,token,json,quantidade,categoria,id;
 
     const urlApi = fncUrl();
-    
+
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
@@ -16,11 +16,11 @@ $(document).ready(function() {
     });
 
     let table  = $('#tableCategorias').DataTable({
-        "createdRow": function(row, data) {
+        /*"createdRow": function(row, data) {
             if (data.status === `INATIVO`) {
                 $(row).addClass('red');
             }
-        },
+        },*/
         "ajax":{
             "method": 'get',
             "url": urlApi + "/categoria/create",
@@ -30,8 +30,20 @@ $(document).ready(function() {
         "columns":[
             {"data": "id"},
             {"data": "nome"},
-            {"data": "quantidade"},
-            {"data": "status"},
+            {"data": "defaultContent",
+                render: function (data, type, row) {
+                    return '<img src="../public/storage/categorias/'+row.id+'/'+ row.imagem + '" class="img-datatable">';
+                }
+            },
+            {"data": "defaultContent",
+                render: function (data, type, row) {
+                    let status = "<span class=\"badge badge-pill badge-success\">"+row.status+"</span>";
+                    if(row.status === "INATIVO"){
+                        status = "<span class=\"badge badge-pill badge-danger\">"+row.status+"</span>";
+                    }
+                    return status;
+                }
+            },
             {"data": "created_at"},
             {"data": "updated_at"},
             {"defaultContent": "<div class='text-center'>" +
@@ -78,7 +90,7 @@ $(document).ready(function() {
         $("#metodo").val('PUT');
         $("#id").val(id);
         $("#nome").val(categoria);
-        $("#quantidade").val(quantidade);
+        //$("#image").val(image);
         $("#status").val(status);
 
         $('#modal-title').html('<p><strong>EDITANDO CATEGORIA</strong></p>');
@@ -95,7 +107,7 @@ $(document).ready(function() {
             nome: {
                 required: true
             },
-            quantidade: {
+            image: {
                 required: true
             }
         },
@@ -103,8 +115,8 @@ $(document).ready(function() {
             nome: {
                 required: "Informe o nome da categoria!!"
             },
-            quantidade: {
-                required: "Informe a quantidade!"
+            image: {
+                required: "Informe a imagem!"
             }
         }, submitHandler: function(form,e) {
          //   console.log('Form submitted');
@@ -165,7 +177,7 @@ $(document).ready(function() {
                         }
                 }
             });
-          return false;
+         //return false;
         }
     });
 

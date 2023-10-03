@@ -9,6 +9,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\SwaggerController;
+use App\Http\Controllers\UploadController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -119,6 +120,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
         return view('admin.usuarios');
     })->name('admin.users');*/
 
+    Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
+    Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
 });
 
 /*Route::resource('/usuario','UserSystemController');

@@ -58,3 +58,8 @@ tr.shown td.details-control {
 table.dataTable tbody td {
     vertical-align: middle;
 }
+.img-datatable{
+    border-radius: 20%;
+    width: 80px;
+    height: 80px;
+}
