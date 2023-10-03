@@ -108,7 +108,7 @@ $(document).ready(function() {
                 required: true
             },
             image: {
-                required: true
+                required: false
             }
         },
         messages: {
@@ -173,6 +173,7 @@ $(document).ready(function() {
                         if(json.success) {
                             window.setTimeout(function () {
                                 $('#divModal').modal('hide');
+                                window.location.reload();
                             }, 1500);
                         }
                 }

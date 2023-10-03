@@ -150,16 +150,13 @@ class CategoriaController extends Controller
 
             $validator = Validator::make($this->request->all(), [
                 'nome' => 'required|max:155|unique:' . $this->categoria->table . ',nome,' . $this->request->input('id'),
-                'image' => 'required',
                 'status' => 'required|max:1'
             ],[
                 'nome.unique'  => 'Categoria já cadastrado!',
                 'nome.required'=> 'Categoria é obrigatório!',
                 'nome.max'=> 'Categoria deve ser menos que 155 caracteres!',
                 'status.required'  => 'Status é obrigatório!',
-                'status.max'  => 'Status deve ser 1 caracter!',
-                'image.required'=> 'Imagem é obrigatório!'
-            ]);
+                'status.max'  => 'Status deve ser 1 caracter!']);
 
             if ($validator->fails()) {
                 $error = $validator->errors()->first();
@@ -167,18 +164,20 @@ class CategoriaController extends Controller
             }
             $this->categoria = $this->categoria::find($this->request->input('id'));
 
-            $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+            if($this->request->image){
+                $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
-            if($temp_file){
-                Storage::deleteDirectory('categorias/'.$this->request->input('id'));
-                Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
+                if($temp_file){
+                    Storage::deleteDirectory('categorias/'.$this->request->input('id'));
+                    Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
 
-                Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
-                $temp_file->delete();
+                    Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+                    $temp_file->delete();
+                }
+                $this->categoria->imagem = $temp_file->file;
             }
 
             $this->categoria->nome = $this->request->input('nome');
-            $this->categoria->imagem = $temp_file->file;
             $this->categoria->status = $this->request->input('status');
 
             $this->categoria->save();
