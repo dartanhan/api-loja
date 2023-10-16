@@ -146,7 +146,7 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
                                                             "<img src='../public/storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
 
                                     tmpRow += "<tr>" +
@@ -838,8 +838,8 @@ $(function() {
 
             swalWithBootstrapButtons.fire({
                 imageUrl:  img[0].currentSrc,
-                imageWidth: 350,
-                imageHeight: 350,
+                imageWidth: 420,
+                imageHeight: 240,
                 showConfirmButton: false,
                 showClass: {
                     popup: 'animate__animated animate__fadeInDown'
