@@ -70,7 +70,7 @@ $(document).ready(function() {
         $("#metodo").val('POST');
         this.blur(); // Manually remove focus from clicked link.
         $('#modal-title').html('<strong>Novo Fornecedor</strong>');
-
+        $("#fornecedor_new").css("display","none");
     });
 
     /**
@@ -90,6 +90,7 @@ $(document).ready(function() {
         $('#modal-title').html('<strong>Editando Fornecedor</strong>');
         $('#fornecedor_new').attr('disabled', true);
         $('#message-alert-update').attr("hidden", "hidden");
+        $("#fornecedor_new").css("display","block");
     });
 
     /****
