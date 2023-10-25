@@ -102,8 +102,8 @@
                                         <th>#</th>
                                         <th data-sortable="true">ID</th>
                                         <th data-sortable="true">Código</th>
-                                        <th data-sortable="true">Produto</th>
                                         <th data-sortable="true">Imagem</th>
+                                        <th data-sortable="true">Produto</th>
                                         <th data-sortable="true">Categoria</th>
                                         <th data-sortable="true">Status</th>
                                         <th data-sortable="true">Criado</th>
