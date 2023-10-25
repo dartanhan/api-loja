@@ -19,8 +19,14 @@
     <script src="{{URL::asset('assets/dashboard/js/scripts.js')}}"></script>
     <script src="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
     <link href="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+
     <script src="{{URL::asset('js/url.js')}}"></script>
-    
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+
     @stack("styles")
 
 </head>

@@ -1,4 +1,4 @@
-const inputElement = document.querySelector('input[type="file"]');
+const inputElement = document.querySelector('input[id="image"]');
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 

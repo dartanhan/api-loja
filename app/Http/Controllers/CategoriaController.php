@@ -76,6 +76,7 @@ class CategoriaController extends Controller
      */
     public function store()
     {
+
         try{
             $validator  = Validator::make($this->request->all(),[
                 'nome' => 'required|unique:'.$this->categoria->table.'|max:155',

@@ -3,9 +3,6 @@ $(function() {
 
     const fileInput = document.getElementById('file');
 
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
     const url = fncUrl();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -50,6 +47,15 @@ $(function() {
                 },
                 {"data": "id", "defaultContent": ""},
                 {"data": "codigo_produto", "defaultContent": ""},
+                {"data": "imagem",
+                    render: function (data, type, row) {
+                        if(row.imagem !== null){
+                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="img-datatable">';
+                        }else{
+                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable">';
+                        }
+                    }
+                },
                 {"data": "descricao", "defaultContent": ""},
                 {"data": "categoria", "defaultContent": ""},
                 {
@@ -64,7 +70,10 @@ $(function() {
                     "data": "defaultContent",
                     render: function (data, type, row) {
                         return "<div class='text-center'>" +
-                            "<div class='btn-group'>" +
+                            "<i class=\"bi-image btnProductImage\" " +
+                            "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                            "               title='Imagem do Produto' data-bs-toggle=\"modal\" " +
+                            "               data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"'></i>"+
                             "<i class=\"bi-pencil-square btnUpdateProduct\" " +
                             "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                             "               title='Atualizar Produto' data-id=\"" + row.id + "\">" +
@@ -164,7 +173,7 @@ $(function() {
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image btnImageProduct\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                        "               title='Imagens Produto' data-bs-toggle=\"modal\" " +
+                                        "               title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
                                         "               data-bs-target=\"#divModalImage\" data-variacao-id='"+arrayItem.id+"' " +
                                         "               data-subcodigo='"+arrayItem.subcodigo+"'>"+
                                         "</td>"+
@@ -220,9 +229,81 @@ $(function() {
     }
     /**  Fim GerarCodigo */
 
+    /***
+     * Salva a imagem no produto PAI
+     * */
+    $('form[name="formImageProduct"]').validate({
+        errorClass: "my-error-class",
+        validClass: "my-valid-class",
+        rules: {
+            image: {
+                required: false
+            }
+        },
+        messages: {
+            image: {
+                required: "Informe a imagem!"
+            }
+        }, submitHandler: function(form,e) {
+             //  console.log('Form submitted');
+            e.preventDefault();
+
+            let metodo = $("#metodo").val();
+            //console.log(metodo);
+
+            $.ajax({
+                type: metodo,
+                url: url + "/image/"+$("#product_id").val(),
+                data:$('form[name="formImageProduct"]').serialize(),
+                dataType:"json",
+                beforeSend: function () {
+                    //$("#modal-title").removeClass( "alert alert-danger" );
+                    $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
+                    //$("#modal-title").addClass( "alert alert-info" );
+                },
+                success: function(data) {
+                    //console.log(data.success);
+
+                    if(data.success) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sucesso!",
+                            text: data.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        table.destroy();
+                        getdata();
+                    }
+                },
+                error: function(data){
+                    //console.log(data.responseText);
+                    json = $.parseJSON(data.responseText);
+                    $("#modal-title").addClass( "alert alert-danger" );
+                    $('#modal-title').html('<p><strong>'+json.message+'</strong></p>');
+                    Swal.fire(
+                        'error!',
+                        json.message,
+                        'error'
+                    )
+                },
+                complete:function(data){
+                    // console.log(data.responseText);
+                    json = $.parseJSON(data.responseText);
+                    if(json.success) {
+                        window.setTimeout(function () {
+                            window.location.reload();
+                        }, 1500);
+                    }
+                }
+            });
+        }
+    });
+
+
 
     /***
-     * Salva imagem
+     * Salva imagem variação ou produto
      * */
 
     $("#formImage").on('submit',function (event) {
@@ -296,9 +377,6 @@ $(function() {
                 });
             }
     });
-
-
-
 
     /***
      * Salva o produto
@@ -487,7 +565,16 @@ $(function() {
         });
     });
 
-    /**
+    /***
+     *
+     * */
+
+    $(document).on("click",".btnProductImage" ,function(event){
+        event.preventDefault();
+        id = $(this).data('id') != null ? $(this).data('id') : 0; //capturo o ID
+        $("#product_id").val(id);
+    });
+        /**
      * Exibe as imagens das variações dos produtos
      * **/
     $(document).on("click",".btnImageProduct" ,function(event){

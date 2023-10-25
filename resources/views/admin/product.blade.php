@@ -103,6 +103,7 @@
                                         <th data-sortable="true">ID</th>
                                         <th data-sortable="true">Código</th>
                                         <th data-sortable="true">Produto</th>
+                                        <th data-sortable="true">Imagem</th>
                                         <th data-sortable="true">Categoria</th>
                                         <th data-sortable="true">Status</th>
                                         <th data-sortable="true">Criado</th>
@@ -134,8 +135,9 @@
                     <div id="load" style="display: none"></div>
                     <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
                         @csrf
+                        <input type="hidden" id="products_variation_id" name="products_variation_id">
+                        <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
                         <div class="form-row">
-                                <input type="hidden" id="products_variation_id" name="products_variation_id">
                                 <div class="form-group col-md-6">
                                     <input type="Text" name="arquivo" id="arquivo" class="form-control" placeholder="Arquivo" />
                                 </div>
@@ -154,6 +156,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Image Pooduto PAI-->
+       <div class="modal fade" id="divModalImageProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content ">
+                <form id="formImageProduct" name="formImageProduct" class="needs-validation form-floating" novalidate method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="product_id" id="product_id">
+                    <input type="hidden" name="tipoImage" id="tipoImage" value="product">
+                    <input type="hidden" name="metodo" id="metodo" value="put">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Incluir/Alterar/Remover - Image do Produto </h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file"  id="image" name="image" title="Imagem" placeholder="Imagem" >
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal Update Lote-->
     <div class="modal fade" id="modalUpdateLote" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -196,6 +226,7 @@
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('js/produto_new.js')}}"></script>
+    <script src="{{URL::asset('js/filePond.js')}}"></script>
 
 @endpush
 @push("styles")

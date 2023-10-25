@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Models\Produto;
 use App\Http\Models\ProdutoImagem;
+use App\Http\Models\TemporaryFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -17,11 +19,14 @@ use Throwable;
 
 class ProdutoImagemController extends Controller
 {
-    protected $request,$produtoImagem;
+    protected Request $request;
+    protected ProdutoImagem $produtoImagem;
+    protected Produto $produto;
 
-    public function __construct(Request $request, ProdutoImagem $produtoImagem){
+    public function __construct(Request $request, ProdutoImagem $produtoImagem, Produto $produto){
         $this->request = $request;
         $this->produtoImagem = $produtoImagem;
+        $this->produto = $produto;
     }
 
     /**
@@ -133,11 +138,29 @@ class ProdutoImagemController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return void
+     * @return JsonResponse
      */
     public function update()
     {
-        //
+       // dd($this->request->input("product_id"));
+     //   dd($this->request->all());
+        try {
+
+        $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+
+        if($temp_file){
+            Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'product/'.$this->request->input("product_id")."/".$temp_file->file);
+
+            Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+            $temp_file->delete();
+        }
+
+            $this->produto->where('id', $this->request->input("product_id"))->update(['imagem' => $temp_file->file]);
+
+    }catch (Throwable $e) {
+        return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
+    }
+        return Response::json(array('success' => true, 'message' => 'Imagem cadastrada com sucesso!!'), 201);
     }
 
     /**

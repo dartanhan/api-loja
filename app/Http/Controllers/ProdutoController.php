@@ -80,6 +80,7 @@ class ProdutoController extends Controller
                 ->select(
                     'loja_produtos_new.id',
                     'loja_produtos_new.codigo_produto',
+                    'loja_produtos_new.imagem',
                     'loja_produtos_new.descricao',
                     'loja_categorias.nome as categoria',
                     (DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status')),
@@ -107,7 +108,8 @@ class ProdutoController extends Controller
                     'loja_fornecedores.id as fornecedor_id',
                     'loja_categorias.id as categoria_id'*/
 
-                )->where('block',0)
+                )
+                ->where('block',0)
                 ->where('loja_produtos_new.status',1) //somente ativos
                 ->orderBy('loja_produtos_new.id', 'DESC')
                 ->get();
