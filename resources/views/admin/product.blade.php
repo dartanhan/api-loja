@@ -96,7 +96,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <table id="table" class="table table-striped table-condensed table-hover display nowrap" style="width:100%">
+                                <table id="table" class="table table-striped table-condensed table-hover  responsive" style="width:100%">
                                     <thead class="text-center">
                                     <tr>
                                         <th>#</th>

@@ -38,6 +38,7 @@ $(function() {
     function initialiseTable() {
         table = $('#table').DataTable({
             data:asyncData,
+            responsive: true,
             "columns": [
                 {
                     "className": 'details-control',
