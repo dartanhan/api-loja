@@ -51,7 +51,7 @@ $(function() {
                 {"data": "imagem",
                     render: function (data, type, row) {
                         if(row.imagem !== null){
-                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="img-datatable">';
+                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable">';
                         }else{
                             return '<img src="../public/storage/produtos/not-image.png" class="img-datatable">';
                         }
@@ -158,8 +158,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
+                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -799,7 +799,7 @@ $(function() {
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
         let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
-        let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parceladoo0").val() : '';
+        let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
 
 
 
@@ -825,7 +825,7 @@ $(function() {
                                         "<label for=\"label-subcodigo\">SUBCOD</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -12px;width:160px'>" +
+                                "<div class=\"col-md-2\" style='left: -12px;width:150px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
                                             "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
@@ -872,7 +872,7 @@ $(function() {
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_lista + "\' required/>"+
                                     "   <label for=\"label-valor-lista\">DINHEIRO</label>"+
                                     "</span>"+
-                                "</div>" +
+                                "</div>&nbsp;" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_cartao_pix[]\"  id=\"valor_cartao_pix"+i+"\""+
@@ -880,7 +880,7 @@ $(function() {
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_cartao_pix + "\' required/>"+
                                     "   <label for=\"label-valor-lista\">CARTÃO/PIX</label>"+
                                 "</span>"+
-                                "</div>" +"<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
+                                "</div>&nbsp;" +"<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_parcelado[]\"  id=\"valor_parcelado"+i+"\""+
                                     "class=\"form-control\" placeholder=\"PARCELADO\""+
