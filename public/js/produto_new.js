@@ -135,6 +135,8 @@ $(function() {
                                     "<th>ATA.10UN</th>" +
                                     "<th>VAL.LISTA</th>" +
                                     "<th>PRODUTO</th>" +
+                                    "<th>VAL.CARTÃO/PIX</th>" +
+                                    "<th>VAL.PARCELADO</th>" +
                                     "<th>STATUS</th>" +
                                     "<th>AÇÃO</th>" +
                                 "</tr>" +
@@ -171,6 +173,8 @@ $(function() {
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_lista) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
+                                        "<td>" + formatMoney(arrayItem.valor_cartao_pix) + "</td>" +
+                                        "<td>" + formatMoney(arrayItem.valor_parcelado) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image btnImageProduct\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
@@ -430,6 +434,12 @@ $(function() {
             },
             cest: {
                 required: true
+            },
+            valor_cartao_pix0: {
+                required: true
+            },
+            valor_parcelado0: {
+                required: true
             }
         },
         messages: {
@@ -471,6 +481,12 @@ $(function() {
             },
             cest: {
                 required: "Informe o número CEST do produto?"
+            },
+            valor_cartao_pix: {
+                required: "Informe o Valor?"
+            },
+            valor_parcelado: {
+                required: "Informe o Valor?"
             }
         }, submitHandler: function(form,event) {
             event.preventDefault();
@@ -485,7 +501,7 @@ $(function() {
                     selectElements.forEach(function(select) {
                          valorSelecionado = select.value;
                     });
-                    console.log(selectElements.length + " - " + valorSelecionado);
+                   // console.log(selectElements.length + " - " + valorSelecionado);
 
                     if(selectElements.length === 1 && valorSelecionado === "0"){
                         Swal.fire({
@@ -782,6 +798,9 @@ $(function() {
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
+        let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
+        let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parceladoo0").val() : '';
+
 
 
         /**
@@ -806,7 +825,7 @@ $(function() {
                                         "<label for=\"label-subcodigo\">SUBCOD</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -12px'>" +
+                                "<div class=\"col-md-2\" style='left: -12px;width:160px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
                                             "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
@@ -841,25 +860,40 @@ $(function() {
                                 "<div class=\"col-md-2\" style='padding:unset;left: -32px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_atacado_10un[]\"  id=\"valor_atacado_10un"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"ATA.10UN\""+
+                                    "class=\"form-control\" placeholder=\"CX.FECHADA\""+
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_10un + "\' required/>"+
-                                    "   <label for=\"label-atacado10un\">ATACADO 10UN</label>"+
+                                    "   <label for=\"label-atacado10un\">CX.FECHADA</label>"+
                                     "</span>"+
                                 "</div>" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_lista[]\"  id=\"valor_lista"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"VAL.LISTA\""+
+                                    "class=\"form-control\" placeholder=\"DINHEIRO\""+
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_lista + "\' required/>"+
-                                    "   <label for=\"label-valor-lista\">VALOR LISTA</label>"+
+                                    "   <label for=\"label-valor-lista\">DINHEIRO</label>"+
                                     "</span>"+
+                                "</div>" +
+                                "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
+                                    "<span class=\"border-lable-flt\">"+
+                                    "<input type=\"text\" name=\"valor_cartao_pix[]\"  id=\"valor_cartao_pix"+i+"\""+
+                                    "class=\"form-control\" placeholder=\"CARTÃO/PIX\""+
+                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_cartao_pix + "\' required/>"+
+                                    "   <label for=\"label-valor-lista\">CARTÃO/PIX</label>"+
+                                "</span>"+
+                                "</div>" +"<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
+                                    "<span class=\"border-lable-flt\">"+
+                                    "<input type=\"text\" name=\"valor_parcelado[]\"  id=\"valor_parcelado"+i+"\""+
+                                    "class=\"form-control\" placeholder=\"PARCELADO\""+
+                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_parcelado + "\' required/>"+
+                                "   <label for=\"label-valor-lista\">PARCELADO</label>"+
+                                "</span>"+
                                 "</div>" +
                                 "<div  class=\"col-md-2\" style='padding:unset;left: -24px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"valor_produto[]\"  id=\"valor_produto"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"PRODUTO\""+
+                                        "class=\"form-control\" placeholder=\"VLR.PAGO\""+
                                         "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\' required/>"+
-                                        "<label for=\"label-produto\">PRODUTO</label>"+
+                                        "<label for=\"label-produto\">VLR.PAGO</label>"+
                                     "</span>"+
                                 "</div>" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 60px'>"+

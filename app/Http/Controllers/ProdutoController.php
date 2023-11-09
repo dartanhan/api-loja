@@ -188,6 +188,7 @@ class ProdutoController extends Controller
             $data["categoria_id"] = $this->request->input("categoria_id");
             $data["cor_id"] = 1;
 
+
             //Cria o produto
             //$products = $this->produto::create($data);
             $matchThese = array('id' => $this->request->input("id"));
@@ -229,6 +230,8 @@ class ProdutoController extends Controller
                 $data["validade"] = Carbon::createFromFormat('d/m/Y',$this->request->input("validade")[$i])->format('Y-m-d');
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
+                $data["valor_cartao_pix"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
+                $data["valor_parcelado"] = $formatter->parse($this->request->input("valor_parcelado")[$i]);
 
                 /**
                  * Cria ou Atualiza a variação do produto
