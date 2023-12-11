@@ -8,9 +8,9 @@
 
 @section('content')
 
-    <div class="container-fluid"  style="padding-top: 10px;padding-right: 10px">
-        <div class="col-md-12">
-            <div class="card">
+    <div class="container-fluid"  style="padding-top: 10px;">
+        <div class="col-md-12" style="padding:unset">
+            <div class="card" style="padding:unset">
                 <form method="post" autocomplete="off" id="form" name="form" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" id="id">
@@ -82,7 +82,7 @@
                                         <label for="label-qtd">ORIGEM DO PRODUTO</label>
                                     </div>
 
-                                    <div id="tbl"></div>
+                                    <div id="tbl" style="width: 100%"></div>
                                 </div>
                             </div>
                         </div>

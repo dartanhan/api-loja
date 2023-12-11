@@ -742,7 +742,7 @@ $(function() {
      * */
     let fnc_fornecedor = async function(name,value){
        // localStorage.clear();
-        if(localStorage.getItem("data-suppliers") !== null){
+        /*if(localStorage.getItem("data-suppliers") !== null){
             let myArray = JSON.parse(localStorage.getItem("data-suppliers"));
            // console.log("localStorage");
             await Promise.all(myArray).then(valores=> {
@@ -756,7 +756,7 @@ $(function() {
                 });
             });
 
-        }else {
+        }else {*/
               fetch(url + "/fornecedor/1")
                 .then(function (response) {
                     return response.json()
@@ -767,7 +767,7 @@ $(function() {
                     /**
                      * set local os dados do fornecedor para não ficar indo na api
                      */
-                    localStorage.setItem("data-suppliers", JSON.stringify(response));
+                 //   localStorage.setItem("data-suppliers", JSON.stringify(response));
                     $(name).append('<option value="">SELECIONE?</option>');
                     response.forEach(function (ret) {
                         //       console.log(ret.id +" - "+ value);
@@ -776,7 +776,7 @@ $(function() {
                         $(name).append("<option value=" + ret.id + " " + sel + ">" + ret.nome + "</option>");
                     });
                 });
-        }
+       // }
     }
     /**
      * Retorna os campos de variações do produto
@@ -814,7 +814,7 @@ $(function() {
                 "</div>" ;
         }
 
-        $("#tbl").append("<div class=\"row \" style='padding: 3px' id=\"div_pai"+i+"\">" +
+        $("#tbl").append("<div class=\"row \" style='padding: 3px;' id=\"div_pai"+i+"\">" +
                                 "<input type=\"hidden\" name=\"variacao_id[]\" id=\"variacao_id"+i+"\"" +
                                 " class=\"form-control\" value=\'"+id+"\'/>"+
                                 "<div class=\"px-80\">" +
@@ -825,7 +825,7 @@ $(function() {
                                         "<label for=\"label-subcodigo\">SUBCOD</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -12px;width:150px'>" +
+                                "<div class=\"col-md-2\" style='left: -12px;width: 200px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
                                             "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
@@ -896,7 +896,7 @@ $(function() {
                                         "<label for=\"label-produto\">VLR.PAGO</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 60px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 50px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"quantidade[]\"  id=\"quantidade"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD\" onkeyup=\"SomenteNumeros(this)\" " +
@@ -904,7 +904,7 @@ $(function() {
                                         "<label for=\"label-qtd\">QTD</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -16px;width: 60px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -16px;width: 55px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"quantidade_minima[]\"  id=\"quantidade_minima"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\" onkeyup=\"SomenteNumeros(this)\" " +
@@ -912,7 +912,7 @@ $(function() {
                                         "<label for=\"label-qtd\">QTD.MIN</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 65px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 60px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"estoque[]\"  id=\"estoque"+i+"\""+
                                         "class=\"form-control\" placeholder=\"EST\" onkeyup=\"SomenteNumeros(this)\" " +
