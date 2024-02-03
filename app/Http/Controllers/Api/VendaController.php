@@ -29,7 +29,7 @@ class VendaController extends Controller
 {
     protected  $request, $product, $vendas,$vendasProdutos, $vendasDescontos,$productVariation,
                         $tipoPagamento,$valorCartao, $valorDuplo,$produtoQuantidade,$taxaCartao,$cashbackVendas,
-                        $cashback, $cashBackValor;
+                        $cashback, $cashBackValor,$vendasPdv;
 
     public function __construct(Request $request,
                                     Produto $product,
@@ -80,7 +80,7 @@ class VendaController extends Controller
        // if($flag == 0) {
             $variations = DB::table('loja_produtos_variacao')
                 ->leftJoin('loja_produtos_imagens', 'loja_produtos_imagens.produto_variacao_id', '=', 'loja_produtos_variacao.id')
-                ->where('loja_produtos_variacao.subcodigo', '=', $codigo_produto)->first();
+               ->where('loja_produtos_variacao.subcodigo', '=', $codigo_produto)->first();
 
             if ($variations) {
                 if ($variations->status == 0) {
@@ -103,7 +103,7 @@ class VendaController extends Controller
                         $data['descricao'] = $products->descricao . " - " . $variations->variacao;
                         //$data['variacao'] = $variations->variacao;
                         $data['status'] = $variations->status;
-                        $data['fornecedor_id'] = $products->fornecedor_id;
+                        $data['fornecedor_id'] = $variations->fornecedor;
                         $data['categoria_id'] = $products->categoria_id;
                         $data['id_forma_pgto'] = $tipo_pgto;
                         $data['quantidade'] = 1;
@@ -120,11 +120,15 @@ class VendaController extends Controller
                         $data['troca'] = false;
                         $data['path'] = $variations->path;
 
+          
+                        //Verifica qual o host para pegar a imagem no destino certo
+                        $storage = $this->request->secure() === true ? 'https://'.$this->request->getHttpHost() : 
+                                                                        'http://'.$this->request->getHttpHost().$this->request->getBasePath();
 
-                        $storage = $this->request->getHttpHost() === 'administracao3.knesmalteria.com.br' ?
-                                                                    'https://'.$this->request->getHttpHost()."/public/storage/"  :
-                                                                    'http://'.$this->request->getHttpHost()."/api-loja-new-git/public/storage/"  ;
-
+                        //concatena o pasta publica
+                        $storage = $storage."/public/storage/";
+                        
+                        //Verifica se existe o diretorio
                         $result =  Storage::exists($variations->path);
 
                         if ($result) {

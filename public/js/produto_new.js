@@ -51,9 +51,9 @@ $(function() {
                 {"data": "imagem",
                     render: function (data, type, row) {
                         if(row.imagem !== null){
-                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable">';
+                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable"></img>';
                         }else{
-                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable">';
+                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
                         }
                     }
                 },
@@ -158,8 +158,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
+                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -618,12 +618,12 @@ $(function() {
                 if(response.data.length > 0){
                     $.each(response.data, function (idx, value) {
                         grid += "<div class=\"col\">";
-                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
+                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"></img>";
                         grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
                         grid += "</div>";
                     });
                 }else{
-                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"/>";
+                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"></img>";
                 }
                 $("#pictures").html(grid);
             },
@@ -809,7 +809,7 @@ $(function() {
         if(i > 0){
             icon_remove =  "<div class=\"col-md-1\" style='padding:unset;left: -6px;width: 10px' >"+
                 "<a href=\"javascript:void(0)\" onclick=\"removeCampo('div_pai" + i + "')\" " +
-                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\" />" +
+                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\"></img>" +
                 "</a>"+
                 "</div>" ;
         }

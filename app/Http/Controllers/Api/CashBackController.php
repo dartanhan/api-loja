@@ -83,8 +83,8 @@ class CashBackController extends Controller
     public function show($param)
     {
         try{
-            // $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->where( 'status', 1)->sum('valor');
-            $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->sum('valor');
+             $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->where( 'status', 0)->sum('valor');
+           // $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->sum('valor');
 
             $this->vendasCashBackModel = new VendasCashBack();
 
