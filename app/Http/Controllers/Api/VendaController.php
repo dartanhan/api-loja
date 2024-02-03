@@ -362,12 +362,15 @@ class VendaController extends Controller
                 }
                 $valor_cashback = ($sale->valor_total * $taxa) / 100;
 
-                $this->cashbackVendas = new VendasCashBack();
-                $this->cashbackVendas->cliente_id = $sale->cliente_id;
-                $this->cashbackVendas->venda_id = $sale->id;
-                $this->cashbackVendas->valor = $valor_cashback;
-                $this->cashbackVendas->save();
-
+                //Salva o cashback caso tenha valor acima de 0
+                if($valor_cashback > 0){
+                    $this->cashbackVendas = new VendasCashBack();
+                    $this->cashbackVendas->cliente_id = $sale->cliente_id;
+                    $this->cashbackVendas->venda_id = $sale->id;
+                    $this->cashbackVendas->valor = $valor_cashback;
+                    $this->cashbackVendas->save();
+                }
+                
                 //Pega total cashback do cliente pelo ID
                 //$cashBackTotal = $this->cashbackVendas::where('cliente_id', $sale->cliente_id)->where('status', 0)->sum('valor');
 
