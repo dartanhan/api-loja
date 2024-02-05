@@ -57,8 +57,9 @@ class ClienteController extends Controller
     {
         DB::beginTransaction();
         try {
-            //$request = $this->request->all();
-            $request = $request->toArray();
+            $request = $this->request->all();
+          
+            //$request = $request->toArray();
 
             $rules = [
                 'email'=>'email|regex:/(.+)@(.+)\.(.+)/i'
@@ -97,20 +98,15 @@ class ClienteController extends Controller
             $dados["taxa"] = $request['taxa'];
 
             //Cria o cliente ou atualiza
-            $matchThese = array('id' => $request['id']);
+             $matchThese = array('id' => $request['id']);
             $cliente = $this->clienteModel::updateOrCreate($matchThese, $dados);
 
-            $message = $cliente->wasRecentlyCreated == true ? "Cliente cadastrado com sucesso!" : "Cliente atualizado com sucesso!";
-           /* if ($cliente->wasRecentlyCreated) {
-                $message = "Cliente cadastrado com sucesso!";
-            }else{
-                $message = "Cliente atualizado com sucesso!";
-            }*/
-
+             $message = $cliente->wasRecentlyCreated == true ? "Cliente cadastrado com sucesso!" : "Cliente atualizado com sucesso!";
+   
             DB::commit();
-
+              
             if ($cliente) {
-                return Response::json(array('success' => true, "message" => $message), 201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+             return Response::json(array('success' => true, "message" => $message), 201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             } else {
                 return Response::json(array('success' => false, "message" => 'Cliente não cadastrado!'), 400, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
