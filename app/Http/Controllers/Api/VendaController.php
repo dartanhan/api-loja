@@ -158,14 +158,14 @@ class VendaController extends Controller
             $code_store = $this->request->header('store-id');
 
             /**
-            PEGA A ÚLTIMA VENDA
+            PEGA A ÚLTIMA VENDA DA LOJA ESPECIFICA
              */
             $store =  DB::table('loja_vendas')->where('loja_id',$code_store)->orderBy('id', 'DESC')->first();
 
             if( $store != null) {
 
                 $total_store = $store->valor_total;
-                $code_store = $store->codigo_venda;
+                $code_store = $store->codigo_venda; //Pega o código venda KNxxx
 
                 $store = DB::table('loja_vendas')
                     ->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
@@ -194,6 +194,13 @@ class VendaController extends Controller
                         //->select('loja_forma_pagamentos.id','loja_forma_pagamentos.nome')->first();
                         ->select('loja_forma_pagamentos.id', 'loja_forma_pagamentos.nome')->get();
 
+                    $clienteCashBack = DB::table('loja_vendas')
+                        ->leftJoin('loja_vendas_cashback', 'loja_vendas.id', '=',  'loja_vendas_cashback.venda_id')
+                        ->leftJoin('loja_clientes', 'loja_vendas_cashback.cliente_id' ,'=', 'loja_clientes.id')
+                        ->where('loja_vendas.codigo_venda', '=', $code_store)
+                    ->select('loja_clientes.nome', 'loja_vendas_cashback.valor as cashback')->first();
+
+
                     // dd($payment);
                     $pro["produtos"] = $store;
                     $pro["percentual"] = $discount->valor_percentual;
@@ -206,6 +213,9 @@ class VendaController extends Controller
                     $pro["valor_total"] = $total_store;
                     $pro["valor_troco"] = $discount->valor_troco;
                     $pro["valor_sub_total"] = $discount->sub_total;
+                    $pro["clienteModel"]["nome"] = $clienteCashBack->nome;
+                    $pro["clienteModel"]["cashback"] = $clienteCashBack->cashback;
+                    $pro["clienteModel"]["clientes"] = array($clienteCashBack);
 
                     $pro["success"] = true;
                 }
