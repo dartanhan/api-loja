@@ -58,7 +58,8 @@ class ClienteController extends Controller
         DB::beginTransaction();
         try {
             $request = $this->request->all();
-            $request['email'] = "kn@gmail.com.br";
+
+            $request['email'] = ($request['email'] === null) ? "kn@gmail.com.br"  : $request['email'];
             //$request = $request->toArray();
 
             $rules = [
