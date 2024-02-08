@@ -58,7 +58,7 @@ class ProdutoController extends Controller
                         "loja_produtos_variacao.products_id",
                         "loja_produtos_variacao.id",
                         "loja_produtos_variacao.valor_varejo",
-                        "loja_produtos_variacao.valor_atacado",
+                        "loja_produtos_variacao.valor_atacado_10un",
                         "loja_produtos_variacao.quantidade")
                 ->where('loja_produtos_variacao.status',1)
                 ->get();

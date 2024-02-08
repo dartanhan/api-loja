@@ -29,7 +29,7 @@ class VendaController extends Controller
 {
     protected  $request, $product, $vendas,$vendasProdutos, $vendasDescontos,$productVariation,
                         $tipoPagamento,$valorCartao, $valorDuplo,$produtoQuantidade,$taxaCartao,$cashbackVendas,
-                        $cashback, $cashBackValor;
+                        $cashback, $cashBackValor,$vendasPdv;
 
     public function __construct(Request $request,
                                     Produto $product,
@@ -80,7 +80,7 @@ class VendaController extends Controller
        // if($flag == 0) {
             $variations = DB::table('loja_produtos_variacao')
                 ->leftJoin('loja_produtos_imagens', 'loja_produtos_imagens.produto_variacao_id', '=', 'loja_produtos_variacao.id')
-                ->where('loja_produtos_variacao.subcodigo', '=', $codigo_produto)->first();
+               ->where('loja_produtos_variacao.subcodigo', '=', $codigo_produto)->first();
 
             if ($variations) {
                 if ($variations->status == 0) {
@@ -103,28 +103,32 @@ class VendaController extends Controller
                         $data['descricao'] = $products->descricao . " - " . $variations->variacao;
                         //$data['variacao'] = $variations->variacao;
                         $data['status'] = $variations->status;
-                        $data['fornecedor_id'] = $products->fornecedor_id;
+                        $data['fornecedor_id'] = $variations->fornecedor;
                         $data['categoria_id'] = $products->categoria_id;
                         $data['id_forma_pgto'] = $tipo_pgto;
                         $data['quantidade'] = 1;
                         $data['valor_produto'] = $variations->valor_produto;
-                        $data['valor_atacado'] = $variations->valor_atacado;
-                        $data['valor_varejo'] = $variations->valor_varejo;
-                        $data['valor_venda'] = $variations->valor_varejo;
-                        $data['valor_atacado_5un'] = $variations->valor_atacado_5un;
-                        $data['valor_atacado_10un'] = $variations->valor_atacado_10un;
-                        $data['valor_lista'] = $variations->valor_lista;
+                        $data['valor_atacado'] = $variations->valor_atacado_10un;//$variations->valor_atacado;
+                        $data['valor_varejo'] =  $variations->valor_varejo;
+                        $data['valor_venda'] =  $data['valor_varejo'];//$variations->valor_varejo;
+                        //$data['valor_atacado_5un'] = $variations->valor_atacado_5un;
+                       // $data['valor_atacado_10un'] = $variations->valor_atacado_10un;
+                       // $data['valor_lista'] = $variations->valor_lista;
                         $data['percentual'] = $variations->percentage;
                         $data['qtdestoque'] = $variations->quantidade;
                         $data['loja_id'] = 2;
                         $data['troca'] = false;
                         $data['path'] = $variations->path;
 
+          
+                        //Verifica qual o host para pegar a imagem no destino certo
+                        $storage = $this->request->secure() === true ? 'https://'.$this->request->getHttpHost() : 
+                                                                        'http://'.$this->request->getHttpHost().$this->request->getBasePath();
 
-                        $storage = $this->request->getHttpHost() === 'administracao3.knesmalteria.com.br' ?
-                                                                    'https://'.$this->request->getHttpHost()."/public/storage/"  :
-                                                                    'http://'.$this->request->getHttpHost()."/api-loja-new-git/public/storage/"  ;
-
+                        //concatena o pasta publica
+                        $storage = $storage."/public/storage/";
+                        
+                        //Verifica se existe o diretorio
                         $result =  Storage::exists($variations->path);
 
                         if ($result) {
@@ -154,14 +158,14 @@ class VendaController extends Controller
             $code_store = $this->request->header('store-id');
 
             /**
-            PEGA A ÚLTIMA VENDA
+            PEGA A ÚLTIMA VENDA DA LOJA ESPECIFICA
              */
             $store =  DB::table('loja_vendas')->where('loja_id',$code_store)->orderBy('id', 'DESC')->first();
 
             if( $store != null) {
 
                 $total_store = $store->valor_total;
-                $code_store = $store->codigo_venda;
+                $code_store = $store->codigo_venda; //Pega o código venda KNxxx
 
                 $store = DB::table('loja_vendas')
                     ->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
@@ -190,6 +194,13 @@ class VendaController extends Controller
                         //->select('loja_forma_pagamentos.id','loja_forma_pagamentos.nome')->first();
                         ->select('loja_forma_pagamentos.id', 'loja_forma_pagamentos.nome')->get();
 
+                    $clienteCashBack = DB::table('loja_vendas')
+                        ->leftJoin('loja_vendas_cashback', 'loja_vendas.id', '=',  'loja_vendas_cashback.venda_id')
+                        ->leftJoin('loja_clientes', 'loja_vendas_cashback.cliente_id' ,'=', 'loja_clientes.id')
+                        ->where('loja_vendas.codigo_venda', '=', $code_store)
+                    ->select('loja_clientes.nome', 'loja_vendas_cashback.valor as cashback')->first();
+
+
                     // dd($payment);
                     $pro["produtos"] = $store;
                     $pro["percentual"] = $discount->valor_percentual;
@@ -202,6 +213,9 @@ class VendaController extends Controller
                     $pro["valor_total"] = $total_store;
                     $pro["valor_troco"] = $discount->valor_troco;
                     $pro["valor_sub_total"] = $discount->sub_total;
+                    $pro["clienteModel"]["nome"] = $clienteCashBack->nome;
+                    $pro["clienteModel"]["cashback"] = $clienteCashBack->cashback;
+                    $pro["clienteModel"]["clientes"] = array($clienteCashBack);
 
                     $pro["success"] = true;
                 }
@@ -358,12 +372,15 @@ class VendaController extends Controller
                 }
                 $valor_cashback = ($sale->valor_total * $taxa) / 100;
 
-                $this->cashbackVendas = new VendasCashBack();
-                $this->cashbackVendas->cliente_id = $sale->cliente_id;
-                $this->cashbackVendas->venda_id = $sale->id;
-                $this->cashbackVendas->valor = $valor_cashback;
-                $this->cashbackVendas->save();
-
+                //Salva o cashback caso tenha valor acima de 0
+                if($valor_cashback > 0){
+                    $this->cashbackVendas = new VendasCashBack();
+                    $this->cashbackVendas->cliente_id = $sale->cliente_id;
+                    $this->cashbackVendas->venda_id = $sale->id;
+                    $this->cashbackVendas->valor = $valor_cashback;
+                    $this->cashbackVendas->save();
+                }
+                
                 //Pega total cashback do cliente pelo ID
                 //$cashBackTotal = $this->cashbackVendas::where('cliente_id', $sale->cliente_id)->where('status', 0)->sum('valor');
 

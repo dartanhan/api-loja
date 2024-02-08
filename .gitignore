@@ -18,6 +18,4 @@ storage/*.key
 *.sql
 *.jpeg
 api-loja.rar
-/bootstrap/cache/*
-bootstrap/cache/packages.php
-bootstrap/cache/packages.php
+/bootstrap/cache

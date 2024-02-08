@@ -51,9 +51,9 @@ $(function() {
                 {"data": "imagem",
                     render: function (data, type, row) {
                         if(row.imagem !== null){
-                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable">';
+                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable"></img>';
                         }else{
-                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable">';
+                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
                         }
                     }
                 },
@@ -130,13 +130,13 @@ $(function() {
                                     "<th>QTD</th>" +
                                     "<th>ESTOQUE</th>" +
                                     "<th>VAREJO</th>" +
-                                    "<th>ATA.3UN</th>" +
-                                    "<th>ATA.5UN</th>" +
-                                    "<th>ATA.10UN</th>" +
-                                    "<th>VAL.LISTA</th>" +
+                                    "<th>ATACADO</th>" +
+                                    //"<th>ATA.5UN</th>" +
+                                    //"<th>ATA.10UN</th>" +
+                                    //"<th>VAL.LISTA</th>" +
                                     "<th>PRODUTO</th>" +
-                                    "<th>VAL.CARTÃO/PIX</th>" +
-                                    "<th>VAL.PARCELADO</th>" +
+                                    //"<th>VAL.CARTÃO/PIX</th>" +
+                                    //"<th>VAL.PARCELADO</th>" +
                                     "<th>STATUS</th>" +
                                     "<th>AÇÃO</th>" +
                                 "</tr>" +
@@ -158,8 +158,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
+                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -168,13 +168,14 @@ $(function() {
                                         "<td>" + arrayItem.quantidade + "</td>" +
                                         "<td>" + arrayItem.estoque + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_atacado) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_atacado_5un) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_atacado) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_lista) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_atacado_5un) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_lista) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_cartao_pix) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_parcelado) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_cartao_pix) + "</td>" +
+                                        //"<td>" + formatMoney(arrayItem.valor_parcelado) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image btnImageProduct\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
@@ -623,12 +624,12 @@ $(function() {
                 if(response.data.length > 0){
                     $.each(response.data, function (idx, value) {
                         grid += "<div class=\"col\">";
-                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
+                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"></img>";
                         grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
                         grid += "</div>";
                     });
                 }else{
-                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"/>";
+                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"></img>";
                 }
                 $("#pictures").html(grid);
             },
@@ -814,7 +815,7 @@ $(function() {
         if(i > 0){
             icon_remove =  "<div class=\"col-md-1\" style='padding:unset;left: -6px;width: 10px' >"+
                 "<a href=\"javascript:void(0)\" onclick=\"removeCampo('div_pai" + i + "')\" " +
-                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\" />" +
+                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\"></img>" +
                 "</a>"+
                 "</div>" ;
         }
@@ -830,7 +831,7 @@ $(function() {
                                         "<label for=\"label-subcodigo\">SUBCOD</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -12px;width: 200px'>" +
+                                "<div class=\"col-md-2\" style='left: -12px;width: 300px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
                                             "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
@@ -846,12 +847,12 @@ $(function() {
                                             "<label for=\"label-varejo\">VAREJO</label>"+
                                     "</span>"+
                                  "</div>"+
-                                "<div class=\"col-md-2\" style='padding:unset;left: -40px;width: 100px'>"+
+                               /* "<div class=\"col-md-2\" style='padding:unset;left: -40px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"valor_atacado[]\"  id=\"valor_atacado"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"ATA.3UN\""+
+                                        "class=\"form-control\" placeholder=\"ATACADO\""+
                                         "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado + "\' required/>"+
-                                    "   <label for=\"label-atacado3n\">ATACADO 3UN</label>"+
+                                    "   <label for=\"label-atacado3n\">ATACADO</label>"+
                                     "</span>"+
                                 "</div>" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -36px;width: 100px'>"+
@@ -861,16 +862,16 @@ $(function() {
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_5un + "\' required/>"+
                                     "   <label for=\"label-atacado5un\">ATACADO 5UN</label>"+
                                     "</span>"+
-                                "</div>" +
+                                "</div>" +*/
                                 "<div class=\"col-md-2\" style='padding:unset;left: -32px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_atacado_10un[]\"  id=\"valor_atacado_10un"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"CX.FECHADA\""+
+                                    "class=\"form-control\" placeholder=\"ATACADO\""+
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_10un + "\' required/>"+
-                                    "   <label for=\"label-atacado10un\">CX.FECHADA</label>"+
+                                    "   <label for=\"label-atacado10un\">ATACADO</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
+                              /*  "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_lista[]\"  id=\"valor_lista"+i+"\""+
                                     "class=\"form-control\" placeholder=\"DINHEIRO\""+
@@ -892,16 +893,16 @@ $(function() {
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_parcelado + "\' required/>"+
                                 "   <label for=\"label-valor-lista\">PARCELADO</label>"+
                                 "</span>"+
-                                "</div>" +
-                                "<div  class=\"col-md-2\" style='padding:unset;left: -24px;width: 100px'>"+
+                                "</div>" +*/
+                                "<div  class=\"col-md-2\" style='padding:unset;left: -24px;width: 130px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"valor_produto[]\"  id=\"valor_produto"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"VLR.PAGO\""+
+                                        "class=\"form-control\" placeholder=\"VALOR PAGO\""+
                                         "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\' required/>"+
-                                        "<label for=\"label-produto\">VLR.PAGO</label>"+
+                                        "<label for=\"label-produto\">VALOR PAGO</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 50px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 70px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"quantidade[]\"  id=\"quantidade"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD\" onkeyup=\"SomenteNumeros(this)\" " +
@@ -909,7 +910,7 @@ $(function() {
                                         "<label for=\"label-qtd\">QTD</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -16px;width: 55px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -16px;width: 70px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"quantidade_minima[]\"  id=\"quantidade_minima"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\" onkeyup=\"SomenteNumeros(this)\" " +
@@ -917,10 +918,10 @@ $(function() {
                                         "<label for=\"label-qtd\">QTD.MIN</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 60px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 100px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"estoque[]\"  id=\"estoque"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"EST\" onkeyup=\"SomenteNumeros(this)\" " +
+                                        "class=\"form-control\" placeholder=\"ESTOQUE\" onkeyup=\"SomenteNumeros(this)\" " +
                                         "value=\'" + estoque + "\' required/>"+
                                         "<label for=\"label-estoque\">ESTOQUE</label>"+
                                     "</span>"+
