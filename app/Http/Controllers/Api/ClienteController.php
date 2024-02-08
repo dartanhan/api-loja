@@ -58,7 +58,7 @@ class ClienteController extends Controller
         DB::beginTransaction();
         try {
             $request = $this->request->all();
-          
+            $request['email'] = "kn@gmail.com.br";
             //$request = $request->toArray();
 
             $rules = [
@@ -102,9 +102,9 @@ class ClienteController extends Controller
             $cliente = $this->clienteModel::updateOrCreate($matchThese, $dados);
 
              $message = $cliente->wasRecentlyCreated == true ? "Cliente cadastrado com sucesso!" : "Cliente atualizado com sucesso!";
-   
+
             DB::commit();
-              
+
             if ($cliente) {
              return Response::json(array('success' => true, "message" => $message), 201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             } else {
