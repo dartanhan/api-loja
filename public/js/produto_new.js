@@ -193,11 +193,16 @@ $(function() {
                             json = $.parseJSON(response.responseText);
                             $("#modal-title").addClass("alert alert-danger");
                             $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
-                            Swal.fire(
-                                'error!',
-                                json.message,
-                                'error'
-                            )
+                            Swal.fire({
+                                title: 'error!',
+                                text: json.message,
+                                icon: 'error'
+                            }).then((result) => {
+                                /* Read more about isConfirmed, isDenied below */
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
                         }
                     });
 
