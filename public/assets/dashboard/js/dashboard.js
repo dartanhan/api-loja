@@ -21,6 +21,8 @@ $(function () {
     let newCtxChartLine = new Chart(ctxLine);
     let ctxLineMulti = document.getElementById("myLineMultiChart");
     let newCtxChartLineMulti = new Chart(ctxLineMulti);
+    let ctxBarFunc = document.getElementById("myBarChartFunc");
+    let newCtxChartBarFunc = new Chart(ctxBarFunc);
 
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -245,7 +247,6 @@ $(function () {
             }
         });
         fncLoadChartBar("close");
-
     }
 
     let fncLineChart = function(response) {
@@ -341,6 +342,69 @@ $(function () {
         //fncLoadCharLine("close");
     }
 
+    //Gráfico com dados dos funcionarios por venda
+     let fncBarChartFunc = async function() {
+        await fetch(url+ "/relatorio/chartFunc/")
+            .then(function (response) {
+
+                return response.json()
+            }).then(function (data) {
+                  console.log(data);
+
+                // Mapear o número do mês para o nome do mês correspondente
+                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+                // Extrair os nomes dos funcionários dinamicamente
+                const funcionarios = [...new Set(data.map(item => item.funcionario_nome))];
+
+                // Extrair os dados do objeto recebido
+                //var labels = [...new Set(data.map(item => item.mes))];
+                const labels = [...new Set(data.map(item => monthNames[item.mes - 1]))];
+                console.log(labels);
+
+                // Criar datasets dinamicamente para cada funcionário
+                const datasets = funcionarios.map(function (funcionario) {
+                    return {
+                        label: funcionario,
+                        backgroundColor: getRandomColor(),
+                        data: labels.map(function (mes) {
+                            var venda = data.find(item => item.funcionario_nome === funcionario && monthNames[item.mes - 1] === mes);
+                            return venda ? parseFloat(venda.total_vendas) : 0;
+                        }),
+                    };
+                });
+
+                // Criar o gráfico usando Chart.js
+                const ctx = document.getElementById('myBarChartFunc').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets,
+                    },
+                    options: {
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem, chart) {
+                                    const datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                    return datasetLabel + ': R$ ' + number_format(tooltipItem.yLabel, 2, ',', '.');
+                                }
+                            }
+                        }
+                    }
+                });
+
+            });
+    }
+    // Função para gerar cores aleatórias
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
     /**
      * #########################################################################
      * ##########  ÁREA DATATABLE ###################################
@@ -364,6 +428,15 @@ $(function () {
             "columns": [
                 {"data": "codigo_venda"},
                 {"data": "usuario"},
+                {
+                    //"data": "tipo_venda",
+                    "render": function ( data, type, row, meta ) {
+                        if(row.tipo_venda.toUpperCase() === "PRESENCIAL"){
+                            return "<span class='text-primary'>"+row.tipo_venda+"</span>"
+                        }
+                        return "<span class='text-danger'>"+row.tipo_venda+"</span>"
+                    }
+                },
                 {"data": "nome_pgto"},
                 {
                     "data": "sub_total",
@@ -647,6 +720,8 @@ $(function () {
         }
     };
 
+
+
     let dynamicColors = function() {
         r = Math.floor(Math.random() * 255);
         g = Math.floor(Math.random() * 255);
@@ -771,4 +846,5 @@ $(function () {
     fncDataLineMultiChart().then();
     fncCardBody("close");
     fncDataDatatable("", "").then();
+    fncBarChartFunc().then();
 });
