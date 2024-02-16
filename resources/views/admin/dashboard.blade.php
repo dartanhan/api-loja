@@ -175,6 +175,7 @@
                             <th data-sortable="true">Forma Pagamento</th>
                             <th data-sortable="true">Sub Total</th>
                             <th data-sortable="true">Desconto</th>
+                            <th data-sortable="true">Cashback</th>
                             <th data-sortable="true">Total</th>
                             <th data-sortable="true">Data</th>
                             <th data-sortable="false" style="width: 50px">Ações</th>

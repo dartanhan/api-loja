@@ -362,7 +362,12 @@ $(function () {
                 responsive: true,
             },
             "columns": [
-                {"data": "codigo_venda"},
+                {
+                    //"data": "codigo_venda",
+                    "render": function ( data, type, row, meta ) {
+                        return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
+                    }
+                },
                 {"data": "usuario"},
                 {"data": "nome_pgto"},
                 {
@@ -372,6 +377,11 @@ $(function () {
                 },
                 {
                     "data": "valor_desconto",
+                    render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
+                    //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
+                },
+                {
+                    "data": "cashback",
                     render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
                     //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
                 },
@@ -404,7 +414,7 @@ $(function () {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[6, "desc"]]
+            "order": [[7, "desc"]]
 
         });//fim datatables
     }

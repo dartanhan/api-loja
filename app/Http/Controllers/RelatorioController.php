@@ -6,6 +6,8 @@ use App\Http\Models\Payments;
 use App\Http\Models\Lojas;
 use App\Http\Models\TaxaCartao;
 use App\Http\Models\Vendas;
+use App\Http\Models\VendasCashBack;
+use App\Http\Models\VendasProdutosDesconto;
 use App\Http\Models\VendasProdutosTipoPagamento;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -21,12 +23,13 @@ use Throwable;
 
 class RelatorioController extends Controller
 {
-    protected $request, $vendas, $payments, $lojas, $salePayments,$formatter, $taxaCartao;
+    protected $request, $vendas, $payments, $lojas, $salePayments,$formatter, $taxaCartao,$vendasCashBack,$vendasProdutosDesconto;
 
     public function __construct(Request $request, Vendas $vendas,
                                 Lojas $lojas, Payments $payments,
                                 VendasProdutosTipoPagamento $salePayments,
-                                TaxaCartao $taxaCartao){
+                                TaxaCartao $taxaCartao, VendasCashBack $cashbackVendas,
+                                VendasProdutosDesconto $vendasProdutosDesconto){
         $this->request = $request;
         $this->vendas = $vendas;
         $this->lojas = $lojas;
@@ -34,6 +37,9 @@ class RelatorioController extends Controller
         $this->salePayments = $salePayments;
         $this->taxaCartao = $taxaCartao;
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
+        $this->vendasCashBack = $cashbackVendas;
+        $this->vendasProdutosDesconto = $vendasProdutosDesconto;
+        
     }
     /**
      * Display a listing of the resource.
@@ -609,7 +615,7 @@ class RelatorioController extends Controller
 
             foreach ($listSales as $listSale) {
 
-                $data['total'] =  $listSale->total;
+                $data['total'] =  $listSale->total - $this->cashback($listSale->venda_id);
                 $data['data'] =  $listSale->data;
                 $data['loja'] =  $listSale->loja;
                 $data['codigo_venda'] =  $listSale->codigo_venda;
@@ -619,6 +625,7 @@ class RelatorioController extends Controller
                 $data['nome_pgto'] =  $this->formName($listSale->venda_id);//$listSale->nome_pgto;
                 $data['id_pgto'] =  $listSale->id_pgto;
                 $data['usuario'] =  ($listSale->usuario_id == "") ? 'Karla' : $listSale->nome;
+                $data['cashback'] = $this->cashback($listSale->venda_id);
 
                 $return[] = $data;
             }
@@ -627,6 +634,44 @@ class RelatorioController extends Controller
             return Response::json(['error' => $e], 400);
         }
         return Response::json(array("data" => $return));
+    }
+
+     /****
+     * Pega o cashback da venda
+     * 
+     */
+    public function cashback(int $venda_id){
+        $cashback = $this->vendasCashBack
+            ->select(
+                "valor AS total_cashback",
+        )->where('venda_id', $venda_id)
+        ->where('status', 1)
+        ->first();
+
+        if ($cashback) {
+           return $cashback->total_cashback;
+        } else {
+            return 0;
+        }
+    }
+
+     /****
+     * Pega o desconto da venda
+     * 
+     */
+    public function valor_recebido(int $venda_id){
+        $data = $this->vendasProdutosDesconto
+            ->select(
+                "valor_recebido",
+        )->where('venda_id', $venda_id)
+        ->first();
+
+        if ($data) {
+           return $data->valor_recebido;
+        } else {
+            return 0;
+        }
+        
     }
 
     /**
@@ -643,7 +688,12 @@ class RelatorioController extends Controller
 
         $saida = "";
         foreach ($nomePayments as $nomePayment) {
-            $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - tx.'. $nomePayment->taxa .')'. "<br/>";
+            if(strtoupper($nomePayment->nome) == "DINHEIRO"){
+                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - RECEBIDO:  '. $this->formatter->formatCurrency($this->valor_recebido($id), 'BRL') .')'. "<br/>";    
+            }else{
+                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - tx.'. $nomePayment->taxa .')'. "<br/>";
+            }
+            
         }
         return substr($saida,0,-1);
 

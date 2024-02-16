@@ -101,7 +101,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/fluxo/chart/{id}',[FluxoController::class,'chart']);
     Route::resource('/fluxo','FluxoController');
 
-    Route::resource('/flux',FluxController::class);
+   // Route::resource('/flux',FluxController::class);
 
     Route::resource('/calendario','CalendarioController');
 
