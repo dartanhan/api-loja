@@ -596,12 +596,15 @@ class RelatorioController extends Controller
                 "loja_vendas_produtos_descontos.valor_desconto",
                 (DB::raw(("loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"))),
                 "loja_forma_pagamentos.nome as nome_pgto",
-                "loja_forma_pagamentos.id as id_pgto"
+                "loja_forma_pagamentos.id as id_pgto",
+                "loja_tipo_vendas.descricao as tipo_venda"
             )->leftJoin('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
                 ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
                 ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
                 ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'loja_vendas.usuario_id')
+                ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'loja_vendas.tipo_venda_id')
+
                 ->where('loja_vendas.loja_id', $this->request->id)
                //  ->whereDate('loja_vendas.created_at', Carbon::today())
                // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('1'))
@@ -626,6 +629,7 @@ class RelatorioController extends Controller
                 $data['id_pgto'] =  $listSale->id_pgto;
                 $data['usuario'] =  ($listSale->usuario_id == "") ? 'Karla' : $listSale->nome;
                 $data['cashback'] = $this->cashback($listSale->venda_id);
+                $data['tipo_venda'] = $listSale->tipo_venda;
 
                 $return[] = $data;
             }
@@ -831,6 +835,32 @@ class RelatorioController extends Controller
 
     function buscaTaxa(int $idPagamento){
         return $this->taxaCartao::select('valor_taxa')->where('forma_id', $idPagamento)->first()->valor_taxa;
+    }
+
+    /**
+    Gráfico de vendas dos funcionarios
+     */
+    function chartFunc(){
+       // dd("ok");
+
+        // Construir a consulta SQL dinâmica para agrupar por funcionário
+        $query = DB::table('loja_vendas')
+            ->join('loja_usuarios', 'loja_vendas.usuario_id', '=', 'loja_usuarios.id')
+            ->select(
+                'loja_usuarios.nome AS funcionario_nome', // Selecionar o nome do funcionário
+                DB::raw('MONTH(loja_vendas.created_at) AS mes'), // Extrair o mês da data_venda
+                DB::raw('SUM(loja_vendas.valor_total) AS total_vendas') // Calcular a soma das vendas para cada funcionário
+            )
+           // ->whereYear('loja_vendas.created_at', date('Y')) // Filtrar pelo ano atual
+            ->groupBy('funcionario_nome', 'mes'); // Agrupar por funcionário e mês
+
+        // Executar a consulta e obter os resultados
+        $salesData = $query->get();
+
+        // Converter os resultados para array e retornar como resposta JSON
+        return response()->json($salesData);
+
+        //return Response::json(array("success" => true,"dados" => "ok"));
     }
 
 }

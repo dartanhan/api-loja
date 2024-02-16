@@ -85,6 +85,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/relatorio/card/{ano}',[RelatorioController::class,'card']);
     Route::get('/relatorio/chartLineGroupYear/{year}',[RelatorioController::class,'chartLineGroupYear']);
     Route::get('/relatorio/chartLineMultiGroupYear',[RelatorioController::class,'chartLineMultiGroupYear']);
+    Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
 
     Route::resource('/relatorio','RelatorioController');
 
@@ -123,7 +124,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
     Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
 });
-
+Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
 /*Route::resource('/usuario','UserSystemController');
 Route::resource('/relatorio','RelatorioController');
 Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');

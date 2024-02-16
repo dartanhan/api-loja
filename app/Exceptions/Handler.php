@@ -50,6 +50,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof TokenMismatchException) {
+            // Personalize o redirecionamento conforme necessário
+            return redirect()->route('admin.login');
+        }
+
         return parent::render($request, $exception);
     }
 }

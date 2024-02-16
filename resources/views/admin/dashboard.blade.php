@@ -160,6 +160,15 @@
                     <div class="card-body"><canvas id="myLineMultiChart" width="100%" height="40"></canvas></div>
                 </div>
             </div>
+
+            <div class="col-xl-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-1"></i>Total Vendas por Funcionário
+                    </div>
+                    <div class="card-body"><canvas id="myBarChartFunc" width="100%" height="40"></canvas></div>
+                </div>
+            </div>
         </div>
         <div class="card mb-4">
             <div class="card-header">
@@ -172,6 +181,7 @@
                         <tr>
                             <th data-sortable="true">Venda</th>
                             <th data-sortable="false" style="width: 100px">Vendedor</th>
+                            <th data-sortable="true">Tipo Venda</th>
                             <th data-sortable="true">Forma Pagamento</th>
                             <th data-sortable="true">Sub Total</th>
                             <th data-sortable="true">Desconto</th>
