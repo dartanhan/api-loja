@@ -487,7 +487,7 @@ $(function () {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[7, "desc"]]
+            "order": [[8, "desc"]]
 
         });//fim datatables
     }
