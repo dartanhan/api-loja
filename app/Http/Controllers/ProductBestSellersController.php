@@ -245,7 +245,7 @@ class ProductBestSellersController extends Controller
 
             return  DataTables::of($ret)->make(true);*/
 
-            $ret =  $this->salesProduct
+            /*$ret =  $this->salesProduct
                 ->join('loja_produtos_variacao as lpv', 'loja_vendas_produtos.codigo_produto','=', 'lpv.subcodigo')
                 ->join('loja_produtos_new as pn', 'lpv.products_id','=', 'pn.id')
                 ->select(
@@ -288,7 +288,46 @@ class ProductBestSellersController extends Controller
                     $responseArray[$key]['valor_produto_total'] = $this->formatter->formatCurrency($value->valor_produto_total, 'BRL');
                     $responseArray[$key]['qtd_media_3_meses'] = round($medias->qtd_media);
                     $responseArray[$key]['tot_3_meses'] = round($medias->tot_3_meses);
-                }
+                }*/
+
+                $ret = $this->salesProduct
+                        ->join('loja_produtos_variacao as lpv', 'loja_vendas_produtos.codigo_produto', '=', 'lpv.subcodigo')
+                        ->join('loja_produtos_new as pn', 'lpv.products_id', '=', 'pn.id')
+                        ->select(
+                            "loja_vendas_produtos.codigo_produto",
+                            "loja_vendas_produtos.descricao",
+                            "lpv.quantidade",
+                            "lpv.estoque",
+                            DB::raw("sum(loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade) as valor_produto_total"),
+                            DB::raw("sum(loja_vendas_produtos.quantidade) as qtd_tot_mes"),
+                            DB::raw("sum(case when DATEDIFF(NOW(), loja_vendas_produtos.created_at) <= 90 then loja_vendas_produtos.quantidade else 0 end) as tot_3_meses"),
+                            DB::raw("sum(case when DATEDIFF(NOW(), loja_vendas_produtos.created_at) <= 60 then loja_vendas_produtos.quantidade else 0 end) as tot_2_meses"),
+                            DB::raw("sum(case when DATEDIFF(NOW(), loja_vendas_produtos.created_at) <= 30 then loja_vendas_produtos.quantidade else 0 end) as tot_1_meses")
+                        )
+                        ->where(DB::raw('DATE_FORMAT(loja_vendas_produtos.created_at, "%Y-%m")'), Carbon::now()->subDays(30)->format("Y-m"))
+                        ->where(['lpv.status' => 1, 'pn.status' => 1]) //somente ativos
+                        ->whereNotIn("loja_vendas_produtos.troca", [1])
+                        ->groupBy("loja_vendas_produtos.codigo_produto", "loja_vendas_produtos.descricao", "lpv.quantidade", "lpv.estoque")
+                        //->orderBy("qtd_tot_mes","desc")
+                        ->get();
+
+                    $responseArray = [];
+
+                    foreach ($ret as $key => $value) {
+                        $responseArray[$key]['falta_comprar'] = (round($value->tot_3_meses / 3) - $value->estoque - $value->quantidade < 0)
+                            ? 0
+                            : round($value->tot_3_meses / 3) - intval($value->estoque) - intval($value->quantidade);
+                        $responseArray[$key]['estoque'] = intval($value->estoque);
+                        $responseArray[$key]['codigo_produto'] = $value->codigo_produto;
+                        $responseArray[$key]['descricao'] = $value->descricao;
+                        $responseArray[$key]['qtd_atual'] = intval($value->quantidade);
+                        $responseArray[$key]['qtd_total_mes'] = intval($value->qtd_tot_mes);
+                        $responseArray[$key]['valor_produto_total'] = $this->formatter->formatCurrency($value->valor_produto_total, 'BRL');
+                        $responseArray[$key]['qtd_media_3_meses'] = round($value->tot_3_meses / 3);
+                        $responseArray[$key]['tot_3_meses'] = round($value->tot_3_meses);
+                        $responseArray[$key]['tot_2_meses'] = round($value->tot_2_meses);
+                        $responseArray[$key]['tot_1_meses'] = round($value->tot_1_meses);
+                    }
 
                 return datatables($responseArray)->toJson();
 
