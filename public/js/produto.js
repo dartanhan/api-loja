@@ -717,7 +717,8 @@ $(function() {
                             "<i class=\"bi-image btnProductImage\" " +
                             "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                             "               title='Imagem do Produto' data-bs-toggle=\"modal\" " +
-                            "               data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' data-image='"+ image  +"'></i>"+
+                            "               data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' "+
+                            "               data-image-preview='"+image+"'  data-path='"+row.imagem+"' ></i>"+
                             "</i>&nbsp;" +
                             "</div>" +
                             "</div>";
@@ -767,16 +768,8 @@ $(function() {
                                     "<th>IMAGEM</th>" +
                                     "<th>SUB CÓDIGO</th>" +
                                     "<th>VARIAÇÃO</th>" +
-                                    "<th>QTD</th>" +
-                                    "<th>ESTOQUE</th>" +
                                     "<th>VAREJO</th>" +
                                     "<th>ATACADO</th>" +
-                                    //"<th>ATA.5UN</th>" +
-                                    //"<th>ATA.10UN</th>" +
-                                    //"<th>VAL.LISTA</th>" +
-                                    "<th>PRODUTO</th>" +
-                                    //"<th>VAL.CARTÃO/PIX</th>" +
-                                    //"<th>VAL.PARCELADO</th>" +
                                     "<th>STATUS</th>" +
                                     "<th>AÇÃO</th>" +
                                 "</tr>" +
@@ -791,7 +784,7 @@ $(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                           //  console.log(response.data.products);
+                             console.log(response.data.products);
                             if (response.success) {
                                 let arrayProducts = JSON.stringify(response.data.products);
 
@@ -810,17 +803,14 @@ $(function() {
                                         "<td>"+image+"</td>" +
                                         "<td>" + arrayItem.subcodigo + "</td>" +
                                         "<td>" + arrayItem.variacao + "</td>" +
-                                        "<td>" + arrayItem.quantidade + "</td>" +
-                                        "<td>" + arrayItem.estoque + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                         "               title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
                                         "               data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
-                                        "               data-subcodigo='"+arrayItem.subcodigo+"' data-image='"+ image_filho +"'>"+
+                                        "               data-subcodigo='"+arrayItem.subcodigo+"' data-image-preview='"+image_filho+"' data-path='"+ arrayItem.path +"'>"+
                                         "</td>"+
                                     "</tr>"
                                 });
@@ -855,7 +845,8 @@ $(function() {
         event.preventDefault();
     
         // Obtém o valor do atributo "data-imagem"
-        var imagem = $(this).data('image');
+        var imagem = $(this).data('path');
+        var imagePreview = $(this).data('image-preview');
         var variacaoId = $(this).data('variacao-id');
         var productId = $(this).data('id');
 
@@ -865,8 +856,10 @@ $(function() {
         // Atribui o valor ID da imagem do produto
         $('#productId').val(productId);
 
+        $('#imagemName').val(imagem);
+
         // Atribui o valor da imagem ao atributo "src" da tag "<img>" no modal
-        $('#modal-imagem').attr('src', imagem);
+        $('#modal-imagem').attr('src', imagePreview);
 
         // Abre o modal
        // $('#modal').modal('show');

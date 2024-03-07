@@ -57,7 +57,7 @@ class ProdutoController extends Controller
 
             $user_data = Usuario::where("user_id",auth()->user()->id)->first();
 
-            return view('admin.product', compact('origem_nfces','categories','cores','user_data'));
+            return view('admin.produto', compact('origem_nfces','categories','cores','user_data'));
         }
 
         return redirect()->route('admin.login');

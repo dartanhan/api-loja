@@ -60,6 +60,7 @@
                                 @csrf
                                 <input type="hidden" name="id" id="id">
                                 <input type="hidden" name="metodo" id="metodo">
+                                <input type="hidden" name="destinoFile" id="destinoFile" value="categorias">
                                 <div class="modal-body">
                                     <div class="row">
                                         <div class="col-md-8 mb-3">
