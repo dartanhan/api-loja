@@ -58,7 +58,7 @@ class ReposicaoController extends Controller
                         DB::raw('CAST(SUM(IF(vp.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY), vp.quantidade, 0)) AS UNSIGNED) AS qtd_total_venda_30d'),
                         DB::raw('CAST(SUM(IF(vp.created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY), vp.quantidade, 0)) AS UNSIGNED) AS qtd_total_venda_60d'),
                         DB::raw('CAST(SUM(IF(vp.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY), vp.quantidade, 0)) AS UNSIGNED) AS qtd_total_venda_90d'),
-                        DB::raw('CAST(va.quantidade) AS UNSIGNED AS qtd'),
+                        DB::raw('CAST(va.quantidade AS UNSIGNED) AS qtd'),
                         DB::raw('IF((va.status = 1), "ATIVO", "INATIVO") as status')
                 )
                 ->groupBy('vp.codigo_produto')
