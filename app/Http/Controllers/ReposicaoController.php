@@ -49,10 +49,11 @@ class ReposicaoController extends Controller
             $informacoes = DB::table('loja_vendas_produtos as vp')
                 ->leftJoin('loja_produtos_variacao as va', 'vp.codigo_produto', '=', 'va.subcodigo')
                 ->leftJoin('loja_produtos_imagens as pi', 'va.id', '=', 'pi.produto_variacao_id')
+                ->Join('loja_produtos_new as pn', 'va.products_id', '=', 'pn.id')    
                     ->select(
                         'pi.path as imagem',
                         'vp.codigo_produto as subcodigo',
-                        'vp.descricao as variacao',
+                        DB::raw('CONCAT(pn.descricao, " - ", va.variacao) AS variacao'),
                         'va.valor_produto as valor_pago',
                         'va.estoque',
                         DB::raw('CAST(SUM(IF(vp.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY), vp.quantidade, 0)) AS UNSIGNED) AS qtd_total_venda_30d'),
