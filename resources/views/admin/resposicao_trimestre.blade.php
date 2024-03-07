@@ -38,7 +38,6 @@
                                         <th data-sortable="true">Status</th>
                                         <th data-sortable="true">Criado</th>
                                         <th data-sortable="true">Atualizado</th>
-                                        <th data-sortable="true">Ação</th>
                                     </tr>
                                     </thead>
                                     <tbody class="text-center"></tbody>
@@ -51,7 +50,7 @@
         </div>
     </div>
     
-    <!-- Modal Image-->
+    <!-- Modal Image -->
        <div class="modal fade" id="divModalImageProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content ">
@@ -87,7 +86,7 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>    
     <script src="{{URL::asset('js/comum.js')}}"></script>
-    <script src="{{URL::asset('js/produto.js')}}"></script>
+    <script src="{{URL::asset('js/resposicao.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
 @endpush
 @push("styles")

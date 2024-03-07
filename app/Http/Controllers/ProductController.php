@@ -55,25 +55,26 @@ class  ProductController extends Controller
      */
     public function index()
     {
+        return view('admin.produto');
 
         //$produtos =  $this->produto::with('produtos', 'images')
-        $produtos =  $this->produto::with('produtos')
-            ->leftJoin('loja_fornecedores','loja_produtos.fornecedor_id','=' ,'loja_fornecedores.id')
-            ->leftJoin('loja_categorias','loja_produtos.categoria_id','=' ,'loja_categorias.id')
-            ->select(
-                'loja_produtos.*',
-                'loja_fornecedores.nome as nome_fornecedor',
-                'loja_categorias.nome as nome_categoria'
-            )->orderBy('id', 'DESC')
-            ->get();
+        // $produtos =  $this->produto::with('produtos')
+        //     ->leftJoin('loja_fornecedores','loja_produtos.fornecedor_id','=' ,'loja_fornecedores.id')
+        //     ->leftJoin('loja_categorias','loja_produtos.categoria_id','=' ,'loja_categorias.id')
+        //     ->select(
+        //         'loja_produtos.*',
+        //         'loja_fornecedores.nome as nome_fornecedor',
+        //         'loja_categorias.nome as nome_categoria'
+        //     )->orderBy('id', 'DESC')
+        //     ->get();
 
-        $user_data = Usuario::where("user_id",auth()->user()->id)->first();
+        // $user_data = Usuario::where("user_id",auth()->user()->id)->first();
 
-        $fornecedors = $this->fornecedor->where('status',true)->orderBy('nome', 'ASC')->get();
-        $categorias = $this->categoria->where('status',true)->orderBy('nome', 'ASC')->get();
-        $cores = $this->cor->where('status',true)->orderBy('nome', 'ASC')->get();
+        // $fornecedors = $this->fornecedor->where('status',true)->orderBy('nome', 'ASC')->get();
+        // $categorias = $this->categoria->where('status',true)->orderBy('nome', 'ASC')->get();
+        // $cores = $this->cor->where('status',true)->orderBy('nome', 'ASC')->get();
 
-        return view('admin.produto', compact('produtos','fornecedors','categorias','cores','user_data'));
+        // return view('admin.produto', compact('produtos','fornecedors','categorias','cores','user_data'));
     }
 
     /**
@@ -448,14 +449,14 @@ class  ProductController extends Controller
     public function importProduct()
     {
       //  dd($this->request->all());
-        try {
+        // try {
 
-            Excel::import(new ProductImport, $this->request->file('fileUpload'));
-            return redirect('/admin/produto');
+        //     Excel::import(new ProductImport, $this->request->file('fileUpload'));
+        //     return redirect('/admin/produto');
 
-        } catch (Throwable $e) {
+        // } catch (Throwable $e) {
 
-            return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
-        }
+        //     return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
+        // }
     }
 }

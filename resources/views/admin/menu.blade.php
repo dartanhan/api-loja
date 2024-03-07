@@ -13,12 +13,12 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                             <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
                             Produtos
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
@@ -28,17 +28,21 @@
                                     <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
                                     Produtos Inativos
                                 </a>
+                                <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                                    Produtos
+                                </a>
                             </nav>
                         </div>
 
                         <div class="sb-sidenav-menu-heading">Interface</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                             Configurações
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
 
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse" id="collapsePagesConfiguracoes" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ Route::current()->getName() === 'cashback.index' ? 'active' : '' }}" href="{{route('cashback.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-money-bill"></i></div>
@@ -88,12 +92,12 @@
                                 </div>
                             </nav>
                         </div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesRelatorios" aria-expanded="false" aria-controls="collapsePages">
                             <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Relatórios
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse" id="collapsePagesRelatorios" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link {{ Route::current()->getName() === 'categoria.index' ? 'active' : '' }}" href="{{route('categoria.index')}}">
                                         <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
@@ -122,32 +126,42 @@
                                     </a>
                                 </nav>
                         </div>
-                        <!--div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                                    Authentication
-                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                </a>
-                                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                                    <nav class="sb-sidenav-menu-nested nav">
-                                        <a class="nav-link" href="login.html">Login</a>
-                                        <a class="nav-link" href="register.html">Register</a>
-                                        <a class="nav-link" href="password.html">Forgot Password</a>
-                                    </nav>
-                                </div>
-                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                                    Error
-                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                </a>
-                                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                                    <nav class="sb-sidenav-menu-nested nav">
-                                        <a class="nav-link" href="401.html">401 Page</a>
-                                        <a class="nav-link" href="404.html">404 Page</a>
-                                        <a class="nav-link" href="500.html">500 Page</a>
-                                    </nav>
-                                </div>
-                            </nav>
-                        </div-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                                Resposição
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePagesResposicao" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+                                           Visão por Trimestre
+                                    </a>
+                                    <!--a class="nav-link {{ Route::current()->getName() === 'gastosfixo.index' ? 'active' : '' }}" href="{{route('gastosfixo.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
+                                            Contas a Pagar
+                                    </a>
+                                    <a class="nav-link {{ Route::current()->getName() === 'estoque.index' ? 'active' : '' }}" href="{{route('estoque.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                                            Estoque
+                                    </a>
+                                    <a class="nav-link {{ Route::current()->getName() === 'fluxo.index' ? 'active' : '' }}" href="{{route('fluxo.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-money-bill"></i></div>
+                                            Fluxo de Caixa
+                                    </a>
+                                    <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
+                                            Mais Vendidos por Categorias
+                                    </a>
+
+                                     <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
+                                        <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
+                                            Mais Vendidos
+                                    </a-->
+                                </nav>
+                        </div>
                         <div class="sb-sidenav-menu-heading">Addons</div>
                         <a class="nav-link" href="charts.html">
                             <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>

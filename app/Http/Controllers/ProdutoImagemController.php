@@ -85,7 +85,7 @@ class ProdutoImagemController extends Controller
                 //$productsImages->path = $file->store('produtos/' . $this->request->products_variation_id);
                 $productsImages->path = 'produtos/' . $this->request->products_variation_id .'/'. $image_name;
                 $productsImages->save();
-                unset($this->productsImages);
+                unset($productsImages);
 
                 //Storage::disk('public')->put('produtos/'.$this->request->products_variation_id ,  $file, 'public');
 

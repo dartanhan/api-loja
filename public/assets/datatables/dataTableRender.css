@@ -61,5 +61,5 @@ table.dataTable tbody td {
 .img-datatable{
     border-radius: 10%;
     width: 120px;
-    height: 80px;
+    height: auto;
 }

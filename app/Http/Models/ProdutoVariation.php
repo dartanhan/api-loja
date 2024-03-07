@@ -21,4 +21,9 @@ class ProdutoVariation extends Model
     function images(){
         return  $this->hasMany(ProdutoImagem::class ,'produto_variacao_id','id');
     }
+
+    public function venda()
+    {
+        return $this->belongsTo(VendasProdutos::class, 'subcodigo', 'codigo_produto');
+    }
 }

@@ -123,6 +123,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
     Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
+
+    Route::resource('reposicao','ReposicaoController');
 });
 Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
 /*Route::resource('/usuario','UserSystemController');

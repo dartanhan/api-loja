@@ -39,4 +39,5 @@ class Produto extends Model
                 "loja_produtos_imagens.produto_variacao_id",
                 (DB::raw('IF((loja_produtos_variacao.status = 1), "ATIVO", "INATIVO") as status')));
     }
+
 }
