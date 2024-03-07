@@ -21,7 +21,7 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-auto input-group-sm">
-                                        <h6><i class="fas fa-table me-1"></i>Produtos</h6>
+                                        <h6><i class="fas fa-table me-1"></i>Produtos Visão por Trimestre</h6>
                                     </div>
                                 </div>
                             </div>
