@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid"  style=" padding-top: 10px;padding-right: 10px">
+    <div class="container-fluid mt-3">
         <div id="divDelete" name="load">
             <div class="" role="alert" id="alert-title-delete"></div>
         </div>

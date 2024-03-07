@@ -52,14 +52,25 @@ class AuthController extends Controller
         }
 
         if ($response->isSuccess()) {
-            if(!filter_var($request->input("email") , FILTER_VALIDATE_EMAIL)){
-                return redirect()->back()->withInput()->withErrors(['Login informado não é valido!']);
-            }
+            // if(!filter_var($request->input("email") , FILTER_VALIDATE_EMAIL)){
+            //     return redirect()->back()->withInput()->withErrors(['Login informado não é valido!']);
+            // }
 
-            $credentials = [
-                'email' => $request->input("email"),
-                'password' => $request->input("password")
-            ];
+            // $credentials = [
+            //     'email' => $request->input("email"),
+            //     'password' => $request->input("password")
+            // ];
+
+            $loginField = $request->input('login');
+            $password = $request->input('password');
+
+            if (filter_var($loginField, FILTER_VALIDATE_EMAIL)) {
+                // Se for um email, tenta fazer login usando email
+                $credentials = ['email' => $loginField,'password' => $password];
+            } else {
+                // Se não for um email, tenta fazer login usando o nome de usuário
+                $credentials = ['login' => $loginField, 'password' => $password];
+            }
 
             if(Auth::attempt($credentials)){
                 return redirect()->route('admin.home');

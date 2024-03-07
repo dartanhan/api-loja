@@ -30,12 +30,31 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only(['login', 'password']);
+        // $credentials = $request->only(['login', 'password']);
 
-        if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Acesso não autorizado!'], 401);
+        // if (!$token = auth('api')->attempt($credentials)) {
+        //     return response()->json(['error' => 'Acesso não autorizado!'], 401);
+        // }
+
+        //return $this->respondWithToken($token);
+        $loginField = $request->input('login');
+        $password = $request->input('password');
+
+        // Verifica se o loginField parece ser um email
+        if (filter_var($loginField, FILTER_VALIDATE_EMAIL)) {
+            // Se for um email, tenta fazer login usando email
+            $credentials = ['email' => $loginField, 'password' => $password];
+        } else {
+            // Se não for um email, tenta fazer login usando o nome de usuário
+            $credentials = ['login' => $loginField, 'password' => $password];
         }
 
+        // Tenta fazer login com as credenciais fornecidas
+        if (!$token = auth('api')->attempt($credentials)) {
+                 return response()->json(['error' => 'Acesso não autorizado!'], 401);
+        }
+
+        // Se o login for bem-sucedido, retorna o token de autenticação
         return $this->respondWithToken($token);
     }
 

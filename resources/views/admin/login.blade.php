@@ -35,7 +35,7 @@
 
                                 <!-- Email input -->
                                 <div class="form-group border-lable-flt ">
-                                      <input  id="email" type="email" name="email" class="form-control" placeholder="Login" required autofocus>
+                                      <input  id="login" type="text" name="login" class="form-control" placeholder="Login" required autofocus>
                                       <label for="label-name">Login</label>
                                 </div>
 

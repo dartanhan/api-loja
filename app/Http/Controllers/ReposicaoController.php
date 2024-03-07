@@ -62,6 +62,7 @@ class ReposicaoController extends Controller
                         DB::raw('IF((va.status = 1), "ATIVO", "INATIVO") as status')
                 )
                 ->groupBy('vp.codigo_produto')
+                ->where('va.status',true) //somente ativos
                 ->where('va.products_id',$id)->get();
             
         } catch (Throwable $e) {
