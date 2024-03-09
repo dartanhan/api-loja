@@ -7,6 +7,7 @@ use http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 /***
  * Classe responsável pelo upload temporário das imagens do sistema
@@ -21,22 +22,28 @@ class UploadController extends Controller
         $this->request = $request;
         $this->temporaryFile = $temporaryFile;
     }
+
     public function tmpUpload(){
 
-        if($this->request->hasFile('image')){
+        if ($this->request->hasFile('image')) {
             $image = $this->request->file('image');
-            $destinoFile = $this->request->input("productId") !== "" ? 'product' : 'produtos';
 
-            
             $nome_unico = Str::uuid() . '.' . $image->getClientOriginalExtension();
-           // $file_name = $image->getClientOriginalName();
-            $folder = uniqid($destinoFile,true);
-            $image->storeAs($destinoFile.'/tmp/'.$folder,$nome_unico,'public');
+
+            $folder = uniqid("temporary", true);
+
+            // Redimensionar imagem
+            $image = Image::make($image);
+            $image->resize(500, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $temp_file = $image->encode('jpeg');
+
+            // Armazenar imagem redimensionada
+            Storage::put('/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
 
             $this->temporaryFile->folder = $folder;
             $this->temporaryFile->file =  $nome_unico;
-
-           // dd($this->temporaryFile);
             $this->temporaryFile->save();
 
             return $folder;
@@ -48,11 +55,56 @@ class UploadController extends Controller
         $temp_file = TemporaryFile::where('folder',$this->request->getContent())->first();
 
         if($temp_file){
-            $destinoFile = $this->request->input('destinoFile');
+            $destinoFile = 'product';
+
+            Storage::deleteDirectory($destinoFile.'/tmp/'.$temp_file->folder);
+            $temp_file->delete();
+            return response('');
+        }
+    }
+
+    public function tmpUploadVariacao(){
+
+        if ($this->request->hasFile('image')) {
+            $image = $this->request->file('image');
+
+            $destinoFile = 'produtos';
+
+            $nome_unico = Str::uuid() . '.' . $image->getClientOriginalExtension();
+
+            $folder = uniqid("product", true);
+
+            // Redimensionar imagem
+            $image = Image::make($image);
+            $image->resize(500, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $temp_file = $image->encode('jpeg');
+
+            // Armazenar imagem redimensionada
+            Storage::put($destinoFile.'/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+
+            $this->temporaryFile->folder = $folder;
+            $this->temporaryFile->file =  $nome_unico;
+
+            $this->temporaryFile->save();
+
+            return $folder;
+        }
+        return '';
+    }
+
+    public function tmpDeleteVariacao(){
+        $temp_file = TemporaryFile::where('folder',$this->request->getContent())->first();
+
+        if($temp_file){
+            $destinoFile = 'product';
+
             Storage::deleteDirectory($destinoFile.'/tmp/'.$temp_file->folder);
             $temp_file->delete();
             return response('');
         }
 
     }
+
 }

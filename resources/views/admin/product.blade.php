@@ -14,9 +14,9 @@
                 <form method="post" autocomplete="off" id="form" name="form" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" id="id">
-                   
+
                     <div class="card-body">
-                       
+
                        <div class="card mb-4">
                             <div class="card-header">
                                 <div class="row">
@@ -50,7 +50,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Image-->
        <div class="modal fade" id="divModalImageProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -59,7 +59,11 @@
                     @csrf
                     <input type="hidden" name="productId" id="productId">
                     <input type="hidden" name="variacaoId" id="variacaoId">
+                    <input type="hidden" name="variacaoImageId" id="variacaoImageId">
+                    <input type="hidden" name="imagemName" id="imagemName">
+                    <input type="hidden" name="flagImage" id="flagImage">
                     <input type="hidden" name="metodo" id="metodo" value="put">
+
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="exampleModalLongTitle">Imagem do Produto </h5>
                         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
@@ -81,11 +85,12 @@
             </div>
         </div>
     </div>
-    
+
 @endsection
 @push("scripts")
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
-    <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>    
+    <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
+    <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{URL::asset('js/produto.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>

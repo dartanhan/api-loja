@@ -59,7 +59,7 @@ table.dataTable tbody td {
     vertical-align: middle;
 }
 .img-datatable{
-    border-radius: 10%;
+    border-radius: 5%;
     width: 120px;
-    height: auto;
+    height: 120px;
 }
