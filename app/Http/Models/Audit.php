@@ -1,15 +1,22 @@
 <?php
 
+
 namespace App\Http\Models;
 
-use App\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Http\Models\ProdutoVariation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 
+/**
+ * @property string $tags
+ * @property string $event
+ * @property array $new_values
+ * @property array $old_values
+ * @property mixed $user
+ * @property mixed $auditable.
+ */
 class Audit extends Model implements \OwenIt\Auditing\Contracts\Audit
 {
-    use HasFactory;
-
     use \OwenIt\Auditing\Audit;
 
     /**
@@ -29,15 +36,16 @@ class Audit extends Model implements \OwenIt\Auditing\Contracts\Audit
     public function getSerializedDate($date)
     {
         return $this->serializeDate($date);
+    } 
+    
+    protected $appends = ['created_at','updated_at'];
+    public function getCreatedAtAttribute()
+    {
+        return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));
     }
 
-    public function user()
+    public function getUpdatedAtAttribute()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function productNew()
-    {
-        return $this->belongsTo(Produto::class);
+        return date('d/m/Y H:i:s', strtotime($this->attributes['updated_at']));
     }
 }

@@ -6,6 +6,7 @@ namespace App\Http\Models;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
+use OwenIt\Auditing\Models\Audit;
 
 /**
  * @method static create($data)
@@ -30,4 +31,5 @@ class ProdutoVariation extends Model implements Auditable
     {
         return $this->belongsTo(VendasProdutos::class, 'subcodigo', 'codigo_produto');
     }
+
 }
