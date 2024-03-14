@@ -62,16 +62,20 @@ $(function() {
                 {
                     "data": "defaultContent",
                     render: function (data, type, row) {
+                        let image = "../public/storage/produtos/not-image.png";
+                        if(row.imagem !== null){
+                            image = '../public/storage/product/'+row.id+'/'+ row.imagem;
+                        }
                         return "<div class='text-center'>" +
-                            "<i class=\"bi-image btnProductImage\" " +
-                            "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                            "               title='Imagem do Produto' data-bs-toggle=\"modal\" " +
-                            "               data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"'></i>"+
+                            "<i class=\"bi-image\" " +
+                            "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                            "   title='Imagem do Produto' data-bs-toggle=\"modal\" " +
+                            "   data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
+                            "   data-image-preview='"+image+"'  data-path='"+row.imagem+"' data-flag-image='0'></i>"+
                             "<i class=\"bi-pencil-square btnUpdateProduct\" " +
                             "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                            "               title='Atualizar Produto' data-id=\"" + row.id + "\">" +
-                            "</i>&nbsp;" +
-                            "</div>" +
+                            "               title=\"Atualizar Produto\" data-id='"+row.id+"'>" +
+                            "</i>" +
                             "</div>";
                     }
                 }
@@ -150,8 +154,13 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
+                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>" :
+                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>"
+
+                                    let image_filho = "../public/storage/produtos/not-image.png";
+                                    if(arrayItem.path !== null){
+                                        image_filho = '../public/storage/'+arrayItem.path;
+                                    }
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -169,11 +178,12 @@ $(function() {
                                         //"<td>" + formatMoney(arrayItem.valor_cartao_pix) + "</td>" +
                                         //"<td>" + formatMoney(arrayItem.valor_parcelado) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
-                                        "<td><i class=\"bi-image btnImageProduct\" " +
-                                        "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                        "               title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
-                                        "               data-bs-target=\"#divModalImage\" data-variacao-id='"+arrayItem.id+"' " +
-                                        "               data-subcodigo='"+arrayItem.subcodigo+"'>"+
+                                        "<td><i class=\"bi-image\" " +
+                                        "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                                        "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
+                                        "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
+                                        "   data-subcodigo='"+arrayItem.subcodigo+"' data-image-id='"+arrayItem.id_image+"'" +
+                                        "   data-image-preview='"+image_filho+"'  data-path='"+arrayItem.path+"' data-flag-image='1'>"+
                                         "</td>"+
                                     "</tr>"
                                 });
@@ -233,82 +243,9 @@ $(function() {
     /**  Fim GerarCodigo */
 
     /***
-     * Salva a imagem no produto PAI
-     * */
-    $('form[name="formImageProduct"]').validate({
-        errorClass: "my-error-class",
-        validClass: "my-valid-class",
-        rules: {
-            image: {
-                required: false
-            }
-        },
-        messages: {
-            image: {
-                required: "Informe a imagem!"
-            }
-        }, submitHandler: function(form,e) {
-             //  console.log('Form submitted');
-            e.preventDefault();
-
-            let metodo = $("#metodo").val();
-            //console.log(metodo);
-
-            $.ajax({
-                type: metodo,
-                url: url + "/image/"+$("#product_id").val(),
-                data:$('form[name="formImageProduct"]').serialize(),
-                dataType:"json",
-                beforeSend: function () {
-                    //$("#modal-title").removeClass( "alert alert-danger" );
-                    $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
-                    //$("#modal-title").addClass( "alert alert-info" );
-                },
-                success: function(data) {
-                    //console.log(data.success);
-
-                    if(data.success) {
-                        swalWithBootstrapButtons.fire({
-                            title: "Sucesso!",
-                            text: data.message,
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        table.destroy();
-                        getdata();
-                    }
-                },
-                error: function(data){
-                    //console.log(data.responseText);
-                    json = $.parseJSON(data.responseText);
-                    $("#modal-title").addClass( "alert alert-danger" );
-                    $('#modal-title').html('<p><strong>'+json.message+'</strong></p>');
-                    Swal.fire(
-                        'error!',
-                        json.message,
-                        'error'
-                    )
-                },
-                complete:function(data){
-                    // console.log(data.responseText);
-                    json = $.parseJSON(data.responseText);
-                    if(json.success) {
-                        window.setTimeout(function () {
-                            window.location.reload();
-                        }, 1500);
-                    }
-                }
-            });
-        }
-    });
-
-
-
-    /***
      * Salva imagem variação ou produto
      * */
-
+/*
     $("#formImage").on('submit',function (event) {
         event.preventDefault();
 
@@ -355,8 +292,8 @@ $(function() {
                                 timer: 1500
                             });
                             //table.ajax.reload(null, false);
-                            table.destroy();
-                            getdata();
+                            //table.destroy();
+                           // getdata();
                         }
                     },
                     error: function (response) {
@@ -380,7 +317,7 @@ $(function() {
                 });
             }
     });
-
+*/
     /***
      * Salva o produto
      * **/
@@ -583,16 +520,16 @@ $(function() {
     /***
      *
      * */
-
+/*
     $(document).on("click",".btnProductImage" ,function(event){
         event.preventDefault();
         id = $(this).data('id') != null ? $(this).data('id') : 0; //capturo o ID
         $("#product_id").val(id);
-    });
+    });*/
         /**
      * Exibe as imagens das variações dos produtos
      * **/
-    $(document).on("click",".btnImageProduct" ,function(event){
+    /*$(document).on("click",".btnImageProduct" ,function(event){
         event.preventDefault();
 
         //console.log($(this).data('variacao-id'));
@@ -639,13 +576,13 @@ $(function() {
 
             }
         });
-    });
+    });/
 
     /**
      * Deleta a imagem do produto
      * */
    // $('i[name="btnRemoveImage"]').on('click',function(event) {
-    $(document).on("click",".btnRemoveImage" , function(event){
+   /* $(document).on("click",".btnRemoveImage" , function(event){
         event.preventDefault();
 
         Swal.fire({
@@ -709,7 +646,7 @@ $(function() {
                 });
             }
         });
-    });
+    });*/
 
     /*** Fim */
 
@@ -950,7 +887,7 @@ $(function() {
 
     }
 
-    
+
     let fnc_enviaForm = function (formData) {
         $.ajax({
             url: url + "/produto",

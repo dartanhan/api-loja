@@ -25,6 +25,8 @@
     <script src="{{URL::asset('js/url.js')}}"></script>
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
+
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 
     @stack("styles")

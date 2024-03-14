@@ -136,26 +136,47 @@ class ProdutoImagemController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
+     * Atualize o recurso especificado no armazenamento.
+     * Comum para a tela de Produtos e Product
+     * @param int $flag
      * @return JsonResponse
      */
-    public function update()
+    public function update(int $flag)
     {
-       // dd($this->request->input("product_id"));
+       // dd($flag);
      //   dd($this->request->all());
         try {
 
-        $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+            $destino = ($flag == 0) ? "product/" : "produtos/";
+            $produtoId  = $this->request->input("productId") !== null ? $this->request->input("productId") : $this->request->input("variacaoId");
+            $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
-        if($temp_file){
-            Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'product/'.$this->request->input("product_id")."/".$temp_file->file);
+            if($temp_file) {
+                if ($this->request->input("imagemName")) {
+                    // Exclua a foto antiga do armazenamento
+                    $path = ($flag == 0) ?
+                        $destino . $produtoId . "/" . $this->request->input("imagemName") :
+                        $this->request->input("imagemName");
+                    Storage::delete( $path);
+                }
 
-            Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
-            $temp_file->delete();
-        }
+                Storage::copy( '/tmp/' . $temp_file->folder . '/' . $temp_file->file,  $destino . $produtoId . "/" . $temp_file->file);
 
-            $this->produto->where('id', $this->request->input("product_id"))->update(['imagem' => $temp_file->file]);
+                //delete a imagem temporaria
+                Storage::deleteDirectory( '/tmp/' . $temp_file->folder);
+                $temp_file->delete();
+
+                if($flag == 0) {
+                    Produto::where('id', $produtoId)->update(['imagem' => $temp_file->file]);
+                }else{
+
+                    $produtoImagem["produto_variacao_id"] = $produtoId;
+                    $produtoImagem["path"] = $destino . $produtoId . "/" . $temp_file->file;
+
+                    $matchThese = array('id' => $this->request->input("variacaoImageId"));
+                    ProdutoImagem::updateOrCreate($matchThese, $produtoImagem);
+                }
+            }
 
     }catch (Throwable $e) {
         return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
