@@ -14,7 +14,7 @@ class AuditsController extends Controller
 
         $user_data = Usuario::where("user_id",auth()->user()->id)->first();
       
-         $audits = Audit::
+         $auditsUpdate = Audit::
                   leftJoin('loja_produtos_variacao as va', 'audits.auditable_id','=', 'va.id' )
                   ->leftJoin('loja_produtos_new as pn', 'va.products_id','=', 'pn.id' ) 
                   ->leftJoin('users', 'audits.user_id','=', 'users.id' )
@@ -26,9 +26,26 @@ class AuditsController extends Controller
                     'audits.new_values',
                     'audits.updated_at')
                  ->where('audits.auditable_type', 'App\Http\Models\ProdutoVariation')
+                 ->where('audits.event', 'updated')
                  ->get();
 
-        return view('admin.audit', compact('user_data','audits'));
+          $auditsCreate = Audit::
+                 leftJoin('loja_produtos_variacao as va', 'audits.auditable_id','=', 'va.id' )
+                 ->leftJoin('loja_produtos_new as pn', 'va.products_id','=', 'pn.id' ) 
+                 ->leftJoin('users', 'audits.user_id','=', 'users.id' )
+                 ->select(
+                   'users.name',
+                   'audits.event',
+                   DB::raw("CONCAT(pn.descricao, ' - ', va.variacao) AS variacao"),
+                   'audits.old_values',
+                   'audits.new_values',
+                   'pn.updated_at')
+                ->where('audits.auditable_type', 'App\Http\Models\VendasProdutos')
+                ->where('audits.event', 'created')
+                ->get();
+                
+
+        return view('admin.audit', compact('user_data','auditsUpdate','auditsCreate'));
 
     }
 }

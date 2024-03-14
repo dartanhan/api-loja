@@ -214,7 +214,14 @@ class ProdutoController extends Controller
             $formatter = new NumberFormatter('pt_BR',  NumberFormatter::DECIMAL);
 
             for ($i=0; $i<$qtd_lines; $i++) {
-                // $newDate = Carbon::createFromFormat('d/m/Y', $this->request->input("validade".[$i])->format('Y-m-d'));
+                $dateString = $this->request->input("validade")[$i];
+             
+                 if ($dateString === "00/00/0000") {
+                     $formattedDate = "0000-00-00"; 
+                }else{
+                    $formattedDate = Carbon::createFromFormat('d/m/Y',$dateString)->format('Y-m-d');
+                }
+             
 
                 $data["subcodigo"] = $data["codigo_produto"].$this->request->input("subcodigo")[$i];
                 $data["variacao"] = $this->request->input("variacao")[$i];
@@ -227,7 +234,9 @@ class ProdutoController extends Controller
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
                 $data["status"] = $this->request->input("status_variacao")[$i];
-                $data["validade"] = Carbon::createFromFormat('d/m/Y',$this->request->input("validade")[$i])->format('Y-m-d');
+                
+                $data["validade"] = $formattedDate;
+                
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
                 //$data["valor_cartao_pix"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);

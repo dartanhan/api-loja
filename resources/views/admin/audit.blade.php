@@ -21,43 +21,95 @@
                 </div>
 
                 <div class="card-body">
-                <table id="table" class="table table-striped table-condensed table-hover">
-                    <thead class="text-center">
-                        <tr>
-                            <th data-sortable="true">USUÁRIO</th>
-                            <th data-sortable="true">EVENTO</th>
-                            <th data-sortable="true">PRODUTO</th>
-                            <th data-sortable="true">QTD ANTERIOR</th>
-                            <th data-sortable="true">QTD ATUAL</th>
-                            <th data-sortable="true">ATUALIZADO</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                        @foreach($audits as $audit)
+                    <table id="table" class="table table-striped table-condensed table-hover">
+                        <thead class="text-center">
                             <tr>
-                                <td>{{ $audit->name }}</td>
-                                <td>{{ $audit->event }}</td>
-                                <td>{{ $audit->variacao }}</td>
-                                <td>
-                                    @if(isset($audit->old_values['quantidade']))
-                                        {{ $audit->old_values['quantidade'] }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if(isset($audit->new_values['quantidade']))
-                                        {{ $audit->new_values['quantidade'] }}
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $audit->updated_at }}
-                                </td>
+                                <th data-sortable="true">USUÁRIO</th>
+                                <th data-sortable="true">EVENTO</th>
+                                <th data-sortable="true">PRODUTO</th>
+                                <th data-sortable="true">QTD ANTERIOR</th>
+                                <th data-sortable="true">QTD ATUAL</th>
+                                <th data-sortable="true">ATUALIZADO</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="text-center">
+                            @foreach($auditsUpdate as $audit)
+                                <tr>
+                                    <td>{{ $audit->name }}</td>
+                                    <td>{{ $audit->event }}</td>
+                                    <td>{{ $audit->variacao }}</td>
+                                    <td>
+                                        @if(isset($audit->old_values['quantidade']))
+                                            {{ $audit->old_values['quantidade'] }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($audit->new_values['quantidade']))
+                                            {{ $audit->new_values['quantidade'] }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $audit->updated_at }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
             </div>
         </div>
     </div>
+    <div class="container-fluid px-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-auto input-group-sm">
+                            <i class="fas fa-cube"></i>
+                            Auditoria - Criação de Produtos
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <table id="tableCreate" class="table table-striped table-condensed table-hover">
+                        <thead class="text-center">
+                            <tr>
+                                <th data-sortable="true">USUÁRIO</th>
+                                <th data-sortable="true">EVENTO</th>
+                                <th data-sortable="true">PRODUTO</th>
+                                <th data-sortable="true">QTD ANTERIOR</th>
+                                <th data-sortable="true">QTD ATUAL</th>
+                                <th data-sortable="true">ATUALIZADO</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            @foreach($auditsCreate as $audit)
+                                <tr>
+                                    <td>{{ $audit->name }}</td>
+                                    <td>{{ $audit->event }}</td>
+                                    <td> 
+                                        @if(isset($audit->new_values['descricao']))
+                                            {{ $audit->new_values['descricao'] }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($audit->old_values['quantidade']))
+                                            {{ $audit->old_values['quantidade'] }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($audit->new_values['quantidade']))
+                                            {{ $audit->new_values['quantidade'] }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $audit->updated_at }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+            </div>
+        </div>
 
 @endsection
 @push("scripts")
