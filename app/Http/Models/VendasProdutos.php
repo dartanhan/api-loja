@@ -2,9 +2,13 @@
 namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class VendasProdutos extends Model
+class VendasProdutos extends Model implements Auditable
 {
+    use AuditableTrait;
+
     public $table = 'loja_vendas_produtos';
     public $timestamps = false;
     protected $fillable = ['venda_id','codigo_produto','descricao','valor_produto','quantidade','categoria_id','fornecedor_id','created_at'];

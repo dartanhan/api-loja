@@ -121,11 +121,11 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                 Mais Vendidos por Categorias
                         </a>
-
-                            <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
+                        <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                 Mais Vendidos
                         </a>
+                        
                     </nav>
                 </div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
@@ -162,6 +162,21 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                 Mais Vendidos
                         </a-->
+                    </nav>
+                </div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesAudits" aria-expanded="false" aria-controls="collapsePages">
+                    <div class="sb-nav-link-icon">
+                        <i class="fas fa-check-square"></i>
+                    </div>
+                        Auditoria
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapsePagesAudits" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ Route::current()->getName() === 'audit.index' ? 'active' : '' }}" href="{{route('audit.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                                Produtos
+                        </a>
                     </nav>
                 </div>
                 <div class="sb-sidenav-menu-heading">Addons</div>

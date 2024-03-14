@@ -1030,7 +1030,6 @@ $(function() {
      fnc_variacao(0,1,null,null, '');
 });
 
-
 /**
  *  Formatting function for row details - modify as you need
  */

@@ -239,11 +239,11 @@ class VendaController extends Controller
     public function store()
     {
 
-        DB::beginTransaction();
+     //   DB::beginTransaction();
         try {
             $dados  = $this->request->all();
-
-            $affected = "";
+          //  dd($dados);
+            $affected = 0;
 
             // Convert JSON string to Array
             //$dados = json_decode($dadosVendaJson['json']);
@@ -283,13 +283,7 @@ class VendaController extends Controller
                 $this->vendasDescontos->valor_percentual = $dados["percentual"];
                 $this->vendasDescontos->save();
 
-                //Salva o tipo de pagamento
-                /*$this->tipoPagamento = new VendasProdutosTipoPagamento();
-                $this->tipoPagamento->venda_id = $sale->id;
-                $this->tipoPagamento->forma_pagamento_id = $dados["tipo_pagamento"];
-                $this->tipoPagamento->save();*/
 
-                //dd($totalPayment);
                 for ($i = 0; $i < $totalPayment; $i++) {
                     $this->tipoPagamento = new VendasProdutosTipoPagamento();
                     $this->tipoPagamento->venda_id = $sale->id;
@@ -315,50 +309,29 @@ class VendaController extends Controller
 
             //Realizar baixa do produto
             for ($i = 0; $i < $total; $i++) {
-                $id = $dados["produtos"][$i]["id"]; // id do produto
-                $sub_codigo = $dados["produtos"][$i]["codigo_produto"]; // id do produto
+                $id = $dados["produtos"][$i]["id"]; // id do produto pai
+                $sub_codigo = $dados["produtos"][$i]["codigo_produto"]; // subcodigo do produto
                 //$loja_id = $dados["loja_id"]; //id da loja
-
-                $product =  DB::table('loja_produtos_variacao')
-                    ->where('products_id', '=', $id)
-                    ->where('subcodigo', '=', $sub_codigo)
-                    ->select('quantidade as qtdestoque')->first();
+                
+                $productVariation =  $this->productVariation
+                                ->where('products_id', '=', $id)
+                                ->where('subcodigo', '=', $sub_codigo)
+                                ->select('id','quantidade')->first();
 
                 if($dados["produtos"][$i]["troca"] === false){
-                    $qtd = $product->qtdestoque - $dados["produtos"][$i]["quantidade"];
+                    $productVariation->quantidade -= $dados["produtos"][$i]["quantidade"];
                 }else{
-                    $qtd = $product->qtdestoque + $dados["produtos"][$i]["quantidade"];
+                    $productVariation->quantidade += $dados["produtos"][$i]["quantidade"];
                 }
 
-                $affected = DB::table('loja_produtos_variacao')
-                    ->where('products_id', '=',$id)
-                    ->where('subcodigo', '=', $sub_codigo)
-                    ->update(['quantidade' => $qtd]);
-
-              /* $product =  DB::table('loja_produtos_quantidade')
-                    ->where('loja_produtos_quantidade.produto_id', '=', $id)
-                    ->where('loja_produtos_quantidade.loja_id', '=', $loja_id)
-                    ->select('loja_produtos_quantidade.quantidade as qtdestoque')
-                    ->first();*/
-
-               //dd($dados["produtos"][$i]["troca"]);
-               //dd($dados["produtos"][$i]["quantidade"]);
-               /*if($dados["produtos"][$i]["troca"] === false){
-                   $qtd = $product->qtdestoque - $dados["produtos"][$i]["quantidade"];
-               }else{
-                   $qtd = $product->qtdestoque + $dados["produtos"][$i]["quantidade"];
-               }
-
-                $affected = DB::table('loja_produtos_quantidade')
-                    ->where('loja_produtos_quantidade.produto_id', '=',$id)
-                    ->where('loja_produtos_quantidade.loja_id', '=', $loja_id)
-                    ->update(['loja_produtos_quantidade.quantidade' => $qtd]);*/
+                $affected = $productVariation->save();
             }
+
             //Salva valor cashback
             if($sale->cliente_id) {
                 //Se tiver valor de cashback, entendo que foi usado, seta status true
                 if ($dados["clienteModel"]["cashback"] > 0){
-                    DB::table('loja_vendas_cashback')
+                   $this->cashbackVendas
                         ->where('cliente_id', '=',$sale->cliente_id)
                         ->update(['status' => 1]);
                 }
@@ -368,6 +341,8 @@ class VendaController extends Controller
                 foreach ($cashbacks as $valor) {
                     if ($valor->valor < $sale->valor_total) {
                         $taxa = $valor->taxa;
+                    }else{
+                        $taxa = 0.05;
                     }
                 }
                 $valor_cashback = ($sale->valor_total * $taxa) / 100;
@@ -381,32 +356,20 @@ class VendaController extends Controller
                     $this->cashbackVendas->save();
                 }
                 
-                //Pega total cashback do cliente pelo ID
-                //$cashBackTotal = $this->cashbackVendas::where('cliente_id', $sale->cliente_id)->where('status', 0)->sum('valor');
-
-                //Monta estrutura para salvar o valor total do cashback
-                //$data["cliente_id"] = $sale->cliente_id;
-                //$data["valor_total"] = $cashBackTotal;
-
-                //Se tiver atualiza, caso não cria
-                //$matchThese = array('cliente_id' => $sale->cliente_id);
-                //$this->cashBackValor::updateOrCreate($matchThese, $data);
-
             }
 
             if ($affected > 0) {
-                DB::commit();
+              //  DB::commit();
                 return Response::json(array('success' => true), 200);
             }else{
-                DB::rollBack();
+                //DB::rollBack();
                 return Response::json(array('success' => false, 'message' => 'Ocorreu um erro no fechamento da venda!!'), 400);
             }
 
     } catch (Throwable $e) {
-        DB::rollBack();
+       // DB::rollBack();
         return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
     }
-
 }
 
     /**

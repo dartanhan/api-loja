@@ -63,3 +63,14 @@ table.dataTable tbody td {
     width: 120px;
     height: auto;
 }
+/* Ícone para cima (verde) */
+.bi-up {
+    color: green;
+    cursor: pointer;
+}
+
+/* Ícone para baixo (vermelho) */
+.bi-down {
+    color: red;
+    cursor: pointer;
+}

@@ -4,12 +4,16 @@ namespace App\Http\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
 /**
  * @method static create($data)
  */
-class ProdutoVariation extends Model
+class ProdutoVariation extends Model implements Auditable
 {
+    use AuditableTrait;
+
     protected $table = 'loja_produtos_variacao';
     protected $fillable = ['id','products_id','subcodigo','variacao','valor_varejo','valor_atacado','valor_atacado_5un','valor_atacado_10un','valor_lista','valor_produto'
                             ,'percentage','quantidade','quantidade_minima','status','validade','created_at','fornecedor','estoque','valor_cartao_pix','valor_parcelado'];

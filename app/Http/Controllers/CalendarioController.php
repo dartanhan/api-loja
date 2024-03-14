@@ -17,7 +17,7 @@ use NumberFormatter;
 class CalendarioController extends Controller
 {
 
-    protected $request,$calendar,$database,$vendas, $lojas, $payments;
+    protected $request,$calendar,$database,$vendas, $lojas, $payments,$formatter;
 
     public function __construct(Request $request, Calendario $calendar, Vendas $vendas, Lojas $lojas, Payments $payments){
 

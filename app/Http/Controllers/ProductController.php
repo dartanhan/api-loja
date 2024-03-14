@@ -50,7 +50,6 @@ class  ProductController extends Controller
         $this->produtoImagem = $produtoImagem;
     }
 
-
     /**
      * Display a listing of the resource.
      *

@@ -85,7 +85,7 @@ class  ProductMinController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(): \Illuminate\Http\Response
+    public function store()
     {
         //
     }
@@ -96,7 +96,7 @@ class  ProductMinController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id)
     {
         //
     }
@@ -107,7 +107,7 @@ class  ProductMinController extends Controller
      * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id): \Illuminate\Http\Response
+    public function edit($id)
     {
         //
     }
@@ -139,7 +139,7 @@ class  ProductMinController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id): \Illuminate\Http\Response
+    public function destroy(int $id)
     {
       //
 
