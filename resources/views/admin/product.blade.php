@@ -14,6 +14,7 @@
                 <form method="post" autocomplete="off" id="form" name="form" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" id="id">
+                    <input type="hidden" name="login" id="login" value="{{Auth::user()->login}}">
 
                     <div class="card-body">
 

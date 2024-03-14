@@ -160,7 +160,7 @@ $('form[name="formImageProduct"]').validate({
         e.preventDefault();
 
         let metodo = $("#metodo").val();
-        //console.log(metodo);
+        console.log(fncUrl() + "/image/"+$("#flagImage").val());
 
         $.ajax({
             type: metodo,

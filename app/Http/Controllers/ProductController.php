@@ -10,6 +10,7 @@ use App\Http\Models\ProdutoQuantidade;
 use App\Http\Models\Categoria;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoCodigo;
+use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TemporaryFile;
 use App\Http\Models\Usuario;
 use App\Imports\ProductImport;
@@ -29,16 +30,17 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
-class  ProductController extends Controller
+class  ProductController extends Controller 
 {
 
-    protected $request,$produto,$produtoQuantidade,$categoria, $produtoCodigo,$cor,$produtoImagem,$fornecedor;
+    protected $request,$produto,$produtoQuantidade,$categoria, $produtoCodigo,$cor,$produtoImagem,$fornecedor,$variation;
 
     public function __construct(Request $request, Produto $produto,
                                     ProdutoQuantidade $produtoQuantidade,
                                     Fornecedor $fornecedor, Categoria $categoria,
                                     ProdutoCodigo $produtoCodigo,
-                                    Cor $cor, ProdutoImagem $produtoImagem){
+                                    Cor $cor, ProdutoImagem $produtoImagem,
+                                    ProdutoVariation $variation){
 
         $this->request = $request;
         $this->produto = $produto;
@@ -48,7 +50,9 @@ class  ProductController extends Controller
         $this->produtoCodigo = $produtoCodigo;
         $this->cor = $cor;
         $this->produtoImagem = $produtoImagem;
+        $this->variation = $variation;
     }
+
 
     /**
      * Display a listing of the resource.
@@ -178,38 +182,221 @@ class  ProductController extends Controller
      */
     public function store()
     {
-//        try {
-//            //dd($this->request->allFiles());
-//            $produtoId  = $this->request->input("productId") !== "" ? $this->request->input("productId") : $this->request->input("variacaoId");
-//
-//            //Se productId for preenchido sei que é produto PAI salva na pasta product caso não pasta produtos(variações)
-//            $destino = $this->request->input("productId") !== "" ? 'product/' : 'produtos/';
-//
-//            //busca a foto temporario que foi feita upload pelo UploadController
-//            $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
-//
-//            //faz a logica de deletar caso enha a foto e inserir nova, caso a foto seja ok no upload temporário
-//            if($temp_file){
-//                if ($this->request->input("imagemName")) {
-//                     // Exclua a foto antiga do armazenamento
-//                     Storage::delete($destino.$produtoId ."/".$this->request->input("imagemName"));
-//                }
-//
-//                Storage::copy($destino.'/tmp/'.$temp_file->folder.'/'.$temp_file->file,$destino.$produtoId ."/".$temp_file->file);
-//
-//                //delete a imagem temporaria
-//                Storage::deleteDirectory($destino.'/tmp/'.$temp_file->folder);
-//                $temp_file->delete();
-//            }
-//            //Atualiza a tabela de produtos_new com a imagem
-//            Produto::where('id', $produtoId)->update(['imagem' => $temp_file->file]);
-//
-//
-//        } catch (Throwable $e) {
-//            return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
-//        }
-//        //return redirect()->route('product.index');
-//        return Response::json(array('success' => true, 'message' => 'Produto atualizado/cadastrado com sucesso!'), 200);
+        try {
+        //     dd($this->request->all());
+            
+        //     $produtoId  = $this->request->input("productId") !== "" ? $this->request->input("productId") : $this->request->input("variacaoId");
+            
+        //     //Se productId for preenchido sei que é produto PAI salva na pasta product caso não pasta produtos(variações)
+        //     $destino = $this->request->input("productId") !== "" ? 'product/' : 'produtos/';
+
+        //   //  dd( $this->request->all() );
+
+        //     $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+
+        //    // dd( $temp_file );
+
+        //     if($temp_file){
+        //         Storage::copy($destino.'/tmp/'.$temp_file->folder.'/'.$temp_file->file,$destino.$produtoId ."/".$temp_file->file);
+
+        //         Storage::deleteDirectory($destino.'/tmp/'.$temp_file->folder);
+        //         $temp_file->delete();
+        //     }
+
+        //     Produto::where('id', $produtoId)->update(['imagem' => $temp_file->file]);
+
+            // if($this->request->hasFile('image')){
+            //     $image = $this->request ->file('image');
+                
+            //     $path = storage_path($destino . $produtoId);
+
+            //     dd( $path );
+                
+            //     if($this->request->input("productId") !== ""){
+                   
+            //         //Storage::deleteDirectory($path);
+
+            //         if ($this->request->input("imagemName")) {
+            //             // Exclua a foto antiga do armazenamento
+            //             Storage::delete($path);
+            //         }
+
+            //         $file = $this->request->allFiles()['images'];
+            //         $image_name =  $file->hashName();
+                    
+            //         File::makeDirectory($path , 0775, true, true);
+            //         $image_resize = Image::make($file->path());
+            //         $image_resize->resize(500,500)->save($path .'/'.$image_name);
+
+            //         $product = new Produto();
+            //         $product->imagem = $image_name;
+            //         $product->id =  $produtoId;
+            //         $product->save();
+
+            //     }else{
+            //         $productsImages = new ProdutoImagem();
+            //         $productsImages->produto_variacao_id = $produtoId;
+            //         $productsImages->loja_produtos_new_id = null;
+            //         $productsImages->path = 'produtos/' . $produtoId .'/'. $image_name;
+            //         $productsImages->save();
+            //         unset($productsImages);
+            //     }               
+            // }
+                    
+        // DB::beginTransaction();
+        // //OK
+        // try {
+        //     if($this->request->input("id") == null){
+        //         $rules = ['codigo_produto' => 'required|unique:'.$this->produto->table.'|max:255'];
+        //     }else{
+        //         $rules = ['codigo_produto' => 'required|max:255|unique:'.$this->produto->table.',codigo_produto,'. $this->request->input("id")];
+        //     }
+        //     $validator = Validator::make($this->request->all(), $rules);
+        //        // 'codigo_produto' => 'required|unique:'.$this->produto->table.'|max:255']);
+        //       //  'codigo_produto' => 'required|max:255|unique:' . $this->produto->table . ',nome,' . $this->request->iProduto]);
+
+        //     if ($validator->fails()) {
+        //         $error = $validator->errors()->first();
+        //         return Response::json(array('success' => false,'message' => $error), 400);
+        //     }
+
+
+        //     $data["id"] = $this->request->input("id");
+
+        //     /***
+        //      * Caso seja diferente de 13 não é código de barras é codigo loja [1000,1001,1002]
+        //      * Então pega o ultimo código da loja e incrementa de 1
+        //      * se qualquer códiog abaixo de 13 for informado , será seguido a sequencia do código loja
+        //      */
+        //     if (strlen($this->request->input("codigo_produto")) < 13 ) {
+        //         if($this->request->input("id") == ""){
+        //             $maxCodigo = DB::table($this->produtoCodigo->table)->max('codigo')+1;
+        //            // $this->produtoCodigo = new $this->produtoCodigo();
+        //             if($maxCodigo == $this->request->input("codigo_produto")){
+        //                 $data["codigo_produto"] = $this->request->input("codigo_produto");
+        //             }else if(strlen($this->request->input("codigo_produto")) < 13){
+        //                 $data["codigo_produto"] = $maxCodigo;
+        //             }
+        //         }
+        //     }else{
+        //         $data["codigo_produto"] = $this->request->input("codigo_produto");
+        //     }
+
+        //     $data["descricao"] = $this->request->input("nome");
+        //     $data["status"] = $this->request->input("status");
+
+        //     $data["valor_produto"] = str_replace(',', '.', str_replace('R$ ', '', $this->request->input("valorproduto")));
+
+        //     $data["valor_dinheiro"] = str_replace(',', '.', str_replace('R$ ', '', $this->request->input("valordinheiro")));
+
+        //     $data["valor_cartao"] = str_replace(',', '.', str_replace('R$ ', '', $this->request->input("valorcartao")));
+
+        //     $data["percentual"] = str_replace(',', '.', str_replace(' %', '', $this->request->input("valorpercentual")));
+
+        //     $data["fornecedor_id"] = $this->request->input("fornecedor");
+
+        //     $data["categoria_id"] = $this->request->input("categoria");
+
+        //     $data["cor_id"] = $this->request->input("cor");
+
+        //   //  dd($data);
+        //     //Cria o produto
+        //     $matchThese = array('id' => $this->request->input("id"));
+        //     $produtos = $this->produto::updateOrCreate($matchThese, $data);
+        //    // dd($produtos);
+
+        //     //monta dados tabela de quantidade do produto
+        //     $dadosqtd["produto_id"] = $produtos->id;
+        //     $dadosqtd["loja_id"] = 1;
+        //     $dadosqtd["quantidade"] = $this->request->qtdfeira;
+        //     $dadosqtd["quantidade_minima"] = $this->request->qtdmin;
+        //     $dadosqtd["status"] = $this->request->status;
+
+        //     $dadosqtd1["produto_id"] = $produtos->id;
+        //     $dadosqtd1["loja_id"] = 2;
+        //     $dadosqtd1["quantidade"] = $this->request->qtdbarao;
+        //     $dadosqtd1["quantidade_minima"] = $this->request->qtdmin;
+        //     $dadosqtd1["status"] = $this->request->status;
+
+
+        //     $dados['valores'] = array($dadosqtd, $dadosqtd1);
+
+        //     //tranforma em json
+        //     $json = json_encode($dados);
+
+        //     //converte em array
+        //     $arrJson = json_decode($json, true);
+
+        //     //Grava na tabela de quantidade para retornar em PIVOT
+        //     if ($produtos->exists) {
+        //         foreach ($arrJson['valores'] as $valor) {
+
+        //             $produtosQuantidade = new $this->produtoQuantidade($arrJson['valores']);
+        //             $produtosQuantidade->produto_id = $produtos->id;
+        //             $produtosQuantidade->cor_id = $this->request->input("cor");
+        //             $produtosQuantidade->loja_id = $valor['loja_id'];
+        //             $produtosQuantidade->quantidade = $valor['quantidade'];
+        //             $produtosQuantidade->quantidade_minima = $valor['quantidade_minima'];
+        //             $produtosQuantidade->status = $valor['status'];
+
+        //             if ($this->request->input("id") != "") {
+        //                 $this->produtoQuantidade->where(
+        //                     ['produto_id' => $this->request->input("id"), 'loja_id' => $valor['loja_id']])
+        //                     ->update(['produto_id' => $this->request->input("id"),
+        //                         'loja_id' => $valor['loja_id'],
+        //                         'quantidade' => $valor['quantidade'],
+        //                         'quantidade_minima' => $valor['quantidade_minima'],
+        //                         'status' => $valor['status'],
+        //                         'cor_id' => $this->request->input("cor")
+        //                     ]);
+        //             } else {
+        //                 $produtosQuantidade->save();
+        //             }
+        //         }
+
+        //         /***
+        //          * Caso seja diferente de 13 não é código de barras é codigo loja [1000,1001,1002]
+        //          * Então pega o ultimo código da loja e incrementa de 1
+        //          * se qualquer códiog abaixo de 13 for informado , será seguido a sequencia do código loja
+        //          */
+        //         if (strlen($this->request->input("codigo_produto")) < 13 ) {
+        //             if($this->request->input("id") == ""){
+        //                 $maxCodigo = DB::table($this->produtoCodigo->table)->max('codigo')+1;
+        //                 $this->produtoCodigo = new $this->produtoCodigo();
+        //                 if($maxCodigo == $this->request->input("codigo_produto")){
+        //                     $this->produtoCodigo->codigo = $this->request->input("codigo_produto");
+        //                    // $this->produtoCodigo->save();
+        //                 }else if(strlen($this->request->input("codigo_produto")) < 13){
+        //                     $this->produtoCodigo->codigo = $maxCodigo;
+        //                     //$this->produtoCodigo->save();
+        //                 }
+        //                // dd($this->request->codigo_produto);
+        //                 $this->produtoCodigo->save();
+        //             }
+        //         }
+
+        //        // dd($this->request->allFiles());
+        //         //UPLOAD DE IMAGENS
+
+        //         if (count($this->request->allFiles()) > 0) {
+        //             $total = count($this->request->allFiles()['images']);
+        //             for ($i = 0; $i < $total; $i++) {
+        //                 $file = $this->request->allFiles()['images'][$i];
+
+        //                 $this->produtoImagem = new ProdutoImagem();
+        //                 $this->produtoImagem->produto_id = $produtos->id;
+        //                 $this->produtoImagem->path = $file->store('produtos/' . $produtos->id);
+        //                 $this->produtoImagem->save();
+        //                 unset($this->produtoImagem);
+        //             }
+        //         }
+        //     }
+        //     DB::commit();
+
+        } catch (Throwable $e) {
+            return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
+        }
+        return Response::json(array('success' => true, 'message' => 'Produto atualizado/cadastrado com sucesso!'), 200);
 
     }
 
@@ -266,22 +453,22 @@ class  ProductController extends Controller
      */
     public function update(int $id)
     {
-        //dd($id);
-        try{
-            $produto =$this->produto::where('id', $id)->update(['block' => 1]);
+       try{
+            $produto = $this->variation::find($id);
+            $sentido = request()->input('sentido');
 
-            if(!$produto)
-                return Response::json(array("success" => false, "message" => utf8_encode("Produto não bloqueado id: [ {$id} ]")), 400);
-
-        }catch(QueryException $e){
-            $errorCode = $e->errorInfo[1];
-            if($errorCode == '1451') {
-                return Response::json(array('success' => false, 'message' => 'Produto não pode ser removido, ele está sendo usado no sistema!'), 400);
+            if($produto and $sentido == "up"){
+                $produto->increment('quantidade');
+            }else{
+                $produto->decrement('quantidade');
             }
+
+            $produto = $this->variation::where('id', $id)->update(['quantidade' => $produto->quantidade]);
+
         }catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage() ), 500);
         }
-        return Response::json(array("success" => true, "message" => "Produto bloqueado com sucesso!"),200);
+        return Response::json(array("success" => true, "message" => "Quantidade do produto atualizado!"),200);
     }
 
     /**
