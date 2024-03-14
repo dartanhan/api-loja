@@ -133,7 +133,7 @@ class ProdutoController extends Controller
     public function store()
     {
         try{
-            //  dd($this->request->all());
+             // dd($this->request->all());
             //   dd(count($this->request->allFiles()['images0']));
             if($this->request->input("id") == null){
                 $msg = "Produto Cadastrado com sucesso!";
@@ -219,70 +219,26 @@ class ProdutoController extends Controller
                 $data["subcodigo"] = $data["codigo_produto"].$this->request->input("subcodigo")[$i];
                 $data["variacao"] = $this->request->input("variacao")[$i];
                 $data["valor_varejo"] = $formatter->parse($this->request->input("valor_varejo")[$i]);
-                //$data["valor_atacado"] = $formatter->parse($this->request->input("valor_atacado")[$i]);
-               // $data["valor_atacado_5un"] = $formatter->parse($this->request->input("valor_atacado_5un")[$i]);
                 $data["valor_atacado_10un"] = $formatter->parse($this->request->input("valor_atacado_10un")[$i]);
-               // $data["valor_lista"] = $formatter->parse($this->request->input("valor_lista")[$i]);
-               // $data["valor_produto"] = $formatter->parse($this->request->input("valor_produto")[$i]);
+                $data["valor_produto"] = $formatter->parse($this->request->input("valor_produto")[$i]);
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
                 $data["status"] = $this->request->input("status_variacao")[$i];
                 $data["validade"] = Carbon::createFromFormat('d/m/Y',$this->request->input("validade")[$i])->format('Y-m-d');
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
-                //$data["valor_cartao_pix"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
-               // $data["valor_parcelado"] = $formatter->parse($this->request->input("valor_parcelado")[$i]);
 
                 /**
                  * Cria ou Atualiza a variação do produto
                  */
                 $matchThese = array('id' => $this->request->input("variacao_id")[$i]);
                 $controle = ProdutoVariation::updateOrCreate($matchThese, $data);
-                //dd($productsVariation);
-
-                /***
-                    Salva as alterações do produto para controle de contas à pagar
-                 */
-               // $produtoControle = new ProdutoControle();
-                //$produtoControle->products_variation_id = $controle->id;
-               //$produtoControle->valor_custo = $controle->valor_produto;
-                //$produtoControle->quantidade = $controle->quantidade;
-                //$produtoControle->save();
-
-                /**
-                 * UPLOAD DE IMAGENS
-                 */
-                /* dd($this->request->all());
-                for ($k = 0; $k < count($this->request->allFiles()); $k++) {
-                    //(isset($this->request->allFiles('images')[$k]));
-                    dd(isset($this->request->allFiles('images'.$k)[$k]));
-                    if(isset($this->request->allFiles('images')[$k])){
-
-                        if (count($this->request->allFiles('images' . $k)) > 0) {
-                            $total = count($this->request->allFiles()['images' . $i]);
-
-                            for ($j = 0; $j < $total; $j++) {
-                                $file = $this->request->allFiles()['images' . $i][$j];
-
-                                $productsImages = new ProdutoImagem();
-                                $productsImages->produto_id = $productsVariation->id;
-                                $productsImages->path = $file->store('produtos/' . $productsVariation->id);
-                                $productsImages->save();
-                                unset($this->productsImages);
-                            }
-                        }
-                    }
-                }*/
             }
-
-            // return back()->withStatus(__('Produto cadastrado com sucesso!'));
-            //return redirect()->route('product.index')->with('success','Produto cadastrado com sucesso!');
-            return Response::json(array('success' => true, 'message' => $msg), 201);
 
         } catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
         }
-        // return Response::json(array('success' => true, 'message' => 'Produto cadastrado com sucesso!'), 201);
+        return Response::json(array('success' => true, 'message' => $msg), 201);
     }
 
     /**
