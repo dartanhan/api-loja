@@ -38,11 +38,12 @@ class Audit extends Model implements \OwenIt\Auditing\Contracts\Audit
         return $this->serializeDate($date);
     } 
     
-    protected $appends = ['created_at','updated_at'];
-    public function getCreatedAtAttribute()
-    {
-        return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));
-    }
+    //protected $appends = ['created_at','updated_at'];
+    protected $appends = ['updated_at'];
+    // public function getCreatedAtAttribute()
+    // {
+    //     return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));
+    // }
 
     public function getUpdatedAtAttribute()
     {

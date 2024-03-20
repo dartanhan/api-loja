@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditsController;
 use App\Http\Controllers\FluxoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
@@ -127,6 +128,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('reposicao','ReposicaoController');
     Route::resource('audit','AuditsController');
+    Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
+    
     
 });
 Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);

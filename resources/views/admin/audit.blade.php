@@ -33,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-center">
-                            @foreach($auditsUpdate as $audit)
+                            <!-- @foreach($auditsUpdate as $audit)
                                 <tr>
                                     <td>{{ $audit->name }}</td>
                                     <td>{{ $audit->event }}</td>
@@ -52,7 +52,7 @@
                                         {{ $audit->updated_at }}
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach -->
                         </tbody>
                     </table>
             </div>
@@ -81,7 +81,8 @@
                                 <th data-sortable="true">ATUALIZADO</th>
                             </tr>
                         </thead>
-                        <tbody class="text-center">
+                        <tbody class="text-center"></tbody>
+                        <!-- <tbody class="text-center">
                             @foreach($auditsCreate as $audit)
                                 <tr>
                                     <td>{{ $audit->name }}</td>
@@ -106,7 +107,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
+                        </tbody> -->
                     </table>
             </div>
         </div>
