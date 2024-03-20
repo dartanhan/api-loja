@@ -15,8 +15,8 @@ $(document).ready(function() {
                       //  console.log(row.old_values.quantidade);
                         
                         // Verifica se a chave 'quantidade'
-                        if (row.new_values.quantidade){
-                            return row.new_values.quantidade;
+                        if (row.old_values.quantidade){
+                            return row.old_values.quantidade;
                         } else {
                             return '-'; // Retorna vazio se 'quantidade' não estiver presente
                         }
@@ -27,8 +27,8 @@ $(document).ready(function() {
                       //  console.log(row.old_values.quantidade);
                         
                         // Verifica se a chave 'quantidade'
-                        if (row.old_values.quantidade){
-                            return row.old_values.quantidade;
+                        if (row.new_values.quantidade){
+                            return row.new_values.quantidade;
                         } else {
                             return '-'; // Retorna vazio se 'quantidade' não estiver presente
                         }
