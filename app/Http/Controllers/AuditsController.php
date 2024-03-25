@@ -4,16 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Http\Models\Audit;
 use App\Http\Models\Usuario;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
+use Auth;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class AuditsController extends Controller
 {
+   private $user_data;
+   protected $user;
    
+    public function __construct()
+    {
+      $this->middleware(function ($request, $next) {
+        $this->user = FacadesAuth::user(); // Recupera o usuário autenticado
+        $this->user_data = Usuario::where("user_id",$this->user->id)->first();
+        return $next($request);
+      });
+    }
     public function index(){
 
-        $user_data = Usuario::where("user_id",auth()->user()->id)->first();
+       // $user_data = Usuario::where("user_id",auth()->user()->id)->first();
       
          $auditsUpdate = Audit::
                   leftJoin('loja_produtos_variacao as va', 'audits.auditable_id','=', 'va.id' )
@@ -46,7 +59,7 @@ class AuditsController extends Controller
                 ->get();
                 
 
-        return view('admin.audit', compact('user_data','auditsUpdate','auditsCreate'));
+        return view('admin.audit', compact($this->user_data,'auditsUpdate','auditsCreate'));
 
     }
 
@@ -69,7 +82,5 @@ class AuditsController extends Controller
 
         return DataTables::of($auditsUpdate)->toJson();
       }
-      
-                 
     }
 }

@@ -132,32 +132,3 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     
     
 });
-Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
-/*Route::resource('/usuario','UserSystemController');
-Route::resource('/relatorio','RelatorioController');
-Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
-Route::resource('produto','ProdutoController');
-Route::get('/fluxo/chart/{id}','FluxoController@chartFluxo');
-Route::resource('/fluxo','FluxoController');*/
-//Route::post('/importProduct', 'ProductController@importProduct')->name('importProduct');
-/*
-Route::resource('/conferenciames','ConferenciaController');
-Route::get('/relatorio/dailySalesList/{id}','RelatorioController@dailySalesList');
-Route::get('/relatorio/detailCart/{id}','RelatorioController@detailCart');
-Route::get('/relatorio/detailSales/{id}','RelatorioController@detailSales');
-Route::get('/relatorio/chartDay','RelatorioController@chartDay');
-Route::get('/relatorio/buscaTaxa/{id}','RelatorioController@buscaTaxa');
-Route::get('/relatorio/totalMes','RelatorioController@totalMes');
-Route::get('/relatorio/fechamentoMes','RelatorioController@fechamentoMes');
-Route::resource('/categoria','CategoriaController');
-//Route::resource('/fluxo','FluxoController');
-//Route::resource('/calendario','CalendarioController');
-Route::get('/gastosfixofiltro', 'GastosFixoController@getFormGasto')->name('gastosfixo.filtro');
-//Route::resource('/gastosfixo','GastosFixoController');
-Route::resource('productBestSellers','ProductBestSellersController');*/
-//Route::get('/relatorio/chartDay/{dataini}/{datafim}','RelatorioController@chartDay')->name('chartDay');
-//Route::get('/relatorio/chartLineGroupYear/{year}',[RelatorioController::class,'chartLineGroupYear']);
-//Route::get('/relatorio/chartLineMultiGroupYear',[RelatorioController::class,'chartLineMultiGroupYear']);
-//Route::resource('/relatorio','RelatorioController');
-
-//Route::post('/relatorio/dailySalesList',[RelatorioController::class,'dailySalesList']);

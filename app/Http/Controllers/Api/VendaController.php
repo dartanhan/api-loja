@@ -359,15 +359,12 @@ class VendaController extends Controller
             }
 
             if ($affected > 0) {
-              //  DB::commit();
-                return Response::json(array('success' => true), 200);
+              return Response::json(array('success' => true), 200);
             }else{
-                //DB::rollBack();
                 return Response::json(array('success' => false, 'message' => 'Ocorreu um erro no fechamento da venda!!'), 400);
             }
 
     } catch (Throwable $e) {
-       // DB::rollBack();
         return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
     }
 }

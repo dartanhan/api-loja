@@ -92,14 +92,10 @@ $(function() {
      */
     $('#table tbody').on('click', 'td.details-control', function (event) {
         event.preventDefault();
-        const perfisPermitidos = ["barbara", "karla", "darta"];
 
         let tr = $(this).closest('tr');
         let row = table.row( tr );
-      
-        //para adicionar a coluna de quantidade dependendo do usuário
-        let isPerfil = $("#login").val();
-              
+     
         if ( row.child.isShown() ) {
             // This row is already open - close it
             row.child.hide();
@@ -114,15 +110,13 @@ $(function() {
                             "<thead class=\"text-center\">" +
                                 "<tr class='bg-secondary '>" +
                                     "<th>IMAGEM</th>" +
-                                    "<th>SUB CÓDIGO</th>";
-
-                                    tmpRow  += (perfisPermitidos.includes(isPerfil) === true)  ? "<th>QUANTIDADE</th>"  : "";
-                                    
-                                    tmpRow  += "<th>VARIAÇÃO</th>" +
-                                                "<th>VAREJO</th>" +
-                                                "<th>ATACADO</th>" +
-                                                "<th>STATUS</th>" +
-                                                "<th>AÇÃO</th>" +
+                                    "<th>SUB CÓDIGO</th>"+
+                                    "<th>QUANTIDADE</th>"+
+                                    "<th>VARIAÇÃO</th>" +
+                                    "<th>VAREJO</th>" +
+                                    "<th>ATACADO</th>" +
+                                    "<th>STATUS</th>" +
+                                    "<th>AÇÃO</th>" +
                                 "</tr>" +
                             "</thead>";
 
@@ -152,17 +146,13 @@ $(function() {
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
-                                        "<td>" + arrayItem.subcodigo + "</td>";
-
-                                    tmpRow  += (perfisPermitidos.includes(isPerfil) === true)  ? 
-                                            "<td> " +
-                                                " <i class=\"bi-up fas fa-arrow-up action\" data-id="+arrayItem.id+" data-sentido=\"up\" " +
-                                                " title=\"Adiconar Quantidade\"></i>&nbsp;" + arrayItem.quantidade + "&nbsp;<i class=\"bi-down fas fa-arrow-down action\" "+
-                                                " data-id="+arrayItem.id+" data-sentido=\"down\"  title=\"Diminuir Quantidade\"></i>" +
-                                                " </td>"
-                                                : "";
-
-                                        tmpRow  += "<td>" + arrayItem.variacao + "</td>" +
+                                        "<td>"+ arrayItem.subcodigo + "</td>"+
+                                        "<td>"+
+                                            " <i class=\"bi-up fas fa-arrow-up action\" data-id="+arrayItem.id+" data-sentido=\"up\" " +
+                                            " title=\"Adiconar Quantidade\"></i>&nbsp;" + arrayItem.quantidade + "&nbsp;<i class=\"bi-down fas fa-arrow-down action\" "+
+                                            " data-id="+arrayItem.id+" data-sentido=\"down\"  title=\"Diminuir Quantidade\"></i>" +
+                                        "</td>"+
+                                        "<td>" + arrayItem.variacao + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
