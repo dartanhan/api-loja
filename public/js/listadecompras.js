@@ -13,7 +13,7 @@ $(function() {
        // $('#table').html('<i class="fas fa-spinner fa-spin"></i> Carregando...');
 
         const getDados = async () => {
-            const data = await fetch(url + "/reposicao/create", {
+            const data = await fetch(url + "/listaCompras/create", {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,12 +110,11 @@ $(function() {
                                     "<th>60D</th>" +
                                     "<th>90D</th>" +
                                     "<th>STATUS</th>" +
-                                    "<th>AÇÕES</th>" +
                                 "</tr>" +
                             "</thead>";
 
                     $.ajax({
-                        url: url + "/reposicao/"+row.data().id,
+                        url: url + "/listaCompras/"+row.data().id,
                         type: 'GET',
                         data: '',
                         dataType: 'json',
@@ -123,37 +122,31 @@ $(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                            // console.log(response.data);
-                           
+                           //  console.log(response.data[0].produto_variacao.variacao);
+                          // return false;
                            if (response.success) {
                            // Iterar sobre cada objeto no array
                            response.data.forEach(function(obj) {
-                                let image = obj.imagem !== null ?
-                                                "<img src='../public/storage/"+ obj.imagem + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+obj.variacao+"'></img>" :
-                                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+obj.variacao+"'></img>"
+                                let image = obj.produto_variacao.imagem_path !== null ?
+                                                "<img src='../public/storage/"+ obj.produto_variacao.imagem_path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+obj.produto_variacao.variacao+"'></img>" :
+                                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+obj.produto_variacao.variacao+"'></img>"
 
-                                    let image_filho = "../public/storage/produtos/not-image.png";
-                                    if(obj.imagem !== null){
-                                        image_filho = '../public/storage/'+obj.imagem;
-                                    }
+                                   // let image_filho = "../public/storage/produtos/not-image.png";
+                                  //  if(obj.produto_variacao.imagem !== null){
+                                  //      image_filho = '../public/storage/'+obj.produto_variacao.imagem_path;
+                                  //  }
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
-                                        "<td>" + obj.subcodigo + "</td>" +
-                                        "<td>" + obj.variacao + "</td>" +
-                                        "<td>" + obj.qtd + "</td>" +
-                                        "<td>" + obj.estoque + "</td>" +
-                                        "<td>" + formatMoney(obj.valor_pago) + "</td>" +
-                                        "<td>" + obj.qtd_total_venda_30d + "</td>" +
-                                        "<td>" + obj.qtd_total_venda_60d + "</td>" +
-                                        "<td>" + obj.qtd_total_venda_90d + "</td>" +
-                                        "<td>" + "<span class='badge bg-success'>"+obj.status+"</span>" + "</td>" +
-                                        "<td>" + "<button type=\"button\" class=\"btn btn-primary rounded btn-sm\" id=\"addListaCompra\" "+
-                                                    " data-produto_new_id="+row.data().id+" data-produto_variacao_id="+obj.variacao_id+">"+
-                                                    "<i class=\"fa-brands fa-shopify fa-2x\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Adicionar à Lista de Compras\">"+
-                                                    "</i>"+
-                                                "</button>"+
-                                        "</td>" +
+                                        "<td>" + obj.produto_variacao.subcodigo + "</td>" +
+                                        "<td>" + obj.produto_variacao.variacao + "</td>" +
+                                        "<td>" + obj.produto_variacao.quantidade + "</td>" +
+                                        "<td>" + obj.produto_variacao.estoque + "</td>" +
+                                        "<td>" + formatMoney(obj.produto_variacao.valor_produto) + "</td>" +
+                                        "<td>" + obj.produto_variacao.qtd_total_venda_30d + "</td>" +
+                                        "<td>" + obj.produto_variacao.qtd_total_venda_60d + "</td>" +
+                                       "<td>" + obj.produto_variacao.qtd_total_venda_90d + "</td>" +
+                                        "<td>" + "<span class='badge bg-success'>"+obj.produto_variacao.status+"</span>" + "</td>" +
                                     "</tr>";
                                 });
 
@@ -182,78 +175,7 @@ $(function() {
     } );
 
 
-    // Captura o clique no ícone de imagem com a classe "abrir-modal"
-    $(document).on("click",".bi-image" ,function(event){
-        event.preventDefault();
-    
-        // Obtém o valor do atributo "data-imagem"
-        var imagem = $(this).data('image');
-        var variacaoId = $(this).data('variacao-id');
-        var productId = $(this).data('id');
-
-        // Atribui o valor ID da imagem da variação do produto
-        $('#variacaoId').val(variacaoId);
-
-        // Atribui o valor ID da imagem do produto
-        $('#productId').val(productId);
-
-        // Atribui o valor da imagem ao atributo "src" da tag "<img>" no modal
-        $('#modal-imagem').attr('src', imagem);
-
-        // Abre o modal
-       // $('#modal').modal('show');
-    });
-
-    /***
-     * Ação de gravar na tabela de Lista de Compras
-     */
-    $(document).on("click","#addListaCompra" ,function(event){
-        event.preventDefault();
-        var produto_new_id = $(this).data('produto_new_id');
-        var produto_variacao_id = $(this).data('produto_variacao_id');
-
-          $.ajax({
-                url: url + "/reposicao", //product.update
-                cache: false,
-                type:'post',
-                data:{ // Objeto de dados que você deseja enviar
-                    produto_new_id: produto_new_id,
-                    produto_variacao_id: produto_variacao_id // Informação adicional que você quer passar
-                },
-                dataType:'json',
-                success: function(response){
-                //    console.log(response);
-                if(response.success){
-                    swalWithBootstrapButtons.fire({
-                        title: 'Sucesso!',
-                        text: response.message,
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                }else{
-                    swalWithBootstrapButtons.fire({
-                        title: 'Atenção!',
-                        text: response.message,
-                        icon: 'warning',
-                        showConfirmButton: false,
-                        timer: 2500
-                    });
-                }
-                    
-                },
-                error:function(response){
-                  //  console.log(response.responseJSON);
-                    swalWithBootstrapButtons.fire({
-                        title: 'Error!',
-                        text: response.responseJSON.message,
-                        icon: 'error',
-                        showConfirmButton: false,
-                        timer: 2500
-                    });
-                }
-        });
-    });
+   
 
     /****
      * LOAD DE FUNÇOES

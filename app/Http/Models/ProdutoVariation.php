@@ -32,4 +32,8 @@ class ProdutoVariation extends Model implements Auditable
         return $this->belongsTo(VendasProdutos::class, 'subcodigo', 'codigo_produto');
     }
 
+    public function listaDeCompras()
+    {
+        return $this->hasMany(ListaDeCompras::class, 'produto_variacao_id', 'id')->where('status',true); //somente ativos;
+    }
 }

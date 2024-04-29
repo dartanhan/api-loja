@@ -139,13 +139,13 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
-                                Visão por Trimestre
+                                Visão Trimestre
                         </a>
-                        <!--a class="nav-link {{ Route::current()->getName() === 'gastosfixo.index' ? 'active' : '' }}" href="{{route('gastosfixo.index')}}">
+                        <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
-                                Contas a Pagar
+                                Lista de Compras
                         </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'estoque.index' ? 'active' : '' }}" href="{{route('estoque.index')}}">
+                        <!--a class="nav-link {{ Route::current()->getName() === 'estoque.index' ? 'active' : '' }}" href="{{route('estoque.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                                 Estoque
                         </a>
@@ -184,7 +184,7 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                         Charts
                     </a>
-<a class="nav-link" href="tables.html">
+                    <a class="nav-link" href="tables.html">
                         <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                         Tables
                     </a>

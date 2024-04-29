@@ -129,6 +129,6 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('reposicao','ReposicaoController');
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
-    
+    Route::resource('listaCompras','ListaDeComprasController');
     
 });

@@ -44,4 +44,9 @@ class Produto extends Model implements Auditable
                 (DB::raw('IF((loja_produtos_variacao.status = 1), "ATIVO", "INATIVO") as status')));
     }
 
+    public function listaDeCompras()
+    {
+        return $this->hasMany(ListaDeCompras::class, 'produto_new_id', 'id');
+    }
+
 }
