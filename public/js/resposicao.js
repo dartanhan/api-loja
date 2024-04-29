@@ -211,6 +211,7 @@ $(function() {
         event.preventDefault();
         var produto_new_id = $(this).data('produto_new_id');
         var produto_variacao_id = $(this).data('produto_variacao_id');
+        var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
           $.ajax({
                 url: url + "/reposicao", //product.update
@@ -218,7 +219,8 @@ $(function() {
                 type:'post',
                 data:{ // Objeto de dados que você deseja enviar
                     produto_new_id: produto_new_id,
-                    produto_variacao_id: produto_variacao_id // Informação adicional que você quer passar
+                    produto_variacao_id: produto_variacao_id, // Informação adicional que você quer passar
+                    _token: csrfToken
                 },
                 dataType:'json',
                 success: function(response){
