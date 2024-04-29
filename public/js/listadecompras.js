@@ -26,6 +26,7 @@ $(function() {
         };
         getDados();
     }
+    
     function initialiseTable() {
      //   $('#table').html('');
         table = $('#table').DataTable({
@@ -110,6 +111,7 @@ $(function() {
                                     "<th>60D</th>" +
                                     "<th>90D</th>" +
                                     "<th>STATUS</th>" +
+                                    "<th>AÇÕES</th>" +
                                 "</tr>" +
                             "</thead>";
 
@@ -146,7 +148,8 @@ $(function() {
                                         "<td>" + obj.produto_variacao.qtd_total_venda_30d + "</td>" +
                                         "<td>" + obj.produto_variacao.qtd_total_venda_60d + "</td>" +
                                        "<td>" + obj.produto_variacao.qtd_total_venda_90d + "</td>" +
-                                        "<td>" + "<span class='badge bg-success'>"+obj.produto_variacao.status+"</span>" + "</td>" +
+                                       "<td>" + "<span class='badge bg-success'>"+obj.produto_variacao.status+"</span>" + "</td>" +
+                                       "<td>" + "<button class='btn btn-danger btn-sm' title='Remover da Lista' data-id='"+obj.id+"'><i class='fa fa-trash'></i></button></td>" +
                                     "</tr>";
                                 });
 
@@ -175,7 +178,57 @@ $(function() {
     } );
 
 
-   
+   /**
+     * DESBLOQUEAR PRODUTO
+     * */
+   $(document).on("click", ".btn-danger", function(event){
+    event.preventDefault();
+
+    let lista_id = $(this).data('id');
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    Swal.fire({
+        title: "Está seguro de remover este produto?",
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Remover",
+        denyButtonText: `Cancelar`
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url + "/listaCompras/" + lista_id ,
+                data: {_token: csrfToken},
+                cache: false,
+                type: "DELETE",
+                datatype:"json",
+                success: function(response) {
+                    // console.log(response);
+    
+                     if(response.success){
+                        swalWithBootstrapButtons.fire({
+                            title: 'Sucesso!',
+                            text: response.message,
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                        table.destroy();
+                        getdata();
+                     }
+                },
+                error: function(response){
+                    //console.log(data.responseText);
+                    json = $.parseJSON(data.responseText);
+                    $("#alert-title").addClass("alert alert-danger").text(json.message);
+                }
+            });
+        } else  {
+          return false;
+        }
+      });
+});
 
     /****
      * LOAD DE FUNÇOES

@@ -144,13 +144,13 @@ class ProdutoImagemController extends Controller
     public function update(int $flag)
     {
        // dd($flag);
-     //   dd($this->request->all());
+       // dd($this->request->all());
         try {
 
             $destino = ($flag == 0) ? "product/" : "produtos/";
             $produtoId  = $this->request->input("productId") !== null ? $this->request->input("productId") : $this->request->input("variacaoId");
             $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
-
+           
             if($temp_file) {
                 if ($this->request->input("imagemName")) {
                     // Exclua a foto antiga do armazenamento

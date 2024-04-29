@@ -142,8 +142,11 @@ class ListaDeComprasController extends Controller
      * @param  \App\ListaDeCompras  $listaDeCompras
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ListaDeCompras $listaDeCompras)
+    public function destroy(int $id)
     {
-        //
+        $listaIds = ListaDeCompras::find($id)->delete();
+
+        return Response::json(array("success" => true, "message" => "Produto removido com sucesso da Lista de Compras!"),200);
+        
     }
 }

@@ -98,10 +98,10 @@ class ReposicaoController extends Controller
     public function create()
     {
         try {
-
+        
             //$ret =  $this->produto::with('products')
             $ret = $this->produto
-            ->leftJoin('loja_fornecedores', 'loja_produtos_new.fornecedor_id', '=', 'loja_fornecedores.id')
+            //->leftJoin('loja_fornecedores', 'loja_produtos_new.fornecedor_id', '=', 'loja_fornecedores.id')
             ->leftJoin('loja_categorias', 'loja_produtos_new.categoria_id', '=', 'loja_categorias.id')
             ->leftJoin('loja_produtos_variacao as va', 'loja_produtos_new.id', '=', 'va.products_id')
             ->select(
@@ -114,24 +114,25 @@ class ReposicaoController extends Controller
                 DB::raw("DATE_FORMAT(loja_produtos_new.created_at, '%d/%m/%Y %H:%i:%s') as created"),
                 DB::raw("DATE_FORMAT(loja_produtos_new.updated_at, '%d/%m/%Y %H:%i:%s') as updated")
             )
-            ->where('block', 0)
+            //->where('block', 0)
             ->where('loja_produtos_new.status', 1) //somente ativos
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('loja_vendas_produtos')
                     ->whereRaw('va.subcodigo = loja_vendas_produtos.codigo_produto')
-                    ->whereRaw('DATEDIFF(CURDATE(), loja_vendas_produtos.created_at) <= 60');
+                    ->whereRaw('DATEDIFF(CURDATE(), loja_vendas_produtos.created_at) <= 90');
             })
             ->orderBy('loja_produtos_new.id', 'DESC')
+            ->groupBy('loja_produtos_new.id')
             ->get();
-            if(!empty($ret)) {
-                return Response()->json($ret);
-            }  else {
+
+            if(empty($ret)) {
                 return Response()->json(array('data'=>''));
             }
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 500);
         }
+        return Response()->json($ret);
     }
 }
