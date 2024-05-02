@@ -157,7 +157,7 @@ $(function () {
                     $('#salvar').html('Aguarde... <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>');
                 },
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
 
                     if(response.success) {
                         swalWithBootstrapButtons.fire({
@@ -314,7 +314,7 @@ $(function () {
 
 
     let fncLineMultiChart = function(response) {
-       // console.log(response);
+        console.log(response);
 
         newCtxChartLineMulti.destroy();
         newCtxChartLineMulti = new Chart(ctxLineMulti, {
@@ -333,7 +333,7 @@ $(function () {
                     callbacks: {
                         label: function (tooltipItem, chart) {
                             var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                            return datasetLabel + ': R$ ' + number_format(tooltipItem.yLabel, 2, ',', '.');
+                            return datasetLabel + ' - R$ ' + number_format(tooltipItem.yLabel, 2, ',', '.');
                         }
                     }
                 }

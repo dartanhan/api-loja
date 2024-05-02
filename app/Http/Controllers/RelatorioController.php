@@ -497,24 +497,25 @@ class RelatorioController extends Controller
 
 
     public function chartLineMultiGroupYear(){
-        $data = [];
-
+        
         try {
             Carbon::setLocale('pt_BR');
 
-            $years = $this->vendas::select(DB::raw('YEAR(created_at) year'))->groupby('year')->get();
+            $years = $this->vendas::select(DB::raw('YEAR(created_at) year'), DB::raw("sum(valor_total) as total"))->groupby('year')->get();
 
             foreach ($years as $index => $year){
 
+                $color = $this->dynamicColors($index,1);
+
                 $datasets['label'] = $year->year;
                 $datasets['lineTension'] = "0.3";
-                $datasets["backgroundColor"] = "rgba(255,255,255,0.2)";//$this->dynamicColors($index,0.2);//"rgba(2,117,216,0.2)";
-                $datasets["borderColor"] =  $this->dynamicColors($index,1);//"rgba(2,117,216,1)";
+                $datasets["backgroundColor"] = $this->dynamicColors($index,0.2);//"rgba(2,117,216,0.2)";
+                $datasets["borderColor"] =  $color;//"rgba(2,117,216,1)";
                 $datasets["pointRadius"] = "5";
-                $datasets["pointBackgroundColor"] = "rgba(2,117,216,1)";
-                $datasets["pointBorderColor"] = "rgba(255,255,255,0.8)";
+                $datasets["pointBackgroundColor"] = $color;
+                $datasets["pointBorderColor"] = $color;
                 $datasets["pointHoverRadius"] = "5";
-                $datasets["pointHoverBackgroundColor"] = "rgba(2,117,216,1)";
+                $datasets["pointHoverBackgroundColor"] = $color;
                 $datasets["pointHitRadius"] = "50";
                 $datasets["pointBorderWidth"] = "2";
                 $datasets["data"] = $this->retornaValoresPorAno($year->year);
@@ -540,12 +541,14 @@ class RelatorioController extends Controller
     }
 
     public function dynamicColors($index,$alpha) {
-        $r = floor(rand(0,$index) * 255);
-        $g = floor(rand(0,$index) * 255);
-        $b = floor(rand(0,$index) * 255);
-       // $alpha =  0.2;
+        // Definir um limite mínimo para os valores de cor
+        $minColorValue = 100;
+      
+      $r = floor(rand(0,$index) * $minColorValue);
+      $g = floor(rand(0,$index) * $minColorValue);
+      $b = floor(rand(0,$index) * $minColorValue);
 
-        return "rgba($r,$g,$b,$alpha)";
+        return "rgba($r,$g,$b,$alpha)" ;
     }
 
     public function retornaValoresPorAno($ano){
