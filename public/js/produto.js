@@ -156,13 +156,21 @@ $(function() {
                                         "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
-                                        "<td><i class=\"bi-image\" " +
+                                        "<td>"+
+                                        " <div style=\"display: flex; align-items: center;\">"+
+                                        "   <i class=\"bi-image\" " +
                                         "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                         "               title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
                                         "               data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
                                         "               data-subcodigo='"+arrayItem.subcodigo+"' data-image-preview='"+image_filho+"' "+
-                                        "               data-path='"+ arrayItem.path +"' data-flag-image='1' data-image-id='"+arrayItem.id_image+"'/>"+
-                                        "</td>"+
+                                        "               data-path='"+ arrayItem.path +"' data-flag-image='1' data-image-id='"+arrayItem.id_image+"'></i>&nbsp;"+
+                                        "   <button type=\"button\" class=\"btn btn-primary rounded btn-sm\" id=\"addListaCompra\" "+
+                                                    " data-produto_new_id="+row.data().id+" data-produto_variacao_id="+arrayItem.id+">"+
+                                                    "<i class=\"fa-brands fa-shopify fa-1x\" data-toggle=\"tooltip\" "+
+                                                    "data-placement=\"top\" title=\"Adicionar à Lista de Compras\"></i>"+
+                                                "</button>"+
+                                        "</div>" +
+                                        "</td>" +
                                     "</tr>"
                                 });
 

@@ -160,7 +160,7 @@ $('form[name="formImageProduct"]').validate({
         e.preventDefault();
 
         let metodo = $("#metodo").val();
-        console.log(fncUrl() + "/image/"+$("#flagImage").val());
+        //console.log(fncUrl() + "/image/"+$("#flagImage").val());
 
         $.ajax({
             type: metodo,
@@ -209,4 +209,58 @@ $('form[name="formImageProduct"]').validate({
             }
         });
     }
+});
+
+
+/***
+     * Ação de gravar na tabela de Lista de Compras
+     */
+$(document).on("click","#addListaCompra" ,function(event){
+    event.preventDefault();
+    var produto_new_id = $(this).data('produto_new_id');
+    var produto_variacao_id = $(this).data('produto_variacao_id');
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+      $.ajax({
+            url: fncUrl() + "/reposicao", //product.update
+            cache: false,
+            type:'post',
+            data:{ // Objeto de dados que você deseja enviar
+                produto_new_id: produto_new_id,
+                produto_variacao_id: produto_variacao_id, // Informação adicional que você quer passar
+                _token: csrfToken
+            },
+            dataType:'json',
+            success: function(response){
+            //    console.log(response);
+            if(response.success){
+                swalWithBootstrapButtons.fire({
+                    title: 'Sucesso!',
+                    text: response.message,
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }else{
+                swalWithBootstrapButtons.fire({
+                    title: 'Atenção!',
+                    text: response.message,
+                    icon: 'warning',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            }
+                
+            },
+            error:function(response){
+              //  console.log(response.responseJSON);
+                swalWithBootstrapButtons.fire({
+                    title: 'Error!',
+                    text: response.responseJSON.message,
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            }
+    });
 });

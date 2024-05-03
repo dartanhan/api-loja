@@ -34,6 +34,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
                             Produtos
                         </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
+                                Lista de Compras
+                        </a>
                     </nav>
                 </div>
                 @if( Auth::user()->is_admin)
@@ -191,6 +195,7 @@
                 </div>
             </div>
             @endif
+
             <div class="sb-sidenav-footer">
                 <div class="small">Bem Vindo:
                     @if(Auth::check()) {{Auth::user()->name}} @endif

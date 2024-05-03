@@ -207,7 +207,7 @@ $(function() {
     /***
      * Ação de gravar na tabela de Lista de Compras
      */
-    $(document).on("click","#addListaCompra" ,function(event){
+    /*$(document).on("click","#addListaCompra" ,function(event){
         event.preventDefault();
         var produto_new_id = $(this).data('produto_new_id');
         var produto_variacao_id = $(this).data('produto_variacao_id');
@@ -255,7 +255,7 @@ $(function() {
                     });
                 }
         });
-    });
+    });*/
 
     /****
      * LOAD DE FUNÇOES
