@@ -314,7 +314,7 @@ $(function () {
 
 
     let fncLineMultiChart = function(response) {
-        console.log(response);
+       // console.log(response);
 
         newCtxChartLineMulti.destroy();
         newCtxChartLineMulti = new Chart(ctxLineMulti, {
@@ -349,7 +349,7 @@ $(function () {
 
                 return response.json()
             }).then(function (data) {
-                  console.log(data);
+                 // console.log(data);
 
                 // Mapear o número do mês para o nome do mês correspondente
                 const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -360,7 +360,7 @@ $(function () {
                 // Extrair os dados do objeto recebido
                 //var labels = [...new Set(data.map(item => item.mes))];
                 const labels = [...new Set(data.map(item => monthNames[item.mes - 1]))];
-                console.log(labels);
+               // console.log(labels);
 
                 // Criar datasets dinamicamente para cada funcionário
                 const datasets = funcionarios.map(function (funcionario) {
