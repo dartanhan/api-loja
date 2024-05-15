@@ -13,9 +13,11 @@ class CreateLojaProdutosImagem extends Migration
      */
     public function up()
     {
-        Schema::create('loja_produtos_imagens', function (Blueprint $table) {
+        Schema::create('loja_produtos_imagens2', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('produto_variacao_id');
+            $table->unsignedBigInteger('produto_id')->nullable(true);
+            $table->foreign('produto_id')->references('id')->on('loja_produtos_new');
+            $table->unsignedBigInteger('produto_variacao_id')->nullable(true);
             $table->foreign('produto_variacao_id')->references('id')->on('loja_produtos_variacao');
             $table->string('path');
 

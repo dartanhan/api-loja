@@ -74,13 +74,13 @@ class ProdutoController extends Controller
         try {
 
             //$ret =  $this->produto::with('products')
-            $ret =  $this->produto->leftJoin('loja_fornecedores','loja_produtos_new.fornecedor_id','=' ,'loja_fornecedores.id')
+            $ret =  $this->produto::with('produtoImagens')
+                ->leftJoin('loja_fornecedores','loja_produtos_new.fornecedor_id','=' ,'loja_fornecedores.id')
                 ->leftJoin('loja_categorias','loja_produtos_new.categoria_id','=' ,'loja_categorias.id')
                 //->leftJoin('loja_produtos_variacao','loja_produtos_new.id','=' ,'loja_produtos_variacao.products_id')
                 ->select(
                     'loja_produtos_new.id',
                     'loja_produtos_new.codigo_produto',
-                    'loja_produtos_new.imagem',
                     'loja_produtos_new.descricao',
                     'loja_categorias.nome as categoria',
                     (DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status')),
@@ -215,13 +215,13 @@ class ProdutoController extends Controller
 
             for ($i=0; $i<$qtd_lines; $i++) {
                 $dateString = $this->request->input("validade")[$i];
-             
+
                  if ($dateString === "00/00/0000") {
-                     $formattedDate = "0000-00-00"; 
+                     $formattedDate = "0000-00-00";
                 }else{
                     $formattedDate = Carbon::createFromFormat('d/m/Y',$dateString)->format('Y-m-d');
                 }
-             
+
 
                 $data["subcodigo"] = $data["codigo_produto"].$this->request->input("subcodigo")[$i];
                 $data["variacao"] = $this->request->input("variacao")[$i];
@@ -234,9 +234,9 @@ class ProdutoController extends Controller
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
                 $data["status"] = $this->request->input("status_variacao")[$i];
-                
+
                 $data["validade"] = $formattedDate;
-                
+
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
                 //$data["valor_cartao_pix"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);

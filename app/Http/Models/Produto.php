@@ -14,7 +14,7 @@ use OwenIt\Auditing\Auditable as AuditableTrait;
 class Produto extends Model implements Auditable
 {
     use AuditableTrait;
-    
+
     public $table = 'loja_produtos_new';
     protected $fillable = ['codigo_produto','descricao','status','valor_produto','valor_dinheiro','valor_cartao',
         'percentual','fornecedor_id','categoria_id','cor_id','ncm','cest','origem_id','imagem'];
@@ -47,6 +47,11 @@ class Produto extends Model implements Auditable
     public function listaDeCompras()
     {
         return $this->hasMany(ListaDeCompras::class, 'produto_new_id', 'id');
+    }
+
+    public function produtoImagens()
+    {
+        return $this->hasMany(ProdutoImagem::class, 'produto_id', 'id');
     }
 
 }

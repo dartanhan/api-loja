@@ -13,9 +13,9 @@ use OwenIt\Auditing\Auditable as AuditableTrait;
 class ProdutoImagem extends Model implements Auditable
 {
     use AuditableTrait;
-    
+
     public $table = 'loja_produtos_imagens';
-    protected $fillable = ['produto_variacao_id','path'];
+    protected $fillable = ['produto_variacao_id','path','produto_id'];
 
     public function images() {
         return $this->belongsTo(ProdutoImagem::class);

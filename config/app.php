@@ -167,6 +167,7 @@ return [
          */
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        OwenIt\Auditing\AuditingServiceProvider::class,
 
         /*
          * Application Service Providers...

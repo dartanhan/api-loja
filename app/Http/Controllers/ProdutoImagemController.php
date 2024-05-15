@@ -149,8 +149,9 @@ class ProdutoImagemController extends Controller
 
             $destino = ($flag == 0) ? "product/" : "produtos/";
             $produtoId  = $this->request->input("productId") !== null ? $this->request->input("productId") : $this->request->input("variacaoId");
+            $imageId = $this->request->input("imageId");
             $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
-           
+
             if($temp_file) {
                 if ($this->request->input("imagemName")) {
                     // Exclua a foto antiga do armazenamento
@@ -167,15 +168,14 @@ class ProdutoImagemController extends Controller
                 $temp_file->delete();
 
                 if($flag == 0) {
-                    Produto::where('id', $produtoId)->update(['imagem' => $temp_file->file]);
+                    $produtoImagem["produto_id"] = $produtoId;
+                    $produtoImagem["path"] = $temp_file->file;
                 }else{
-
                     $produtoImagem["produto_variacao_id"] = $produtoId;
                     $produtoImagem["path"] = $destino . $produtoId . "/" . $temp_file->file;
-
-                    $matchThese = array('id' => $this->request->input("variacaoImageId"));
-                    ProdutoImagem::updateOrCreate($matchThese, $produtoImagem);
                 }
+                $matchThese = array('id' => $imageId);
+                ProdutoImagem::updateOrCreate($matchThese, $produtoImagem);
             }
 
     }catch (Throwable $e) {

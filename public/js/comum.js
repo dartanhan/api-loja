@@ -120,7 +120,7 @@ $("#table").on("click",".bi-image" ,function(event){
     let imagePreview = $(this).data('image-preview');
     let variacaoId = $(this).data('variacao-id');
     let productId = $(this).data('id');
-    let variacaoImageId = $(this).data('image-id');
+    let imageId = $(this).data('image-id');//id da variação da imagem do produto
     let flagImage = $(this).data('flag-image');//0 = pai 1 = filho
 
     // Atribui o valor ID da imagem da variação do produto
@@ -129,7 +129,7 @@ $("#table").on("click",".bi-image" ,function(event){
     // Atribui o valor ID da imagem do produto
     $('#productId').val(productId);
 
-    $('#variacaoImageId').val(variacaoImageId);
+    $('#imageId').val(imageId);
 
     $('#imagemName').val(imagem);
 
@@ -250,7 +250,7 @@ $(document).on("click","#addListaCompra" ,function(event){
                     timer: 2500
                 });
             }
-                
+
             },
             error:function(response){
               //  console.log(response.responseJSON);

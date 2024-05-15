@@ -15,7 +15,7 @@ class CreateProdutoProdutoquantidadePivotTable extends Migration
 
     public function up()
     {
-        Schema::create('loja_produtos_quantidades', function (Blueprint $table) {
+        Schema::create('loja_produtos_quantidade', function (Blueprint $table) {
             $table->bigInteger('produto_id')->unsigned()->index();
             $table->foreign('produto_id')->references('id')->on('loja_produtos')->onDelete('cascade');
 

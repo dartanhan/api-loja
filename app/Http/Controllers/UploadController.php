@@ -55,9 +55,7 @@ class UploadController extends Controller
         $temp_file = TemporaryFile::where('folder',$this->request->getContent())->first();
 
         if($temp_file){
-            $destinoFile = 'product';
-
-            Storage::deleteDirectory($destinoFile.'/tmp/'.$temp_file->folder);
+            Storage::deleteDirectory('tmp/'.$temp_file->folder);
             $temp_file->delete();
             return response('');
         }
