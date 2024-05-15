@@ -87,29 +87,7 @@ class ProdutoController extends Controller
                     (DB::raw("DATE_FORMAT(loja_produtos_new.created_at, '%d/%m/%Y %H:%i:%s') as created")),
                     (DB::raw("DATE_FORMAT(loja_produtos_new.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
 
-
-                    /*(DB::raw("FORMAT(loja_produtos_variacao.valor_varejo, 2) as valor_varejo")),
-
-                    'loja_produtos_variacao.valor_atacado',
-                    'loja_produtos_variacao.valor_produto',
-                    'loja_produtos_variacao.subcodigo',
-                    'loja_produtos_variacao.variacao',
-                    'loja_produtos_variacao.quantidade',
-                    'loja_produtos_variacao.quantidade_minima',
-                    'loja_produtos_variacao.estoque',
-                    'loja_produtos_variacao.percentage',
-                    'loja_produtos_variacao.id as id_variacao',
-                    'loja_produtos_variacao.subcodigo',
-                    'loja_produtos_variacao.status as status_variacao',
-                    (DB::raw("DATE_FORMAT(loja_produtos_variacao.validade, '%d/%m/%Y') as data_validade_variacao")),
-                    (DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status_produto')),
-                    'loja_fornecedores.nome as fornecedor',
-                    'loja_categorias.nome as categoria',
-                    'loja_fornecedores.id as fornecedor_id',
-                    'loja_categorias.id as categoria_id'*/
-
                 )
-                ->where('block',0)
                 ->where('loja_produtos_new.status',1) //somente ativos
                 ->orderBy('loja_produtos_new.id', 'DESC')
                 ->get();
@@ -340,7 +318,7 @@ class ProdutoController extends Controller
         try {
 
             $ret =  $this->produto::with('products')
-                ->select("id","codigo_produto","descricao","status","block","fornecedor_id","categoria_id","ncm",'cest',"origem_id")
+                ->select("id","codigo_produto","descricao","status","fornecedor_id","categoria_id","ncm",'cest',"origem_id")
                 ->where('id',$id)->first();
 
 

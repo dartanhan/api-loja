@@ -144,7 +144,7 @@ class ProdutoImagemController extends Controller
     public function update(int $flag)
     {
        // dd($flag);
-       // dd($this->request->all());
+       //dd($this->request->all());
         try {
 
             $destino = ($flag == 0) ? "product/" : "produtos/";

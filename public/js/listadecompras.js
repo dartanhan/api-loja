@@ -27,10 +27,11 @@ $(function () {
             {
                 "data": "imagem",
                 render: function (data, type, row) {
-                    if (row.imagem !== null) {
-                        return '<img src="../public/storage/product/' + row.id + '/' + row.imagem + '" class="image img-datatable"></img>';
-                    } else {
-                        return '<img src="../public/storage/produtos/not-image.png" class="image img-datatable"></img>';
+                    if(row.produto_imagens.length > 0){
+                        let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+                        return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable"></img>';
+                    }else{
+                        return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
                     }
                 }
             },

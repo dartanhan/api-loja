@@ -60,7 +60,7 @@
                     @csrf
                     <input type="hidden" name="productId" id="productId">
                     <input type="hidden" name="variacaoId" id="variacaoId">
-                    <input type="hidden" name="variacaoImageId" id="variacaoImageId">
+                    <input type="hidden" name="imageId" id="imageId">
                     <input type="hidden" name="imagemName" id="imagemName">
                     <input type="hidden" name="flagImage" id="flagImage">
                     <input type="hidden" name="metodo" id="metodo" value="put">

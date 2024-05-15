@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
-class  ProductController extends Controller 
+class  ProductController extends Controller
 {
 
     protected $request,$produto,$produtoQuantidade,$categoria, $produtoCodigo,$cor,$produtoImagem,$fornecedor,$variation;
@@ -128,7 +128,7 @@ class  ProductController extends Controller
                     DB::raw("(DATE_FORMAT(loja_produtos.created_at,'%d/%m/%Y %H:%i:%s')) as dataCriacao"),
                     DB::raw("(DATE_FORMAT(loja_produtos.updated_at,'%d/%m/%Y %H:%i:%s')) as dataAtualizacao")
                 )
-                ->where('block',0)
+                ->where('status',1)
                 ->where('tblQtd.loja_id',2)
                 ->orderBy('id', 'DESC');
 
@@ -184,9 +184,9 @@ class  ProductController extends Controller
     {
         try {
         //     dd($this->request->all());
-            
+
         //     $produtoId  = $this->request->input("productId") !== "" ? $this->request->input("productId") : $this->request->input("variacaoId");
-            
+
         //     //Se productId for preenchido sei que é produto PAI salva na pasta product caso não pasta produtos(variações)
         //     $destino = $this->request->input("productId") !== "" ? 'product/' : 'produtos/';
 
@@ -207,13 +207,13 @@ class  ProductController extends Controller
 
             // if($this->request->hasFile('image')){
             //     $image = $this->request ->file('image');
-                
+
             //     $path = storage_path($destino . $produtoId);
 
             //     dd( $path );
-                
+
             //     if($this->request->input("productId") !== ""){
-                   
+
             //         //Storage::deleteDirectory($path);
 
             //         if ($this->request->input("imagemName")) {
@@ -223,7 +223,7 @@ class  ProductController extends Controller
 
             //         $file = $this->request->allFiles()['images'];
             //         $image_name =  $file->hashName();
-                    
+
             //         File::makeDirectory($path , 0775, true, true);
             //         $image_resize = Image::make($file->path());
             //         $image_resize->resize(500,500)->save($path .'/'.$image_name);
@@ -240,9 +240,9 @@ class  ProductController extends Controller
             //         $productsImages->path = 'produtos/' . $produtoId .'/'. $image_name;
             //         $productsImages->save();
             //         unset($productsImages);
-            //     }               
+            //     }
             // }
-                    
+
         // DB::beginTransaction();
         // //OK
         // try {

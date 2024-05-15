@@ -37,8 +37,9 @@ $(function() {
                 {"data": "codigo_produto", "defaultContent": ""},
                 {"data": "imagem",
                     render: function (data, type, row) {
-                        if(row.imagem !== null){
-                            return '<img src="../public/storage/product/'+row.id+'/'+ row.imagem + '" class="image img-datatable"></img>';
+                        if(row.produto_imagens.length > 0){
+                            let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+                            return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable"></img>';
                         }else{
                             return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
                         }
@@ -58,14 +59,21 @@ $(function() {
                     "data": "defaultContent",
                     render: function (data, type, row) {
                         let image = "../public/storage/produtos/not-image.png";
-                        if(row.imagem !== null){
-                            image = '../public/storage/product/'+row.id+'/'+ row.imagem;
+                        let image_id = null;
+                        let path = null;
+                        //if(row.imagem !== null){
+                        if(row.produto_imagens.length > 0){
+                            path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+                            image = '../public/storage/product/'+row.id+'/'+ path;
+                            image_id = row.produto_imagens[0].id;
                         }
                         return "<i class=\"bi-image btnProductImage\" " +
                                     "  style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                     "  title='Imagem do Produto' data-bs-toggle=\"modal\" " +
                                     "  data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' "+
-                                    "  data-image-preview='"+image+"'  data-path='"+row.imagem+"' data-flag-image='0'></i>";
+                                    "  data-image-preview='"+image+"'  data-path='"+path+"' " +
+                                    "  data-flag-image='0' data-image-id='"+image_id+"'>" +
+                                "</i>";
                     }
                 }
 
@@ -95,7 +103,7 @@ $(function() {
 
         let tr = $(this).closest('tr');
         let row = table.row( tr );
-     
+
         if ( row.child.isShown() ) {
             // This row is already open - close it
             row.child.hide();
@@ -136,8 +144,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
+                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
+                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
 
                                     let image_filho = "../public/storage/produtos/not-image.png";
                                     if(arrayItem.path !== null){

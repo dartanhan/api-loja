@@ -37,14 +37,13 @@ class ListaDeComprasController extends Controller
     public function create()
     {
         try {
-            $ret = $this->produto
+            $ret = $this->produto::with('produtoImagens')
                         ->Join('loja_lista_de_compras as lc', 'loja_produtos_new.id', '=', 'lc.produto_new_id')
                         ->leftJoin('loja_categorias', 'loja_produtos_new.categoria_id', '=', 'loja_categorias.id')
-            
+
             ->select(
                 'loja_produtos_new.id',
                 'loja_produtos_new.codigo_produto',
-                'loja_produtos_new.imagem',
                 'loja_produtos_new.descricao',
                 'loja_categorias.nome as categoria',
                 DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status'),
@@ -147,6 +146,6 @@ class ListaDeComprasController extends Controller
         $listaIds = ListaDeCompras::find($id)->delete();
 
         return Response::json(array("success" => true, "message" => "Produto removido com sucesso da Lista de Compras!"),200);
-        
+
     }
 }
