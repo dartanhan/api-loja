@@ -204,7 +204,7 @@ class ProdutoController extends Controller
                 $data["subcodigo"] = $data["codigo_produto"].$this->request->input("subcodigo")[$i];
                 $data["variacao"] = $this->request->input("variacao")[$i];
                 $data["valor_varejo"] = $formatter->parse($this->request->input("valor_varejo")[$i]);
-                //$data["valor_atacado"] = $formatter->parse($this->request->input("valor_atacado")[$i]);
+                $data["valor_atacado"] = $formatter->parse($this->request->input("valor_atacado_10un")[$i]);
                // $data["valor_atacado_5un"] = $formatter->parse($this->request->input("valor_atacado_5un")[$i]);
                 $data["valor_atacado_10un"] = $formatter->parse($this->request->input("valor_atacado_10un")[$i]);
                // $data["valor_lista"] = $formatter->parse($this->request->input("valor_lista")[$i]);

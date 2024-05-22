@@ -64,13 +64,13 @@ class ReposicaoController extends Controller
     }
 
     public function show(int $id)  {
-       
+
         try {
 
             $informacoes = DB::table('loja_vendas_produtos as vp')
                 ->leftJoin('loja_produtos_variacao as va', 'vp.codigo_produto', '=', 'va.subcodigo')
                 ->leftJoin('loja_produtos_imagens as pi', 'va.id', '=', 'pi.produto_variacao_id')
-                ->Join('loja_produtos_new as pn', 'va.products_id', '=', 'pn.id')    
+                ->Join('loja_produtos_new as pn', 'va.products_id', '=', 'pn.id')
                     ->select(
                         'va.id as variacao_id',
                         'pi.path as imagem',
@@ -87,7 +87,7 @@ class ReposicaoController extends Controller
                 ->groupBy('vp.codigo_produto')
                 ->where('va.status',true) //somente ativos
                 ->where('va.products_id',$id)->get();
-            
+
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 500);
         }
@@ -98,16 +98,17 @@ class ReposicaoController extends Controller
     public function create()
     {
         try {
-        
+
             //$ret =  $this->produto::with('products')
             $ret = $this->produto
             //->leftJoin('loja_fornecedores', 'loja_produtos_new.fornecedor_id', '=', 'loja_fornecedores.id')
             ->leftJoin('loja_categorias', 'loja_produtos_new.categoria_id', '=', 'loja_categorias.id')
             ->leftJoin('loja_produtos_variacao as va', 'loja_produtos_new.id', '=', 'va.products_id')
+            ->leftJoin('loja_produtos_imagens as pi', 'loja_produtos_new.id', '=', 'pi.produto_id')
             ->select(
                 'loja_produtos_new.id',
                 'loja_produtos_new.codigo_produto',
-                'loja_produtos_new.imagem',
+                'pi.path as imagem',
                 'loja_produtos_new.descricao',
                 'loja_categorias.nome as categoria',
                 DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status'),
