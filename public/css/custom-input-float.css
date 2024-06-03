@@ -96,3 +96,41 @@
     background-color:#DB9DBE!important
 }
 a.bg-primary:focus,a.bg-primary:hover,button.bg-primary:focus,button.bg-primary:hover{color:#fff!important}
+
+/*.slide-in-modal {*/
+/*    transform: translateX(-100%);*/
+/*    transition: transform 0.3s ease-in-out;*/
+/*}*/
+
+/*.slide-in-modal.show {*/
+/*    transform: translateX(0);*/
+/*}*/
+
+/*.modal-content {*/
+/*    height: 100vh;*/
+/*    overflow-y: auto;*/
+/*}*/
+
+.modal.right .modal-dialog {
+    position: fixed;
+    margin: auto;
+    width: 500px;
+    height: 100%;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal.right .modal-content {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.modal.right.fade .modal-dialog {
+    transform: translateX(100%);
+}
+
+.modal.right.fade.show .modal-dialog {
+    transform: translateX(0);
+}

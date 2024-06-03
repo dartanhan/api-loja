@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use NumberFormatter;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProdutoController extends Controller
 {
@@ -74,7 +75,7 @@ class ProdutoController extends Controller
         try {
 
             //$ret =  $this->produto::with('products')
-            $ret =  $this->produto::with('produtoImagens')
+            $query =  $this->produto::with('produtoImagens')
                 ->leftJoin('loja_fornecedores','loja_produtos_new.fornecedor_id','=' ,'loja_fornecedores.id')
                 ->leftJoin('loja_categorias','loja_produtos_new.categoria_id','=' ,'loja_categorias.id')
                 //->leftJoin('loja_produtos_variacao','loja_produtos_new.id','=' ,'loja_produtos_variacao.products_id')
@@ -88,12 +89,12 @@ class ProdutoController extends Controller
                     (DB::raw("DATE_FORMAT(loja_produtos_new.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
 
                 )
-                ->where('loja_produtos_new.status',1) //somente ativos
-                ->orderBy('loja_produtos_new.id', 'DESC')
-                ->get();
+                ->where('loja_produtos_new.status',true) //somente ativos
+                ->orderBy('loja_produtos_new.id', 'DESC');
 
-            if(!empty($ret)) {
-                return Response()->json($ret);
+            if(!empty($query)) {
+                return DataTables::of($query)->make(true);
+              //  return Response()->json($ret);
             }  else {
                 return Response()->json(array('data'=>''));
             }
@@ -217,8 +218,7 @@ class ProdutoController extends Controller
 
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
-                //$data["valor_cartao_pix"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
-               // $data["valor_parcelado"] = $formatter->parse($this->request->input("valor_parcelado")[$i]);
+                $data["descontos"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
 
                 /**
                  * Cria ou Atualiza a variação do produto
@@ -329,4 +329,21 @@ class ProdutoController extends Controller
     }
 
 
+
+    public function indexNew()
+    {
+        if(Auth::check() === true){
+            $suppliers = $this->fornecedor->where('status',true)->orderBy('nome', 'ASC')->get();
+            $categories = $this->category->where('status',true)->orderBy('nome', 'ASC')->get();
+            $cores = $this->cor->where('status',true)->orderBy('nome', 'ASC')->get();
+            $origem_nfces = $this->origem_nfce->orderBy('codigo', 'ASC')->get();
+
+            $user_data = Usuario::where("user_id",auth()->user()->id)->first();
+
+            return view('admin.produto-new', compact('origem_nfces','categories','cores','user_data'));
+        }
+
+        return redirect()->route('admin.login');
+
+    }
 }
