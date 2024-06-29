@@ -270,7 +270,7 @@ $(function () {
         const response = await fetch(url + "/relatorio/editSales/"+venda_id);
         const data = await response.json();
         // console.log(data.data);
-        // console.log(data.payments);
+         console.log(data.payments);
 
         let html = data.data.reduce(function (string, obj) {
             return string + "<option value="+obj.id+" data-taxa="+obj.taxa+">" + obj.payments_list[0].nome +" - taxa("+ obj.taxa +")</option>"
@@ -279,7 +279,9 @@ $(function () {
         $("#payments_sale").html(html);
 
         html = data.payments.reduce(function (string, obj) {
-            return string + "<option value=" + obj.id + " data-taxa="+obj.payments_taxes[0].valor_taxa+">" + obj.nome +" - taxa("+obj.payments_taxes[0].valor_taxa+")</option>"
+            if (obj.payments_taxes && obj.payments_taxes.length > 0 && obj.payments_taxes[0].hasOwnProperty('valor_taxa')) {
+                return string + "<option value='" + obj.id + "' data-taxa='" + obj.payments_taxes[0].valor_taxa + "'>" + obj.nome + " - taxa(" + obj.payments_taxes[0].valor_taxa + ")</option>";
+            }
         }, "<option value='' selected='selected'>Forma de Pagamentos </option>");
 
         $("#payments").html(html);
