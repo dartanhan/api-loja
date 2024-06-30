@@ -89,12 +89,42 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row date" id="data">
+                            <div class="col-auto input-group-sm">
+                                <i class="fas fa-chart-area me-1"></i>
+                                Filtro:
+                            </div>
+                            <div class="col-auto input-group-sm" id="dataIni" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
+                                <label for="dataini" class="visually-hidden">Data Inicial</label>
+                                <input type="text" class="form-control input-group-sm" placeholder="Data Inicial" aria-label="Data Inicial" name="dataIni">
+                                <span class="add-on"><i class="icon-th"></i></span>
+                            </div>
+                            <div class="col-auto input-group-sm" id="dataFim" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
+                                <label for="datafim" class="visually-hidden">Data Final</label>
+                                <input type="text" class="form-control input-group-sm" placeholder="Data Final" aria-label="Data Final" name="dataFim">
+                                <span class="add-on"><i class="icon-th"></i></span>
+                            </div>
+
+                            <div class="col-auto input-group-sm">
+                                <button class="btn bgBtn btn-enviar" type="button">Filtrar</button>
+                                <button class="btn bgBtn btn-limpar" type="button">Limpar</button>
+                                <span id="loadChartBar"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
             <div class="card mt-3">
                 <div class="card-header">
                     <i class="fas fa-table me-1"></i>Vendas no dia
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive w-100">
                         <table id="datatablesDiario" class="table compact table-striped table-bordered table-hover">
                             <thead class="text-center">
                                 <tr>
@@ -110,8 +140,8 @@
                                     <th data-sortable="true">Imposto</th>
                                     <th data-sortable="true">Taxa</th>
                                     <th data-sortable="true">Valor Produto</th>
-                                    <th data-sortable="true">MC</th>
-                                    <th data-sortable="true">% MC</th>
+                                    <th data-sortable="true" style="width:80px">MC</th>
+                                    <th data-sortable="true" style="width:80px">% MC</th>
                                     <th data-sortable="true">Data</th>
                                     <th data-sortable="false" style="width: 50px">Ações</th>
                                 </tr>

@@ -70,46 +70,44 @@ class DashboardController extends Controller
                     ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
 
 
-            //  print_r( $this->request->all());
+           /* $valorTotalProdutos = DB::table('loja_produtos_variacao as lvp')
+                    ->select(DB::raw('SUM(lpv.valor_produto * lv.quantidade)'))
+                    ->where('lvp.venda_id', '=', 'lv.id')
+                    ->get();*/
             /**
              * Semana agrupado por dia
              */
             $listSales = $this->vendas->select(
-                "loja_vendas.valor_total AS total",
-                DB::raw('DATE_FORMAT(loja_vendas.created_at, "%d/%m/%Y %H:%i:%s") as data'),
+                "lv.valor_total AS total",
+                DB::raw('DATE_FORMAT(lv.created_at, "%d/%m/%Y %H:%i:%s") as data'),
                 "loja_lojas.nome as loja",
-                "loja_vendas.codigo_venda",
-                "loja_vendas.id as venda_id",
-                "loja_vendas.usuario_id as usuario_id",
+                "lv.codigo_venda",
+                "lv.id as venda_id",
+                "lv.usuario_id as usuario_id",
                 "loja_usuarios.nome",
                 "loja_vendas_produtos_descontos.valor_desconto",
-                DB::raw("loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"),
+                DB::raw("lv.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"),
                 "loja_forma_pagamentos.nome as nome_pgto",
                 "tp.taxa as taxa_pgto",
                 "loja_forma_pagamentos.id as id_pgto",
                 "loja_tipo_vendas.descricao as tipo_venda",
                 DB::raw('SUM(loja_produtos_variacao.valor_produto * loja_vendas_produtos.quantidade) as valor_total_produtos'),
+               // DB::raw('(' . $valorTotalProdutos->getQuery()->toSql() . ') as valor_total_produtos'),
                 "loja_clientes.nome as nome_cli"
-            )->leftJoin('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-              ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-              ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            )->from('loja_vendas as lv')
+              ->leftJoin('loja_lojas', 'loja_lojas.id', '=', 'lv.loja_id')
+              ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'lv.id')
+              ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
               ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
-              ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'loja_vendas.usuario_id')
-              ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'loja_vendas.tipo_venda_id')
-              ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'loja_vendas.id')
+              ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'lv.usuario_id')
+              ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'lv.tipo_venda_id')
+              ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
-              ->leftJoin('loja_clientes', 'loja_clientes.id', '=', 'loja_vendas.cliente_id')
-              ->where('loja_vendas.loja_id', $this->request->id)
-            
-            
-                //  ->whereDate('loja_vendas.created_at', Carbon::today())
-                // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('1'))
-
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataOne, $dataTwo))
-
-                //->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m-%d"),loja_id')))
-                ->groupBy('loja_vendas.codigo_venda')
-                ->orderBy('loja_vendas.created_at', 'asc')
+              ->leftJoin('loja_clientes', 'loja_clientes.id', '=', 'lv.cliente_id')
+              ->where('lv.loja_id', $this->request->id)
+              ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataOne, $dataTwo))
+                ->groupBy('lv.codigo_venda')
+                ->orderBy('lv.created_at', 'asc')
                 ->get();
 
 

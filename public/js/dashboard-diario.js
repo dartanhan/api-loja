@@ -2,6 +2,16 @@ $(function () {
 
     const url = fncUrl();
     let table;
+
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    });
+
+
      /**
      * #########################################################################
      * ##########  ÁREA DATATABLE ###################################
@@ -63,8 +73,30 @@ $(function () {
                 {"data": "imposto"},
                 {"data": "taxa_pgto"},
                 {"data": "valor_produto"},
-                {"data": "mc"},
-                {"data": "percentual_mc"},
+                {
+                    //"data": "mc"
+                    "render": function ( data, type, row, meta ) {
+                        var numero = row.mc.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
+
+                        // Converter para número
+                        var numeroFloat = parseFloat(numero);
+                        
+                        if(numeroFloat < 0){
+                            return "<span class='text-danger'>"+row.mc+"</span>"
+                        }
+                        return "<span class='text-primary'>"+row.mc+"</span>"
+                    }
+
+                },
+                {
+                    //"data": "percentual_mc"
+                    "render": function ( data, type, row, meta ) {
+                        if(row.percentual_mc.replace("%","") < 0){
+                            return "<span class='text-danger'>"+row.percentual_mc+"</span>"
+                        }
+                        return "<span class='text-primary'>"+row.percentual_mc+"</span>"
+                    }
+                },
                 {
                     "data": "data"
                 }, {
@@ -91,7 +123,7 @@ $(function () {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[8, "desc"]]
+            "order": [[14, "desc"]]
 
         });//fim datatables
     }
@@ -352,10 +384,64 @@ $(function () {
             });
     };
 
+     /*******************************************************
+     *********** FILTRO ALL BAR CHART **********************
+     * *****************************************************/
+     $( ".btn-enviar" ).on("click", function() {
+        
+        var dataIni =  $('input[name=dataIni]').val();
+        var dataFim =  $('input[name=dataFim]').val();
+        var isValid = true;
+        var texto = '';
+
+        console.log(dataIni);
+
+         // Check if dataIni is filled
+         if (!dataIni) {
+            texto = "Por favor, preencha a Data Inicio."
+            isValid = false;
+        } 
+        
+        if (!dataFim && isValid == true) {
+            texto = "Por favor, preencha a Data Fim.";
+            isValid = false;
+        }
+
+        // If both fields are filled, submit the form
+        if (isValid) {
+            fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+        // fncLoadChartBar();
+            d1 =  dataIni !=="" ? dataIni.replaceAll("/","") : 0;
+            d2 =  dataFim !=="" ? dataFim.replaceAll("/","") : 0;
+
+            fncDataBarChart(d1,d2).then(); // atualiza os cards de totais
+            fncDataDatatable(d1,d2).then();
+        }else{
+            swalWithBootstrapButtons.fire({
+                title: "Atenção",
+                text: texto,
+                icon: 'warning',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
+
+    $(".btn-limpar").on("click", function () {
+        fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+        fncLoadChartBar("");
+
+        $('input[name=dataIni]').val("");
+        $('input[name=dataFim]').val("");
+
+        fncDataBarChart(0,0).then();
+        fncDataDatatable(0,0).then();
+    });
+
     /***
      * Alterar a forma de pagamento
      * */
-    $("#form").submit(function(evt){
+    $("#form").on("submit",function(evt){
         evt.preventDefault();
     }).validate({
         errorClass: "my-error-class",
@@ -425,6 +511,33 @@ $(function () {
             });
         }
     });
+
+
+     /**
+     * #########################################################################
+     * ##########  ÁREA DE FILTRO DE DATAS   ###################################
+     * #########################################################################
+     * */
+     $('#data input').datepicker({
+        'language' : 'pt-BR',
+        'todayBtn': true,
+        'todayHighlight':true,
+        'weekStart':0,
+        'orientation':'bottom',
+        'autoclose':true
+    });
+
+    $('#data_ano [name=ano]').datepicker({
+        'language' : 'pt-BR',
+        'todayHighlight':true,
+        'orientation':'bottom',
+        'autoclose':true,
+        'multidate':false,
+        'format': "yyyy",
+        'viewMode': "years",
+        'minViewMode': "years"
+    });
+
     /**
      * #########################################################################
      * ##########  ÁREA EXECUÇÃO DE FUNCÇÕES ONLOAD ############################
