@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuditsController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FluxoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PdvController;
@@ -33,6 +34,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');
+    
+    Route::resource('dashboardDiario','DashboardController');
+    Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
+
     Route::get('/logout', 'AuthController@logout')->name('admin.logout');
 
     Route::get('/produto/pictures/{id}',[ProdutoController::class,'pictures'])->name('pictures');
@@ -81,6 +86,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/relatorio/dailySalesList',[RelatorioController::class,'dailySalesList']);
     Route::get('/relatorio/detailSales/{id}',[RelatorioController::class,'detailSales']);
     Route::get('/relatorio/detailCart/{id}',[RelatorioController::class,'detailCart']);
+    Route::get('/relatorio/detailDinner/{id}',[RelatorioController::class,'detailDinner']);
     Route::get('/relatorio/buscaTaxa/{id}',[RelatorioController::class,'buscaTaxa']);
     Route::get('/relatorio/mes/{ano}',[RelatorioController::class ,'mes']);
     Route::get('/relatorio/card/{ano}',[RelatorioController::class,'card']);

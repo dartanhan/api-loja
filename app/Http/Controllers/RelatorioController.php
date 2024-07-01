@@ -745,7 +745,7 @@ class RelatorioController extends Controller
      */
     public function detailCart(int $id)
     {
-        $listDetail = $this->vendas::join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+        $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
            // ->join('loja_taxa_cartoes as tx', 'tx.forma_id', '=', 'fp.id')
             ->select(
@@ -760,6 +760,33 @@ class RelatorioController extends Controller
             //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
             ->groupBy('fp.id')
             ->orderBy('fp.id', 'asc')
+            ->get();
+
+        return Response::json(array("dados" => $listDetail));
+    }
+
+    /***
+     * Detalhes das vendas no dinheiro
+     * @param $id = id loja
+     * @return JsonResponse
+     */
+    public function detailDinner(int $id)
+    {
+        $listDetail = $this->vendas
+            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
+            ->join('loja_usuarios as u', 'loja_vendas.usuario_id', '=', 'u.id')
+            ->select(
+               (DB::raw("SUM(tp.valor_pgto)  AS total")),
+                (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
+                'fp.nome',
+                'u.nome as nome_usu'
+            )
+            ->where('loja_vendas.loja_id', $id)
+            ->whereIn('fp.id', [1]) //dinheiro
+            ->whereDate('loja_vendas.created_at', Carbon::today())
+            ->groupBy('u.nome')
+            ->orderBy('u.nome', 'asc')
             ->get();
 
         return Response::json(array("dados" => $listDetail));
@@ -841,7 +868,7 @@ class RelatorioController extends Controller
     }
 
     /**
-    Gráfico de vendas dos funcionarios
+    * Gráfico de vendas dos funcionarios
      */
     function chartFunc(){
        // dd("ok");
