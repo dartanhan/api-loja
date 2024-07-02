@@ -40,7 +40,7 @@ class UploadController extends Controller
             $temp_file = $image->encode('jpeg');
 
             // Armazenar imagem redimensionada
-            Storage::put('/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+            Storage::put('tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
 
             $this->temporaryFile->folder = $folder;
             $this->temporaryFile->file =  $nome_unico;
