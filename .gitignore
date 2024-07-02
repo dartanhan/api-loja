@@ -19,3 +19,4 @@ storage/*.key
 *.jpeg
 api-loja.rar
 /bootstrap/cache
+/config/app.php
