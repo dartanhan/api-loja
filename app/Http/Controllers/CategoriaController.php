@@ -105,9 +105,9 @@ class CategoriaController extends Controller
             $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
             if($temp_file){
-                Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$cat->id."/".$temp_file->file);
+                Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'public/categorias/'.$cat->id."/".$temp_file->file);
 
-                Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+                Storage::deleteDirectory('tmp/'.$temp_file->folder);
                 $temp_file->delete();
             }
 
@@ -169,10 +169,10 @@ class CategoriaController extends Controller
                 $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
                 if($temp_file){
-                    Storage::deleteDirectory('categorias/'.$this->request->input('id'));
-                    Storage::copy('categorias/tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
+                    Storage::deleteDirectory('public/categorias/'.$this->request->input('id'));
+                    Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'public/categorias/'.$this->request->input('id')."/".$temp_file->file);
 
-                    Storage::deleteDirectory('categorias/tmp/'.$temp_file->folder);
+                    Storage::deleteDirectory('tmp/'.$temp_file->folder);
                     $temp_file->delete();
                 }
                 $this->categoria->imagem = $temp_file->file;
