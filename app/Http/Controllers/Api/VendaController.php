@@ -337,12 +337,10 @@ class VendaController extends Controller
                 }
 
                 $cashbacks = $this->cashback::all();
-                $taxa = 0;
+                $taxa = 0.05;
                 foreach ($cashbacks as $valor) {
                     if ($valor->valor < $sale->valor_total) {
                         $taxa = $valor->taxa;
-                    }else{
-                        $taxa = 0.05;
                     }
                 }
                 $valor_cashback = ($sale->valor_total * $taxa) / 100;

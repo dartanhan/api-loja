@@ -144,7 +144,7 @@ class ProdutoImagemController extends Controller
     public function update(int $flag)
     {
        // dd($flag);
-       //dd($this->request->all());
+     //  dd($this->request->all());
         try {
 
             $destino = ($flag == 0) ? "product/" : "produtos/";
@@ -158,13 +158,15 @@ class ProdutoImagemController extends Controller
                     $path = ($flag == 0) ?
                         $destino . $produtoId . "/" . $this->request->input("imagemName") :
                         $this->request->input("imagemName");
-                    Storage::delete( $path);
+                    //Storage::delete($path);
+                    //deleto o diretorio para caso de imagem não encontrada
+                    $del = Storage::deleteDirectory("public/".$destino . $produtoId);
                 }
-
-                Storage::copy( '/tmp/' . $temp_file->folder . '/' . $temp_file->file,  $destino . $produtoId . "/" . $temp_file->file);
+               
+                Storage::copy( 'tmp/' . $temp_file->folder . '/' . $temp_file->file,  "public/".$destino . $produtoId . "/" . $temp_file->file);
 
                 //delete a imagem temporaria
-                Storage::deleteDirectory( '/tmp/' . $temp_file->folder);
+                Storage::deleteDirectory( 'tmp/' . $temp_file->folder);
                 $temp_file->delete();
 
                 if($flag == 0) {

@@ -218,7 +218,7 @@ class ProdutoController extends Controller
 
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
-                $data["descontos"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
+              //  $data["descontos"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
 
                 /**
                  * Cria ou Atualiza a variação do produto

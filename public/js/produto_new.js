@@ -736,18 +736,18 @@ $(function() {
         let subcodigo = arrayItem != null ? arrayItem.subcodigo.substring(arrayItem.subcodigo.length-2,arrayItem.subcodigo.length) : val;
         let variacao = arrayItem != null ? arrayItem.variacao : '';
         let valor_varejo = arrayItem != null ? formatMoney(arrayItem.valor_varejo) : typeof $("#valor_varejo0").val() !== "undefined" ? $("#valor_varejo0").val() : '';
-        let valor_atacado = arrayItem != null ? formatMoney(arrayItem.valor_atacado) : typeof $("#valor_atacado0").val() !== "undefined" ? $("#valor_atacado0").val() : '';
-        let valor_atacado_5un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_5un) : typeof $("#valor_atacado_5un0").val() !== "undefined" ? $("#valor_atacado_5un0").val() : '';
+    //    let valor_atacado = arrayItem != null ? formatMoney(arrayItem.valor_atacado) : typeof $("#valor_atacado0").val() !== "undefined" ? $("#valor_atacado0").val() : '';
+    //    let valor_atacado_5un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_5un) : typeof $("#valor_atacado_5un0").val() !== "undefined" ? $("#valor_atacado_5un0").val() : '';
         let valor_atacado_10un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_10un) : typeof $("#valor_atacado_10un0").val() !== "undefined" ? $("#valor_atacado_10un0").val() : '';
-        let valor_lista = arrayItem != null ? formatMoney(arrayItem.valor_lista) : typeof $("#valor_lista0").val() !== "undefined" ? $("#valor_lista0").val() : '';
+    //    let valor_lista = arrayItem != null ? formatMoney(arrayItem.valor_lista) : typeof $("#valor_lista0").val() !== "undefined" ? $("#valor_lista0").val() : '';
         let valor_produto = arrayItem != null ? formatMoney(arrayItem.valor_produto) : typeof $("#valor_produto0").val() !== "undefined" ? $("#valor_produto0").val() : '';
         let quantidade = arrayItem != null ? arrayItem.quantidade : '';
         let estoque = arrayItem != null ? arrayItem.estoque : '';
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
-        let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
-        let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
+   //     let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
+   //     let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
 
 
 

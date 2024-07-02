@@ -44,16 +44,32 @@ function formatMoneyPress(parm) {
  * */
 function formatMoney(valor)
 {
-    const v = ((valor.replace(/\D/g, '') / 100).toFixed(2) + '').split('.');
+    try {
+     
+        // Verifica se o valor passado é uma string
+        if (typeof valor !== 'string') {
+            throw new Error('O valor deve ser uma string. ' + valor);
+        }
 
-    const m = v[0].split('').reverse().join('').match(/.{1,3}/g);
+        const v = ((valor.replace(/\D/g, '') / 100).toFixed(2) + '').split('.');
 
-    for (let i = 0; i < m.length; i++)
-        m[i] = m[i].split('').reverse().join('') + '.';
+        const m = v[0].split('').reverse().join('').match(/.{1,3}/g);
 
-    const r = m.reverse().join('');
+        if (!m) {
+            throw new Error('Não foi possível formatar o valor.' + m);
+        }
 
-    return r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
+        for (let i = 0; i < m.length; i++)
+            m[i] = m[i].split('').reverse().join('') + '.';
+
+        const r = m.reverse().join('');
+
+        return r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
+    } catch (error) {
+        console.error('Erro na função formatMoney:', error.message);
+        // Você pode decidir o que fazer aqui em caso de erro, como retornar um valor padrão ou lançar novamente o erro
+        throw error; // Lança novamente o erro para que quem chama a função possa lidar com ele
+    }
 }
 
  /***
