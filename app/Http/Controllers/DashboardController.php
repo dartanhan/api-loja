@@ -48,7 +48,7 @@ class DashboardController extends Controller
 
         }
 
-        return redirect()->route('admin.login');       
+        return redirect()->route('admin.login');
     }
 
     /***
@@ -110,7 +110,6 @@ class DashboardController extends Controller
                 ->orderBy('lv.created_at', 'asc')
                 ->get();
 
-
             foreach ($listSales as $listSale) {
 
                 $imposto = ($listSale->total * 4)/100;
@@ -133,12 +132,14 @@ class DashboardController extends Controller
                 //MC = SUBTOTAL - DESCONTO -  CASHBACK - TAXA DE CARTÃO - IMPOSTO- VALOR DO PRODUTO
                 $mc = $listSale->sub_total - $listSale->valor_desconto -  $data['cashback'] - $listSale->taxa_pgto - $imposto - $listSale->valor_total_produtos;
                 $data['mc'] = $this->formatter->formatCurrency($mc, 'BRL');
-                $data['percentual_mc'] =  number_format($mc / $listSale->valor_total_produtos * 100, 2) . '%';
+                if($listSale->valor_total_produtos > 0){
+                    $data['percentual_mc'] =  number_format($mc/$listSale->valor_total_produtos * 100, 2) . '%';
+                }
                 $data['nome_cli'] = $listSale->nome_cli == "" ? "Cliente não Identificado" : $listSale->nome_cli;
 
-                $return[] = $data;
+                array_push($return,$data);
             }
-           // var_dump($return);
+
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 400);
         }
@@ -147,7 +148,7 @@ class DashboardController extends Controller
 
     /****
      * Pega o cashback da venda
-     * 
+     *
      */
     public function cashback(int $venda_id)
     {
