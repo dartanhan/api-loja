@@ -11,4 +11,7 @@ class VendasProdutosDesconto extends Model
     protected $fillable = ['venda_id','valor_desconto','valor_recebido','valor_percentual'];
 
 
+    function produto_desconto(){
+        return $this->belongsTo(Vendas::class, 'venda_id', 'id');
+    }
 }

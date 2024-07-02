@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
- 
+
     <div class="container-fluid">
         <h1 class="mt-4">Dashboard</h1>
         <input type="hidden" name="store_id" id="store_id" value="{{$user_data->loja_id}}">
@@ -154,7 +154,7 @@
         </div>
         <!-- Modal -->
         <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="exampleModalLongTitle">Detalhes da Venda - <span id="codigo_venda"></span></h5>
@@ -170,6 +170,7 @@
                                         <th data-sortable="false">CÓDIGO</th>
                                         <th data-sortable="false">PRODUTO</th>
                                         <th data-sortable="false">VALOR</th>
+                                        <th data-sortable="false">VALOR PRODUTO</th>
                                         <th data-sortable="false">QTD</th>
                                         <th data-sortable="false">TOTAL</th>
                                     </tr>
@@ -280,8 +281,8 @@
                 </div>
             </div>
         </div>
-    
-    
+
+
 @endsection
 
 

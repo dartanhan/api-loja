@@ -34,7 +34,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');
-    
+
     Route::resource('dashboardDiario','DashboardController');
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
 

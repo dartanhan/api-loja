@@ -39,7 +39,7 @@ class RelatorioController extends Controller
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
         $this->vendasCashBack = $cashbackVendas;
         $this->vendasProdutosDesconto = $vendasProdutosDesconto;
-        
+
     }
     /**
      * Display a listing of the resource.
@@ -497,7 +497,7 @@ class RelatorioController extends Controller
 
 
     public function chartLineMultiGroupYear(){
-        
+
         try {
             Carbon::setLocale('pt_BR');
 
@@ -543,7 +543,7 @@ class RelatorioController extends Controller
     public function dynamicColors($index,$alpha) {
         // Definir um limite mínimo para os valores de cor
         $minColorValue = 100;
-      
+
       $r = floor(rand(0,$index) * $minColorValue);
       $g = floor(rand(0,$index) * $minColorValue);
       $b = floor(rand(0,$index) * $minColorValue);
@@ -645,7 +645,7 @@ class RelatorioController extends Controller
 
      /****
      * Pega o cashback da venda
-     * 
+     *
      */
     public function cashback(int $venda_id){
         $cashback = $this->vendasCashBack
@@ -664,7 +664,7 @@ class RelatorioController extends Controller
 
      /****
      * Pega o desconto da venda
-     * 
+     *
      */
     public function valor_recebido(int $venda_id){
         $data = $this->vendasProdutosDesconto
@@ -678,7 +678,7 @@ class RelatorioController extends Controller
         } else {
             return 0;
         }
-        
+
     }
 
     /**
@@ -696,11 +696,11 @@ class RelatorioController extends Controller
         $saida = "";
         foreach ($nomePayments as $nomePayment) {
             if(strtoupper($nomePayment->nome) == "DINHEIRO"){
-                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - RECEBIDO:  '. $this->formatter->formatCurrency($this->valor_recebido($id), 'BRL') .')'. "<br/>";    
+                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - RECEBIDO:  '. $this->formatter->formatCurrency($this->valor_recebido($id), 'BRL') .')'. "<br/>";
             }else{
                 $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - tx.'. $nomePayment->taxa .')'. "<br/>";
             }
-            
+
         }
         return substr($saida,0,-1);
 
@@ -718,22 +718,23 @@ class RelatorioController extends Controller
         // $stores = $this->lojas::all();
 
         //semana agrupado por dia
-        $listSalesDetail = $this->vendas::join('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'loja_vendas.id')
-            ->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-            ->select(
+        $listSalesDetail = $this->vendas::with('VendasProdutos.productsSales','descontos')
+           // ->join('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'loja_vendas.id')
+          // ->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
+           // ->select(
             //(DB::raw("loja_vendas.valor_total AS total")),
             // (DB::raw('DATE_FORMAT(loja_vendas.created_at, "%d/%m/%Y %H:%i:%s") as data')),
             //"loja_vendas.codigo_venda",
             //"loja_vendas_produtos_descontos.valor_desconto",
             // (DB::raw(("loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"))),
-                "loja_vendas_produtos.codigo_produto",
-                "loja_vendas_produtos.descricao",
-                "loja_vendas_produtos.valor_produto",
-                (DB::raw(("loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade as total"))),
-                "loja_vendas_produtos.quantidade"
-            )
+               // "loja_vendas_produtos.codigo_produto",
+               // "loja_vendas_produtos.descricao",
+              // "loja_vendas_produtos.valor_produto",
+              //  (DB::raw(("loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade as total"))),
+              //  "loja_vendas_produtos.quantidade"
+          //  )
             ->where('loja_vendas.codigo_venda', $sales)
-            ->orderBy('loja_vendas_produtos.codigo_produto', 'asc')
+            //->orderBy('loja_vendas_produtos.codigo_produto', 'asc')
             ->get();
         return Response::json(array("dados" => $listSalesDetail));
     }
