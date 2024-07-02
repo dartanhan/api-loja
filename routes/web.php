@@ -4,13 +4,11 @@ use App\Http\Controllers\AuditsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FluxoController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PdvController;
 use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\RelatorioController;
-use App\Http\Controllers\SwaggerController;
 use App\Http\Controllers\UploadController;
 
 
@@ -36,7 +34,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');
-    
+
     Route::resource('dashboardDiario','DashboardController');
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
 
@@ -44,6 +42,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::get('/produto/pictures/{id}',[ProdutoController::class,'pictures'])->name('pictures');
     Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
+    Route::get('/indexNew',[ProdutoController::class,'indexNew'])->name('produto.indexNew');
     Route::resource('produto','ProdutoController');
 
     Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');
@@ -136,5 +135,5 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
     Route::resource('listaCompras','ListaDeComprasController');
-    
+
 });

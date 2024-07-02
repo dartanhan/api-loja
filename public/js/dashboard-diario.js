@@ -59,7 +59,7 @@ $(function () {
                 {
                     "data": "total",
                     "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-                }, 
+                },
                 {
                     "data": "valor_desconto",
                     render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
@@ -80,7 +80,7 @@ $(function () {
 
                         // Converter para número
                         var numeroFloat = parseFloat(numero);
-                        
+
                         if(numeroFloat < 0){
                             return "<span class='text-danger'>"+row.mc+"</span>"
                         }
@@ -139,13 +139,31 @@ $(function () {
 
         await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
             .then(function (response) {
-                //console.log(response);
+                console.log(response);
                 return response.json()
             })
             .then(function (response) {
 
+                // Transformar os dados para que cada variação de produto seja uma linha separada
+                const transformedData = response.dados.flatMap(item =>
+                    item.vendas_produtos.map(produto => ({
+                        id: item.id,
+                        codigo_venda: item.codigo_venda,
+                      //  loja_id: item.loja_id,
+                      //  cliente_id: item.cliente_id,
+                        created_at: item.created_at,
+                        ////descontos: item.descontos.map(desconto => desconto.valor_desconto).join(', '),
+                        codigo_produto: produto.codigo_produto,
+                        descricao: produto.descricao,
+                        quantidade: produto.quantidade,
+                        valor: produto.valor_produto,
+                        valor_produto:produto.products_sales[0].valor_produto,
+                        valor_total: (produto.quantidade * produto.valor_produto).toFixed(2)
+                    }))
+                );
+
                 table = $('#tableView').DataTable({
-                    "data": response.dados,
+                    "data": transformedData,
                     "bInfo" : false,
                     "paging": true,
                     "ordering": true,
@@ -155,13 +173,18 @@ $(function () {
                         {"data": "codigo_produto"},
                         {"data": "descricao"},
                         {
+                            "data": "valor",
+                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                        },
+                        {
                             "data": "valor_produto",
                             "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
                         },
                         {"data": "quantidade"},
                         {
-                            "data": "total",
+                            "data": "valor_total",
                             "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
                         }
@@ -179,19 +202,19 @@ $(function () {
                         };
 
                         // Total over all pages
-                        total = api
-                            .column( 4 )
+                        let total = api
+                            .column(5)
                             .data()
-                            .reduce( function (a, b) {
+                            .reduce(function (a, b) {
                                 // console.log(a);
                                 return parseFloat(a) + parseFloat(b);
-                            }, 0 );
+                            }, 0);
 
                         // Update footer
                         //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
                         let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
                         $("#foot").html("");
-                        $("#foot").append('<td colspan="5" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
+                        $("#foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
                     },
 
                 });//fim datatables
@@ -287,7 +310,7 @@ $(function () {
                 });//fim datatables
             });
     });
-    
+
 
 
     /***
@@ -298,7 +321,7 @@ $(function () {
 
         let venda_id = $(this).data('value');
         let codigo_venda = $(this).data('codigo-venda');
-        
+
         const response = await fetch(url + "/relatorio/editSales/"+venda_id);
         const data = await response.json();
         // console.log(data.data);
@@ -332,7 +355,7 @@ $(function () {
             "    </div>\n" +
             "  </div>");
     }
-    
+
 
       /**
      * #########################################################################
@@ -388,7 +411,7 @@ $(function () {
      *********** FILTRO ALL BAR CHART **********************
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
-        
+
         var dataIni =  $('input[name=dataIni]').val();
         var dataFim =  $('input[name=dataFim]').val();
         var isValid = true;
@@ -400,8 +423,8 @@ $(function () {
          if (!dataIni) {
             texto = "Por favor, preencha a Data Inicio."
             isValid = false;
-        } 
-        
+        }
+
         if (!dataFim && isValid == true) {
             texto = "Por favor, preencha a Data Fim.";
             isValid = false;

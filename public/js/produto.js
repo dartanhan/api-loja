@@ -3,29 +3,33 @@ $(function() {
     let json,id,table,asyncData;
 
     const url = fncUrl();
-
+    initialiseTable();
     /**
      * DATATABLES
      * */
-    function getdata(){
-        const getDados = async () => {
-            const data = await fetch(url + "/produto/create", {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            asyncData = await data.json();
-            initialiseTable();
-            return asyncData;
-        };
-        getDados();
-    }
+    // function getdata(){
+    //     const getDados = async () => {
+    //         const data = await fetch(url + "/produto/create", {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             }
+    //         });
+    //
+    //         asyncData = await data.json();
+    //         initialiseTable();
+    //         return asyncData;
+    //     };
+    //     getDados();
+    // }
     function initialiseTable() {
         table = $('#table').DataTable({
-            data:asyncData,
-            responsive: true,
+            ajax: {
+                method: 'get',
+                processing: true,
+                serverSide: true,
+                url: url + "/produto/create",
+            },
             "columns": [
                 {
                     "className": 'details-control',

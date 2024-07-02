@@ -22,4 +22,13 @@ class Vendas extends Model implements Auditable
     function quantityProduct(){
         return $this->hasMany(VendasProdutos::class, 'venda_id', 'id');
     }
+
+    function VendasProdutos(){
+        return $this->hasMany(VendasProdutos::class, 'venda_id', 'id');
+    }
+
+    function descontos(){
+        return $this->hasMany(VendasProdutosDesconto::class, 'venda_id', 'id');
+
+    }
 }

@@ -29,6 +29,10 @@
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
                                 Produtos Ativos
                             </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
+                                Produtos Ativos(New)
+                            </a>
                             <a class="nav-link {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
                                 Produtos Inativos
@@ -133,7 +137,7 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                 Mais Vendidos
                         </a>
-                        
+
                     </nav>
                 </div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
@@ -205,7 +209,7 @@
                     @if(Auth::check()) {{Auth::user()->name}} @endif
                 </div>
             </div>
-       
+
 </nav>
 
 
