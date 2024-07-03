@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('dashboardDiario','DashboardController');
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
+    Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');
 
     Route::get('/logout', 'AuthController@logout')->name('admin.logout');
 
@@ -137,3 +138,4 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('listaCompras','ListaDeComprasController');
 
 });
+Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');

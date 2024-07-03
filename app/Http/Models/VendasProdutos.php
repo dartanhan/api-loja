@@ -21,4 +21,8 @@ class VendasProdutos extends Model implements Auditable
         return  $this->hasMany(ProdutoVariation::class,'subcodigo', 'codigo_produto');
     }
 
+    function produtoVariation() {
+        return  $this->hasMany(ProdutoVariation::class,'subcodigo', 'codigo_produto');
+    }
+
 }
