@@ -412,21 +412,21 @@ $(function () {
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
 
-        var dataIni =  $('input[name=dataIni]').val();
-        var dataFim =  $('input[name=dataFim]').val();
-        var isValid = true;
-        var texto = '';
+         const dataIni = $('input[name=dataIni]').val();
+         const dataFim = $('input[name=dataFim]').val();
+         let isValid = true;
+         let msg = '';
 
-        console.log(dataIni);
+         //console.log(dataIni);
 
          // Check if dataIni is filled
          if (!dataIni) {
-            texto = "Por favor, preencha a Data Inicio."
+             msg = "Por favor, preencha a Data Inicio."
             isValid = false;
         }
 
-        if (!dataFim && isValid == true) {
-            texto = "Por favor, preencha a Data Fim.";
+        if (!dataFim && isValid === true) {
+            msg = "Por favor, preencha a Data Fim.";
             isValid = false;
         }
 
@@ -434,15 +434,15 @@ $(function () {
         if (isValid) {
             fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
         // fncLoadChartBar();
-            d1 =  dataIni !=="" ? dataIni.replaceAll("/","") : 0;
-            d2 =  dataFim !=="" ? dataFim.replaceAll("/","") : 0;
+            let d1 =  dataIni !=="" ? dataIni.replaceAll("/","") : 0;
+            let d2 =  dataFim !=="" ? dataFim.replaceAll("/","") : 0;
 
             fncDataBarChart(d1,d2).then(); // atualiza os cards de totais
             fncDataDatatable(d1,d2).then();
         }else{
             swalWithBootstrapButtons.fire({
                 title: "Atenção",
-                text: texto,
+                text: msg,
                 icon: 'warning',
                 showConfirmButton: false,
                 timer: 1500
@@ -452,7 +452,7 @@ $(function () {
 
     $(".btn-limpar").on("click", function () {
         fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
-        fncLoadChartBar("");
+       // fncLoadChartBar("");
 
         $('input[name=dataIni]').val("");
         $('input[name=dataFim]').val("");

@@ -124,8 +124,8 @@
                     <i class="fas fa-table me-1"></i>Vendas no dia
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive w-100">
-                        <table id="datatablesDiario" class="table compact table-striped table-bordered table-hover">
+                    <div class="table-responsive">
+                        <table id="datatablesDiario" class="table compact table-striped table-bordered table-hover w-100">
                             <thead class="text-center">
                                 <tr>
                                     <th data-sortable="true">Venda</th>
@@ -134,7 +134,7 @@
                                     <th data-sortable="true">Tipo Venda</th>
                                     <th data-sortable="true">Sub Total</th>
                                     <th data-sortable="true">Forma Pagamento</th>
-                                    <th data-sortable="true">Total</th>
+                                    <th data-sortable="true" style="width:80px">Total</th>
                                     <th data-sortable="true">Desconto</th>
                                     <th data-sortable="true">Cashback</th>
                                     <th data-sortable="true">Imposto</th>
