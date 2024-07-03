@@ -112,8 +112,6 @@ class DashboardController extends Controller
 
             foreach ($listSales as $listSale) {
 
-                $imposto = ($listSale->total * 4)/100;
-
                 $data['total'] =  $listSale->total - $this->cashback($listSale->venda_id);
                 $data['data'] =  $listSale->data;
                 $data['loja'] =  $listSale->loja;
@@ -122,12 +120,20 @@ class DashboardController extends Controller
                 $data['valor_desconto'] =  $listSale->valor_desconto;
                 $data['sub_total'] =  $listSale->sub_total;
                 $data['nome_pgto'] =  $this->formName($listSale->venda_id); //$listSale->nome_pgto;
-                $data['taxa_pgto'] =  $this->formatter->formatCurrency($listSale->taxa_pgto, 'BRL');;
+                if( $listSale->taxa_pgto > 0){
+                    $data['taxa_pgto'] =  $this->formatter->formatCurrency(($listSale->total * $listSale->taxa_pgto ) / 100, 'BRL');
+                }else{
+                    $data['taxa_pgto'] =  $this->formatter->formatCurrency(0, 'BRL');
+                }
                 $data['id_pgto'] =  $listSale->id_pgto;
                 $data['usuario'] =  ($listSale->usuario_id == "") ? 'Karla' : $listSale->nome;
                 $data['cashback'] = $this->cashback($listSale->venda_id);
                 $data['tipo_venda'] = $listSale->tipo_venda;
+
+                //se igual a forma de pagamento DINHEIRO não calcula imposto
+                $imposto = $listSale->id_pgto !== 1 ? ($listSale->total * 4)/100 : 0;
                 $data['imposto'] = $this->formatter->formatCurrency($imposto, 'BRL');
+
                 $data['valor_produto'] = $this->formatter->formatCurrency($listSale->valor_total_produtos, 'BRL');
                 //MC = SUBTOTAL - DESCONTO -  CASHBACK - TAXA DE CARTÃO - IMPOSTO- VALOR DO PRODUTO
                 $mc = $listSale->sub_total - $listSale->valor_desconto -  $data['cashback'] - $listSale->taxa_pgto - $imposto - $listSale->valor_total_produtos;
@@ -148,7 +154,8 @@ class DashboardController extends Controller
 
     /****
      * Pega o cashback da venda
-     *
+     * @param int $venda_id
+     * @return int
      */
     public function cashback(int $venda_id)
     {
