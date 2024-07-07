@@ -363,9 +363,9 @@ $(function () {
      * #########################################################################
      * */
       let fncDataBarChart = async function(dateOne, dateTwo) {
-        await fetch(url+ "/relatorio/chartDay/"+dateOne+"/"+dateTwo+"/2")
+        const endpoint = `${url}/relatorio/chartDay/`+dateOne+`/`+dateTwo+`/2`;
+        await fetch(endpoint)
             .then(function (response) {
-
                 return response.json()
             }).then(function (response) {
                 //  console.log(response);
@@ -407,6 +407,8 @@ $(function () {
             });
     };
 
+   
+    
      /*******************************************************
      *********** FILTRO ALL BAR CHART **********************
      * *****************************************************/
@@ -568,4 +570,5 @@ $(function () {
      * */
     fncDataDatatable("", "").then();
     fncDataBarChart(0,0).then();
+    getFncDataCardTotalProdutoPorVenda("","",2);
 });

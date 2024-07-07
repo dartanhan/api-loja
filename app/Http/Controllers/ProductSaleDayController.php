@@ -75,7 +75,7 @@ class ProductSaleDayController extends Controller
 
             return  DataTables::of($sales)->make(true);
 
-        }catch (Throwable $e) {
+        }catch (\Throwable $e) {
             return Response::json(array('success' => false, 'message' => 'ProductBestSellersController' . $e ), 500);
         }
     }

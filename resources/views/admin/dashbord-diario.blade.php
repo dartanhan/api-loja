@@ -8,87 +8,72 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid mt-4">
         <h1 class="mt-4">Dashboard</h1>
         <input type="hidden" name="store_id" id="store_id" value="{{$user_data->loja_id}}">
-        <div class="row">
-            <div class="contador">
+        <div class="contador">
                 Atualizando em:
                 <span id="contador"></span>
-            </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-primary text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalDinner" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link detailDinner" href="#" data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+        </div>
+        <div class="d-flex flex-wrap">
+            <div class="card bg-primary text-white card-custom-width h-25">
+                <div class="d-flex  align-items-center" id="totalDinner" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer">
+                    <a class="small text-white stretched-link detailDinner" href="#" 
+                    data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-warning text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalCartao" name="load">
+            <div class="card bg-warning text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalCartao" name="load">
                         <div class="card-body" name="card-body"></div>
                         <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link detailCart" href="#" data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+                </div>
+                <div class="card-footer">
+                    <a class="small text-white stretched-link detailCart" href="#" 
+                    data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-danger text-white mb-4">
-                    <div class="d-flex align-items-center" id="totalDesconto" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+            <div class="card bg-danger text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalDesconto" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-info text-white mb-4">
-                    <div class="d-flex align-items-center" id="totalDia" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+            <div class="card bg-info text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalDia" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-secondary text-white mb-4">
-                    <div class="d-flex align-items-center" id="totalSemana" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+            <div class="card bg-secondary text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalSemana" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-6">
-                <div class="card bg-dark text-white mb-4">
-                    <div class="d-flex align-items-center" id="totalMes" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                    </div>
+            <div class="card bg-dark text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalMes" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
         </div>
+        
         <div class="row">
             <div class="col-xl-12">
                 <div class="card mb-4">
@@ -305,16 +290,14 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
 @endpush
 <style>
-        .container-fluid {
-            padding: 0 15px;
-        }
-        .card {
-            margin: 0;
-        }
-        .table-responsive {
+       .table-responsive {
             overflow-x: auto;
         }
         table {
             width: 100%;
+        }
+        .card-custom-width {
+            width: 15%;
+            margin: 0.5%;
         }
     </style>

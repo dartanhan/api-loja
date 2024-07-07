@@ -4,7 +4,7 @@
     font-variant: all-small-caps;
 }
 
-thead{
+.table thead{
     font-size: 12px;
     /*font-variant: all-small-caps;*/
     background-color: #212529;
@@ -73,4 +73,12 @@ table.dataTable tbody td {
 .bi-down {
     color: red;
     cursor: pointer;
+}
+
+/** Mensagem load na datatable*/
+.loading-message {
+    text-align: center;
+    padding: 50px;
+    font-size: 20px;
+    color: #007bff;
 }

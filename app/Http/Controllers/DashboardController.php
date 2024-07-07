@@ -57,6 +57,7 @@ class DashboardController extends Controller
      */
     public function vendasDia()
     {
+        dd($this->request->all());
         try {
             $data = null;
             $return = [];
@@ -224,6 +225,7 @@ class DashboardController extends Controller
             $totalValorProduto = 0;
             $dataOneRequest = $this->request->input('dataOne');
             $dataTwoRequest = $this->request->input('dataTwo');
+            $idLojaRequest = $this->request->input('idLoja');
 
             $dataOne = ($dataOneRequest)
                         ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
@@ -235,7 +237,7 @@ class DashboardController extends Controller
 
             $listSales = $this->vendas::with('VendasProdutos.produtoVariation')
                         ->from('loja_vendas as lv')
-                        ->where('lv.loja_id', 2)
+                        ->where('lv.loja_id', $idLojaRequest)
                         ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataOne, $dataTwo))
                             ->groupBy('lv.codigo_venda')
                             ->orderBy('lv.created_at', 'asc')

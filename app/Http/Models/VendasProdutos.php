@@ -13,9 +13,11 @@ class VendasProdutos extends Model implements Auditable
     public $timestamps = false;
     protected $fillable = ['venda_id','codigo_produto','descricao','valor_produto','quantidade','categoria_id','fornecedor_id','created_at'];
 
-    public function vendas() {
-        return $this->belongsTo('App\Http\Models\Vendas');
-    }
+     // Define o relacionamento belongsTo
+     public function vendas()
+     {
+         return $this->belongsTo(Vendas::class, 'venda_id');
+     }
 
     function productsSales() {
         return  $this->hasMany(ProdutoVariation::class,'subcodigo', 'codigo_produto');
@@ -25,4 +27,5 @@ class VendasProdutos extends Model implements Auditable
         return  $this->hasMany(ProdutoVariation::class,'subcodigo', 'codigo_produto');
     }
 
+   
 }

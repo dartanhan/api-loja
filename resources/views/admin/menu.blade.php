@@ -16,6 +16,10 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Dashboard Diário
                     </a>
+                    <a class="nav-link {{ Route::current()->getName() === 'reposicao-produto.index' ? 'active' : '' }}" href="{{route('reposicao-produto.index')}}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-sync-alt"></i></div>
+                        Reposição
+                    </a>
                 @endif
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>

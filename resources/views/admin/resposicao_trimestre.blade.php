@@ -42,6 +42,7 @@
                                     </thead>
                                     <tbody class="text-center"></tbody>
                                 </table>
+                                <div class="loading-message" id="loadingMessage"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
                             </div>
                         </div>
                     </div>
@@ -87,7 +88,7 @@
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>    
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{URL::asset('js/comum.js')}}"></script>
-    <script src="{{URL::asset('js/resposicao.js')}}"></script>
+    <script src="{{URL::asset('js/resposicao_trimestre.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
 @endpush
 @push("styles")
