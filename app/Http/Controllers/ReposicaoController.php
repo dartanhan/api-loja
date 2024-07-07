@@ -7,10 +7,12 @@ use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\Reposicao;
 use App\Http\Models\VendasProdutos;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class ReposicaoController extends Controller
 {
@@ -135,5 +137,58 @@ class ReposicaoController extends Controller
             return Response::json(['error' => $e->getMessage()], 500);
         }
         return Response()->json($ret);
+    }
+
+    public function filter(){
+        
+       // $startDate = Carbon::createFromFormat('d/m/Y', $this->request->input('startDate'))->startOfDay();
+       // $endDate = Carbon::createFromFormat('d/m/Y', $this->request->input('endDate'))->endOfDay();
+       $startDate = $this->request->input('startDate');
+       $endDate = $this->request->input('endDate');
+       
+        $vendas = $this->listSales($startDate,$endDate);
+
+        return DataTables::of($vendas)
+            ->addColumn('imagem', function ($venda) {
+                if ($venda->imagem) {
+                    return '<img src="' . asset('storage/' . $venda->imagem) . '" class="image img-datatable">';
+                } else {
+                    return '<img src="' . asset('storage/produtos/not-image.png') . '" class="image img-datatable">';
+                }
+            })
+            ->rawColumns(['imagem'])
+            ->make(true);
+    
+    }
+
+    public function listSales($startDate,$endDate){
+
+        if ($startDate && $endDate) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+        } else {
+            // Se as datas não forem fornecidas, define um período padrão
+           // $startDate = Carbon::now()->subMonth()->startOfDay(); // Um mês atrás
+            $startDate = Carbon::now()->subDays('5')->startOfDay();
+            $endDate = Carbon::now()->endOfDay(); // Hoje
+        }
+
+        return DB::table('loja_vendas_produtos as lv')
+            ->leftJoin('loja_produtos_variacao as v', 'lv.codigo_produto', '=', 'v.subcodigo')
+            ->leftJoin('loja_produtos_imagens as i', 'v.id', '=', 'i.produto_variacao_id')
+            
+            ->select(
+                'lv.descricao',
+                'lv.codigo_produto',
+                DB::raw("DATE_FORMAT(lv.created_at, '%d/%m/%Y') AS venda_data"),
+                DB::raw('SUM(lv.quantidade) AS quantidade'),
+                'i.path AS imagem'
+                
+            )
+            ->whereBetween('lv.created_at', [$startDate, $endDate])
+            ->groupBy('lv.codigo_produto', 'lv.descricao', 'i.path')
+            ->orderBy('quantidade', 'DESC')
+            ->orderBy('lv.descricao')
+            ->get();
     }
 }

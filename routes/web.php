@@ -9,6 +9,8 @@ use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\ReposicaoController;
+use App\Http\Controllers\ReposicaoProdutoController;
 use App\Http\Controllers\UploadController;
 
 
@@ -37,6 +39,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('dashboardDiario','DashboardController');
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
+    Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');
 
     Route::get('/logout', 'AuthController@logout')->name('admin.logout');
 
@@ -131,7 +134,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
     Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
 
+    
+    Route::post('/reposicao/filter', [ReposicaoController::class, 'filter'])->name('admin.reposicaoProduto.filter');
     Route::resource('reposicao','ReposicaoController');
+    Route::resource('reposicao-produto','ReposicaoProdutoController');
+  
+
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
     Route::resource('listaCompras','ListaDeComprasController');

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use NumberFormatter;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -56,19 +57,32 @@ class DashboardController extends Controller
      */
     public function vendasDia()
     {
+        dd($this->request->all());
         try {
             $data = null;
             $return = [];
 
-            $dataOne = ($this->request->dataOne != 0) ?
+            $dataOneRequest = $this->request->dataOne;
+            $dataTwoRequest = $this->request->dataTwo;
+
+            $dataOne = ($dataOneRequest)
+                        ? CarbonImmutable::createFromFormat('dmY', $dataOneRequest)->format('Y-m-d')
+                        : CarbonImmutable::now()->format('Y-m-d');
+
+            $dataTwo = ($dataTwoRequest) 
+                        ? CarbonImmutable::createFromFormat('dmY', $dataTwoRequest)->format('Y-m-d')
+                        : CarbonImmutable::now()->format("Y-m-d");
+
+           /* $dataOne = ($this->request->dataOne != 0) ?
                 CarbonImmutable::parse(
                     Carbon::createFromFormat('dmY', $this->request->dataOne)
                         ->format('Y-m-d')
                 ) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
+                
             $dataTwo = ($this->request->dataTwo != 0) ?
                 CarbonImmutable::parse(Carbon::createFromFormat('dmY', $this->request->dataTwo)
                     ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-
+*/
 
            /* $valorTotalProdutos = DB::table('loja_produtos_variacao as lvp')
                     ->select(DB::raw('SUM(lpv.valor_produto * lv.quantidade)'))
@@ -199,4 +213,52 @@ class DashboardController extends Controller
         // }
         // return substr($saida, 0, -1);
     }
+
+
+    /***
+     * Retonar o total dos produtos no valor de compra do dia em cima das vendas do dia
+     */
+    public function totalProdutoVenda(){
+
+        try{
+            //  dd($this->request->input('dataOne'));
+            $totalValorProduto = 0;
+            $dataOneRequest = $this->request->input('dataOne');
+            $dataTwoRequest = $this->request->input('dataTwo');
+            $idLojaRequest = $this->request->input('idLoja');
+
+            $dataOne = ($dataOneRequest)
+                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
+                        : CarbonImmutable::now()->format('Y-m-d');
+
+            $dataTwo = ($dataTwoRequest) 
+                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataTwoRequest)->format('Y-m-d')
+                        : CarbonImmutable::now()->format("Y-m-d");
+
+            $listSales = $this->vendas::with('VendasProdutos.produtoVariation')
+                        ->from('loja_vendas as lv')
+                        ->where('lv.loja_id', $idLojaRequest)
+                        ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataOne, $dataTwo))
+                            ->groupBy('lv.codigo_venda')
+                            ->orderBy('lv.created_at', 'asc')
+                            ->get();
+
+            $json = Response::json(["data" => $listSales])->getContent();
+
+            $data = json_decode($json, true); 
+
+            foreach ($data['data'] as $venda) {
+                foreach ($venda['vendas_produtos'] as $produto) {
+                    foreach ($produto['produto_variation'] as $variacao) {
+                        $totalValorProduto += (float) $variacao['valor_produto'];
+                    }
+                }
+            }
+            return Response::json(["data" => $this->formatter->formatCurrency($totalValorProduto, 'BRL')]);
+
+        }catch(Throwable $e){
+            return Response::json(['error' => $e->getMessage()], 500);
+        }
+    }
+     
 }

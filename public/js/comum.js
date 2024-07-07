@@ -6,6 +6,15 @@ const swalWithBootstrapButtons = Swal.mixin({
     buttonsStyling: false
 });
 
+const sweetAlert = function(title, text,icon){
+    swalWithBootstrapButtons.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        showConfirmButton: false
+    });
+}
+
 /**
  * SÓ PERMITE DIGITAR NUMEROS NO CAMPO
  * */
