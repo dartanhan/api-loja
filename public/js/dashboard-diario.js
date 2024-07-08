@@ -123,7 +123,13 @@ $(function () {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[14, "desc"]]
+            "order": [[14, "desc"]],
+            initComplete: function(settings, json) {
+                console.log(json.total_imposto);
+                $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
+                    " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
+                    " </div>");
+            }
 
         });//fim datatables
     }
@@ -133,7 +139,7 @@ $(function () {
      * **/
      $(document).on("click", ".btnView", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel();
+        fncLoadDataTableModel("tableView");
         let fila = $(this).closest("tr");
         let codigo_venda = $(this).data('codigo-venda');
 
@@ -190,7 +196,7 @@ $(function () {
                         }
                     ],
                     language: {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+                        "url": "../public/Portuguese-Brasil.json"
                     },
                     "order": [[0, "asc"]],
                     "footerCallback": function ( row, data, start, end, display ) {
@@ -229,7 +235,7 @@ $(function () {
         event.preventDefault();
 
         let id = $(this).data('content');
-       // fncLoadDataTableModel();
+        fncLoadDataTableModel("tableViewCart");
 
         await fetch(url + "/relatorio/detailCart/" + id )
             .then(function (response) {
@@ -259,7 +265,7 @@ $(function () {
                         },
                     ],
                     language: {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+                        "url": "../public/Portuguese-Brasil.json"
                     },
                     "order": [[0, "asc"]]
                 });//fim datatables
@@ -274,7 +280,8 @@ $(function () {
         event.preventDefault();
 
         let id = $(this).data('content');
-        //fncLoadDataTableModel();
+        console.log("id " +id);
+        fncLoadDataTableModel("dataTableModalDinner");
 
         await fetch(url + "/relatorio/detailDinner/" + id )
             .then(function (response) {
@@ -304,7 +311,7 @@ $(function () {
                         },
                     ],
                     language: {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+                        "url": "../public/Portuguese-Brasil.json"
                     },
                     "order": [[0, "asc"]]
                 });//fim datatables
@@ -348,8 +355,8 @@ $(function () {
      * ##########  ÁREA DE FUNÇÕES DO SISTEMA   ###################################
      * #########################################################################
      * */
-    let fncLoadDataTableModel = function() {
-        $('tbody[id=dataTableModal]').html("<div class=\"row\">\n" +
+    let fncLoadDataTableModel = function(table) {
+        $("tbody[id="+table+"]").html("<div class=\"row\">\n" +
             "    <div class=\"col-md-8 mx-auto\">\n" +
             "      <h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>\n" +
             "    </div>\n" +
