@@ -102,21 +102,25 @@ $(function () {
                 }, {
                     "render": function ( data, type, row, meta ) {
                         return "<div class='text-center'>" +
-                            "<div class='btn-group'>" +
-                            "<button class='btn btn-warning btn-sm btnEdit m-1' data-toggle=\"modal\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
-                            "  data-target=\"#divModalUpdate\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
-                            "  <i class=\"far fa-edit\"></i>" +
-                            "</button>" +
-                            "<button class='btn btn-info btn-sm btnView m-1' data-toggle=\"modal\" data-codigo-venda="+row.codigo_venda+" " +
-                            "  data-target=\"#divModal\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Detalhes da Venda\"'>" +
-                            "  <i class=\"far fa-eye\"></i>" +
-                            "</button>" +
-                            // "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
-                            // "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
-                            // "  <i class=\"far fa-trash-alt\"></i>" +
-                            // "</button>" +
-                            "</div>" +
-                            "</div>"
+                                    "<div class='btn-group'>" +
+
+                                            "<button class='btn btn-warning btn-sm btnEdit m-1'  data-target=\"#divModalUpdate\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
+                                            "   data-toggle=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
+                                            "  <i class=\"far fa-edit\"></i>" +
+                                            "</button>" +
+
+                                        "<span data-toggle=\"modal\" data-target=\"#divModal\">" +
+                                            "<button class='btn btn-info btn-sm btnView m-1'  data-codigo-venda="+row.codigo_venda+" " +
+                                            " data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detalhes da Venda\"'>" +
+                                            " <i class=\"far fa-eye\"></i>" +
+                                            "</button>" +
+                                        "</span>"+
+                                        // "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
+                                        // "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
+                                        // "  <i class=\"far fa-trash-alt\"></i>" +
+                                        // "</button>" +
+                                    "</div>" +
+                                "</div>"
                     }
                 }
             ],
@@ -125,7 +129,8 @@ $(function () {
             },
             "order": [[14, "desc"]],
             initComplete: function(settings, json) {
-                console.log(json.total_imposto);
+                $('[data-toggle="tooltip"]').tooltip();
+                //  console.log(json.total_imposto);
                 $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
                     " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
                     " </div>");
@@ -140,8 +145,21 @@ $(function () {
      $(document).on("click", ".btnView", async function(event) {
         event.preventDefault();
         fncLoadDataTableModel("tableView");
-        let fila = $(this).closest("tr");
-        let codigo_venda = $(this).data('codigo-venda');
+
+         let startDate;
+         let endDate;
+         let fila = $(this).closest("tr");
+         $("#codigo_venda").text($(this).data('codigo-venda'));
+
+         const dataIni = $('input[name=dataini]').val();
+         const dataFim = $('input[name=datafim]').val();
+
+         if (dataIni) {
+             startDate = moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD');
+         }
+         if (dataFim) {
+             endDate = moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD');
+         }
 
         await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
             .then(function (response) {
@@ -225,7 +243,9 @@ $(function () {
 
                 });//fim datatables
             });
-            $("#codigo_venda").html(codigo_venda);
+
+         // Abrir o modal após preencher os dados
+         $('#divModalUpdate').modal('show');
     });
 
     /**
@@ -332,7 +352,7 @@ $(function () {
         const response = await fetch(url + "/relatorio/editSales/"+venda_id);
         const data = await response.json();
         // console.log(data.data);
-         console.log(data.payments);
+         //console.log(data.payments);
 
         let html = data.data.reduce(function (string, obj) {
             return string + "<option value="+obj.id+" data-taxa="+obj.taxa+">" + obj.payments_list[0].nome +" - taxa("+ obj.taxa +")</option>"
@@ -347,7 +367,12 @@ $(function () {
         }, "<option value='' selected='selected'>Forma de Pagamentos </option>");
 
         $("#payments").html(html);
-        $("#codigo_venda").html(codigo_venda);
+
+        // Usar text() em vez de html() para span
+        $("#codigovenda").text(codigo_venda);
+
+        // Abrir o modal após preencher os dados
+        $('#divModalUpdate').modal('show');
     });
 
         /**
@@ -414,8 +439,8 @@ $(function () {
             });
     };
 
-   
-    
+
+
      /*******************************************************
      *********** FILTRO ALL BAR CHART **********************
      * *****************************************************/

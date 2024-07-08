@@ -773,6 +773,8 @@ class RelatorioController extends Controller
      */
     public function detailDinner(int $id)
     {
+        $startDate = Carbon::createFromFormat('Y-m-d',"2024-07-01")->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d', "2024-07-08")->endOfDay();
         $listDetail = $this->vendas
             ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
@@ -785,7 +787,8 @@ class RelatorioController extends Controller
             )
             ->where('loja_vendas.loja_id', $id)
             ->whereIn('fp.id', [1]) //dinheiro
-            ->whereDate('loja_vendas.created_at', Carbon::today())
+           // ->whereDate('loja_vendas.created_at', Carbon::today())
+            ->whereBetween('loja_vendas.created_at', [$startDate, $endDate])
             ->groupBy('u.nome')
             ->orderBy('u.nome', 'asc')
             ->get();
