@@ -17,11 +17,11 @@ $(function() {
      * */
 
     let fncDataDatatable = async function(startDate, endDate) {
-        sweetAlert("Aguarde", "Carregando dados da reposição...",'info');
+        
         
         if (table) {
             table.destroy();
-            //table.ajax.reload();
+            sweetAlert("Aguarde", "Carregando dados da reposição...",'info');
         }
         table = await $('#table').DataTable({
             responsive: true,
@@ -44,7 +44,9 @@ $(function() {
                 {"data": "imagem",name: 'imagem'},
                 { data: 'codigo_produto', name: 'codigo_produto'},
                 { data: 'descricao', name: 'descricao'},
+                { data: 'valor_produto', name: 'valor_produto'},
                 { data: 'quantidade', name: 'quantidade'},
+                { data: 'valor_total', name: 'valor_total'},
                 {
                     "data": "defaultContent",
                     render: function(data, type, row) {
@@ -53,11 +55,15 @@ $(function() {
                 }        
             ],
             language: {
-                "url": "./public/Portuguese-Brasil.json"
+                "url": "../public/Portuguese-Brasil.json"
             },
             "order": [[3, "desc"]],
             initComplete: function(settings, json) {
                 swalWithBootstrapButtons.close();
+                $("#data-periodo").html("- Período pesquisado : " + 
+                    moment(startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') + " até " + 
+                    moment(endDate, 'YYYY-MM-DD').format('DD/MM/YYYY'));
+                $('[data-toggle="tooltip"]').tooltip();               
             }
         });
     }
@@ -155,5 +161,8 @@ $(function() {
     /****
      * LOAD DE FUNÇOES
      */
-    fncDataDatatable("", "").then();
+    // Obter a data atual
+    const currentDate = moment().format('YYYY-MM-DD');
+
+    fncDataDatatable(currentDate, currentDate).then();
 });

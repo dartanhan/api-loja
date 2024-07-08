@@ -49,9 +49,9 @@ $(function() {
                     render: function (data, type, row) {
                         if(row.produto_imagens.length > 0){
                             let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                            return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable"></img>';
+                            return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" ></img>';
                         }else{
-                            return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
+                            return '<img src="../public/storage/produtos/not-image.png" class="image img-datatable"></img>';
                         }
                     }
                 },
@@ -79,21 +79,26 @@ $(function() {
                             }
 
                         return "<div class='text-center'>" +
-                            "<i class=\"bi-image\" " +
+                            "<span data-toggle=\"tooltip\" data-placement=\"right\"  title='Alterar Imagem do Produto'> "+
+                            " <i class=\"bi-image\" " +
                             "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                            "   title='Imagem do Produto' data-bs-toggle=\"modal\" " +
+                            "   data-bs-toggle=\"modal\" " +
                             "   data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
                             "   data-image-preview='"+image+"'  data-path='"+path+"' data-flag-image='0'  " +
-                            "   data-image-id='"+image_id+"'></i>"+
+                            "   data-image-id='"+image_id+"'></i></span>"+
                             "<i class=\"bi-pencil-square btnUpdateProduct\" " +
                             "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                            "               title=\"Atualizar Produto\" data-id='"+row.id+"'>" +
+                            "               title=\"Atualizar Produto\" data-id='"+row.id+"' "+
+                            "               data-toggle=\"tooltip\" data-placement=\"right\">" +
                             "</i>" +
                             "</div>";
                     }
                 }
 
             ],
+            initComplete: function(settings, json) {
+                $('[data-toggle="tooltip"]').tooltip();      
+            },
             scrollX: true,
             select: false,
             "columnDefs": [
@@ -106,8 +111,7 @@ $(function() {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[0, "desc"]],
-            //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
+            "order": [[0, "desc"]]           
         });
     }
 
