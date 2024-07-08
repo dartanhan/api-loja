@@ -570,5 +570,5 @@ $(function () {
      * */
     fncDataDatatable("", "").then();
     fncDataBarChart(0,0).then();
-    getFncDataCardTotalProdutoPorVenda("","",2);
+   // getFncDataCardTotalProdutoPorVenda("","",2);
 });

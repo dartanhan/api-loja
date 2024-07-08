@@ -57,7 +57,7 @@ class DashboardController extends Controller
      */
     public function vendasDia()
     {
-        dd($this->request->all());
+       // dd($this->request->all());
         try {
             $data = null;
             $return = [];
