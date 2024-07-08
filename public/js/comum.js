@@ -116,7 +116,9 @@ function formatDate(parm) {
 /**
      *  Preview da imagem ao passar o mause
      * */
-$(document).on("mouseover",".image" , function(e){
+$(document).on("click",".image" , function(e){
+    e.preventDefault;
+    
     let img = $(this);
 
     swalWithBootstrapButtons.fire({

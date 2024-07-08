@@ -47,7 +47,8 @@ class ReposicaoProdutoController extends Controller
      */
     public function create()
     {
-        dd($this->request->all());
+        /*
+       // dd($this->request->all());
 
         // Defina o período desejado
         //$startDate = Carbon::createFromFormat('Y-m-d', '2024-07-01')->startOfDay();
@@ -70,7 +71,7 @@ class ReposicaoProdutoController extends Controller
                 $startDate = Carbon::now()->subDays('5')->startOfDay();
                 $endDate = Carbon::now()->endOfDay(); // Hoje
             }
-dd($startDate,$endDate);
+//dd($startDate,$endDate);
            $saida = [];
             // Consulta para obter vendas e produtos agrupados pelo código do produto no período especificado
             $listSales = DB::table('loja_vendas_produtos as lv')
@@ -90,7 +91,7 @@ dd($startDate,$endDate);
             ->orderBy('quantidade', 'DESC')
             ->orderBy('lv.descricao')
             ->get();
-
+*/
            
 
             /*$listSales = Vendas::with(['produtos'])->
@@ -156,7 +157,7 @@ dd($startDate,$endDate);
                 array_push($saida, $data);
             }*/
             
-            return  DataTables::of($listSales)->make(true);
+           // return  DataTables::of($listSales)->make(true);
        
     }
 
@@ -168,7 +169,7 @@ dd($startDate,$endDate);
      */
     public function store()
     { 
-        dd($this->request->all());
+       /* dd($this->request->all());
         // Recebe as datas do request
         $startDate = $this->request->input('startDate');
         $endDate = $this->request->input('endDate');
@@ -214,7 +215,7 @@ dd($startDate,$endDate);
         }
 
         // Caso as datas não sejam fornecidas, retorne um erro ou dados padrão
-        return response()->json(['data' => []]);
+        return response()->json(['data' => []]);*/
     }
 
     /**

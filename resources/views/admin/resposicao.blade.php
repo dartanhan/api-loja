@@ -77,7 +77,7 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-auto input-group-sm">
-                                        <h6><i class="fas fa-table me-1"></i>Resposição de Produtos</h6>
+                                        <h6><i class="fas fa-table me-1"></i>Resposição de Produtos&nbsp; <span id="data-periodo" class="text-primary"></span></h6>
                                     </div>
                                 </div>
                             </div>
@@ -120,12 +120,9 @@
                                                 <th data-sortable="false">Imagem</th>
                                                 <th data-sortable="false">Codigo</th>
                                                 <th data-sortable="false">Descrição</th>
+                                                <th data-sortable="false">Valor Produto</th>
                                                 <th data-sortable="false">Quantidade</th>
-                                                <!--th data-sortable="false">TOTAL DE RECOMPRA</th>
-                                                <th data-sortable="false">MC</th>
-                                                <th data-sortable="false">%MC</th>
-                                                <th data-sortable="false">Total</th>
-                                                <th data-sortable="true">Data</th-->
+                                                <th data-sortable="false">Valor Total</th>
                                                 <th data-sortable="false">Ações</th>
                                             </tr>
                                         </thead>
@@ -181,8 +178,8 @@
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
+    <script src="{{URL::asset('js/moment.min.js')}}"></script>
+ 
 @endpush
 @push("styles")
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap-datepicker.min.css')}}">

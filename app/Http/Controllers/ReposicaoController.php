@@ -139,6 +139,10 @@ class ReposicaoController extends Controller
         return Response()->json($ret);
     }
 
+
+    /****
+     * Nova tela de resposição
+     */
     public function filter(){
         
        // $startDate = Carbon::createFromFormat('d/m/Y', $this->request->input('startDate'))->startOfDay();
@@ -151,7 +155,7 @@ class ReposicaoController extends Controller
         return DataTables::of($vendas)
             ->addColumn('imagem', function ($venda) {
                 if ($venda->imagem) {
-                    return '<img src="' . asset('storage/' . $venda->imagem) . '" class="image img-datatable">';
+                    return '<img src="' . asset('storage/' . $venda->imagem) . '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" >';
                 } else {
                     return '<img src="' . asset('storage/produtos/not-image.png') . '" class="image img-datatable">';
                 }
@@ -169,7 +173,7 @@ class ReposicaoController extends Controller
         } else {
             // Se as datas não forem fornecidas, define um período padrão
            // $startDate = Carbon::now()->subMonth()->startOfDay(); // Um mês atrás
-            $startDate = Carbon::now()->subDays('5')->startOfDay();
+            $startDate = Carbon::now()->subDays()->startOfDay();
             $endDate = Carbon::now()->endOfDay(); // Hoje
         }
 
@@ -180,6 +184,8 @@ class ReposicaoController extends Controller
             ->select(
                 'lv.descricao',
                 'lv.codigo_produto',
+                DB::raw('CONCAT("R$ ", FORMAT(v.valor_produto, 2, "pt_BR")) AS valor_produto'),
+                DB::raw('CONCAT("R$ ", FORMAT(SUM(v.valor_produto * lv.quantidade), 2, "pt_BR")) AS valor_total'),
                 DB::raw("DATE_FORMAT(lv.created_at, '%d/%m/%Y') AS venda_data"),
                 DB::raw('SUM(lv.quantidade) AS quantidade'),
                 'i.path AS imagem'
