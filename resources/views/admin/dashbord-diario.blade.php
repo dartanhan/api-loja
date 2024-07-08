@@ -72,6 +72,15 @@
                     <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
+            <div class="card bg-danger opacity-75 text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalImposto" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+                </div>
+            </div>
         </div>
         
         <div class="row">

@@ -61,6 +61,7 @@ class DashboardController extends Controller
         try {
             $data = null;
             $return = [];
+            $imposto_total = 0;
 
             $dataOneRequest = $this->request->dataOne;
             $dataTwoRequest = $this->request->dataTwo;
@@ -147,7 +148,8 @@ class DashboardController extends Controller
                 //se igual a forma de pagamento DINHEIRO não calcula imposto
                 $imposto = $listSale->id_pgto !== 1 ? ($listSale->total * 4)/100 : 0;
                 $data['imposto'] = $this->formatter->formatCurrency($imposto, 'BRL');
-
+                $imposto_total += $imposto;
+                
                 $data['valor_produto'] = $this->formatter->formatCurrency($listSale->valor_total_produtos, 'BRL');
                 //MC = SUBTOTAL - DESCONTO -  CASHBACK - TAXA DE CARTÃO - IMPOSTO- VALOR DO PRODUTO
                 $mc = $listSale->sub_total - $listSale->valor_desconto -  $data['cashback'] - $listSale->taxa_pgto - $imposto - $listSale->valor_total_produtos;
@@ -159,11 +161,14 @@ class DashboardController extends Controller
 
                 array_push($return,$data);
             }
+            // Adiciona o total de impostos ao array de retorno
+            //array_push($return, ['total' => 'Total de Impostos', 'valor_imposto' => $imposto_total]);
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 400);
         }
-        return Response::json(array("data" => $return));
+        return Response::json(array("data" => $return, 
+                                "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL')));
     }
 
     /****
