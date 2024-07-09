@@ -103,9 +103,15 @@ class CategoriaController extends Controller
             ]);
 
             $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
+            
+            $destinationPath = 'categorias/'.$cat->id.'/'.$temp_file->file;
+
+            if (app()->environment('local')) {
+                $destinationPath = 'public/' . $destinationPath;
+            }
 
             if($temp_file){
-                Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$cat->id."/".$temp_file->file);
+                Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file, $destinationPath);
 
                 Storage::deleteDirectory('tmp/'.$temp_file->folder);
                 $temp_file->delete();
@@ -147,6 +153,7 @@ class CategoriaController extends Controller
      */
     public function update()
     {
+        
         try {
 
             $validator = Validator::make($this->request->all(), [
@@ -164,19 +171,32 @@ class CategoriaController extends Controller
                 return Response::json(array('success' => false,'message' => $error), 400);
             }
             $this->categoria = $this->categoria::find($this->request->input('id'));
-
+           
             if($this->request->image){
+                
                 $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
                 if($temp_file){
-                    $delete = Storage::deleteDirectory('categorias/'.$this->request->input('id'));
+                    $destinationPath = 'categorias/'.$this->categoria->id;
+                    
+                    if (app()->environment('local')) {
+                        $destinationPath = 'public/' . $destinationPath;
+                    }
                    
-                    Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
-
-                    Storage::deleteDirectory('tmp/'.$temp_file->folder);
-                    $temp_file->delete();
+                    $delete = Storage::deleteDirectory($destinationPath);
+         
+                    if($delete){
+                        Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file, $destinationPath."/".$temp_file->file);
+                       // Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'categorias/'.$this->request->input('id')."/".$temp_file->file);
+    
+                        Storage::deleteDirectory('tmp/'.$temp_file->folder);
+                        $temp_file->delete();
+                    }
+                    
                 }
                 $this->categoria->imagem = $temp_file->file;
+            }else{
+                return Response::json(array('success' => false, 'message' => 'Informe a imagem de atualização!!'), 400);
             }
 
             $this->categoria->nome = $this->request->input('nome');
