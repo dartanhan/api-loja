@@ -30,7 +30,7 @@
             </div>
 
             <div class="card-body">
-                <table id="tableCategorias" class="table compact table-striped table-bordered table-hover">
+                <table id="tableCategorias" class="table compact table-striped table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>Id</th>
