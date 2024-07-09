@@ -147,23 +147,21 @@ class ProdutoImagemController extends Controller
      //  dd($this->request->all());
         try {
 
-            $destino = ($flag == 0) ? "product/" : "produtos/";
+            $pasta = $this->request->input("productId") !== null ? "product/" : "produtos/";
             $produtoId  = $this->request->input("productId") !== null ? $this->request->input("productId") : $this->request->input("variacaoId");
             $imageId = $this->request->input("imageId");
             $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
             if($temp_file) {
-                if ($this->request->input("imagemName")) {
-                    // Exclua a foto antiga do armazenamento
-                    $path = ($flag == 0) ?
-                        $destino . $produtoId . "/" . $this->request->input("imagemName") :
-                        $this->request->input("imagemName");
-                    //Storage::delete($path);
-                    //deleto o diretorio para caso de imagem não encontrada
-                    $del = Storage::deleteDirectory("public/".$destino . $produtoId);
-                }
-               
-                Storage::copy( 'tmp/' . $temp_file->folder . '/' . $temp_file->file,  "public/".$destino . $produtoId . "/" . $temp_file->file);
+
+                //deleto o diretorio da imagem
+                Storage::deleteDirectory($pasta . $produtoId);
+
+                //Diretorio de destino
+                $path =  $pasta . $produtoId . "/" . $temp_file->file;
+
+                //copia a imagem para o diretorio de destino
+                Storage::copy( 'tmp/' . $temp_file->folder . '/' . $temp_file->file,  $path);
 
                 //delete a imagem temporaria
                 Storage::deleteDirectory( 'tmp/' . $temp_file->folder);
@@ -174,7 +172,7 @@ class ProdutoImagemController extends Controller
                     $produtoImagem["path"] = $temp_file->file;
                 }else{
                     $produtoImagem["produto_variacao_id"] = $produtoId;
-                    $produtoImagem["path"] = $destino . $produtoId . "/" . $temp_file->file;
+                    $produtoImagem["path"] = $pasta . $produtoId . "/" . $temp_file->file;
                 }
                 $matchThese = array('id' => $imageId);
                 ProdutoImagem::updateOrCreate($matchThese, $produtoImagem);
