@@ -169,7 +169,8 @@ class CategoriaController extends Controller
                 $temp_file = TemporaryFile::where('folder',$this->request->image)->first();
 
                 if($temp_file){
-                    Storage::deleteDirectory('public/categorias/'.$this->request->input('id'));
+                    $delete = Storage::deleteDirectory('public/categorias/'.$this->request->input('id'));
+                   
                     Storage::copy('tmp/'.$temp_file->folder.'/'.$temp_file->file,'public/categorias/'.$this->request->input('id')."/".$temp_file->file);
 
                     Storage::deleteDirectory('tmp/'.$temp_file->folder);
@@ -205,12 +206,12 @@ class CategoriaController extends Controller
         try{
             $category = $this->categoria::find($id)->delete();
 
-            if(!Storage::deleteDirectory('categorias/'.$id)){
-                return Response::json(array("success" => false, "message" => utf8_encode("Não foi possivel deletar a imagem da categoria id: [ {$id} ]")), 200);
+            if(!Storage::deleteDirectory('public/categorias/'.$id)){
+                return Response::json(array("success" => false, "message" => "Não foi possivel deletar a imagem da categoria id: [ {$id} ]"), 400);
             }
 
             if(!$category)
-                return Response::json(array("success" => false, "message" => utf8_encode("Categoria não localizado para deleção com o id: [ {$id} ]")), 200);
+                return Response::json(array("success" => false, "message" => "Categoria não localizado para deleção com o id: [ {$id} ]"), 400);
 
         }catch(QueryException $e){
             $errorCode = $e->errorInfo[1];

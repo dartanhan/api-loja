@@ -56,7 +56,7 @@ $(document).ready(function() {
                                 "</div>"}
         ] ,
         language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": "../public/Portuguese-Brasil.json"
         },
         "order": [[ 1, "asc" ]]
     });
@@ -153,7 +153,7 @@ $(document).ready(function() {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        table.ajax.reload(null, false);
+                        //table.ajax.reload(null, false);
                     }
                 },
                 error: function(data){
@@ -223,6 +223,14 @@ $(document).ready(function() {
                                 timer: 1500
                             });
                             table.ajax.reload(null, false);
+                        }else{
+                            swalWithBootstrapButtons.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'danger',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
                         }
                     },
                     error: function(data){
