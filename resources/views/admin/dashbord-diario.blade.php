@@ -225,7 +225,6 @@
                                 </tr>
                                 </thead>
                                 <tbody class="text-center" id="dataTableModal"></tbody>
-                                <tfoot><tr id="foot"></tr></tfoot>
                             </table>
                         </div>
                     </div>
@@ -275,7 +274,6 @@
     <script src="{{URL::asset('assets/dashboard/js/Chart.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{URL::asset('js/dashboard-diario.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

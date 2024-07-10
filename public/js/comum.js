@@ -6,8 +6,13 @@ const swalWithBootstrapButtons = Swal.mixin({
     buttonsStyling: false
 });
 
-const sweetAlert = function(json){
-    swalWithBootstrapButtons.fire(json);
+const sweetAlert = function(title, text,icon){
+    swalWithBootstrapButtons.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        showConfirmButton: false
+    });
 }
 
 /**
@@ -80,22 +85,9 @@ function formatMoney(valor)
      * Formata data de yyyy/mm/dd para dd/mm/yyyy
      * */
  function getFormattedDate(parm) {
-    //let d = parm.split('-');
-    //return  d[2] + '/' + d[1] + '/' + d[0];
-    return moment(parm, 'YYYY/MM/DD').format('DD/MM/YYYY');
+    let d = parm.split('-');
+    return  d[2] + '/' + d[1] + '/' + d[0];
 }
-
-/***
- * @param data data a ser convertida
- * @param mascara_to formato/mascara da data a ser convertida ex.: 'DD/MM/YYYY'
- * @param mascara_old formato/mascara da data de retorno ex.: 'YYYY-MM-DD'
- * @returns Se a data não for fornecida , retornar a data corrente no formato 'YYYY-MM-DD'
- */
-const getDataFormat = function(data, mascara_to, mascara_old){
-    return (data !== "") ? moment(data, mascara_to).format(mascara_old) : moment().format('YYYY-MM-DD');
-}
-
-
 
 /***
  * Ao digitar, formata a data no campo em dd/mm/yyyy
@@ -211,7 +203,7 @@ $('form[name="formImageProduct"]').validate({
                 //console.log(data.success);
 
                 if(data.success) {
-                    sweetAlert({
+                    swalWithBootstrapButtons.fire({
                         title: "Sucesso!",
                         text: data.message,
                         icon: 'success',
@@ -269,16 +261,15 @@ $(document).on("click","#addListaCompra" ,function(event){
             success: function(response){
             //    console.log(response);
             if(response.success){
-                sweetAlert({
+                swalWithBootstrapButtons.fire({
                     title: 'Sucesso!',
                     text: response.message,
                     icon: 'success',
                     showConfirmButton: false,
                     timer: 1500
                 });
-               
             }else{
-                sweetAlert({
+                swalWithBootstrapButtons.fire({
                     title: 'Atenção!',
                     text: response.message,
                     icon: 'warning',
@@ -290,7 +281,7 @@ $(document).on("click","#addListaCompra" ,function(event){
             },
             error:function(response){
               //  console.log(response.responseJSON);
-              sweetAlert({
+                swalWithBootstrapButtons.fire({
                     title: 'Error!',
                     text: response.responseJSON.message,
                     icon: 'error',
@@ -299,32 +290,27 @@ $(document).on("click","#addListaCompra" ,function(event){
                 });
             }
     });
-});
 
-/***
- * Faz o HTTP post
- * @returns retorna um json com as informações
- */
-const httpFetchPost = async function(url, token, data) {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
-            },
-            body: JSON.stringify(data)
-        });
+    async function http_fetch_post(url, token, data) {
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+                },
+                body: JSON.stringify(data)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+
+            const responseData = await response.json();
+            return responseData;
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+            throw error; // Re-throw the error so it can be handled by the caller
         }
-
-        return await response.json();
-        
-    } catch (error) {
-        console.error("There was a problem with the fetch operation:", error);
-        throw error; // Re-throw the error so it can be handled by the caller
     }
-}
-
+});
