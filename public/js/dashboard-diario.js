@@ -3,7 +3,7 @@ $(function () {
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = fncUrl();
     let table;
-    let dataIni, dataFim,startDate,endDate;
+    let dataIni, dataFim,startDate,endDate,id;
 
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -149,14 +149,12 @@ $(function () {
         event.preventDefault();
         fncLoadDataTableModel("tableView");
 
-         let startDate;
-         let endDate;
          let fila = $(this).closest("tr");
 
          $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
 
-         const dataIni = $('input[name=dataini]').val();
-         const dataFim = $('input[name=datafim]').val();
+         dataIni = $('input[name=dataini]').val();
+         dataFim = $('input[name=datafim]').val();
 
          if (dataIni) {
              startDate = moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD');
@@ -167,7 +165,7 @@ $(function () {
 
         await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
             .then(function (response) {
-                console.log(response);
+               // console.log(response);
                 return response.json()
             })
             .then(function (response) {
@@ -263,8 +261,8 @@ $(function () {
         dataIni = $('input[name=dataIni]').val();
         dataFim = $('input[name=dataFim]').val();
 
-        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
@@ -273,23 +271,19 @@ $(function () {
         };
 
         try {
-            const response = await fetch(url + "/relatorio/detailCart", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+           // const response = await httpFetchPost(url + "/relatorio/detailCart", token, data);
+           //$('#tableViewCart').DataTable().destroy();
+            $('#tableViewCart').DataTable({
+                //"data": response.dados,
+                "ajax":{
+                    "method": 'post',
+                    "url": url + "/relatorio/detailCart",
+                    "data":{
+                        data
+                    },
+                    "dataType":"json",
+                    responsive: true,
                 },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok " + response.statusText);
-            }
-
-            const responseData = await response.json();
-
-            table =  $('#tableViewCart').DataTable({
-                "data": responseData.dados,
                 "bInfo" : false,
                 "paging": true,
                 "ordering": true,
@@ -319,9 +313,38 @@ $(function () {
                     "url": "../public/Portuguese-Brasil.json"
                 },
                 "order": [[0, "asc"]],
-                initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(startDate + " até " + endDate);
-                }
+                "footerCallback": function ( row, data, start, end, display ) {
+                        var api = this.api(), data;
+
+                        // Remove the formatting to get integer data for summation
+                        const intVal = function (i) {
+                            return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                        };
+
+                        // Total over all pages
+                        let total = api
+                            .column(1)
+                            .data()
+                            .reduce(function (a, b) {
+                                // console.log(a);
+                                return parseFloat(a) + parseFloat(b);
+                            }, 0);
+
+                        // Update footer
+                        //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
+                        let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
+                        $("#foot").html("");
+                        $("#foot").append(
+                            '<td colspan="2" style="background:#000000;color:white; text-align: right;">'+
+                            'Total: '+numFormat(total)+'</td>'
+                        );
+                    },initComplete: function(settings, json) {
+                        $('span[name="periodo"]').text(
+                            getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY') 
+                             + " até " + 
+                             getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY')
+                        );
+                    },
             });//fim datatables
         } catch (error) {
             console.error("There was a problem with the fetch operation:", error);
@@ -334,14 +357,15 @@ $(function () {
          * **/
     $(document).on("click", ".detailDinner", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel("dataTableModalDinner");
+        //fncLoadDataTableModel("dataTableModalDinner");
 
         let id = $(this).data('content');
         dataIni = $('input[name=dataIni]').val();
         dataFim = $('input[name=dataFim]').val();
 
-        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+
+        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
@@ -350,24 +374,20 @@ $(function () {
         };
 
         try {
-            const response = await fetch(url + "/relatorio/detailDinner", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
-                },
-                body: JSON.stringify(data)
-            });
+           // const response = await httpFetchPost(url + "/relatorio/detailDinner", token, data);
 
-            if (!response.ok) {
-                throw new Error("Network response was not ok " + response.statusText);
-            }
-
-            const responseData = await response.json();
-           // console.log(responseData);
 
             table =  $('#dataTableModalDinner').DataTable({
-                "data": responseData.dados,
+                //"data": response.dados,
+                "ajax":{
+                    "method": 'post',
+                    "url": url + "/relatorio/detailDinner",
+                    "data":{
+                        data
+                    },
+                    "dataType":"json",
+                    responsive: true,
+                },
                 "bInfo" : false,
                 "paging": true,
                 "ordering": true,
@@ -392,7 +412,10 @@ $(function () {
                 },
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(startDate + " até " + endDate);
+                    $('span[name="periodo"]').text(
+                        getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY') 
+                         + " até " + 
+                         getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY') );
                 }
             });//fim datatables
 
@@ -543,8 +566,8 @@ $(function () {
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
 
-         const dataIni = $('input[name=dataIni]').val();
-         const dataFim = $('input[name=dataFim]').val();
+         dataIni = $('input[name=dataIni]').val();
+         dataFim = $('input[name=dataFim]').val();
          let isValid = true;
          let msg = '';
 
