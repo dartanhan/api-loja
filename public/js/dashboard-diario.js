@@ -320,7 +320,7 @@ $(function () {
                 },
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(dataIni + " até " + dataFim);
+                    $('span[name="periodo"]').text(startDate + " até " + endDate);
                 }
             });//fim datatables
         } catch (error) {
@@ -392,7 +392,7 @@ $(function () {
                 },
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(dataIni + " até " + dataFim);
+                    $('span[name="periodo"]').text(startDate + " até " + endDate);
                 }
             });//fim datatables
 
