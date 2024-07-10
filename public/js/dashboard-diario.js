@@ -3,7 +3,7 @@ $(function () {
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = fncUrl();
     let table;
-    let dataIni, dataFim,startDate,endDate;
+    let dataIni, dataFim,startDate,endDate,id;
 
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -21,19 +21,31 @@ $(function () {
      * #########################################################################
      * */
 
-     let fncDataDatatable = async function(dataOne, dataTwo) {
+     let fncDataDatatable = async function() {
+         table.ajax.reload(null, false);
+         return false;
+     }
 
-        $('#datatablesDiario').DataTable().destroy();
-        await $('#datatablesDiario').DataTable({
+
+       // $('#datatablesDiario').DataTable().destroy();
+        table =  $('#datatablesDiario').DataTable({
             "render": function ( data, type, row, meta ) {
                 return '<a href="'+data+'">Download</a>';
             },
             "ajax":{
                 "method": 'post',
                 "url": url + "/dashboardDiario/vendasDia",
-                "data":{dataOne: dataOne,dataTwo: dataTwo,id: 2,_token:$('meta[name="csrf-token"]').attr('content')},
+                "data":{id: 2,_token:token},
                 "dataType":"json",
                 responsive: true,
+                dataSrc: function(json) {
+
+                    //console.log(json.total_imposto);
+                    $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
+                        " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
+                        " </div>");
+                    return json.data;
+                }
             },
             "columns": [
                 {
@@ -131,17 +143,18 @@ $(function () {
                 "url": "../public/Portuguese-Brasil.json"
             },
             "order": [[14, "desc"]],
-            initComplete: function(settings, json) {
+            "initComplete": function(settings, json) {
                 $('[data-toggle="tooltip"]').tooltip();
-                //  console.log(json.total_imposto);
-                $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
-                    " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
-                    " </div>");
+            },"xhr": function(settings, json) {
+                $('[data-toggle="tooltip"]').tooltip();
             }
 
         });//fim datatables
-    }
 
+        table.on('preXhr.dt', function (e,settings,data) {
+            data.dataOne = $('input[name=dataIni]').val();
+            data.dataTwo = $('input[name=dataFim]').val();
+        });
      /**
      * DETALHES DA VENDA
      * **/
@@ -149,14 +162,12 @@ $(function () {
         event.preventDefault();
         fncLoadDataTableModel("tableView");
 
-         let startDate;
-         let endDate;
          let fila = $(this).closest("tr");
 
          $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
 
-         const dataIni = $('input[name=dataini]').val();
-         const dataFim = $('input[name=datafim]').val();
+         dataIni = $('input[name=dataini]').val();
+         dataFim = $('input[name=datafim]').val();
 
          if (dataIni) {
              startDate = moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD');
@@ -167,14 +178,14 @@ $(function () {
 
         await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
             .then(function (response) {
-                console.log(response);
+               // console.log(response);
                 return response.json()
             })
             .then(function (response) {
 
                 // Transformar os dados para que cada variação de produto seja uma linha separada
                 const transformedData = response.dados.flatMap(item =>
-                    item.vendas_produtos.map(produto => ({
+                    item.produtos.map(produto => ({
                         id: item.id,
                         codigo_venda: item.codigo_venda,
                       //  loja_id: item.loja_id,
@@ -257,39 +268,34 @@ $(function () {
          * **/
     $(document).on("click", ".detailCart", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel("tableViewCart");
+        //fncLoadDataTableModel("tableViewCart");
 
         let id = $(this).data('content');
         dataIni = $('input[name=dataIni]').val();
         dataFim = $('input[name=dataFim]').val();
 
-        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
-            dataini: startDate,
-            datafim:endDate
+            startDate: startDate,
+            endDate:endDate,
+            _token:token
         };
 
         try {
-            const response = await fetch(url + "/relatorio/detailCart", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+           // const response = await httpFetchPost(url + "/relatorio/detailCart", token, data);
+           //$('#tableViewCart').DataTable().destroy();
+            $('#tableViewCart').DataTable({
+                //"data": response.dados,
+                "ajax":{
+                    "method": 'post',
+                    "url": url + "/relatorio/detailCart",
+                    "data":data,
+                    "dataType":"json",
+                    responsive: true,
                 },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok " + response.statusText);
-            }
-
-            const responseData = await response.json();
-
-            table =  $('#tableViewCart').DataTable({
-                "data": responseData.dados,
                 "bInfo" : false,
                 "paging": true,
                 "ordering": true,
@@ -319,9 +325,38 @@ $(function () {
                     "url": "../public/Portuguese-Brasil.json"
                 },
                 "order": [[0, "asc"]],
-                initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(startDate + " até " + endDate);
-                }
+                "footerCallback": function ( row, data, start, end, display ) {
+                        var api = this.api(), data;
+
+                        // Remove the formatting to get integer data for summation
+                        const intVal = function (i) {
+                            return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                        };
+
+                        // Total over all pages
+                        let total = api
+                            .column(1)
+                            .data()
+                            .reduce(function (a, b) {
+                                // console.log(a);
+                                return parseFloat(a) + parseFloat(b);
+                            }, 0);
+
+                        // Update footer
+                        //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
+                        let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
+                        $("#foot").html("");
+                        $("#foot").append(
+                            '<td colspan="2" style="background:#000000;color:white; text-align: right;">'+
+                            'Total: '+numFormat(total)+'</td>'
+                        );
+                    },initComplete: function(settings, json) {
+                        $('span[name="periodo"]').text(
+                            getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                             + " até " +
+                             getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY')
+                        );
+                    },
             });//fim datatables
         } catch (error) {
             console.error("There was a problem with the fetch operation:", error);
@@ -334,40 +369,34 @@ $(function () {
          * **/
     $(document).on("click", ".detailDinner", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel("dataTableModalDinner");
+        //fncLoadDataTableModel("dataTableModalDinner");
 
         let id = $(this).data('content');
         dataIni = $('input[name=dataIni]').val();
         dataFim = $('input[name=dataFim]').val();
 
-        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+
+        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
-            dataini: startDate,
-            datafim:endDate
+            startDate: startDate,
+            endDate:endDate,
+            _token:token
         };
 
         try {
-            const response = await fetch(url + "/relatorio/detailDinner", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                throw new Error("Network response was not ok " + response.statusText);
-            }
-
-            const responseData = await response.json();
-           // console.log(responseData);
 
             table =  $('#dataTableModalDinner').DataTable({
-                "data": responseData.dados,
+                //"data": response.dados,
+                "ajax":{
+                    "method": 'post',
+                    "url": url + "/relatorio/detailDinner",
+                    "data":data,
+                    "dataType":"json",
+                    responsive: true,
+                },
                 "bInfo" : false,
                 "paging": true,
                 "ordering": true,
@@ -392,7 +421,10 @@ $(function () {
                 },
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
-                    $('span[name="periodo"]').text(startDate + " até " + endDate);
+                    $('span[name="periodo"]').text(
+                        getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                         + " até " +
+                         getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY') );
                 }
             });//fim datatables
 
@@ -543,8 +575,8 @@ $(function () {
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
 
-         const dataIni = $('input[name=dataIni]').val();
-         const dataFim = $('input[name=dataFim]').val();
+         dataIni = $('input[name=dataIni]').val();
+         dataFim = $('input[name=dataFim]').val();
          let isValid = true;
          let msg = '';
 
@@ -697,7 +729,7 @@ $(function () {
      * ##########  ÁREA EXECUÇÃO DE FUNCÇÕES ONLOAD ############################
      * #########################################################################
      * */
-    fncDataDatatable("", "").then();
+   // fncDataDatatable("", "").then();
     fncDataBarChart(0,0).then();
    // getFncDataCardTotalProdutoPorVenda("","",2);
 });

@@ -713,29 +713,13 @@ class RelatorioController extends Controller
      */
     public function detailSales($sales)
     {
-
-        //todas as lojas
+       //todas as lojas
         // $stores = $this->lojas::all();
 
         //semana agrupado por dia
-        $listSalesDetail = $this->vendas::with('VendasProdutos.productsSales','descontos')
-           // ->join('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'loja_vendas.id')
-          // ->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-           // ->select(
-            //(DB::raw("loja_vendas.valor_total AS total")),
-            // (DB::raw('DATE_FORMAT(loja_vendas.created_at, "%d/%m/%Y %H:%i:%s") as data')),
-            //"loja_vendas.codigo_venda",
-            //"loja_vendas_produtos_descontos.valor_desconto",
-            // (DB::raw(("loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"))),
-               // "loja_vendas_produtos.codigo_produto",
-               // "loja_vendas_produtos.descricao",
-              // "loja_vendas_produtos.valor_produto",
-              //  (DB::raw(("loja_vendas_produtos.valor_produto * loja_vendas_produtos.quantidade as total"))),
-              //  "loja_vendas_produtos.quantidade"
-          //  )
-            ->where('loja_vendas.codigo_venda', $sales)
-            //->orderBy('loja_vendas_produtos.codigo_produto', 'asc')
-            ->get();
+        $listSalesDetail = $this->vendas::with('produtos.productsSales','descontos')
+            ->where('loja_vendas.codigo_venda', $sales)->get();
+
         return Response::json(array("dados" => $listSalesDetail));
     }
 
@@ -745,9 +729,10 @@ class RelatorioController extends Controller
      */
     public function detailCart()
     {
+       // dd($this->request->data['id']);
         $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("dataini"));
-        $endDate = Carbon::parse($this->request->input("datafim"));
+        $startDate = Carbon::parse($this->request->input("startDate"));
+        $endDate = Carbon::parse($this->request->input("endDate"));
 
         $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
@@ -778,8 +763,8 @@ class RelatorioController extends Controller
     {
 
         $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("dataini"));
-        $endDate = Carbon::parse($this->request->input("datafim"));
+        $startDate = Carbon::parse($this->request->input("startDate"));
+        $endDate = Carbon::parse($this->request->input("endDate"));
 
         $listDetail = $this->vendas
             ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')

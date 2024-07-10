@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 use Illuminate\Support\Facades\Response;
+use function PHPUnit\Framework\isNull;
 
 class DashboardController extends Controller
 {
@@ -65,13 +66,13 @@ class DashboardController extends Controller
 
             $dataOneRequest = $this->request->dataOne;
             $dataTwoRequest = $this->request->dataTwo;
-
+           // dd($dataOneRequest, $dataTwoRequest);
             $dataOne = ($dataOneRequest)
-                        ? CarbonImmutable::createFromFormat('dmY', $dataOneRequest)->format('Y-m-d')
+                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
                         : CarbonImmutable::now()->format('Y-m-d');
 
-            $dataTwo = ($dataTwoRequest) 
-                        ? CarbonImmutable::createFromFormat('dmY', $dataTwoRequest)->format('Y-m-d')
+            $dataTwo = ($dataTwoRequest)
+                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataTwoRequest)->format('Y-m-d')
                         : CarbonImmutable::now()->format("Y-m-d");
 
            /* $dataOne = ($this->request->dataOne != 0) ?
@@ -79,7 +80,7 @@ class DashboardController extends Controller
                     Carbon::createFromFormat('dmY', $this->request->dataOne)
                         ->format('Y-m-d')
                 ) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-                
+
             $dataTwo = ($this->request->dataTwo != 0) ?
                 CarbonImmutable::parse(Carbon::createFromFormat('dmY', $this->request->dataTwo)
                     ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
@@ -149,7 +150,7 @@ class DashboardController extends Controller
                 $imposto = $listSale->id_pgto !== 1 ? ($listSale->total * 4)/100 : 0;
                 $data['imposto'] = $this->formatter->formatCurrency($imposto, 'BRL');
                 $imposto_total += $imposto;
-                
+
                 $data['valor_produto'] = $this->formatter->formatCurrency($listSale->valor_total_produtos, 'BRL');
                 //MC = SUBTOTAL - DESCONTO -  CASHBACK - TAXA DE CARTÃO - IMPOSTO- VALOR DO PRODUTO
                 $mc = $listSale->sub_total - $listSale->valor_desconto -  $data['cashback'] - $listSale->taxa_pgto - $imposto - $listSale->valor_total_produtos;
@@ -167,7 +168,7 @@ class DashboardController extends Controller
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 400);
         }
-        return Response::json(array("data" => $return, 
+        return Response::json(array("data" => $return,
                                 "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL')));
     }
 
@@ -236,7 +237,7 @@ class DashboardController extends Controller
                         ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
                         : CarbonImmutable::now()->format('Y-m-d');
 
-            $dataTwo = ($dataTwoRequest) 
+            $dataTwo = ($dataTwoRequest)
                         ? CarbonImmutable::createFromFormat('d/m/Y', $dataTwoRequest)->format('Y-m-d')
                         : CarbonImmutable::now()->format("Y-m-d");
 
@@ -250,7 +251,7 @@ class DashboardController extends Controller
 
             $json = Response::json(["data" => $listSales])->getContent();
 
-            $data = json_decode($json, true); 
+            $data = json_decode($json, true);
 
             foreach ($data['data'] as $venda) {
                 foreach ($venda['vendas_produtos'] as $produto) {
@@ -265,5 +266,5 @@ class DashboardController extends Controller
             return Response::json(['error' => $e->getMessage()], 500);
         }
     }
-     
+
 }
