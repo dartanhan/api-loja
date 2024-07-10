@@ -141,7 +141,7 @@
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes da Venda - <span id="codigo_venda"></span></h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes da Venda - <span name="codigo_venda"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -165,7 +165,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                     <input type="hidden" name="new_taxa" id="new_taxa">
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Alterar Venda - <span id="codigovenda"></span></h5>
+                            <h5 class="modal-title" id="exampleModalLongTitle">Alterar Venda - <span name="codigo_venda"></span></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -198,7 +198,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary" id="salvar">Salvar</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </div>
                 </form>
@@ -208,7 +208,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes do Cartão</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes do Cartão<br> <span id="periodo" name="periodo"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -220,7 +220,7 @@
                                 <tr>
                                     <th data-sortable="false">FORMA PAGAMENTO</th>
                                     <th data-sortable="false">TOTAL</th>
-                                    <!--th data-sortable="false">TAXA</th-->
+                                    <th data-sortable="false">TAXA</th>
                                     <th data-sortable="false">TOTAL FINAL</th>
                                 </tr>
                                 </thead>
@@ -239,7 +239,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes Vendas por Fucionário</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Detalhes Vendas por Fucionário<br> <span id="periodo" name="periodo"></span></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -278,7 +278,7 @@
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
-
+    <script src="{{URL::asset('js/moment.min.js')}}"></script>
 
 @endpush
 @push("styles")

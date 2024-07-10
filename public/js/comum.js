@@ -54,7 +54,7 @@ function formatMoneyPress(parm) {
 function formatMoney(valor)
 {
     try {
-     
+
         // Verifica se o valor passado é uma string
         if (typeof valor !== 'string') {
             throw new Error('O valor deve ser uma string. ' + valor);
@@ -118,7 +118,7 @@ function formatDate(parm) {
      * */
 $(document).on("click",".image" , function(e){
     e.preventDefault;
-    
+
     let img = $(this);
 
     swalWithBootstrapButtons.fire({
@@ -290,4 +290,27 @@ $(document).on("click","#addListaCompra" ,function(event){
                 });
             }
     });
+
+    async function http_fetch_post(url, token, data) {
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+
+            const responseData = await response.json();
+            return responseData;
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+            throw error; // Re-throw the error so it can be handled by the caller
+        }
+    }
 });
