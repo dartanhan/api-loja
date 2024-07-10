@@ -21,19 +21,31 @@ $(function () {
      * #########################################################################
      * */
 
-     let fncDataDatatable = async function(dataOne, dataTwo) {
+     let fncDataDatatable = async function() {
+         table.ajax.reload(null, false);
+         return false;
+     }
 
-        $('#datatablesDiario').DataTable().destroy();
-        await $('#datatablesDiario').DataTable({
+
+       // $('#datatablesDiario').DataTable().destroy();
+        table =  $('#datatablesDiario').DataTable({
             "render": function ( data, type, row, meta ) {
                 return '<a href="'+data+'">Download</a>';
             },
             "ajax":{
                 "method": 'post',
                 "url": url + "/dashboardDiario/vendasDia",
-                "data":{dataOne: dataOne,dataTwo: dataTwo,id: 2,_token:$('meta[name="csrf-token"]').attr('content')},
+                "data":{id: 2,_token:token},
                 "dataType":"json",
                 responsive: true,
+                dataSrc: function(json) {
+
+                    //console.log(json.total_imposto);
+                    $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
+                        " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
+                        " </div>");
+                    return json.data;
+                }
             },
             "columns": [
                 {
@@ -131,17 +143,18 @@ $(function () {
                 "url": "../public/Portuguese-Brasil.json"
             },
             "order": [[14, "desc"]],
-            initComplete: function(settings, json) {
+            "initComplete": function(settings, json) {
                 $('[data-toggle="tooltip"]').tooltip();
-                //  console.log(json.total_imposto);
-                $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
-                    " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
-                    " </div>");
+            },"xhr": function(settings, json) {
+                $('[data-toggle="tooltip"]').tooltip();
             }
 
         });//fim datatables
-    }
 
+        table.on('preXhr.dt', function (e,settings,data) {
+            data.dataOne = $('input[name=dataIni]').val();
+            data.dataTwo = $('input[name=dataFim]').val();
+        });
      /**
      * DETALHES DA VENDA
      * **/
@@ -172,7 +185,7 @@ $(function () {
 
                 // Transformar os dados para que cada variação de produto seja uma linha separada
                 const transformedData = response.dados.flatMap(item =>
-                    item.vendas_produtos.map(produto => ({
+                    item.produtos.map(produto => ({
                         id: item.id,
                         codigo_venda: item.codigo_venda,
                       //  loja_id: item.loja_id,
@@ -255,7 +268,7 @@ $(function () {
          * **/
     $(document).on("click", ".detailCart", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel("tableViewCart");
+        //fncLoadDataTableModel("tableViewCart");
 
         let id = $(this).data('content');
         dataIni = $('input[name=dataIni]').val();
@@ -266,8 +279,9 @@ $(function () {
 
         const data = {
             id: id,
-            dataini: startDate,
-            datafim:endDate
+            startDate: startDate,
+            endDate:endDate,
+            _token:token
         };
 
         try {
@@ -278,9 +292,7 @@ $(function () {
                 "ajax":{
                     "method": 'post',
                     "url": url + "/relatorio/detailCart",
-                    "data":{
-                        data
-                    },
+                    "data":data,
                     "dataType":"json",
                     responsive: true,
                 },
@@ -340,8 +352,8 @@ $(function () {
                         );
                     },initComplete: function(settings, json) {
                         $('span[name="periodo"]').text(
-                            getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY') 
-                             + " até " + 
+                            getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                             + " até " +
                              getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY')
                         );
                     },
@@ -369,22 +381,19 @@ $(function () {
 
         const data = {
             id: id,
-            dataini: startDate,
-            datafim:endDate
+            startDate: startDate,
+            endDate:endDate,
+            _token:token
         };
 
         try {
-           // const response = await httpFetchPost(url + "/relatorio/detailDinner", token, data);
-
 
             table =  $('#dataTableModalDinner').DataTable({
                 //"data": response.dados,
                 "ajax":{
                     "method": 'post',
                     "url": url + "/relatorio/detailDinner",
-                    "data":{
-                        data
-                    },
+                    "data":data,
                     "dataType":"json",
                     responsive: true,
                 },
@@ -413,8 +422,8 @@ $(function () {
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
                     $('span[name="periodo"]').text(
-                        getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY') 
-                         + " até " + 
+                        getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                         + " até " +
                          getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY') );
                 }
             });//fim datatables
@@ -720,7 +729,7 @@ $(function () {
      * ##########  ÁREA EXECUÇÃO DE FUNCÇÕES ONLOAD ############################
      * #########################################################################
      * */
-    fncDataDatatable("", "").then();
+   // fncDataDatatable("", "").then();
     fncDataBarChart(0,0).then();
    // getFncDataCardTotalProdutoPorVenda("","",2);
 });

@@ -276,7 +276,7 @@ $(document).on("click","#addListaCompra" ,function(event){
                     showConfirmButton: false,
                     timer: 1500
                 });
-               
+
             }else{
                 sweetAlert({
                     title: 'Atenção!',
@@ -301,6 +301,7 @@ $(document).on("click","#addListaCompra" ,function(event){
     });
 });
 
+
 /***
  * Faz o HTTP post
  * @returns retorna um json com as informações
@@ -321,7 +322,7 @@ const httpFetchPost = async function(url, token, data) {
         }
 
         return await response.json();
-        
+
     } catch (error) {
         console.error("There was a problem with the fetch operation:", error);
         throw error; // Re-throw the error so it can be handled by the caller
