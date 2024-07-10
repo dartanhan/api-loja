@@ -741,24 +741,28 @@ class RelatorioController extends Controller
 
     /***
      * Detalhes das vendas no cartão
-     * @param $id
      * @return JsonResponse
      */
-    public function detailCart(int $id)
+    public function detailCart()
     {
-        $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+        $id = $this->request->input("id");
+        $startDate = Carbon::parse($this->request->input("dataini"));
+        $endDate = Carbon::parse($this->request->input("datafim"));
+
+        $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
            // ->join('loja_taxa_cartoes as tx', 'tx.forma_id', '=', 'fp.id')
             ->select(
                (DB::raw("SUM(tp.valor_pgto)  AS total")),
                 (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
-                'fp.nome'
-               // 'tp.taxa'
-            )
-            ->where('loja_vendas.loja_id', $id)
+                'fp.nome',
+                'tp.taxa'
+            )->from('loja_vendas as lv')
+            ->where('lv.loja_id', $id)
             ->whereNotIn('fp.id', [1]) //sem dinheiro
-            ->whereDate('loja_vendas.created_at', Carbon::today())
+            //->whereDate('loja_vendas.created_at', Carbon::today())
             //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
+            ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
             ->groupBy('fp.id')
             ->orderBy('fp.id', 'asc')
             ->get();
@@ -768,27 +772,30 @@ class RelatorioController extends Controller
 
     /***
      * Detalhes das vendas no dinheiro
-     * @param $id = id loja
      * @return JsonResponse
      */
-    public function detailDinner(int $id)
+    public function detailDinner()
     {
-        $startDate = Carbon::createFromFormat('Y-m-d',"2024-07-01")->startOfDay();
-        $endDate = Carbon::createFromFormat('Y-m-d', "2024-07-08")->endOfDay();
+
+        $id = $this->request->input("id");
+        $startDate = Carbon::parse($this->request->input("dataini"));
+        $endDate = Carbon::parse($this->request->input("datafim"));
+
         $listDetail = $this->vendas
-            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-            ->join('loja_usuarios as u', 'loja_vendas.usuario_id', '=', 'u.id')
+            ->join('loja_usuarios as u', 'lv.usuario_id', '=', 'u.id')
             ->select(
                (DB::raw("SUM(tp.valor_pgto)  AS total")),
                 (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
                 'fp.nome',
                 'u.nome as nome_usu'
-            )
-            ->where('loja_vendas.loja_id', $id)
+            )->from('loja_vendas as lv')
+            ->where('lv.loja_id', $id)
             ->whereIn('fp.id', [1]) //dinheiro
-           // ->whereDate('loja_vendas.created_at', Carbon::today())
-            ->whereBetween('loja_vendas.created_at', [$startDate, $endDate])
+            //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('6'))
+           // ->whereBetween('loja_vendas.created_at', [$startDate, $endDate])
+            ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
             ->groupBy('u.nome')
             ->orderBy('u.nome', 'asc')
             ->get();

@@ -87,15 +87,16 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/relatorio/chartDay/{dataini}/{datafim}/{store_id}',[RelatorioController::class,'chartDay'])->name('chartDay');
     Route::get('/relatorio/editSales/{store_id}',[RelatorioController::class,'editSales'])->name('editSales');
     Route::post('/relatorio/dailySalesList',[RelatorioController::class,'dailySalesList']);
-    Route::get('/relatorio/detailSales/{id}',[RelatorioController::class,'detailSales']);
-    Route::get('/relatorio/detailCart/{id}',[RelatorioController::class,'detailCart']);
-    Route::get('/relatorio/detailDinner/{id}',[RelatorioController::class,'detailDinner']);
+    Route::get('/relatorio/detailSales/{id}/',[RelatorioController::class,'detailSales']);
+    Route::post('/relatorio/detailCart',[RelatorioController::class,'detailCart'])->name("admin.detailCart");
+    Route::post('/relatorio/detailDinner',[RelatorioController::class,'detailDinner'])->name("admin.detailDinner");
     Route::get('/relatorio/buscaTaxa/{id}',[RelatorioController::class,'buscaTaxa']);
     Route::get('/relatorio/mes/{ano}',[RelatorioController::class ,'mes']);
     Route::get('/relatorio/card/{ano}',[RelatorioController::class,'card']);
     Route::get('/relatorio/chartLineGroupYear/{year}',[RelatorioController::class,'chartLineGroupYear']);
     Route::get('/relatorio/chartLineMultiGroupYear',[RelatorioController::class,'chartLineMultiGroupYear']);
     Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
+
 
     Route::resource('/relatorio','RelatorioController');
 
@@ -134,11 +135,11 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
     Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
 
-    
+
     Route::post('/reposicao/filter', [ReposicaoController::class, 'filter'])->name('admin.reposicaoProduto.filter');
     Route::resource('reposicao','ReposicaoController');
     Route::resource('reposicao-produto','ReposicaoProdutoController');
-  
+
 
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');

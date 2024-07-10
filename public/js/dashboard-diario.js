@@ -1,7 +1,10 @@
 $(function () {
-
+    //Obtenha o token CSRF do meta tag
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = fncUrl();
     let table;
+    let dataIni, dataFim,startDate,endDate;
+
 
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -149,7 +152,8 @@ $(function () {
          let startDate;
          let endDate;
          let fila = $(this).closest("tr");
-         $("#codigo_venda").text($(this).data('codigo-venda'));
+
+         $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
 
          const dataIni = $('input[name=dataini]').val();
          const dataFim = $('input[name=datafim]').val();
@@ -253,43 +257,75 @@ $(function () {
          * **/
     $(document).on("click", ".detailCart", async function(event) {
         event.preventDefault();
-
-        let id = $(this).data('content');
         fncLoadDataTableModel("tableViewCart");
 
-        await fetch(url + "/relatorio/detailCart/" + id )
-            .then(function (response) {
-                //console.log(response);
-                return response.json()
-            })
-            .then(function (response) {
-                table =  $('#tableViewCart').DataTable({
-                    "data": response.dados,
-                    "bInfo" : false,
-                    "paging": true,
-                    "ordering": true,
-                    "searching": false,
-                    "destroy": true,
-                    "columns": [
-                        {"data": "nome"},
-                        {
-                            "data": "total",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+        let id = $(this).data('content');
+        dataIni = $('input[name=dataIni]').val();
+        dataFim = $('input[name=dataFim]').val();
 
-                        },
-                        //   {"data": "taxa"},
-                        {
-                            "data": "totalFinal",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
 
-                        },
-                    ],
-                    language: {
-                        "url": "../public/Portuguese-Brasil.json"
-                    },
-                    "order": [[0, "asc"]]
-                });//fim datatables
+        const data = {
+            id: id,
+            dataini: startDate,
+            datafim:endDate
+        };
+
+        try {
+            const response = await fetch(url + "/relatorio/detailCart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+                },
+                body: JSON.stringify(data)
             });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok " + response.statusText);
+            }
+
+            const responseData = await response.json();
+
+            table =  $('#tableViewCart').DataTable({
+                "data": responseData.dados,
+                "bInfo" : false,
+                "paging": true,
+                "ordering": true,
+                "searching": false,
+                "destroy": true,
+                "columns": [
+                    {"data": "nome"},
+                    {
+                        "data": "total",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                       {
+                           "data": "taxa",
+                           "render": function(data, type, row) {
+                               // Converte o valor para percentual
+                               return data + '%';
+                           }
+                       },
+                    {
+                        "data": "totalFinal",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                ],
+                language: {
+                    "url": "../public/Portuguese-Brasil.json"
+                },
+                "order": [[0, "asc"]],
+                initComplete: function(settings, json) {
+                    $('span[name="periodo"]').text(dataIni + " até " + dataFim);
+                }
+            });//fim datatables
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
     });
 
 
@@ -298,12 +334,73 @@ $(function () {
          * **/
     $(document).on("click", ".detailDinner", async function(event) {
         event.preventDefault();
-
-        let id = $(this).data('content');
-        console.log("id " +id);
         fncLoadDataTableModel("dataTableModalDinner");
 
-        await fetch(url + "/relatorio/detailDinner/" + id )
+        let id = $(this).data('content');
+        dataIni = $('input[name=dataIni]').val();
+        dataFim = $('input[name=dataFim]').val();
+
+        startDate = dataIni !== "" ? moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+        endDate = dataFim !== "" ? moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+
+        const data = {
+            id: id,
+            dataini: startDate,
+            datafim:endDate
+        };
+
+        try {
+            const response = await fetch(url + "/relatorio/detailDinner", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok " + response.statusText);
+            }
+
+            const responseData = await response.json();
+           // console.log(responseData);
+
+            table =  $('#dataTableModalDinner').DataTable({
+                "data": responseData.dados,
+                "bInfo" : false,
+                "paging": true,
+                "ordering": true,
+                "searching": false,
+                "destroy": true,
+                "columns": [
+                    {"data": "nome_usu"},
+                    {
+                        "data": "total",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                    //   {"data": "taxa"},
+                    {
+                        "data": "totalFinal",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                ],
+                language: {
+                    "url": "../public/Portuguese-Brasil.json"
+                },
+                "order": [[0, "asc"]],
+                initComplete: function(settings, json) {
+                    $('span[name="periodo"]').text(dataIni + " até " + dataFim);
+                }
+            });//fim datatables
+
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+        }
+
+        /*await fetch(url + "/relatorio/detailDinner/" + id )
             .then(function (response) {
                 //console.log(response);
                 return response.json()
@@ -335,7 +432,7 @@ $(function () {
                     },
                     "order": [[0, "asc"]]
                 });//fim datatables
-            });
+            });*/
     });
 
 
@@ -369,7 +466,7 @@ $(function () {
         $("#payments").html(html);
 
         // Usar text() em vez de html() para span
-        $("#codigovenda").text(codigo_venda);
+        $('span[name="codigo_venda"]').text(codigo_venda);
 
         // Abrir o modal após preencher os dados
         $('#divModalUpdate').modal('show');
