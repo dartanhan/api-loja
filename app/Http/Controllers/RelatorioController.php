@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use NumberFormatter;
 use Throwable;
-
+use Yajra\DataTables\DataTables;
 
 class RelatorioController extends Controller
 {
@@ -745,9 +745,10 @@ class RelatorioController extends Controller
      */
     public function detailCart()
     {
-        $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("dataini"));
-        $endDate = Carbon::parse($this->request->input("datafim"));
+       // dd($this->request->data['id']);
+        $id = $this->request->data['id']; //$this->request->input("id");
+        $startDate = Carbon::parse($this->request->data['dataini']); //$this->request->input("dataini"));
+        $endDate = Carbon::parse($this->request->data['datafim']); //$this->request->input("datafim"));
 
         $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
             ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
@@ -767,7 +768,9 @@ class RelatorioController extends Controller
             ->orderBy('fp.id', 'asc')
             ->get();
 
-        return Response::json(array("dados" => $listDetail));
+            return DataTables::of($listDetail)->make(true);
+
+       // return Response::json(array("dados" => $listDetail));
     }
 
     /***
@@ -777,9 +780,10 @@ class RelatorioController extends Controller
     public function detailDinner()
     {
 
-        $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("dataini"));
-        $endDate = Carbon::parse($this->request->input("datafim"));
+        $id = $this->request->data['id']; //$this->request->input("id");
+        $startDate = Carbon::parse($this->request->data['dataini']); //$this->request->input("dataini"));
+        $endDate = Carbon::parse($this->request->data['datafim']); //$this->request->input("datafim"));
+
 
         $listDetail = $this->vendas
             ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
@@ -800,7 +804,8 @@ class RelatorioController extends Controller
             ->orderBy('u.nome', 'asc')
             ->get();
 
-        return Response::json(array("dados" => $listDetail));
+            return DataTables::of($listDetail)->make(true);
+       // return Response::json(array("dados" => $listDetail));
     }
 
     /***

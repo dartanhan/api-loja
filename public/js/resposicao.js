@@ -11,17 +11,16 @@ $(function() {
      * #########################################################################
      * */
 
-   
-    /**
-     * DATATABLES
-     * */
-
     let fncDataDatatable = async function(startDate, endDate) {
-        
-        
+                
         if (table) {
             table.destroy();
-            sweetAlert("Aguarde", "Carregando dados da reposição...",'info');
+            sweetAlert({
+                title: 'Aguarde!',
+                text: "Carregando dados da reposição...",
+                icon: 'info',
+                showConfirmButton: false
+            });
         }
         table = await $('#table').DataTable({
             responsive: true,
@@ -60,9 +59,10 @@ $(function() {
             "order": [[3, "desc"]],
             initComplete: function(settings, json) {
                 swalWithBootstrapButtons.close();
-                $("#data-periodo").html("- Período pesquisado : " + 
-                    moment(startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') + " até " + 
-                    moment(endDate, 'YYYY-MM-DD').format('DD/MM/YYYY'));
+                $("#data-periodo").html(" - Período pesquisado : " + 
+                    getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY') 
+                    + " até " + 
+                    getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY'));
                 $('[data-toggle="tooltip"]').tooltip();               
             }
         });
