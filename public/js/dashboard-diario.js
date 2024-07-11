@@ -1,281 +1,272 @@
+import {fncDataDatatable,getDataFormat,fncPreLoadModal} from './comum.js';
+
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const url = fncUrl();
+let table;
+let startDate,endDate,id;
+let dataIni = $('input[name=dataIni]');
+let dataFim = $('input[name=dataFim]');
+
 $(function () {
-    //Obtenha o token CSRF do meta tag
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    const url = fncUrl();
-    let table;
-    let dataIni, dataFim,startDate,endDate,id;
+  
 
-
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-        },
-        buttonsStyling: false
-    });
-
-
-     /**
+    /**
      * #########################################################################
      * ##########  ÁREA DATATABLE ###################################
      * #########################################################################
      * */
 
-     let fncDataDatatable = async function() {
-         table.ajax.reload(null, false);
-         return false;
-     }
-
-
-       // $('#datatablesDiario').DataTable().destroy();
-        table =  $('#datatablesDiario').DataTable({
-            "render": function ( data, type, row, meta ) {
-                return '<a href="'+data+'">Download</a>';
+    table =  $('#datatablesDiario').DataTable({
+        "ajax":{
+            "method": 'post',
+            "url": url + "/dashboardDiario/vendasDia",
+            "data":function(data){
+                data.id = 2,
+                data._token = token,
+                data.dataIni = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+                data.dataFim = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
             },
-            "ajax":{
-                "method": 'post',
-                "url": url + "/dashboardDiario/vendasDia",
-                "data":{id: 2,_token:token},
-                "dataType":"json",
-                responsive: true,
-                dataSrc: function(json) {
+            
+            "dataType":"json",
+            responsive: true,
+            dataSrc: function(json) {
 
-                    //console.log(json.total_imposto);
-                    $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
-                        " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
-                        " </div>");
-                    return json.data;
-                }
-            },
-            "columns": [
-                {
-                    //"data": "codigo_venda",
-                    "render": function ( data, type, row, meta ) {
-                        return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
-                    }
-                },
-                {"data": "nome_cli"},
-                {"data": "usuario"},
-                {
-                    //"data": "tipo_venda",
-                    "render": function ( data, type, row, meta ) {
-                        if(row.tipo_venda.toUpperCase() === "PRESENCIAL"){
-                            return "<span class='text-primary'>"+row.tipo_venda+"</span>"
-                        }
-                        return "<span class='text-danger'>"+row.tipo_venda+"</span>"
-                    }
-                },
-                {
-                    "data": "sub_total",
-                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                },
-                {"data": "nome_pgto"},
-                {
-                    "data": "total",
-                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-                },
-                {
-                    "data": "valor_desconto",
-                    render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                    //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-                },
-                {
-                    "data": "cashback",
-                    render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                    //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-                },
-                {"data": "imposto"},
-                {"data": "taxa_pgto"},
-                {"data": "valor_produto"},
-                {
-                    //"data": "mc"
-                    "render": function ( data, type, row, meta ) {
-                        var numero = row.mc.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
-
-                        // Converter para número
-                        var numeroFloat = parseFloat(numero);
-
-                        if(numeroFloat < 0){
-                            return "<span class='text-danger'>"+row.mc+"</span>"
-                        }
-                        return "<span class='text-primary'>"+row.mc+"</span>"
-                    }
-
-                },
-                {
-                    //"data": "percentual_mc"
-                    "render": function ( data, type, row, meta ) {
-                        if(row.percentual_mc.replace("%","") < 0){
-                            return "<span class='text-danger'>"+row.percentual_mc+"</span>"
-                        }
-                        return "<span class='text-primary'>"+row.percentual_mc+"</span>"
-                    }
-                },
-                {
-                    "data": "data"
-                }, {
-                    "render": function ( data, type, row, meta ) {
-                        return "<div class='text-center'>" +
-                                    "<div class='btn-group'>" +
-
-                                            "<button class='btn btn-warning btn-sm btnEdit m-1'  data-target=\"#divModalUpdate\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
-                                            "   data-toggle=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
-                                            "  <i class=\"far fa-edit\"></i>" +
-                                            "</button>" +
-
-                                        "<span data-toggle=\"modal\" data-target=\"#divModal\">" +
-                                            "<button class='btn btn-info btn-sm btnView m-1'  data-codigo-venda="+row.codigo_venda+" " +
-                                            " data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detalhes da Venda\"'>" +
-                                            " <i class=\"far fa-eye\"></i>" +
-                                            "</button>" +
-                                        "</span>"+
-                                        // "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
-                                        // "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
-                                        // "  <i class=\"far fa-trash-alt\"></i>" +
-                                        // "</button>" +
-                                    "</div>" +
-                                "</div>"
-                    }
-                }
-            ],
-            language: {
-                "url": "../public/Portuguese-Brasil.json"
-            },
-            "order": [[14, "desc"]],
-            "initComplete": function(settings, json) {
-                $('[data-toggle="tooltip"]').tooltip();
-            },"xhr": function(settings, json) {
-                $('[data-toggle="tooltip"]').tooltip();
+                //console.log(json.total_imposto);
+                $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
+                    " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
+                    " </div>");
+                return json.data;
             }
+        },
+        "columns": [
+            {
+                //"data": "codigo_venda",
+                "render": function ( data, type, row, meta ) {
+                    return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
+                }
+            },
+            {"data": "nome_cli"},
+            {"data": "usuario"},
+            {
+                //"data": "tipo_venda",
+                "render": function ( data, type, row, meta ) {
+                    if(row.tipo_venda.toUpperCase() === "PRESENCIAL"){
+                        return "<span class='text-primary'>"+row.tipo_venda+"</span>"
+                    }
+                    return "<span class='text-danger'>"+row.tipo_venda+"</span>"
+                }
+            },
+            {
+                "data": "sub_total",
+                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
-        });//fim datatables
+            },
+            {"data": "nome_pgto"},
+            {
+                "data": "total",
+                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+            },
+            {
+                "data": "valor_desconto",
+                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
+                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
+            },
+            {
+                "data": "cashback",
+                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
+                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
+            },
+            {"data": "imposto"},
+            {"data": "taxa_pgto"},
+            {"data": "valor_produto"},
+            {
+                //"data": "mc"
+                "render": function ( data, type, row, meta ) {
+                    var numero = row.mc.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
 
-        table.on('preXhr.dt', function (e,settings,data) {
-            data.dataOne = $('input[name=dataIni]').val();
-            data.dataTwo = $('input[name=dataFim]').val();
-        });
+                    // Converter para número
+                    var numeroFloat = parseFloat(numero);
+
+                    if(numeroFloat < 0){
+                        return "<span class='text-danger'>"+row.mc+"</span>"
+                    }
+                    return "<span class='text-primary'>"+row.mc+"</span>"
+                }
+
+            },
+            {
+                //"data": "percentual_mc"
+                "render": function ( data, type, row, meta ) {
+                    if(row.percentual_mc.replace("%","") < 0){
+                        return "<span class='text-danger'>"+row.percentual_mc+"</span>"
+                    }
+                    return "<span class='text-primary'>"+row.percentual_mc+"</span>"
+                }
+            },
+            {
+                "data": "data"
+            }, {
+                "render": function ( data, type, row, meta ) {
+                return "<div class='text-center'>" +
+                            "<div class='btn-group'>" +
+                                "<button class='btn btn-warning btn-sm btnEdit m-1'  data-target=\"#divModalUpdate\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
+                                "   data-toggle=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
+                                "  <i class=\"far fa-edit\"></i>" +
+                                "</button>" +
+
+                                "<button  data-toggle='tooltip' "+
+                                " data-placement='top' title='Detalhes da Venda' "+
+                                " class='btn btn-info btn-sm btnView m-1' data-codigo-venda="+row.codigo_venda+"> "+
+                                " <i class=\"far fa-eye\"></i>" +
+                                "</button>" +
+
+                            // "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
+                            // "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
+                            // "  <i class=\"far fa-trash-alt\"></i>" +
+                            // "</button>" +
+                        "</div>" +
+                    "</div>"
+                }
+            }
+        ],
+        language: {
+            "url": "../public/Portuguese-Brasil.json"
+        },
+        "order": [[14, "desc"]],
+        "initComplete": function(settings, json) {
+            $('[data-toggle="tooltip"]').tooltip();
+        },"xhr": function(settings, json) {
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+
+    });//fim datatables
+
+    /**
+     * #########################################################################
+     * ##########  ÁREA DE FILTRO DE DATAS   ###################################
+     * #########################################################################
+     * */
+    $('#data input').datepicker({
+        'language' : 'pt-BR',
+        'todayBtn': true,
+        'todayHighlight':true,
+        'weekStart':0,
+        'orientation':'bottom',
+        'autoclose':true
+    });
+
+    $('#data_ano [name=ano]').datepicker({
+        'language' : 'pt-BR',
+        'todayHighlight':true,
+        'orientation':'bottom',
+        'autoclose':true,
+        'multidate':false,
+        'format': "yyyy",
+        'viewMode': "years",
+        'minViewMode': "years"
+    });
+
+       /**
+     * #########################################################################
+     * ##########  ÁREA EXECUÇÃO DE FUNÇÕES ONLOAD ############################
+     * #########################################################################
+     * */
+
+     fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')); 
+       
+   // getFncDataCardTotalProdutoPorVenda("","",2);
+});
+
      /**
      * DETALHES DA VENDA
      * **/
-     $(document).on("click", ".btnView", async function(event) {
+     $(document).on("click", ".btnView", async function (event) {
         event.preventDefault();
-        fncLoadDataTableModel("tableView");
-
-         let fila = $(this).closest("tr");
-
-         $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
-
-         dataIni = $('input[name=dataini]').val();
-         dataFim = $('input[name=datafim]').val();
-
-         if (dataIni) {
-             startDate = moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD');
-         }
-         if (dataFim) {
-             endDate = moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD');
-         }
-
-        await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
-            .then(function (response) {
-               // console.log(response);
-                return response.json()
-            })
-            .then(function (response) {
-
-                // Transformar os dados para que cada variação de produto seja uma linha separada
-                const transformedData = response.dados.flatMap(item =>
-                    item.produtos.map(produto => ({
-                        id: item.id,
-                        codigo_venda: item.codigo_venda,
-                      //  loja_id: item.loja_id,
-                      //  cliente_id: item.cliente_id,
-                        created_at: item.created_at,
-                        ////descontos: item.descontos.map(desconto => desconto.valor_desconto).join(', '),
-                        codigo_produto: produto.codigo_produto,
-                        descricao: produto.descricao,
-                        quantidade: produto.quantidade,
-                        valor: produto.valor_produto,
-                        valor_produto:produto.products_sales[0].valor_produto,
-                        valor_total: (produto.quantidade * produto.valor_produto).toFixed(2)
-                    }))
-                );
-
-                table = $('#tableView').DataTable({
-                    "data": transformedData,
-                    "bInfo" : false,
-                    "paging": true,
-                    "ordering": true,
-                    "searching": false,
-                    "destroy": true,
-                    "columns": [
-                        {"data": "codigo_produto"},
-                        {"data": "descricao"},
-                        {
-                            "data": "valor",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                        {
-                            "data": "valor_produto",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                        {"data": "quantidade"},
-                        {
-                            "data": "valor_total",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        }
-                    ],
-                    language: {
-                        "url": "../public/Portuguese-Brasil.json"
-                    },
-                    "order": [[0, "asc"]],
-                    "footerCallback": function ( row, data, start, end, display ) {
-                        var api = this.api(), data;
-
-                        // Remove the formatting to get integer data for summation
-                        const intVal = function (i) {
-                            return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-                        };
-
-                        // Total over all pages
-                        let total = api
-                            .column(5)
-                            .data()
-                            .reduce(function (a, b) {
-                                // console.log(a);
-                                return parseFloat(a) + parseFloat(b);
-                            }, 0);
-
-                        // Update footer
-                        //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
-                        let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
-                        $("#foot").html("");
-                        $("#foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
-                    },
-
-                });//fim datatables
-            });
-
-         // Abrir o modal após preencher os dados
-         $('#divModalUpdate').modal('show');
+        
+        // Abrir o modal e mostrar o spinner
+        $('#divModal').modal('show');
+            
+        let fila = $(this).closest("tr");
+        let vendaId = fila.find('td:eq(0)').text();
+   
+        // Inicializar a DataTable com a opção ajax
+        $('#tableView').DataTable({
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            destroy : true,
+            "ajax": {
+                "url": url + "/relatorio/detailSales/" + vendaId,
+                "type": "GET",
+                "dataSrc": function (json) {
+                    return json.data; // Retornar os dados para DataTables
+                },
+                "complete": function() {
+                    // Esconder o spinner e mostrar a tabela após a inicialização do DataTable
+                }
+            },
+            "columns": [
+                { "data": "codigo_produto" },
+                { "data": "descricao" },
+                {
+                    "data": "valor",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                },
+                {
+                    "data": "valor_produto",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                },
+                { "data": "quantidade" },
+                {
+                    "data": "valor_total",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                }
+            ],
+            "language": {
+                "url": "../public/Portuguese-Brasil.json"
+            },
+            "order": [[0, "asc"]],
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+    
+                // Remove the formatting to get integer data for summation
+                const intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+    
+                // Total over all pages
+                let total = api
+                    .column(5)
+                    .data()
+                    .reduce(function (a, b) {
+                        return parseFloat(a) + parseFloat(b);
+                    }, 0);
+    
+                // Update footer
+                let numFormat = $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display;
+                $("#foot").html("");
+                $("#foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: ' + numFormat(total) + '</td>');
+            },
+            "initComplete": function (settings, json) {
+                $('[data-toggle="tooltip"]').tooltip();
+                $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
+            }
+        });
     });
+    
 
     /**
          * Detalhes venda no cartão
          * **/
     $(document).on("click", ".detailCart", async function(event) {
         event.preventDefault();
-        //fncLoadDataTableModel("tableViewCart");
 
         let id = $(this).data('content');
-        dataIni = $('input[name=dataIni]').val();
-        dataFim = $('input[name=dataFim]').val();
+        //dataIni = $('input[name=dataIni]').val();
+        //dataFim = $('input[name=dataFim]').val();
 
-        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
-        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
@@ -285,10 +276,8 @@ $(function () {
         };
 
         try {
-           // const response = await httpFetchPost(url + "/relatorio/detailCart", token, data);
-           //$('#tableViewCart').DataTable().destroy();
+
             $('#tableViewCart').DataTable({
-                //"data": response.dados,
                 "ajax":{
                     "method": 'post',
                     "url": url + "/relatorio/detailCart",
@@ -369,15 +358,13 @@ $(function () {
          * **/
     $(document).on("click", ".detailDinner", async function(event) {
         event.preventDefault();
-        //fncLoadDataTableModel("dataTableModalDinner");
 
         let id = $(this).data('content');
-        dataIni = $('input[name=dataIni]').val();
-        dataFim = $('input[name=dataFim]').val();
+        //dataIni = $('input[name=dataIni]').val();
+       // dataFim = $('input[name=dataFim]').val();
 
-
-        startDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
-        endDate = getDataFormat(dataIni,'DD/MM/YYYY','YYYY-MM-DD');
+        startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
@@ -389,7 +376,6 @@ $(function () {
         try {
 
             table =  $('#dataTableModalDinner').DataTable({
-                //"data": response.dados,
                 "ajax":{
                     "method": 'post',
                     "url": url + "/relatorio/detailDinner",
@@ -431,40 +417,6 @@ $(function () {
         } catch (error) {
             console.error("There was a problem with the fetch operation:", error);
         }
-
-        /*await fetch(url + "/relatorio/detailDinner/" + id )
-            .then(function (response) {
-                //console.log(response);
-                return response.json()
-            })
-            .then(function (response) {
-                table =  $('#dataTableModalDinner').DataTable({
-                    "data": response.dados,
-                    "bInfo" : false,
-                    "paging": true,
-                    "ordering": true,
-                    "searching": false,
-                    "destroy": true,
-                    "columns": [
-                        {"data": "nome_usu"},
-                        {
-                            "data": "total",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                        //   {"data": "taxa"},
-                        {
-                            "data": "totalFinal",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                    ],
-                    language: {
-                        "url": "../public/Portuguese-Brasil.json"
-                    },
-                    "order": [[0, "asc"]]
-                });//fim datatables
-            });*/
     });
 
 
@@ -503,19 +455,6 @@ $(function () {
         // Abrir o modal após preencher os dados
         $('#divModalUpdate').modal('show');
     });
-
-        /**
-     * #########################################################################
-     * ##########  ÁREA DE FUNÇÕES DO SISTEMA   ###################################
-     * #########################################################################
-     * */
-    let fncLoadDataTableModel = function(table) {
-        $("tbody[id="+table+"]").html("<div class=\"row\">\n" +
-            "    <div class=\"col-md-8 mx-auto\">\n" +
-            "      <h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>\n" +
-            "    </div>\n" +
-            "  </div>");
-    }
 
 
       /**
@@ -575,8 +514,8 @@ $(function () {
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
 
-         dataIni = $('input[name=dataIni]').val();
-         dataFim = $('input[name=dataFim]').val();
+         //dataIni = $('input[name=dataIni]').val();
+         //dataFim = $('input[name=dataFim]').val();
          let isValid = true;
          let msg = '';
 
@@ -596,14 +535,14 @@ $(function () {
         // If both fields are filled, submit the form
         if (isValid) {
             fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
-        // fncLoadChartBar();
-            let d1 =  dataIni !=="" ? dataIni.replaceAll("/","") : 0;
-            let d2 =  dataFim !=="" ? dataFim.replaceAll("/","") : 0;
 
-            fncDataBarChart(d1,d2).then(); // atualiza os cards de totais
-            fncDataDatatable(d1,d2).then();
+            startDate =  getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+            endDate =  getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
+
+            fncDataBarChart(startDate,endDate); // atualiza os cards de totais
+            fncDataDatatable(table);
         }else{
-            swalWithBootstrapButtons.fire({
+            sweetAlert({
                 title: "Atenção",
                 text: msg,
                 icon: 'warning',
@@ -613,15 +552,17 @@ $(function () {
         }
     });
 
+    /***
+     * Reseta as informações
+     */
     $(".btn-limpar").on("click", function () {
-        fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
-       // fncLoadChartBar("");
+        //fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
 
-        $('input[name=dataIni]').val("");
-        $('input[name=dataFim]').val("");
+        dataIni.val("");
+        dataFim.val("");
 
-        fncDataBarChart(0,0).then();
-        fncDataDatatable(0,0).then();
+        fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
+        fncDataDatatable(table);
     });
 
     /***
@@ -678,18 +619,22 @@ $(function () {
                         });
                         let d1 =  $('input[name=dataini]').val() !=="" ? $('input[name=dataini]').val().replaceAll("/","") : 0;
                         let d2 =  $('input[name=dataini]').val() !=="" ? $('input[name=datafim]').val().replaceAll("/","") : 0;
-                        fncDataDatatable(d1, d2).then();
+                        fncDataDatatable(table);
                     }
 
                 },
                 error: function (response) {
                    // console.log(response);
-                    let json = $.parseJSON(response.responseText);
-                    Swal.fire(
-                        'error!',
-                        json.message,
-                        'error'
-                    )
+                   let json = $.parseJSON(response.responseText);
+                   sweetAlert(
+                        {
+                            title: 'Error!',
+                            text: json.message,
+                            icon: 'danger',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }
+                    );
                 },
                 complete: function () {
                     $('#salvar').html('Salvar');
@@ -697,39 +642,3 @@ $(function () {
             });
         }
     });
-
-
-     /**
-     * #########################################################################
-     * ##########  ÁREA DE FILTRO DE DATAS   ###################################
-     * #########################################################################
-     * */
-     $('#data input').datepicker({
-        'language' : 'pt-BR',
-        'todayBtn': true,
-        'todayHighlight':true,
-        'weekStart':0,
-        'orientation':'bottom',
-        'autoclose':true
-    });
-
-    $('#data_ano [name=ano]').datepicker({
-        'language' : 'pt-BR',
-        'todayHighlight':true,
-        'orientation':'bottom',
-        'autoclose':true,
-        'multidate':false,
-        'format': "yyyy",
-        'viewMode': "years",
-        'minViewMode': "years"
-    });
-
-    /**
-     * #########################################################################
-     * ##########  ÁREA EXECUÇÃO DE FUNCÇÕES ONLOAD ############################
-     * #########################################################################
-     * */
-   // fncDataDatatable("", "").then();
-    fncDataBarChart(0,0).then();
-   // getFncDataCardTotalProdutoPorVenda("","",2);
-});

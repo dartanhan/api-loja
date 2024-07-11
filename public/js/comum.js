@@ -91,7 +91,7 @@ function formatMoney(valor)
  * @param mascara_old formato/mascara da data de retorno ex.: 'YYYY-MM-DD'
  * @returns Se a data não for fornecida , retornar a data corrente no formato 'YYYY-MM-DD'
  */
-const getDataFormat = function(data, mascara_to, mascara_old){
+export function getDataFormat(data, mascara_to, mascara_old){
     return (data !== "") ? moment(data, mascara_to).format(mascara_old) : moment().format('YYYY-MM-DD');
 }
 
@@ -329,3 +329,17 @@ const httpFetchPost = async function(url, token, data) {
     }
 }
 
+ /**
+     *   ATUALIZA A DATATABLE
+     * */
+ export function fncDataDatatable(table) {
+    table.ajax.reload(null, false);
+    return false;
+}
+
+export function fncPreLoadModal(){
+    return "<div class=\"spinner-border text-primary\" role=\"status\">"+
+                "<span class=\"sr-only\">Loading...</span>"+
+            "</div>";
+        
+}

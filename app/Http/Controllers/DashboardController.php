@@ -64,16 +64,16 @@ class DashboardController extends Controller
             $return = [];
             $imposto_total = 0;
 
-            $dataOneRequest = $this->request->dataOne;
-            $dataTwoRequest = $this->request->dataTwo;
+            $dataIni = $this->request->dataIni;
+            $dataFim = $this->request->dataFim;
            // dd($dataOneRequest, $dataTwoRequest);
-            $dataOne = ($dataOneRequest)
+           /* $dataOne = ($dataOneRequest)
                         ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
                         : CarbonImmutable::now()->format('Y-m-d');
 
             $dataTwo = ($dataTwoRequest)
                         ? CarbonImmutable::createFromFormat('d/m/Y', $dataTwoRequest)->format('Y-m-d')
-                        : CarbonImmutable::now()->format("Y-m-d");
+                        : CarbonImmutable::now()->format("Y-m-d");*/
 
            /* $dataOne = ($this->request->dataOne != 0) ?
                 CarbonImmutable::parse(
@@ -121,7 +121,7 @@ class DashboardController extends Controller
               ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
               ->leftJoin('loja_clientes', 'loja_clientes.id', '=', 'lv.cliente_id')
               ->where('lv.loja_id', $this->request->id)
-              ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataOne, $dataTwo))
+              ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataIni, $dataFim))
                 ->groupBy('lv.codigo_venda')
                 ->orderBy('lv.created_at', 'asc')
                 ->get();

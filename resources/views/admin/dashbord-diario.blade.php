@@ -148,7 +148,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="table-responsive">
-                            <table id="tableView" class="table table-striped table-condensed table-hover table-sm">
+                            <table id="tableView" class="table table-striped table-condensed table-hover table-sm w-100">
                                 <thead class="text-center">
                                     <tr>
                                         <th data-sortable="false">CÓDIGO</th>
@@ -274,7 +274,7 @@
     <script src="{{URL::asset('assets/dashboard/js/Chart.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script src="{{URL::asset('js/dashboard-diario.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/dashboard-diario.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
