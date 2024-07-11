@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use NumberFormatter;
 use Throwable;
-
+use Yajra\DataTables\DataTables;
 
 class RelatorioController extends Controller
 {
@@ -228,7 +228,6 @@ class RelatorioController extends Controller
         //todas as lojas
         //$stores = $this->lojas::where("status" , true)->get();
 
-
         //Tipos de pagamentos
         //$paymentType = [2,3,4,5,6,7];
         $payments = $this->payments::all();
@@ -238,31 +237,22 @@ class RelatorioController extends Controller
                 $paymentType[] = $pay->id;
         }
 
-        //
-        //$formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
-       // $totalOrders = "";
-       // $chart ="";
-       // $totalsDayDiscount = "";
-       // $totalOrderDay = "";
-       // $sumOrdersDay = "";
         $totalOrderDiscount = "";
         $totalOrderMonth = "";
         $totalsOrdersWeek = "";
-       // $totalsDayWeek = "";
-      //  $totalsDay = "";
-       // $totalMes = "";
-       // $sumDisc = 0;
-       // $sum =0;
-       // $sumWeek = 0;
+       
 
-        $dataCarbon = ($dateOne != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateOne)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-        $dataCarbonFim = ($dateTwo != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateTwo)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
+       // $dataCarbon = ($dateOne != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateOne)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
+       // $dataCarbonFim = ($dateTwo != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateTwo)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
+       $dateOne = CarbonImmutable::parse($dateOne);
+       $dateTwo = CarbonImmutable::parse($dateTwo);
 
-        $iniDayWeek = $dataCarbon->startOfWeek()->format('Y-m-d');
-        $endDayWeek = $dataCarbon->endOfWeek()->format('Y-m-d');
+        $iniDayWeek = $dateOne->startOfWeek()->format('Y-m-d');
+        $endDayWeek = $dateOne->endOfWeek()->format('Y-m-d');
+        //dd( [$iniDayWeek,  $endDayWeek]);
 
-        $iniDayMonth = $dataCarbon->startOfMonth();
-        $endDayMonth = $dataCarbonFim->endOfMonth();
+        $iniDayMonth = $dateOne->startOfMonth();
+        $endDayMonth = $dateTwo->endOfMonth();
 
         //$iniDayMonth = Carbon::now()->startOfMonth();
         //$endDayMonth = Carbon::now()->endOfMonth();
@@ -270,7 +260,7 @@ class RelatorioController extends Controller
         //foreach ($stores as $key => $store) {
 
             //semana agrupado por dia
-            $chart = $this->vendas::Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
+            $chart = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
                 ->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->select(
                     //(DB::raw("SUM(loja_vendas.valor_total) AS total")),
@@ -304,7 +294,7 @@ class RelatorioController extends Controller
                // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
               //->whereDate('loja_vendas.created_at', Carbon::today())
                ->where('loja_vendas.loja_id', $store_id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataCarbon, $dataCarbonFim))
+                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
                 ->groupBy('fp.id')
                 ->get();
 
@@ -332,7 +322,7 @@ class RelatorioController extends Controller
 */
             //totais descontos por dia
            // $totalsDayDiscount[$store->id] = $this->vendas::join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-            $totalsDayDiscount = $this->vendas::join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
+            $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
                 ->select(
                     (DB::raw("FORMAT(SUM(loja_vendas_produtos_descontos.valor_desconto),2) AS orderTotalDiscount"))
                 )
@@ -341,13 +331,13 @@ class RelatorioController extends Controller
                 //->whereDate('loja_vendas.created_at', Carbon::today())
                 //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($inicioDiaSemana, $fimDiaSemana))
                 ->where('loja_vendas.loja_id', $store_id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataCarbon, $dataCarbonFim))
+                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
                 ->groupBy('loja_vendas.loja_id')
                 ->get();
 
             //total no mês por loja
             //$totalMes[$store->id] = $this->vendas::Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-            $totalMes = $this->vendas::Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
+            $totalMes = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
                 ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
                 ->join('loja_taxa_cartoes', 'loja_taxa_cartoes.forma_id', '=', 'fp.id')
@@ -359,15 +349,15 @@ class RelatorioController extends Controller
                 )
                 //->where('loja_vendas.loja_id', $store->id)
                 ->where('loja_vendas.loja_id', $store_id)
-                ->whereYear('loja_vendas.created_at', '=', $dataCarbon->year)
-                ->whereMonth('loja_vendas.created_at', '=',$dataCarbon->month)
+                ->whereYear('loja_vendas.created_at', '=', $dateOne->year)
+                ->whereMonth('loja_vendas.created_at', '=',$dateOne->month)
                 ->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m"),loja_id')))
                 ->orderBy('loja_vendas.created_at', 'asc')
                 ->get();
 
             //totais por semana
             //$totalsDayWeek[$store->id] = $this->vendas::Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
-            $totalsDayWeek = $this->vendas::Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
+            $totalsDayWeek = $this->vendas->Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
                 ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
                 ->join('loja_taxa_cartoes as ltc', 'ltc.forma_id', '=', 'fp.id')
@@ -385,6 +375,7 @@ class RelatorioController extends Controller
                 ->where('loja_vendas.loja_id', $store_id)
                 ->groupBy('ll.id')
                 ->get();
+                
         //}
      //  $totalsDayWeek['data'] = array($iniDayWeek, $endDayWeek);
         //dd($totalsDayWeek);
@@ -445,6 +436,7 @@ class RelatorioController extends Controller
                 foreach ($totalsDayWeek as $key => $tot) {
                     $sumWeek = $tot->orderTotalWeek;
                 }
+        
                 //$totalsOrdersWeek[$keys] = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
                 $totalsOrdersWeek = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
            // }
@@ -720,7 +712,25 @@ class RelatorioController extends Controller
         $listSalesDetail = $this->vendas::with('produtos.productsSales','descontos')
             ->where('loja_vendas.codigo_venda', $sales)->get();
 
-        return Response::json(array("dados" => $listSalesDetail));
+         // Transformar os dados para que cada variação de produto seja uma linha separada
+        $transformedData = $listSalesDetail->flatMap(function ($item) {
+            return $item->produtos->map(function ($produto) use ($item) {
+                return [
+                    'id' => $item->id,
+                    'codigo_venda' => $item->codigo_venda,
+                    'created_at' => $item->created_at,
+                    'codigo_produto' => $produto->codigo_produto,
+                    'descricao' => $produto->descricao,
+                    'quantidade' => $produto->quantidade,
+                    'valor' => $produto->valor_produto,
+                    'valor_produto' => 0,//$produto->products_sales[0]->valor_produto,
+                    'valor_total' => number_format($produto->quantidade * $produto->valor_produto, 2, '.', ',')
+                ];
+            });
+        });
+        // Configurar retorno para DataTables
+        return DataTables::of($transformedData)->make(true);
+        
     }
 
     /***
@@ -752,7 +762,8 @@ class RelatorioController extends Controller
             ->orderBy('fp.id', 'asc')
             ->get();
 
-        return Response::json(array("dados" => $listDetail));
+        return DataTables::of($listDetail)->make(true);
+        
     }
 
     /***
@@ -785,7 +796,8 @@ class RelatorioController extends Controller
             ->orderBy('u.nome', 'asc')
             ->get();
 
-        return Response::json(array("dados" => $listDetail));
+        return DataTables::of($listDetail)->make(true);
+        
     }
 
     /***
