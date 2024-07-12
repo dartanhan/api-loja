@@ -1,3 +1,5 @@
+import { sweetAlert,formatMoney } from "./comum.js";
+
 $(function() {
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -170,7 +172,7 @@ $(function() {
                             json = $.parseJSON(response.responseText);
                             $("#modal-title").addClass("alert alert-danger");
                             $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
-                            Swal.fire({
+                            sweetAlert({
                                 title: 'error!',
                                 text: json.message,
                                 icon: 'error'
