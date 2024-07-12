@@ -1,33 +1,21 @@
+import { sweetAlert,formatMoney } from "./comum.js";
+
 $(function() {
     $('[data-toggle="tooltip"]').tooltip();
     let json,id,table,asyncData;
 
     const url = fncUrl();
-    initialiseTable();
+  
     /**
      * DATATABLES
      * */
-    // function getdata(){
-    //     const getDados = async () => {
-    //         const data = await fetch(url + "/produto/create", {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             }
-    //         });
-    //
-    //         asyncData = await data.json();
-    //         initialiseTable();
-    //         return asyncData;
-    //     };
-    //     getDados();
-    // }
-    function initialiseTable() {
-        table = $('#table').DataTable({
+   
+    table = $('#table').DataTable({
             ajax: {
                 method: 'get',
                 processing: true,
                 serverSide: true,
+                destroy : true,
                 url: url + "/produto/create",
             },
             "columns": [
@@ -97,7 +85,7 @@ $(function() {
             "order": [[0, "desc"]],
             //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
         });
-    }
+    
 
     /**
      * Add event listener for opening and closing details
@@ -194,7 +182,7 @@ $(function() {
                             json = $.parseJSON(response.responseText);
                             $("#modal-title").addClass("alert alert-danger");
                             $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + json.message + '</strong></p>');
-                            Swal.fire({
+                            sweetAlert({
                                 title: 'error!',
                                 text: json.message,
                                 icon: 'error'
@@ -230,19 +218,18 @@ $(function() {
                 dataType:'json',
                 success: function(response){
                    // console.log(response);
-                    swalWithBootstrapButtons.fire({
+                   sweetAlert.fire({
                                 title: 'Atualizado!',
                                 text: response.message,
                                 icon: 'success',
                                 showConfirmButton: false,
                                 timer: 1500
                             });
-                            table.destroy();
-                            getdata();
+                            fncDataDatatable(table);
                 },
                 error:function(response){
                    // console.log(response);
-                    swalWithBootstrapButtons.fire({
+                    sweetAlert.fire({
                         title: 'Error!',
                         text: response.message,
                         icon: 'error',
@@ -252,8 +239,4 @@ $(function() {
                 }
         });
     });
-
-     /* LOAD DE FUNÇOES
-     */
-    getdata();
 });

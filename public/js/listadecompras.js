@@ -1,3 +1,5 @@
+import {formatMoney,sweetAlert} from './comum.js';
+
 $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -186,7 +188,7 @@ $(function () {
                         // console.log(response);
 
                         if (response.success) {
-                            swalWithBootstrapButtons.fire({
+                            sweetAlert({
                                 title: 'Sucesso!',
                                 text: response.message,
                                 icon: 'success',
@@ -199,7 +201,7 @@ $(function () {
                     error: function (response) {
                         //console.log(data.responseText);
                         json = $.parseJSON(data.responseText);
-                        swalWithBootstrapButtons.fire({
+                        sweetAlert.fire({
                             title: 'Error!',
                             text: json.message,
                             icon: 'danger',

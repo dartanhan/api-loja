@@ -150,6 +150,7 @@ class ReposicaoController extends Controller
        $startDate = $this->request->input('startDate');
        $endDate = $this->request->input('endDate');
        
+       //dd([$startDate ,$endDate]);
         $vendas = $this->listSales($startDate,$endDate);
 
         return DataTables::of($vendas)
@@ -167,16 +168,16 @@ class ReposicaoController extends Controller
 
     public function listSales($startDate,$endDate){
 
-        if ($startDate && $endDate) {
-            $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
-            $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
-        } else {
+        //if ($startDate && $endDate) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
+       /* } else {
             // Se as datas não forem fornecidas, define um período padrão
            // $startDate = Carbon::now()->subMonth()->startOfDay(); // Um mês atrás
             $startDate = Carbon::now()->subDays()->startOfDay();
             $endDate = Carbon::now()->endOfDay(); // Hoje
-        }
-
+        }*/
+       // dd([$startDate ,$endDate]);
         return DB::table('loja_vendas_produtos as lv')
             ->leftJoin('loja_produtos_variacao as v', 'lv.codigo_produto', '=', 'v.subcodigo')
             ->leftJoin('loja_produtos_imagens as i', 'v.id', '=', 'i.produto_variacao_id')

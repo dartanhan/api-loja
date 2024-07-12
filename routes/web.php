@@ -45,7 +45,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::get('/produto/pictures/{id}',[ProdutoController::class,'pictures'])->name('pictures');
     Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
-    Route::get('/indexNew',[ProdutoController::class,'indexNew'])->name('produto.indexNew');
+    Route::get('/indexNew',[ProdutoController::class,'index'])->name('produto.indexNew');
     Route::resource('produto','ProdutoController');
 
     Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');

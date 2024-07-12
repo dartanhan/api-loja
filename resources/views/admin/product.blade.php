@@ -92,8 +92,7 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script src="{{URL::asset('js/comum.js')}}"></script>
-    <script src="{{URL::asset('js/produto.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/produto.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
 @endpush
 @push("styles")

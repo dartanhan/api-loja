@@ -1,9 +1,14 @@
-$(function() {
-
+import { sweetAlert,getDataFormat,fncDataDatatable } from "./comum.js";
+    
     let table;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = fncUrl();
+    let dataIni = $('input[name=dataini]');
+    let dataFim = $('input[name=datafim]');
+    let periodo;
 
+$(function() {
+    
     
      /**
      * #########################################################################
@@ -11,35 +16,21 @@ $(function() {
      * #########################################################################
      * */
 
-   
-    /**
-     * DATATABLES
-     * */
-
-    let fncDataDatatable = async function(startDate, endDate) {
-        
-        
-        if (table) {
-            table.destroy();
-            sweetAlert("Aguarde", "Carregando dados da reposição...",'info');
-        }
-        table = await $('#table').DataTable({
+        table = $('#table').DataTable({
             responsive: true,
             processing: true,
             serverSide: true,
+           
            "ajax":{
                 "method": 'post',
-                "url": url + "/reposicao/filter",
-                "data":
-                    {
-                        startDate: startDate,
-                        endDate: endDate,
-                        _token:csrfToken
-                    },
                 "dataType":"json",
-                responsive: true,
+                "url": url + "/reposicao/filter",
+                "data":function(data){
+                    data._token = csrfToken,
+                    data.startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+                    data.endDate = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
+                }, 
             },
-
             columns: [
                 {"data": "imagem",name: 'imagem'},
                 { data: 'codigo_produto', name: 'codigo_produto'},
@@ -59,23 +50,31 @@ $(function() {
             },
             "order": [[3, "desc"]],
             initComplete: function(settings, json) {
-                swalWithBootstrapButtons.close();
-                $("#data-periodo").html("- Período pesquisado : " + 
-                    moment(startDate, 'YYYY-MM-DD').format('DD/MM/YYYY') + " até " + 
-                    moment(endDate, 'YYYY-MM-DD').format('DD/MM/YYYY'));
-                $('[data-toggle="tooltip"]').tooltip();               
+                //console.log(json);           
             }
-        });
-    }
 
-  
+           
+        });
+    
+
+        table.on('draw', function() {
+            $('[data-toggle="tooltip"]').tooltip();   
+                
+            if(dataIni.val() !== ''){
+                periodo = "- Período pesquisado : " + dataIni.val() + " até " + dataFim.val();
+            }else{
+                periodo = "- Período pesquisado : " + 
+                    moment().format('DD/MM/YYYY')
+                    + " até " + 
+                    moment().format('DD/MM/YYYY');
+            }
+            $("#data-periodo").html(periodo);
+        });
     /*******************************************************
      *********** FILTRO **********************
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
         
-        const dataIni = $('input[name=dataini]').val();
-        const dataFim = $('input[name=datafim]').val();
         let isValid = true;
         let msg = '';
 
@@ -84,33 +83,21 @@ $(function() {
         // Check if dataIni is filled
         if (!dataIni) {
             msg = "Por favor, preencha a Data Inicio."
-            $('input[name=dataini]').focus();
+            $('input[name=dataini]').trigger( "focus" );
            isValid = false;
        }
 
        if (!dataFim && isValid === true) {
            msg = "Por favor, preencha a Data Fim.";
-           $('input[name=datafim]').focus();
+           $('input[name=datafim]').trigger( "focus" );
            isValid = false;
        }
 
        // If both fields are filled, submit the form
        if (isValid) {
-           fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
-       
-           let startDate;
-           let endDate;
-
-            if (dataIni) {
-              startDate = moment(dataIni, 'DD/MM/YYYY').format('YYYY-MM-DD');
-            }
-            if (dataFim) {
-             endDate = moment(dataFim, 'DD/MM/YYYY').format('YYYY-MM-DD');
-            }
-            
-            fncDataDatatable(startDate,endDate).then();
+            fncDataDatatable(table);
        }else{
-           swalWithBootstrapButtons.fire({
+           sweetAlert.fire({
                title: "Atenção",
                text: msg,
                icon: 'warning',
@@ -128,7 +115,7 @@ $(function() {
        $('input[name=dataini]').val("");
        $('input[name=datafim]').val("");
 
-       fncDataDatatable("", "").then();
+       fncDataDatatable(table);
    });
 
 
@@ -162,7 +149,7 @@ $(function() {
      * LOAD DE FUNÇOES
      */
     // Obter a data atual
-    const currentDate = moment().format('YYYY-MM-DD');
+   // const currentDate = moment().format('YYYY-MM-DD');
 
-    fncDataDatatable(currentDate, currentDate).then();
+   // fncDataDatatable(currentDate, currentDate).then();
 });

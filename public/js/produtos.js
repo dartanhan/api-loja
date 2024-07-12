@@ -1,24 +1,11 @@
-$(function() {
-    const url = fncUrl();
-    let json,table,asyncData;
+import {formatMoney,getFormattedDate} from './comum.js';
 
-// function getData(){
-//     const getDados = async () => {
-//         const data = await fetch(url + "/produto/create", {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             }
-//         });
-//
-//         asyncData = await data.json();
-//         //initialiseTable();
-//         return asyncData;
-//     };
-//     getDados();
-// }
-function initialiseTable() {
-    table = $('#table').DataTable({
+ const url = fncUrl();
+let json,table;
+
+$(function() {
+
+    $('#table').DataTable({
             ajax:{
             method: 'get',
             processing: true,
@@ -99,7 +86,7 @@ function initialiseTable() {
         "order": [[0, "desc"]],
         //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
     });
-}
+
 
     /**
      * Add event listener for opening and closing details
@@ -352,9 +339,6 @@ function initialiseTable() {
     $(document).on('click','.openModalBtn', function () {
         $('#slideInModal').modal('show');
     });
-
-
-    initialiseTable();
 });
 /**
  *  Formatting function for row details - modify as you need

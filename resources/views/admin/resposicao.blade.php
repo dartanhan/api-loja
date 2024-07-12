@@ -173,8 +173,7 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>    
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script src="{{URL::asset('js/comum.js')}}"></script>
-    <script src="{{URL::asset('js/resposicao.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/resposicao.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>

@@ -1,4 +1,4 @@
-import {fncDataDatatable,getDataFormat,fncPreLoadModal} from './comum.js';
+import {fncDataDatatable,getDataFormat} from './comum.js';
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const url = fncUrl();
