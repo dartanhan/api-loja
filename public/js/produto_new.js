@@ -1,5 +1,7 @@
+import {formatMoney,getFormattedDate} from './comum.js';
+
 $(function() {
-    let json,id,grid,table,asyncData;
+    let json,id,table;
 
     const fileInput = document.getElementById('file');
 
@@ -12,21 +14,7 @@ $(function() {
     /**
      * DATATABLES
      * */
-    // function getdata(){
-    //     const getDados = async () => {
-    //         const data = await fetch(url + "/produto/create", {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             }
-    //         });
-    //
-    //         asyncData = await data.json();
-    //         initialiseTable();
-    //         return asyncData;
-    //     };
-    //     getDados();
-    // }
+   
     initialiseTable();
     function initialiseTable() {
         table = $('#table').DataTable({

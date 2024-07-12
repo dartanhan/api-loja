@@ -6,14 +6,18 @@ const swalWithBootstrapButtons = Swal.mixin({
     buttonsStyling: false
 });
 
-const sweetAlert = function(json){
+export const sweetAlert = function(json){
     swalWithBootstrapButtons.fire(json);
+}
+
+export const sweetAlertClose = function(){
+    swalWithBootstrapButtons.close();
 }
 
 /**
  * SÓ PERMITE DIGITAR NUMEROS NO CAMPO
  * */
-function SomenteNumeros(num) {
+export function SomenteNumeros(num) {
     let er = /[^0-9.]/;
     er.lastIndex = 0;
     let campo = num;
@@ -27,7 +31,7 @@ function SomenteNumeros(num) {
  *
  * OnkeyPress
  * */
-function formatMoneyPress(parm) {
+export function formatMoneyPress(parm) {
     let valor = parm.value;
 
     valor = valor + '';
@@ -46,7 +50,7 @@ function formatMoneyPress(parm) {
 /**
  * Ajusta para exibição nos inputs e etc.. valor moeda!
  * */
-function formatMoney(valor)
+export function formatMoney(valor)
 {
     try {
 
@@ -79,7 +83,7 @@ function formatMoney(valor)
  /***
      * Formata data de yyyy/mm/dd para dd/mm/yyyy
      * */
- function getFormattedDate(parm) {
+ export function getFormattedDate(parm) {
     //let d = parm.split('-');
     //return  d[2] + '/' + d[1] + '/' + d[0];
     return moment(parm, 'YYYY/MM/DD').format('DD/MM/YYYY');
@@ -100,7 +104,7 @@ export function getDataFormat(data, mascara_to, mascara_old){
 /***
  * Ao digitar, formata a data no campo em dd/mm/yyyy
  * */
-function formatDate(parm) {
+export function formatDate(parm) {
 
     let tecla = this.keyCode;
     let vr = String(parm.value);
@@ -306,7 +310,7 @@ $(document).on("click","#addListaCompra" ,function(event){
  * Faz o HTTP post
  * @returns retorna um json com as informações
  */
-const httpFetchPost = async function(url, token, data) {
+export const httpFetchPost = async function(url, token, data) {
     try {
         const response = await fetch(url, {
             method: "POST",
