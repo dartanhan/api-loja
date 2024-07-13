@@ -224,6 +224,7 @@
             </div>
         </div>
     </div>
+    <input onkeypress="formatMoneyPress(this)">
 
 @endsection
 @push("scripts")
@@ -233,6 +234,7 @@
     <script src="{{URL::asset('assets/jquery/jquery.maskMoney.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{URL::asset('js/moment.js')}}"></script>
     <script type="module" src="{{URL::asset('js/produto_new.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
 

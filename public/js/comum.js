@@ -1,3 +1,10 @@
+// Anexar funções ao objeto window para torná-las globais
+window.formatMoneyPress = formatMoneyPress;
+window.formatMoney = formatMoney;
+window.getFormattedDate = getFormattedDate;
+window.SomenteNumeros = SomenteNumeros;
+window.formatDate = formatDate;
+
 const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
         confirmButton: 'btn btn-success',
@@ -47,6 +54,7 @@ export function formatMoneyPress(parm) {
     if(valor === 'NaN') parm.value = '';
 }
 
+
 /**
  * Ajusta para exibição nos inputs e etc.. valor moeda!
  * */
@@ -72,7 +80,7 @@ export function formatMoney(valor)
 
         const r = m.reverse().join('');
 
-        return r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
+        return "R$ " + r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
     } catch (error) {
         console.error('Erro na função formatMoney:', error.message);
         // Você pode decidir o que fazer aqui em caso de erro, como retornar um valor padrão ou lançar novamente o erro
@@ -84,9 +92,10 @@ export function formatMoney(valor)
      * Formata data de yyyy/mm/dd para dd/mm/yyyy
      * */
  export function getFormattedDate(parm) {
-    //let d = parm.split('-');
-    //return  d[2] + '/' + d[1] + '/' + d[0];
-    return moment(parm, 'YYYY/MM/DD').format('DD/MM/YYYY');
+     if (parm === '0000-00-00') {
+         return '00/00/0000';
+     }
+     return moment(parm, 'YYYY-MM-DD').format('DD/MM/YYYY');
 }
 
 /***
@@ -106,7 +115,7 @@ export function getDataFormat(data, mascara_to, mascara_old){
  * */
 export function formatDate(parm) {
 
-    let tecla = this.keyCode;
+    let tecla = parm.keyCode;
     let vr = String(parm.value);
     vr = vr.replace("/", "");
     vr = vr.replace("/", "");
@@ -121,7 +130,6 @@ export function formatDate(parm) {
         if (tam > 4 && tam < 7)
             parm.value = vr.substr(0, 2) + '/' + vr.substr(2, 2) + '/' + vr.substr(4, 7);
     }
-
 }
 
 
@@ -228,7 +236,7 @@ $('form[name="formImageProduct"]').validate({
             },
             error: function(data){
                 //console.log(data.responseText);
-                json = $.parseJSON(data.responseText);
+                const json = $.parseJSON(data.responseText);
                 $("#modal-title").addClass( "alert alert-danger" );
                 $('#modal-title').html('<p><strong>'+json.message+'</strong></p>');
                 Swal.fire(
@@ -239,7 +247,7 @@ $('form[name="formImageProduct"]').validate({
             },
             complete:function(data){
                 // console.log(data.responseText);
-                json = $.parseJSON(data.responseText);
+                const json = $.parseJSON(data.responseText);
                 if(json.success) {
                     window.setTimeout(function () {
                         window.location.reload();
@@ -345,5 +353,5 @@ export function fncPreLoadModal(){
     return "<div class=\"spinner-border text-primary\" role=\"status\">"+
                 "<span class=\"sr-only\">Loading...</span>"+
             "</div>";
-        
+
 }

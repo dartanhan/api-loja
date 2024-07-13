@@ -1,4 +1,5 @@
-import {formatMoney,getFormattedDate} from './comum.js';
+import {sweetAlert,formatMoney,getFormattedDate,SomenteNumeros,formatMoneyPress,formatDate} from './comum.js';
+
 
 $(function() {
     let json,id,table;
@@ -14,9 +15,9 @@ $(function() {
     /**
      * DATATABLES
      * */
-   
-    initialiseTable();
-    function initialiseTable() {
+
+   // initialiseTable();
+   // function initialiseTable() {
         table = $('#table').DataTable({
             ajax: {
                 method: 'get',
@@ -85,7 +86,7 @@ $(function() {
 
             ],
             initComplete: function(settings, json) {
-                $('[data-toggle="tooltip"]').tooltip();      
+                $('[data-toggle="tooltip"]').tooltip();
             },
             scrollX: true,
             select: false,
@@ -99,9 +100,9 @@ $(function() {
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
-            "order": [[0, "desc"]]           
+            "order": [[0, "desc"]]
         });
-    }
+    //}
 
     /**
      * Add event listener for opening and closing details
@@ -722,7 +723,7 @@ $(function() {
      * Retorna os campos de variações do produto
      * */
     let fnc_variacao = function (i,val,index,arrayItem,selected) {
-       //console.log(arrayItem);
+
         let icon_remove = "";
         let id = arrayItem != null ? arrayItem.id : '';
         let subcodigo = arrayItem != null ? arrayItem.subcodigo.substring(arrayItem.subcodigo.length-2,arrayItem.subcodigo.length) : val;
@@ -737,6 +738,7 @@ $(function() {
         let estoque = arrayItem != null ? arrayItem.estoque : '';
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
+
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
    //     let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
    //     let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
@@ -767,78 +769,41 @@ $(function() {
                                 "</div>"+
                                 "<div class=\"col-md-2\" style='left: -12px;width: 300px'>" +
                                     "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"variacao[]\" id=\"variacao"+i+"\" " +
-                                            "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" " +
+                                        "<input type=\"text\" name=\"variacao[]\"  maxlength='150' id=\"variacao"+i+"\" " +
+                                            "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" maxlength='9' " +
                                             "value=\'" + variacao + "\'/>" +
                                         "<label for=\"label-variacao\">VARIAÇÃO</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -32px;width: 110px'>"+
+                                "<div class=\"col-md-2\" style='left: -32px;width: 140px'>"+
                                     "<span class=\"border-lable-flt\" >"+
-                                        "<input type=\"text\" name=\"valor_varejo[]\"  id=\"valor_varejo"+i+"\""+
-                                            "class=\"form-control\" placeholder=\"VAREJO\""+
+                                        "<input type=\"text\" name=\"valor_varejo[]\"  id=\"valor_varejo"+i+"\" "+
+                                            "class=\"form-control format-font\" placeholder=\"VAREJO\" maxlength='9' "+
                                             "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_varejo + "\' required/>"+
                                             "<label for=\"label-varejo\">VAREJO</label>"+
                                     "</span>"+
                                  "</div>"+
-                               /* "<div class=\"col-md-2\" style='padding:unset;left: -40px;width: 100px'>"+
-                                    "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"valor_atacado[]\"  id=\"valor_atacado"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"ATACADO\""+
-                                        "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado + "\' required/>"+
-                                    "   <label for=\"label-atacado3n\">ATACADO</label>"+
-                                    "</span>"+
-                                "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -36px;width: 100px'>"+
-                                    "<span class=\"border-lable-flt\">"+
-                                    "<input type=\"text\" name=\"valor_atacado_5un[]\"  id=\"valor_atacado_5un"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"ATA.5UN\""+
-                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_5un + "\' required/>"+
-                                    "   <label for=\"label-atacado5un\">ATACADO 5UN</label>"+
-                                    "</span>"+
-                                "</div>" +*/
-                                "<div class=\"col-md-2\" style='padding:unset;left: -32px;width: 100px'>"+
+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -32px;width: 120px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_atacado_10un[]\"  id=\"valor_atacado_10un"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"ATACADO\""+
+                                    "class=\"form-control format-font\" placeholder=\"ATACADO\"  maxlength='9'"+
                                     "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_10un + "\' required/>"+
                                     "   <label for=\"label-atacado10un\">ATACADO</label>"+
                                     "</span>"+
                                 "</div>" +
-                              /*  "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
+
+                                "<div  class=\"col-md-2\" style='padding:unset;left: -24px;width: 120px'>"+
                                     "<span class=\"border-lable-flt\">"+
-                                    "<input type=\"text\" name=\"valor_lista[]\"  id=\"valor_lista"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"DINHEIRO\""+
-                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_lista + "\' required/>"+
-                                    "   <label for=\"label-valor-lista\">DINHEIRO</label>"+
-                                    "</span>"+
-                                "</div>&nbsp;" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
-                                    "<span class=\"border-lable-flt\">"+
-                                    "<input type=\"text\" name=\"valor_cartao_pix[]\"  id=\"valor_cartao_pix"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"CARTÃO/PIX\""+
-                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_cartao_pix + "\' required/>"+
-                                    "   <label for=\"label-valor-lista\">CARTÃO/PIX</label>"+
-                                "</span>"+
-                                "</div>&nbsp;" +"<div class=\"col-md-2\" style='padding:unset;left: -28px;width: 100px'>"+
-                                    "<span class=\"border-lable-flt\">"+
-                                    "<input type=\"text\" name=\"valor_parcelado[]\"  id=\"valor_parcelado"+i+"\""+
-                                    "class=\"form-control\" placeholder=\"PARCELADO\""+
-                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_parcelado + "\' required/>"+
-                                "   <label for=\"label-valor-lista\">PARCELADO</label>"+
-                                "</span>"+
-                                "</div>" +*/
-                                "<div  class=\"col-md-2\" style='padding:unset;left: -24px;width: 130px'>"+
-                                    "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"valor_produto[]\"  id=\"valor_produto"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"VALOR PAGO\""+
-                                        "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\' required/>"+
-                                        "<label for=\"label-produto\">VALOR PAGO</label>"+
+                                        " <input type=\"text\" name=\"valor_produto[]\"  id=\"valor_produto"+i+"\" "+
+                                        " class=\"form-control\" placeholder=\"VALOR PAGO\"  maxlength='9'"+
+                                        " onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\' required/>"+
+                                        " <label for=\"label-produto\">VALOR PAGO</label>"+
                                     "</span>"+
                                 "</div>" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -20px;width: 70px'>"+
                                     "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"quantidade[]\"  id=\"quantidade"+i+"\""+
+                                        "<input type=\"text\" name=\"quantidade[]\"  maxlength='3' id=\"quantidade"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD\" onkeyup=\"SomenteNumeros(this)\" " +
                                         "value=\'" + quantidade + "\' required/>"+
                                         "<label for=\"label-qtd\">QTD</label>"+
@@ -846,15 +811,15 @@ $(function() {
                                 "</div>" +
                                 "<div class=\"col-md-2\" style='padding:unset;left: -16px;width: 70px'>"+
                                     "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"quantidade_minima[]\"  id=\"quantidade_minima"+i+"\""+
+                                        "<input type=\"text\" name=\"quantidade_minima[]\"   maxlength='3' id=\"quantidade_minima"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\" onkeyup=\"SomenteNumeros(this)\" " +
                                         "value=\'" + quantidade_minima + "\' required/>"+
                                         "<label for=\"label-qtd\">QTD.MIN</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 100px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -12px;width: 70px'>"+
                                     "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"text\" name=\"estoque[]\"  id=\"estoque"+i+"\""+
+                                        "<input type=\"text\" name=\"estoque[]\"  maxlength='3' id=\"estoque"+i+"\""+
                                         "class=\"form-control\" placeholder=\"ESTOQUE\" onkeyup=\"SomenteNumeros(this)\" " +
                                         "value=\'" + estoque + "\' required/>"+
                                         "<label for=\"label-estoque\">ESTOQUE</label>"+
@@ -863,7 +828,7 @@ $(function() {
                                 "<div class=\"col-md-2 date\" style='padding:unset;left: -8px;width: 122px' id=\"data_validade"+i+"\">"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"validade[]\"  id=\"validade"+i+"\""+
-                                        "class=\"form-control\" placeholder=\"QTD.MIN\" " +
+                                        "class=\"form-control\" placeholder=\"QTD.MIN\"  " +
                                         "onKeyUp=\"formatDate(this)\" maxlength=\"10\" value=\'" + validade + "\'/>"+
                                         "<label for=\"label-qtd\">VALIDADE</label>"+
                                     "</span>"+
@@ -894,6 +859,9 @@ $(function() {
 
 
     let fnc_enviaForm = function (formData) {
+       // const formDataObj = Object.fromEntries(formData.entries());
+        //console.log(formDataObj);
+       // return;
         $.ajax({
             url: url + "/produto",
             type: 'POST',
@@ -904,24 +872,24 @@ $(function() {
             enctype: 'multipart/form-data',
             processData: false,
             dataType:'json',
-            beforeSend: function () {
+           /*beforeSend: function () {
                 $("#modal-title").removeClass( "alert alert-danger" );
                 $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
                 $("#modal-title").addClass( "alert alert-info" );
-            },
+            },*/
             success: function (response) {
                 // console.log(response);
                 if(response.success) {
-                    Swal.fire({
+                    sweetAlert({
                         title: "Sucesso!",
                         text: response.message,
                         icon: 'success',
                         showConfirmButton: false,
                         timer: 1500
                     });
-                    //.ajax.reload(null, false);
-                    table.destroy();
-                    initialiseTable();
+                    table.ajax.reload(null, false);
+                    //table.destroy();
+                    //initialiseTable();
 
                     $("#id").val('');
                     $("#tbl").html('');
@@ -940,9 +908,9 @@ $(function() {
             },
             error: function(response){
                 json = $.parseJSON(response.responseText);
-                $("#modal-title").addClass( "alert alert-danger" );
+                //$("#modal-title").addClass( "alert alert-danger" );
                 $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
-                Swal.fire(
+                sweetAlert(
                     'error!',
                     json.message,
                     'error'
