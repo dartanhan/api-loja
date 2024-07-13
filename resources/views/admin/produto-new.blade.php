@@ -246,8 +246,10 @@
     <script src="{{URL::asset('assets/jquery/jquery.maskMoney.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="model" src="{{URL::asset('js/produtos.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/produtos.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
+    <script src="{{URL::asset('js/moment.js')}}"></script>
+
 @endpush
 @push("styles")
     <link rel="stylesheet" type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap-datepicker.min.css')}}">

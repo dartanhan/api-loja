@@ -201,15 +201,14 @@ class ProdutoController extends Controller
                     $formattedDate = Carbon::createFromFormat('d/m/Y',$dateString)->format('Y-m-d');
                 }
 
-
                 $data["subcodigo"] = $data["codigo_produto"].$this->request->input("subcodigo")[$i];
                 $data["variacao"] = $this->request->input("variacao")[$i];
-                $data["valor_varejo"] = $formatter->parse($this->request->input("valor_varejo")[$i]);
-                $data["valor_atacado"] = $formatter->parse($this->request->input("valor_atacado_10un")[$i]);
+                $data["valor_varejo"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_varejo")[$i]));
+                $data["valor_atacado"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_atacado_10un")[$i]));
                // $data["valor_atacado_5un"] = $formatter->parse($this->request->input("valor_atacado_5un")[$i]);
-                $data["valor_atacado_10un"] = $formatter->parse($this->request->input("valor_atacado_10un")[$i]);
+                $data["valor_atacado_10un"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_atacado_10un")[$i]));
                // $data["valor_lista"] = $formatter->parse($this->request->input("valor_lista")[$i]);
-                $data["valor_produto"] = $formatter->parse($this->request->input("valor_produto")[$i]);
+                $data["valor_produto"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_produto")[$i]));
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
                 $data["status"] = $this->request->input("status_variacao")[$i];

@@ -8,7 +8,7 @@ let dataIni = $('input[name=dataIni]');
 let dataFim = $('input[name=dataFim]');
 
 $(function () {
-  
+
 
     /**
      * #########################################################################
@@ -26,7 +26,7 @@ $(function () {
                 data.dataIni = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
                 data.dataFim = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
             },
-            
+
             "dataType":"json",
             responsive: true,
             dataSrc: function(json) {
@@ -109,14 +109,16 @@ $(function () {
                 "render": function ( data, type, row, meta ) {
                 return "<div class='text-center'>" +
                             "<div class='btn-group'>" +
-                                "<button class='btn btn-warning btn-sm btnEdit m-1'  data-target=\"#divModalUpdate\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
+                                "<button class='btn btn-warning btn-sm btnEdit m-1'  " +
+                                " data-target=\"#divModalUpdate\" data-value="+row.venda_id+" data-codigo-venda="+row.codigo_venda+"  " +
                                 "   data-toggle=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
                                 "  <i class=\"far fa-edit\"></i>" +
                                 "</button>" +
 
+
                                 "<button  data-toggle='tooltip' "+
                                 " data-placement='top' title='Detalhes da Venda' "+
-                                " class='btn btn-info btn-sm btnView m-1' data-codigo-venda="+row.codigo_venda+"> "+
+                                " class=\"btn btn-info btn-sm btnView m-1\" data-codigo-venda="+row.codigo_venda+"> "+
                                 " <i class=\"far fa-eye\"></i>" +
                                 "</button>" +
 
@@ -172,8 +174,8 @@ $(function () {
      * #########################################################################
      * */
 
-     fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')); 
-       
+     fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD'));
+
    // getFncDataCardTotalProdutoPorVenda("","",2);
 });
 
@@ -182,13 +184,13 @@ $(function () {
      * **/
      $(document).on("click", ".btnView", async function (event) {
         event.preventDefault();
-        
+
         // Abrir o modal e mostrar o spinner
         $('#divModal').modal('show');
-            
+
         let fila = $(this).closest("tr");
         let vendaId = fila.find('td:eq(0)').text();
-   
+
         // Inicializar a DataTable com a opção ajax
         $('#tableView').DataTable({
             responsive: true,
@@ -228,12 +230,12 @@ $(function () {
             "order": [[0, "asc"]],
             "footerCallback": function (row, data, start, end, display) {
                 var api = this.api(), data;
-    
+
                 // Remove the formatting to get integer data for summation
                 const intVal = function (i) {
                     return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
                 };
-    
+
                 // Total over all pages
                 let total = api
                     .column(5)
@@ -241,19 +243,20 @@ $(function () {
                     .reduce(function (a, b) {
                         return parseFloat(a) + parseFloat(b);
                     }, 0);
-    
+
                 // Update footer
                 let numFormat = $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display;
                 $("#foot").html("");
                 $("#foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: ' + numFormat(total) + '</td>');
+                $('[data-toggle="tooltip"]').tooltip();
+                $('span[name="codigo_venda"]').text(vendaId);
             },
             "initComplete": function (settings, json) {
-                $('[data-toggle="tooltip"]').tooltip();
-                $('span[name="codigo_venda"]').text($(this).data('codigo-venda'));
+
             }
         });
     });
-    
+
 
     /**
          * Detalhes venda no cartão

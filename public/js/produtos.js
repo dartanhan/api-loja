@@ -5,7 +5,7 @@ let json,table;
 
 $(function() {
 
-    $('#table').DataTable({
+    table = $('#table').DataTable({
             ajax:{
             method: 'get',
             processing: true,
