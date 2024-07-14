@@ -1,4 +1,9 @@
-// Set new default font family and font color to mimic Bootstrap's default styling
+import {fncDataDatatable,getDataFormat,sweetAlert} from '../../../js/comum.js';
+
+let dataIni = $('input[name=dataIni]');
+let dataFim = $('input[name=dataFim]');
+const token = $('meta[name="csrf-token"]').attr('content');
+
 $(function () {
     Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
     Chart.defaults.global.defaultFontColor = '#292b2c';
@@ -11,7 +16,7 @@ $(function () {
     let dados = [];
     let bgColoR = [];
     let borderColoR = [];
-    let r , g ,b, alpha,d1,d2;
+    let r , g ,b, alpha;
     let titulo = "";
     let typeChart =null;
     let year =  new Date().getFullYear();
@@ -23,16 +28,10 @@ $(function () {
     let newCtxChartLineMulti = new Chart(ctxLineMulti);
     let ctxBarFunc = document.getElementById("myBarChartFunc");
     let newCtxChartBarFunc = new Chart(ctxBarFunc);
+    let startDate;
+    let endDate;
 
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-        },
-        buttonsStyling: false
-    });
-
-    /***
+        /***
      * Id da loja, para retorno do dados referente a loja
      * */
     let fncIdStore = function(){
@@ -46,6 +45,95 @@ $(function () {
         return (new Date()).toISOString().split('T')[0];
     }*/
 
+    /**
+     * #########################################################################
+     * ##########  ÁREA DATATABLE ###################################
+     * #########################################################################
+     * */
+    table = $('#datatablesSimple').DataTable({
+        // "render": function ( data, type, row, meta ) {
+        //     return '<a href="'+data+'">Download</a>';
+        // },
+        "ajax":{
+            "method": 'post',
+            "url": url + "/relatorio/dailySalesList",
+            "data":function(data){
+                data.id = fncIdStore(),
+                data._token = token,
+                data.startDate = getDataFormat($('input[name=dataIni]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+                data.endDate = getDataFormat($('input[name=dataFim]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+            },
+            "dataType":"json",
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            destroy : true,
+        },
+        "columns": [
+            {
+                //"data": "codigo_venda",
+                "render": function ( data, type, row, meta ) {
+                    return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
+                }
+            },
+            {"data": "usuario"},
+            {
+                //"data": "tipo_venda",
+                "render": function ( data, type, row, meta ) {
+                    if(row.tipo_venda.toUpperCase() === "PRESENCIAL"){
+                        return "<span class='text-primary'>"+row.tipo_venda+"</span>"
+                    }
+                    return "<span class='text-danger'>"+row.tipo_venda+"</span>"
+                }
+            },
+            {"data": "nome_pgto"},
+            {
+                "data": "sub_total",
+                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+            },
+            {
+                "data": "valor_desconto",
+                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
+                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
+            },
+            {
+                "data": "cashback",
+                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
+                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
+            },
+            {
+                "data": "total",
+                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+            }, {
+                "data": "data"
+            }, {
+                "render": function ( data, type, row, meta ) {
+                    return "<div class='text-center'>" +
+                        "<div class='btn-group'>" +
+                        "<button class='btn btn-warning btn-sm btnEdit' data-toggle=\"modal\" data-value="+row.venda_id+" " +
+                        "  data-target=\"#divModalUpdate\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
+                        "  <i class=\"far fa-edit\"></i>" +
+                        "</button>" +
+                        "<button class='btn btn-info btn-sm btnView' data-toggle=\"modal\" " +
+                        "  data-target=\"#divModal\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Detalhes da Venda\"'>" +
+                        "  <i class=\"far fa-eye\"></i>" +
+                        "</button>" +
+                        "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
+                        "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
+                        "  <i class=\"far fa-trash-alt\"></i>" +
+                        "</button>" +
+                        "</div>" +
+                        "</div>"
+                }
+            }
+        ],
+        language: {
+            "url": "../public/Portuguese-Brasil.json"
+        },
+        "order": [[8, "desc"]]
+
+    });//fim datatables
 
     /**
      * #########################################################################
@@ -160,7 +248,7 @@ $(function () {
                     //console.log(response);
 
                     if(response.success) {
-                        swalWithBootstrapButtons.fire({
+                        sweetAlert({
                             title: 'OK!',
                             text: response.message,
                             icon: 'success',
@@ -176,7 +264,7 @@ $(function () {
                 error: function (response) {
                    // console.log(response);
                     let json = $.parseJSON(response.responseText);
-                    Swal.fire(
+                    sweetAlert(
                         'error!',
                         json.message,
                         'error'
@@ -396,6 +484,7 @@ $(function () {
 
             });
     }
+
     // Função para gerar cores aleatórias
     function getRandomColor() {
         const letters = '0123456789ABCDEF';
@@ -405,92 +494,7 @@ $(function () {
         }
         return color;
     }
-    /**
-     * #########################################################################
-     * ##########  ÁREA DATATABLE ###################################
-     * #########################################################################
-     * */
 
-    let fncDataDatatable = async function(dataOne, dataTwo) {
-
-        $('#datatablesSimple').DataTable().destroy();
-        await $('#datatablesSimple').DataTable({
-            "render": function ( data, type, row, meta ) {
-                return '<a href="'+data+'">Download</a>';
-            },
-            "ajax":{
-                "method": 'post',
-                "url": url + "/relatorio/dailySalesList",
-                "data":{dataOne: dataOne,dataTwo: dataTwo,id: fncIdStore(),_token:$('meta[name="csrf-token"]').attr('content')},
-                "dataType":"json",
-                responsive: true,
-            },
-            "columns": [
-                {
-                    //"data": "codigo_venda",
-                    "render": function ( data, type, row, meta ) {
-                        return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
-                    }
-                },
-                {"data": "usuario"},
-                {
-                    //"data": "tipo_venda",
-                    "render": function ( data, type, row, meta ) {
-                        if(row.tipo_venda.toUpperCase() === "PRESENCIAL"){
-                            return "<span class='text-primary'>"+row.tipo_venda+"</span>"
-                        }
-                        return "<span class='text-danger'>"+row.tipo_venda+"</span>"
-                    }
-                },
-                {"data": "nome_pgto"},
-                {
-                    "data": "sub_total",
-                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                },
-                {
-                    "data": "valor_desconto",
-                    render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                    //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-                },
-                {
-                    "data": "cashback",
-                    render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                    //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-                },
-                {
-                    "data": "total",
-                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-                }, {
-                    "data": "data"
-                }, {
-                    "render": function ( data, type, row, meta ) {
-                        return "<div class='text-center'>" +
-                            "<div class='btn-group'>" +
-                            "<button class='btn btn-warning btn-sm btnEdit' data-toggle=\"modal\" data-value="+row.venda_id+" " +
-                            "  data-target=\"#divModalUpdate\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Alterar Venda\"'>" +
-                            "  <i class=\"far fa-edit\"></i>" +
-                            "</button>" +
-                            "<button class='btn btn-info btn-sm btnView' data-toggle=\"modal\" " +
-                            "  data-target=\"#divModal\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Detalhes da Venda\"'>" +
-                            "  <i class=\"far fa-eye\"></i>" +
-                            "</button>" +
-                            "<button class='btn btn-danger btn-sm btnDelete' data-toggle=\"modal\" data-value="+row.venda_id+" " +
-                            "  data-target=\"#divModalDelete\" data-toggle-tip=\"tooltip\" data-placement=\"top\" title=\"Deletar Venda\"'>" +
-                            "  <i class=\"far fa-trash-alt\"></i>" +
-                            "</button>" +
-                            "</div>" +
-                            "</div>"
-                    }
-                }
-            ],
-            language: {
-                "url": "../public/Portuguese-Brasil.json"
-            },
-            "order": [[8, "desc"]]
-
-        });//fim datatables
-    }
 
     /**
      * Pega o valor do tipo de pagamento no selected para alteração da forma de pagamento e suas taxas
@@ -520,68 +524,77 @@ $(function () {
      * **/
     $(document).on("click", ".btnView", async function(event) {
         event.preventDefault();
-        fncLoadDataTableModel();
         let fila = $(this).closest("tr");
+        let codigo_venda = fila.find('td:eq(0)').text();
 
-        await fetch(url + "/relatorio/detailSales/" + fila.find('td:eq(0)').text() )
-            .then(function (response) {
-                //console.log(response);
-                return response.json()
-            })
-            .then(function (response) {
+        table = $('#tableView').DataTable({
+            "ajax":{
+                "method": 'post',
+                "url": url + "/relatorio/detailSales",
+                "data":function(data){
+                    data.codigo_venda = codigo_venda;
+                    data._token = token;
+                },
+                "dataType":"json",
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                destroy : true,
+            },
+            "bInfo" : false,
+            "paging": true,
+            "ordering": true,
+            "searching": false,
+            "destroy": true,
+            "columns": [
+                {"data": "codigo_produto"},
+                {"data": "descricao"},
+                {
+                    "data": "valor_produto",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
-                table = $('#tableView').DataTable({
-                    "data": response.dados,
-                    "bInfo" : false,
-                    "paging": true,
-                    "ordering": true,
-                    "searching": false,
-                    "destroy": true,
-                    "columns": [
-                        {"data": "codigo_produto"},
-                        {"data": "descricao"},
-                        {
-                            "data": "valor_produto",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                },
+                {
+                    "data": "valor_venda",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                },
+                {"data": "quantidade"},
+                {
+                    "data": "valor_total",
+                    "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
-                        },
-                        {"data": "quantidade"},
-                        {
-                            "data": "total",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+                }
+            ],
+            language: {
+                "url": "../public/Portuguese-Brasil.json"
+            },
+            "order": [[0, "asc"]],
+            "footerCallback": function ( row, data, start, end, display ) {
+                var api = this.api(), data;
 
-                        }
-                    ],
-                    language: {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
-                    },
-                    "order": [[0, "asc"]],
-                    "footerCallback": function ( row, data, start, end, display ) {
-                        var api = this.api(), data;
+                // Remove the formatting to get integer data for summation
+                const intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
 
-                        // Remove the formatting to get integer data for summation
-                        const intVal = function (i) {
-                            return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
-                        };
+                // Total over all pages
+                total = api
+                    .column( 5 )
+                    .data()
+                    .reduce( function (a, b) {
+                        // console.log(a);
+                        return parseFloat(a) + parseFloat(b);
+                    }, 0 );
 
-                        // Total over all pages
-                        total = api
-                            .column( 4 )
-                            .data()
-                            .reduce( function (a, b) {
-                                // console.log(a);
-                                return parseFloat(a) + parseFloat(b);
-                            }, 0 );
+                // Update footer
+                //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
+                let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
+                $(".foot").html("");
+                $(".foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
+                $('span[name="codigo_venda"]').text(codigo_venda);
+            },
 
-                        // Update footer
-                        //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
-                        let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
-                        $("#foot").html("");
-                        $("#foot").append('<td colspan="5" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
-                    },
-
-                });//fim datatables
-            });
+        });//fim datatables
     });
 
     /**
@@ -590,43 +603,75 @@ $(function () {
     $(document).on("click", ".detailCart", async function(event) {
         event.preventDefault();
 
-        let id = $(this).data('content');
-        fncLoadDataTableModel();
-
-        await fetch(url + "/relatorio/detailCart/" + id )
-            .then(function (response) {
-                //console.log(response);
-                return response.json()
-            })
-            .then(function (response) {
-                table =  $('#tableViewCart').DataTable({
-                    "data": response.dados,
-                    "bInfo" : false,
-                    "paging": true,
-                    "ordering": true,
-                    "searching": false,
-                    "destroy": true,
-                    "columns": [
-                        {"data": "nome"},
-                        {
-                            "data": "total",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                        //   {"data": "taxa"},
-                        {
-                            "data": "totalFinal",
-                            "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-
-                        },
-                    ],
-                    language: {
-                        "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            table =  $('#tableViewCart').DataTable({
+                "ajax":{
+                    "method": 'post',
+                    "url": url + "/relatorio/detailCart",
+                    "data":function(data){
+                            data.id = fncIdStore();
+                            data._token = token;
+                            data.startDate = getDataFormat($('input[name=dataIni]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+                            data.endDate = getDataFormat($('input[name=dataFim]').val(),'DD/MM/YYYY','YYYY-MM-DD');
                     },
-                    "order": [[0, "asc"]]
-                });//fim datatables
-            });
-    });
+                    "dataType":"json",
+                    responsive: true,
+                    processing: true,
+                    serverSide: true,
+                    destroy : true,
+                },
+                "bInfo" : false,
+                "paging": true,
+                "ordering": true,
+                "searching": false,
+                "destroy": true,
+                "columns": [
+                    {"data": "nome"},
+                    {
+                        "data": "total",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                       {
+                           "data": "taxa",
+                            "render": function ( data, type, row, meta ) {
+                               return row.taxa +"%";
+                            }
+                       },
+                    {
+                        "data": "totalFinal",
+                        "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
+                    },
+                ],
+                language: {
+                    "url": "../public/Portuguese-Brasil.json"
+                },
+                "order": [[0, "asc"]],
+                "footerCallback": function ( row, data, start, end, display ) {
+                     var api = this.api(), data;
+
+                    // Remove the formatting to get integer data for summation
+                    const intVal = function (i) {
+                        return typeof i === 'string' ? i.replace(/[R$ ,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                    };
+
+                    // Total over all pages
+                    total = api
+                        .column( 3 )
+                        .data()
+                        .reduce( function (a, b) {
+                            // console.log(a);
+                            return parseFloat(a) + parseFloat(b);
+                        }, 0 );
+
+                    // Update footer
+                    //$( api.column( 4 ).footer() ).html('R$'+ total +' total)');
+                    let numFormat = $.fn.dataTable.render.number( '.', ',', 2, 'R$ ' ).display;
+                    $(".foot").html("");
+                    $(".foot").append('<td colspan="4" style="background:#000000; color:white; text-align: right;">Total: '+numFormat(total)+'</td>');
+                }
+            });//fim datatables
+        });
     /**
      * #########################################################################
      * ##########  ÁREA FUNÇÕES FORMATAÇÕES ###################################
@@ -770,7 +815,9 @@ $(function () {
         $("#payments_sale").html(html);
 
         html = data.payments.reduce(function (string, obj) {
-            return string + "<option value=" + obj.id + " data-taxa="+obj.payments_taxes[0].valor_taxa+">" + obj.nome +" - taxa("+obj.payments_taxes[0].valor_taxa+")</option>"
+            if (obj.payments_taxes && obj.payments_taxes.length > 0 && obj.payments_taxes[0].hasOwnProperty('valor_taxa')) {
+                return string + "<option value='" + obj.id + "' data-taxa='" + obj.payments_taxes[0].valor_taxa + "'>" + obj.nome + " - taxa(" + obj.payments_taxes[0].valor_taxa + ")</option>";
+            }
         }, "<option value='' selected='selected'>Forma de Pagamentos </option>");
 
         $("#payments").html(html);
@@ -780,24 +827,24 @@ $(function () {
      *********** FILTRO ALL BAR CHART **********************
      * *****************************************************/
     $(".btn-enviar").click(function () {
-        fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+        //fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
         fncLoadChartBar();
-        d1 =  $('input[name=dataini]').val() !=="" ? $('input[name=dataini]').val().replaceAll("/","") : 0;
-        d2 =  $('input[name=datafim]').val() !=="" ? $('input[name=datafim]').val().replaceAll("/","") : 0;
+        fncDataDatatable(table);
 
-        fncDataBarChart(d1,d2).then();
-        fncDataDatatable(d1,d2).then();
+        dataIni = getDataFormat($('input[name=dataIni]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+        dataFim = getDataFormat($('input[name=dataFim]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+        fncDataBarChart(dataIni,dataFim).then();
+
     });
 
     $(".btn-limpar").click(function () {
-        fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+       // fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+        dataIni.val("");
+        dataFim.val("");
+
         fncLoadChartBar("");
-
-        $('input[name=dataini]').val("");
-        $('input[name=datafim]').val("");
-
-        fncDataBarChart(0,0).then();
-        fncDataDatatable(0,0).then();
+        fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
+        fncDataDatatable(table);
     });
 
     /*******************************************************
@@ -833,11 +880,11 @@ $(function () {
             if (--timer < 0) {
                 timer = duration;
 
-                d1 =  $('input[name=dataini]').val() !=="" ? $('input[name=dataini]').val().replaceAll("/","") : 0;
-                d2 =  $('input[name=datafim]').val() !=="" ? $('input[name=datafim]').val().replaceAll("/","") : 0;
+                startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+                endDate = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
 
-                fncDataBarChart(d1,d2).then();
-                fncDataDatatable(d1,d2).then();
+                fncDataBarChart(startDate,endDate).then();
+                fncDataDatatable(table);
             }
         }, 1000);
     }
@@ -855,6 +902,5 @@ $(function () {
     fncDataLineChart(year).then();
     fncDataLineMultiChart().then();
     fncCardBody("close");
-    fncDataDatatable("", "").then();
     fncBarChartFunc().then();
 });

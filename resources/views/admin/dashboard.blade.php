@@ -101,12 +101,12 @@
                             </div>
                             <div class="col-auto input-group-sm" id="dataini" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
                                 <label for="dataini" class="visually-hidden">Data Inicial</label>
-                                <input type="text" class="form-control input-group-sm" placeholder="Data Inicial" aria-label="Data Inicial" name="dataini">
+                                <input type="text" class="form-control input-group-sm" placeholder="Data Inicial" aria-label="Data Inicial" name="dataIni">
                                 <span class="add-on"><i class="icon-th"></i></span>
                             </div>
                             <div class="col-auto input-group-sm" id="datafim" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
                                 <label for="datafim" class="visually-hidden">Data Final</label>
-                                <input type="text" class="form-control input-group-sm" placeholder="Data Final" aria-label="Data Final" name="datafim">
+                                <input type="text" class="form-control input-group-sm" placeholder="Data Final" aria-label="Data Final" name="dataFim">
                                 <span class="add-on"><i class="icon-th"></i></span>
                             </div>
 
@@ -199,10 +199,10 @@
     </div>
     <!-- Modal -->
     <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Detalhes da Venda</h5>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Detalhes da Venda - <span name="codigo_venda"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -214,13 +214,14 @@
                                 <tr>
                                     <th data-sortable="false">CÓDIGO</th>
                                     <th data-sortable="false">PRODUTO</th>
-                                    <th data-sortable="false">VALOR</th>
+                                    <th data-sortable="false">VALOR PRODUTO</th>
+                                    <th data-sortable="false">VALOR VENDA</th>
                                     <th data-sortable="false">QTD</th>
                                     <th data-sortable="false">TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody class="text-center" id="dataTableModal">
-                            <tfoot><tr id="foot"></tr></tfoot>
+                            <tfoot><tr class="foot"></tr></tfoot>
                         </table>
                     </div>
                 </div>
@@ -233,7 +234,7 @@
     <div class="modal fade" id="divModalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="exampleModalLongTitle">Detalhes do Cartão</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -246,11 +247,12 @@
                             <tr>
                                 <th data-sortable="false">FORMA PAGAMENTO</th>
                                 <th data-sortable="false">TOTAL</th>
-                                <!--th data-sortable="false">TAXA</th-->
+                                <th data-sortable="false">TAXA</th>
                                 <th data-sortable="false">TOTAL FINAL</th>
                             </tr>
                             </thead>
                             <tbody class="text-center" id="dataTableModal"></tbody>
+                            <tfoot><tr class="foot"></tr></tfoot>
                         </table>
                     </div>
                 </div>
@@ -266,7 +268,7 @@
                 @csrf
                 <input type="hidden" name="new_taxa" id="new_taxa">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="exampleModalLongTitle">Alterar Venda</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -301,11 +303,11 @@
     <script src="{{URL::asset('assets/dashboard/js/Chart.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script type="module" src="{{URL::asset('assets/dashboard/js/dashboard.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
-
+    <script src="{{URL::asset('./js/moment.js')}}"></script>
+    <script type="module" src="{{URL::asset('assets/dashboard/js/dashboard.js')}}"></script>
 
 @endpush
 @push("styles")

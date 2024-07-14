@@ -220,6 +220,7 @@ class RelatorioController extends Controller
     /**
      * @param $dateOne
      * @param $dateTwo
+     * @param $store_id
      * @return JsonResponse
      */
     public function chartDay($dateOne,$dateTwo,$store_id)
@@ -237,13 +238,6 @@ class RelatorioController extends Controller
                 $paymentType[] = $pay->id;
         }
 
-        $totalOrderDiscount = "";
-        $totalOrderMonth = "";
-        $totalsOrdersWeek = "";
-       
-
-       // $dataCarbon = ($dateOne != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateOne)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-       // $dataCarbonFim = ($dateTwo != 0) ?  CarbonImmutable::parse(Carbon::createFromFormat('dmY', $dateTwo)->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
        $dateOne = CarbonImmutable::parse($dateOne);
        $dateTwo = CarbonImmutable::parse($dateTwo);
 
@@ -280,9 +274,7 @@ class RelatorioController extends Controller
 
 
             //totais por dia
-            //$totalsDay[$store->id] = $this->vendas::
-            $totalsDay = $this->vendas::
-                leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            $totalsDay = $this->vendas->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->leftjoin('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
                 ->leftjoin('loja_taxa_cartoes as lc', 'lc.forma_id', '=', 'fp.id')
                 ->select(
@@ -298,30 +290,7 @@ class RelatorioController extends Controller
                 ->groupBy('fp.id')
                 ->get();
 
-
-          /*  $totalsDay[$store->id] = $this->vendas::
-            //Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.id')
-            join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-                ->join('loja_forma_pagamentos', 'tp.forma_pagamento_id', '=', 'loja_forma_pagamentos.id')
-                ->join('loja_taxa_cartoes', 'loja_taxa_cartoes.forma_id', '=', 'loja_forma_pagamentos.id')
-                ->select(
-                    (DB::raw("FORMAT(SUM(loja_vendas.valor_total - (loja_vendas.valor_total * loja_taxa_cartoes.valor_taxa/100)),2) AS orderTotal")),
-                    "loja_forma_pagamentos.nome as name",
-                    "loja_forma_pagamentos.id as id_payment",
-                    "tp.valor_pgto"
-
-                )
-                //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($inicioDiaSemana, $fimDiaSemana))
-                ->where('loja_vendas.loja_id', $store->id)
-              // ->whereDate('loja_vendas.created_at', Carbon::today())
-              ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('3'))
-
-                //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($inicioDiaSemana, $fimDiaSemana))
-                ->groupBy((DB::raw('id_payment')))
-                ->get();
-*/
             //totais descontos por dia
-           // $totalsDayDiscount[$store->id] = $this->vendas::join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
             $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
                 ->select(
                     (DB::raw("FORMAT(SUM(loja_vendas_produtos_descontos.valor_desconto),2) AS orderTotalDiscount"))
@@ -375,7 +344,7 @@ class RelatorioController extends Controller
                 ->where('loja_vendas.loja_id', $store_id)
                 ->groupBy('ll.id')
                 ->get();
-                
+
         //}
      //  $totalsDayWeek['data'] = array($iniDayWeek, $endDayWeek);
         //dd($totalsDayWeek);
@@ -436,7 +405,7 @@ class RelatorioController extends Controller
                 foreach ($totalsDayWeek as $key => $tot) {
                     $sumWeek = $tot->orderTotalWeek;
                 }
-        
+
                 //$totalsOrdersWeek[$keys] = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
                 $totalsOrdersWeek = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
            // }
@@ -564,19 +533,12 @@ class RelatorioController extends Controller
     {
 
         try {
-            $data = null;
+            $data = [];
             $return = [];
 
-            $dataOne = ($this->request->dataOne != 0) ?
-                    CarbonImmutable::parse(
-                        Carbon::createFromFormat('dmY', $this->request->dataOne)
-                            ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-            $dataTwo = ($this->request->dataTwo != 0) ?
-                    CarbonImmutable::parse(Carbon::createFromFormat('dmY', $this->request->dataTwo)
-                            ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
+            $startDate = CarbonImmutable::parse($this->request->input('startDate'));
+            $endDate = CarbonImmutable::parse($this->request->input('endDate'));
 
-
-          //  print_r( $this->request->all());
             /**
              * Semana agrupado por dia
              */
@@ -600,11 +562,11 @@ class RelatorioController extends Controller
                 ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'loja_vendas.usuario_id')
                 ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'loja_vendas.tipo_venda_id')
 
-                ->where('loja_vendas.loja_id', $this->request->id)
+                ->where('loja_vendas.loja_id', $this->request->input('id'))
                //  ->whereDate('loja_vendas.created_at', Carbon::today())
                // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('1'))
 
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataOne, $dataTwo))
+                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($startDate, $endDate))
 
                 //->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m-%d"),loja_id')))
                 ->groupBy('loja_vendas.codigo_venda')
@@ -629,15 +591,17 @@ class RelatorioController extends Controller
                 $return[] = $data;
             }
 
+            return DataTables::of($return)->make(true);
+
         }catch (Throwable $e){
             return Response::json(['error' => $e], 400);
         }
-        return Response::json(array("data" => $return));
     }
 
-     /****
+    /****
      * Pega o cashback da venda
-     *
+     * @param int $venda_id
+     * @return int
      */
     public function cashback(int $venda_id){
         $cashback = $this->vendasCashBack
@@ -654,9 +618,10 @@ class RelatorioController extends Controller
         }
     }
 
-     /****
+    /****
      * Pega o desconto da venda
-     *
+     * @param int $venda_id
+     * @return int
      */
     public function valor_recebido(int $venda_id){
         $data = $this->vendasProdutosDesconto
@@ -688,9 +653,9 @@ class RelatorioController extends Controller
         $saida = "";
         foreach ($nomePayments as $nomePayment) {
             if(strtoupper($nomePayment->nome) == "DINHEIRO"){
-                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - RECEBIDO:  '. $this->formatter->formatCurrency($this->valor_recebido($id), 'BRL') .')'. "<br/>";
+                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - RECEBIDO:  '. $this->formatter->formatCurrency($this->valor_recebido($id), 'BRL') .')';
             }else{
-                $saida .= $nomePayment->nome.' ('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - tx.'. $nomePayment->taxa .')'. "<br/>";
+                $saida .= $nomePayment->nome.'('.$this->formatter->formatCurrency($nomePayment->valor_pgto, 'BRL').' - tx.'. $nomePayment->taxa .')';
             }
 
         }
@@ -703,34 +668,45 @@ class RelatorioController extends Controller
      * @param $sales
      * @return JsonResponse
      */
-    public function detailSales($sales)
+    public function detailSales()
     {
-       //todas as lojas
-        // $stores = $this->lojas::all();
+        try {
+
+         $codigo_venda =  $this->request->input('codigo_venda');
+         $items = [];
 
         //semana agrupado por dia
-        $listSalesDetail = $this->vendas::with('produtos.productsSales','descontos')
-            ->where('loja_vendas.codigo_venda', $sales)->get();
+        $sales = $this->vendas::with('produtos.productsSales','descontos')
+                            ->where('loja_vendas.codigo_venda', $codigo_venda)->first();
 
-         // Transformar os dados para que cada variação de produto seja uma linha separada
-        $transformedData = $listSalesDetail->flatMap(function ($item) {
-            return $item->produtos->map(function ($produto) use ($item) {
-                return [
-                    'id' => $item->id,
-                    'codigo_venda' => $item->codigo_venda,
-                    'created_at' => $item->created_at,
-                    'codigo_produto' => $produto->codigo_produto,
-                    'descricao' => $produto->descricao,
-                    'quantidade' => $produto->quantidade,
-                    'valor' => $produto->valor_produto,
-                    'valor_produto' => 0,//$produto->products_sales[0]->valor_produto,
-                    'valor_total' => number_format($produto->quantidade * $produto->valor_produto, 2, '.', ',')
-                ];
-            });
-        });
+            // Decode JSON string into PHP array
+            $jsonString  = json_decode($sales, true);
+
+            $data["id"] = $jsonString['id'];
+            $data["codigo_venda"] = $jsonString['codigo_venda'];
+            $data["created_at"] = $jsonString['created_at'];
+
+
+            foreach ($jsonString['produtos'] as $produto) {
+                $data["codigo_produto"] = $produto['codigo_produto'];
+                $data["descricao"] = $produto['descricao'];
+                $data["quantidade"] = $produto['quantidade'];
+                $data["valor_venda"] = $produto['valor_produto'];//valor venda
+                $data["valor_total"] = number_format($produto['quantidade'] * $produto['valor_produto'], 2, '.', ',');
+
+                // Accessing nested data (products_sales)
+                foreach ($produto['products_sales'] as $product_sale) {
+                    $data["valor_produto"] = $product_sale['valor_produto'];//valor real do produto
+                }
+                array_push($items, $data);
+            }
+
         // Configurar retorno para DataTables
-        return DataTables::of($transformedData)->make(true);
-        
+        return DataTables::of($items)->make(true);
+
+        }catch (Throwable $e){
+            return Response::json(['error' => $e], 500);
+        }
     }
 
     /***
@@ -740,30 +716,33 @@ class RelatorioController extends Controller
     public function detailCart()
     {
        // dd($this->request->data['id']);
-        $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("startDate"));
-        $endDate = Carbon::parse($this->request->input("endDate"));
+        try{
+            $id = $this->request->input("id");
+            $startDate = Carbon::parse($this->request->input("startDate"));
+            $endDate = Carbon::parse($this->request->input("endDate"));
 
-        $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
-            ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-           // ->join('loja_taxa_cartoes as tx', 'tx.forma_id', '=', 'fp.id')
-            ->select(
-               (DB::raw("SUM(tp.valor_pgto)  AS total")),
-                (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
-                'fp.nome',
-                'tp.taxa'
-            )->from('loja_vendas as lv')
-            ->where('lv.loja_id', $id)
-            ->whereNotIn('fp.id', [1]) //sem dinheiro
-            //->whereDate('loja_vendas.created_at', Carbon::today())
-            //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
-            ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
-            ->groupBy('fp.id')
-            ->orderBy('fp.id', 'asc')
-            ->get();
+            $listDetail = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
+                ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
+               // ->join('loja_taxa_cartoes as tx', 'tx.forma_id', '=', 'fp.id')
+                ->select(
+                   (DB::raw("SUM(tp.valor_pgto)  AS total")),
+                    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
+                    'fp.nome',
+                    'tp.taxa'
+                )->from('loja_vendas as lv')
+                ->where('lv.loja_id', $id)
+                ->whereNotIn('fp.id', [1]) //sem dinheiro
+                //->whereDate('loja_vendas.created_at', Carbon::today())
+                //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
+                ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
+                ->groupBy('fp.id')
+                ->orderBy('fp.id', 'asc')
+                ->get();
 
-        return DataTables::of($listDetail)->make(true);
-        
+            return DataTables::of($listDetail)->make(true);
+        }catch (Throwable $e){
+            return Response::json(['error' => $e], 400);
+        }
     }
 
     /***
@@ -772,32 +751,35 @@ class RelatorioController extends Controller
      */
     public function detailDinner()
     {
+        try{
+            $id = $this->request->input("id");
+            $startDate = Carbon::parse($this->request->input("startDate"));
+            $endDate = Carbon::parse($this->request->input("endDate"));
 
-        $id = $this->request->input("id");
-        $startDate = Carbon::parse($this->request->input("startDate"));
-        $endDate = Carbon::parse($this->request->input("endDate"));
+            $listDetail = $this->vendas
+                ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
+                ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
+                ->join('loja_usuarios as u', 'lv.usuario_id', '=', 'u.id')
+                ->select(
+                   (DB::raw("SUM(tp.valor_pgto)  AS total")),
+                    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
+                    'fp.nome',
+                    'u.nome as nome_usu'
+                )->from('loja_vendas as lv')
+                ->where('lv.loja_id', $id)
+                ->whereIn('fp.id', [1]) //dinheiro
+                //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('6'))
+               // ->whereBetween('loja_vendas.created_at', [$startDate, $endDate])
+                ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
+                ->groupBy('u.nome')
+                ->orderBy('u.nome', 'asc')
+                ->get();
 
-        $listDetail = $this->vendas
-            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
-            ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-            ->join('loja_usuarios as u', 'lv.usuario_id', '=', 'u.id')
-            ->select(
-               (DB::raw("SUM(tp.valor_pgto)  AS total")),
-                (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalFinal")),
-                'fp.nome',
-                'u.nome as nome_usu'
-            )->from('loja_vendas as lv')
-            ->where('lv.loja_id', $id)
-            ->whereIn('fp.id', [1]) //dinheiro
-            //->whereDate('loja_vendas.created_at', Carbon::now()->subDay('6'))
-           // ->whereBetween('loja_vendas.created_at', [$startDate, $endDate])
-            ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
-            ->groupBy('u.nome')
-            ->orderBy('u.nome', 'asc')
-            ->get();
+            return DataTables::of($listDetail)->make(true);
 
-        return DataTables::of($listDetail)->make(true);
-        
+        }catch (Throwable $e){
+            return Response::json(['error' => $e], 400);
+        }
     }
 
     /***

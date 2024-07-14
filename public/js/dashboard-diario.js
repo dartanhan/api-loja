@@ -189,33 +189,32 @@ $(function () {
         $('#divModal').modal('show');
 
         let fila = $(this).closest("tr");
-        let vendaId = fila.find('td:eq(0)').text();
+        let codigo_venda = fila.find('td:eq(0)').text();
 
         // Inicializar a DataTable com a opção ajax
         $('#tableView').DataTable({
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            destroy : true,
-            "ajax": {
-                "url": url + "/relatorio/detailSales/" + vendaId,
-                "type": "GET",
-                "dataSrc": function (json) {
-                    return json.data; // Retornar os dados para DataTables
+            "ajax":{
+                "method": 'post',
+                "url": url + "/relatorio/detailSales",
+                "data":function(data){
+                    data.codigo_venda = codigo_venda;
+                    data._token = token;
                 },
-                "complete": function() {
-                    // Esconder o spinner e mostrar a tabela após a inicialização do DataTable
-                }
+                "dataType":"json",
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                destroy : true,
             },
             "columns": [
                 { "data": "codigo_produto" },
                 { "data": "descricao" },
                 {
-                    "data": "valor",
+                    "data": "valor_produto",
                     "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
                 },
                 {
-                    "data": "valor_produto",
+                    "data": "valor_venda",
                     "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
                 },
                 { "data": "quantidade" },
@@ -249,7 +248,7 @@ $(function () {
                 $("#foot").html("");
                 $("#foot").append('<td colspan="6" style="background:#000000; color:white; text-align: right;">Total: ' + numFormat(total) + '</td>');
                 $('[data-toggle="tooltip"]').tooltip();
-                $('span[name="codigo_venda"]').text(vendaId);
+                $('span[name="codigo_venda"]').text(codigo_venda);
             },
             "initComplete": function (settings, json) {
 
@@ -265,11 +264,9 @@ $(function () {
         event.preventDefault();
 
         let id = $(this).data('content');
-        //dataIni = $('input[name=dataIni]').val();
-        //dataFim = $('input[name=dataFim]').val();
 
         startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
-        endDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+        endDate = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
 
         const data = {
             id: id,
@@ -363,8 +360,6 @@ $(function () {
         event.preventDefault();
 
         let id = $(this).data('content');
-        //dataIni = $('input[name=dataIni]').val();
-       // dataFim = $('input[name=dataFim]').val();
 
         startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
         endDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
