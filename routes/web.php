@@ -87,7 +87,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/relatorio/chartDay/{dataini}/{datafim}/{store_id}',[RelatorioController::class,'chartDay'])->name('chartDay');
     Route::get('/relatorio/editSales/{store_id}',[RelatorioController::class,'editSales'])->name('editSales');
     Route::post('/relatorio/dailySalesList',[RelatorioController::class,'dailySalesList']);
-    Route::get('/relatorio/detailSales/{id}/',[RelatorioController::class,'detailSales']);
+    Route::post('/relatorio/detailSales',[RelatorioController::class,'detailSales']);
     Route::post('/relatorio/detailCart',[RelatorioController::class,'detailCart'])->name("admin.detailCart");
     Route::post('/relatorio/detailDinner',[RelatorioController::class,'detailDinner'])->name("admin.detailDinner");
     Route::get('/relatorio/buscaTaxa/{id}',[RelatorioController::class,'buscaTaxa']);

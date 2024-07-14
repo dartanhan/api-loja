@@ -4,6 +4,8 @@ window.formatMoney = formatMoney;
 window.getFormattedDate = getFormattedDate;
 window.SomenteNumeros = SomenteNumeros;
 window.formatDate = formatDate;
+window.sweetAlert = sweetAlert;
+window.sweetAlertClose = sweetAlertClose;
 
 const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
@@ -13,11 +15,11 @@ const swalWithBootstrapButtons = Swal.mixin({
     buttonsStyling: false
 });
 
-export const sweetAlert = function(json){
+export function sweetAlert(json){
     swalWithBootstrapButtons.fire(json);
 }
 
-export const sweetAlertClose = function(){
+export function sweetAlertClose(){
     swalWithBootstrapButtons.close();
 }
 

@@ -153,8 +153,8 @@
                                     <tr>
                                         <th data-sortable="false">CÓDIGO</th>
                                         <th data-sortable="false">PRODUTO</th>
-                                        <th data-sortable="false">VALOR</th>
                                         <th data-sortable="false">VALOR PRODUTO</th>
+                                        <th data-sortable="false">VALOR VENDA</th>
                                         <th data-sortable="false">QTD</th>
                                         <th data-sortable="false">TOTAL</th>
                                     </tr>
