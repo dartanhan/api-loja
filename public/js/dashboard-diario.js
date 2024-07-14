@@ -192,6 +192,7 @@ $(function () {
         let codigo_venda = fila.find('td:eq(0)').text();
 
         // Inicializar a DataTable com a opção ajax
+         $('#tableView').DataTable().destroy();
         $('#tableView').DataTable({
             "ajax":{
                 "method": 'post',
@@ -276,7 +277,7 @@ $(function () {
         };
 
         try {
-
+            $('#tableViewCart').DataTable().destroy();
             $('#tableViewCart').DataTable({
                 "ajax":{
                     "method": 'post',
