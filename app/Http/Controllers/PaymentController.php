@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaymentController extends Controller
 {
@@ -44,12 +45,13 @@ class PaymentController extends Controller
     public function create()
     {
         try {
-            $ret = $this->payment->get();
+            $payments = $this->payment->all();
+
+            return DataTables::of($payments)->make(true);
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e], 500);
         }
-        return Response()->json($ret);
     }
 
     /**
@@ -123,6 +125,7 @@ class PaymentController extends Controller
     public function update()
     {
         try {
+
             $validated = Validator::make($this->request->all(), [
                 'nome' => 'required|max:255|unique:' . $this->payment->table . ',nome,' . $this->request->input('id')
             ],[
@@ -140,8 +143,11 @@ class PaymentController extends Controller
 
             $this->payment  = $this->payment::find($this->request->input('id'));
             $this->payment->nome = $this->request->input('nome');
+            $this->payment->status = $this->request->input('status');
 
             $this->payment->save();
+
+
 
         } catch (QueryException $e) {
             $errorCode = $e->errorInfo[1];
