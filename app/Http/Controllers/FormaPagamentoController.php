@@ -49,6 +49,7 @@ class FormaPagamentoController extends Controller
             foreach ($this->payment::all() as $value){
                 $data['id'] =  $value->id;
                 $data['nome'] =  $value->nome;
+                $data['slug'] =  $value->slug;
                 $data['status'] =  $value->status;
                 $data['created_at'] =  date('d/m/Y H:i:s', strtotime($value->created_at));
                 $data['updated_at'] =  date('d/m/Y H:i:s', strtotime($value->updated_at));
@@ -155,6 +156,7 @@ class FormaPagamentoController extends Controller
             $this->payment  = $this->payment::find($this->request->id);
 
             $this->payment->nome = $this->request->nome;
+            $this->payment->slug = $this->request->slug;
             $this->formaPagamento->status = $this->request->status;
 
             $this->payment->save();

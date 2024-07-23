@@ -6,6 +6,8 @@ window.SomenteNumeros = SomenteNumeros;
 window.formatDate = formatDate;
 window.sweetAlert = sweetAlert;
 window.sweetAlertClose = sweetAlertClose;
+window.createSlug = createSlug;
+
 
 const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
@@ -316,44 +318,55 @@ $(document).on("click","#addListaCompra" ,function(event){
 });
 
 
-/***
- * Faz o HTTP post
- * @returns retorna um json com as informações
- */
-export const httpFetchPost = async function(url, token, data) {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
-            },
-            body: JSON.stringify(data)
-        });
+    /***
+     * Faz o HTTP post
+     * @returns retorna um json com as informações
+     */
+    export const httpFetchPost = async function(url, token, data) {
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": token // Adicione o token CSRF no cabeçalho
+                },
+                body: JSON.stringify(data)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            return await response.json();
+
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+            throw error; // Re-throw the error so it can be handled by the caller
         }
-
-        return await response.json();
-
-    } catch (error) {
-        console.error("There was a problem with the fetch operation:", error);
-        throw error; // Re-throw the error so it can be handled by the caller
     }
-}
 
- /**
-     *   ATUALIZA A DATATABLE
-     * */
- export function fncDataDatatable(table) {
-    table.ajax.reload(null, false);
-    return false;
-}
+     /**
+         *   ATUALIZA A DATATABLE
+         * */
+     export function fncDataDatatable(table) {
+        table.ajax.reload(null, false);
+        return false;
+    }
 
-export function fncPreLoadModal(){
-    return "<div class=\"spinner-border text-primary\" role=\"status\">"+
-                "<span class=\"sr-only\">Loading...</span>"+
-            "</div>";
+    export function fncPreLoadModal(){
+        return "<div class=\"spinner-border text-primary\" role=\"status\">"+
+                    "<span class=\"sr-only\">Loading...</span>"+
+                "</div>";
 
-}
+    }
+
+    // Função para criar o slug
+    export function createSlug(value) {
+        return value
+            .toLowerCase() // Converter para minúsculas
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remover acentos e diacríticos
+            .trim() // Remover espaços em branco das extremidades
+            .replace(/[^\w\s-]/g, '') // Remover caracteres especiais
+            .replace(/[\s_-]+/g, '-') // Substituir espaços e underscores por hífens
+            .replace(/^-+|-+$/g, ''); // Remover hífens das extremidades
+    }

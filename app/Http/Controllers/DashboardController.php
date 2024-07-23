@@ -100,7 +100,7 @@ class DashboardController extends Controller
                 "lv.codigo_venda",
                 "lv.id as venda_id",
                 "lv.usuario_id as usuario_id",
-                "loja_usuarios.nome",
+                "users.name as nome",
                 "loja_vendas_produtos_descontos.valor_desconto",
                 DB::raw("lv.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"),
                 "loja_forma_pagamentos.nome as nome_pgto",
@@ -115,7 +115,8 @@ class DashboardController extends Controller
               ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
               ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
-              ->leftJoin('loja_usuarios', 'loja_usuarios.id', '=', 'lv.usuario_id')
+              ->leftJoin('users', 'lv.usuario_id', '=', 'users.id')
+              ->leftJoin('loja_usuarios as lu', 'users.id', '=', 'lu.user_id')
               ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'lv.tipo_venda_id')
               ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
@@ -125,6 +126,7 @@ class DashboardController extends Controller
                 ->groupBy('lv.codigo_venda')
                 ->orderBy('lv.created_at', 'asc')
                 ->get();
+
 
             foreach ($listSales as $listSale) {
 
@@ -136,13 +138,14 @@ class DashboardController extends Controller
                 $data['valor_desconto'] =  $listSale->valor_desconto;
                 $data['sub_total'] =  $listSale->sub_total;
                 $data['nome_pgto'] =  $this->formName($listSale->venda_id); //$listSale->nome_pgto;
+
                 if( $listSale->taxa_pgto > 0){
                     $data['taxa_pgto'] =  $this->formatter->formatCurrency(($listSale->total * $listSale->taxa_pgto ) / 100, 'BRL');
                 }else{
                     $data['taxa_pgto'] =  $this->formatter->formatCurrency(0, 'BRL');
                 }
                 $data['id_pgto'] =  $listSale->id_pgto;
-                $data['usuario'] =  ($listSale->usuario_id == "") ? 'Karla' : $listSale->nome;
+                $data['usuario'] =  $listSale->nome;
                 $data['cashback'] = $this->cashback($listSale->venda_id);
                 $data['tipo_venda'] = $listSale->tipo_venda;
 
@@ -206,7 +209,6 @@ class DashboardController extends Controller
         $nomePayments = $this->payments::select('nome', 'valor_pgto', 'taxa')
             ->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.forma_pagamento_id', '=', 'loja_forma_pagamentos.id')
             ->where('venda_id', $id)->first();
-
             return $nomePayments->nome;
 
         // $saida = "";

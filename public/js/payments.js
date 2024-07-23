@@ -1,4 +1,4 @@
-import {sweetAlert} from './comum.js';
+import {sweetAlert,createSlug} from './comum.js';
 
 $(document).ready(function() {
     const urlApi = fncUrl();
@@ -16,6 +16,7 @@ $(document).ready(function() {
         "columns": [
             {"data": "id", "defaultContent": ""},
             {"data": "nome", "defaultContent": ""},
+            {"data": "slug", "defaultContent": ""},
             {
                 "data": "status",
                 render: function (data, type, row) {
@@ -80,17 +81,36 @@ $(document).ready(function() {
         id = parseInt(fila.find('td:eq(0)').text()); //capturo o ID
         nome = fila.find('td:eq(1)').text();
         status =  $(this).data('status');
+        let slug =  fila.find('td:eq(2)').text();
 
         $("#metodo").val('PUT');
         $("#id").val(id);
         $("#nome").val(nome);
         $("#status").val(status);
-       // $("#status").val(status);
+        $("#slug").val(slug);
 
         $('#modal-title').html('<p><img src="../public/img/iconfinder_ecommerce-37_4707183.png"/>&nbsp;<strong>EDITANDO FORMA DE PAGAMENTO</strong></p>');
     });
 
-	/****
+    /**
+     * Cria o slug
+     * */
+    $(document).on("blur", "#nome", function(event){
+        event.preventDefault();
+
+        // Pegue o valor do campo nome
+        let nomeValue = $("#nome").val();
+        //console.log(nomeValue);
+
+        // Crie o slug
+        let slugValue = createSlug(nomeValue);
+        //console.log(slugValue);
+
+        // Defina o valor do campo slug
+        $("#slug").val(slugValue);
+    });
+
+    /****
 	 *
 	 * SALVA FORMA
 	 *
@@ -102,11 +122,17 @@ $(document).ready(function() {
         rules: {
             nome: {
                 required: true
-			}
+			},
+            slug: {
+                required: true
+            }
         },
         messages: {
             nome: {
                 required: "Informe a Forma de Pagamento?"
+            },
+            slug: {
+                required: "Slug é obrigatório, informe o nome da forma de pagamento?"
             }
         }, submitHandler: function(form,e) {
             e.preventDefault();
@@ -224,4 +250,5 @@ $(document).ready(function() {
             }
         });
     });
+
 });

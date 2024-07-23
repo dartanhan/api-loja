@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class Payments extends Model
 {
     public $table = 'loja_forma_pagamentos';
-    protected $fillable = ['id','nome','status','update_at'];
+    protected $fillable = ['id','nome','status','slug','update_at'];
 
     public function PaymentsTaxes()
     {
