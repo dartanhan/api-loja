@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaymentController extends Controller
 {
@@ -44,12 +45,13 @@ class PaymentController extends Controller
     public function create()
     {
         try {
-            $ret = $this->payment->get();
+            $payments = $this->payment->all();
+
+            return DataTables::of($payments)->make(true);
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e], 500);
         }
-        return Response()->json($ret);
     }
 
     /**
@@ -62,10 +64,12 @@ class PaymentController extends Controller
         try {
             $validator = Validator::make($this->request->all(), [
                 'nome' => 'required|unique:'.$this->payment->table.'|max:155',
+                'slug' => 'required|max:50',
             ],[
                 'nome.unique'  => 'Forma de Pagamento já cadastrado!',
                 'nome.max'=> 'Forma de Pagamento deve ser menos que 150 caracteres!',
-                'nome.required'=> 'Forma de Pagamento é obrigatório!'
+                'nome.required'=> 'Forma de Pagamento é obrigatório!',
+                'slug.required'=> 'Slug de Pagamento é obrigatório!'
             ]);
 
             if ($validator->fails()) {
@@ -123,12 +127,15 @@ class PaymentController extends Controller
     public function update()
     {
         try {
+
             $validated = Validator::make($this->request->all(), [
-                'nome' => 'required|max:255|unique:' . $this->payment->table . ',nome,' . $this->request->input('id')
+                'nome' => 'required|max:150|unique:' . $this->payment->table . ',nome,' . $this->request->input('id'),
+                'slug' => 'required|max:50',
             ],[
                 'nome.unique'  => 'Forma de Pagamento já cadastrado!',
                 'nome.max'=> 'Forma de Pagamento deve ser menos que 150 caracteres!',
-                'nome.required'=> 'Forma de Pagamento é obrigatório!'
+                'nome.required'=> 'Forma de Pagamento é obrigatório!',
+                'slug.required'=> 'Slug de Pagamento é obrigatório!'
             ]);
 
             //Verifica se temos erros no form
@@ -140,6 +147,8 @@ class PaymentController extends Controller
 
             $this->payment  = $this->payment::find($this->request->input('id'));
             $this->payment->nome = $this->request->input('nome');
+            $this->payment->slug = $this->request->input('slug');
+            $this->payment->status = $this->request->input('status');
 
             $this->payment->save();
 

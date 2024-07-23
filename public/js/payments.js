@@ -1,32 +1,31 @@
-/* globals Chart:false, feather:false */
+import {sweetAlert,createSlug} from './comum.js';
+
 $(document).ready(function() {
     const urlApi = fncUrl();
-    
-    let metodo = '', titulo = '', url,fila,id,nome,token,json;
 
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger'
-        },
-        buttonsStyling: false
-    });
+    let metodo = '', titulo = '', url,fila,id,nome,token,json,status;
 
     const table = $('#table').DataTable({
-        "createdRow": function (row, data) {
-            if (data.status === "INATIVO") {
-                $(row).addClass('red');
-            }
-        },
-        "ajax": {
-            "method": 'get',
-            "url": urlApi + "/payment/create",
-            "data": '',
-            "dataSrc": ""
+
+        ajax: {
+            method: 'get',
+            processing: true,
+            serverSide: true,
+            url: urlApi + "/payment/create",
         },
         "columns": [
-            {"data": "id"},
-            {"data": "nome"},
+            {"data": "id", "defaultContent": ""},
+            {"data": "nome", "defaultContent": ""},
+            {"data": "slug", "defaultContent": ""},
+            {
+                "data": "status",
+                render: function (data, type, row) {
+                    if(row.status === 1)
+                        return "<span class=\"badge bg-success\">Ativo</span>";
+
+                    return "<span class=\"badge bg-danger\">Inativo</span>";
+                }
+            },
             {"data": "created_at",
                 render: function(data, type, row){
                     return moment(data).format("DD/MM/YYYY HH:mm");
@@ -37,18 +36,22 @@ $(document).ready(function() {
                     return moment(data).format("DD/MM/YYYY HH:mm");
                 }
             },
-            {"defaultContent": "<div class='text-center'>" +
-                    "<div class='btn-group'>" +
-                    "<button class='btn btn-primary btn-sm btnEditar' " +
-                    "data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
-                    "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
-                    "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
-                    "</div>" +
-                    "</div>"}
+            {
+                "data": "defaultContent", render: function (data, type, row) {
+                    return "<div class='text-center'>" +
+                                "<div class='btn-group'>" +
+                                    "<button class='btn btn-primary btn-sm btnEditar' data-status="+row.status+" " +
+                                    " data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
+                                    " <i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
+                                    " <button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
+                                "</div>" +
+                            "</div>"
+                }
+            }
         ],
         "order": [[0, "asc"]]
         , language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": "../public/Portuguese-Brasil.json"
         },
     });
 
@@ -77,17 +80,37 @@ $(document).ready(function() {
         fila = $(this).closest("tr");
         id = parseInt(fila.find('td:eq(0)').text()); //capturo o ID
         nome = fila.find('td:eq(1)').text();
-        //       status = fila.find('td:eq(2)').text() == 'ATIVO'? 1 : 0;
+        status =  $(this).data('status');
+        let slug =  fila.find('td:eq(2)').text();
 
         $("#metodo").val('PUT');
         $("#id").val(id);
         $("#nome").val(nome);
-       // $("#status").val(status);
+        $("#status").val(status);
+        $("#slug").val(slug);
 
         $('#modal-title').html('<p><img src="../public/img/iconfinder_ecommerce-37_4707183.png"/>&nbsp;<strong>EDITANDO FORMA DE PAGAMENTO</strong></p>');
     });
 
-	/****
+    /**
+     * Cria o slug
+     * */
+    $(document).on("blur", "#nome", function(event){
+        event.preventDefault();
+
+        // Pegue o valor do campo nome
+        let nomeValue = $("#nome").val();
+        //console.log(nomeValue);
+
+        // Crie o slug
+        let slugValue = createSlug(nomeValue);
+        //console.log(slugValue);
+
+        // Defina o valor do campo slug
+        $("#slug").val(slugValue);
+    });
+
+    /****
 	 *
 	 * SALVA FORMA
 	 *
@@ -99,11 +122,17 @@ $(document).ready(function() {
         rules: {
             nome: {
                 required: true
-			}
+			},
+            slug: {
+                required: true
+            }
         },
         messages: {
             nome: {
                 required: "Informe a Forma de Pagamento?"
+            },
+            slug: {
+                required: "Slug é obrigatório, informe o nome da forma de pagamento?"
             }
         }, submitHandler: function(form,e) {
             e.preventDefault();
@@ -132,7 +161,7 @@ $(document).ready(function() {
                 success: function(data) {
                     // console.log(data);
                     if(data.success) {
-                        swalWithBootstrapButtons.fire({
+                        sweetAlert({
                             title: titulo,
                             text: data.message,
                             icon: 'success',
@@ -147,7 +176,7 @@ $(document).ready(function() {
                     json = $.parseJSON(data.responseText);
                     $("#modal-title").addClass( "alert alert-danger" );
                     $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
-                    Swal.fire(
+                    sweetAlert(
                         'error!',
                         json.message,
                         'error'
@@ -175,7 +204,7 @@ $(document).ready(function() {
         nome = fila.find('td:eq(1)').text();
         token = $('form').find('input[name="_token"]').val();
 
-        Swal.fire({
+        sweetAlert({
             title: 'Tem certeza?',
             text: "Está seguro de remover este registro: [ " + nome + " ] ?",
             icon: 'warning',
@@ -191,7 +220,7 @@ $(document).ready(function() {
                     type: "DELETE",
                     datatype:"json",
                     beforeSend: function () {
-                        swalWithBootstrapButtons.fire(
+                        sweetAlert(
                             'Aguarde..',
                             '<div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>',
                             'info'
@@ -199,7 +228,7 @@ $(document).ready(function() {
                     },
                     success: function(data) {
                         if(data.success) {
-                            swalWithBootstrapButtons.fire({
+                            sweetAlert({
                                 title: 'Deletado!',
                                 text: data.message,
                                 icon: 'success',
@@ -211,7 +240,7 @@ $(document).ready(function() {
                     },
                     error: function(data){
                         json = $.parseJSON(data.responseText);
-                        Swal.fire(
+                        sweetAlert(
                             'error!',
                             json.message,
                             'error'
@@ -221,4 +250,5 @@ $(document).ready(function() {
             }
         });
     });
+
 });

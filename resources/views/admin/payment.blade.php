@@ -35,6 +35,8 @@
                         <tr>
                             <th>#</th>
                             <th data-sortable="true">Nome</th>
+                            <th>Slug</th>
+                            <th>Situação</th>
                             <th>Data Criação</th>
                             <th>Data Atualização</th>
                             <th>Ações</th>
@@ -61,15 +63,20 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-12 mb-3">
+                                    <label class="form-label">Nome Forma de Pagamento</label>
                                     <input type="text" class="form-control" id="nome" name="nome" title="Nome da Forma de Pagamento" placeholder="Nome da Forma de Pagamento">
                                 </div>
-                                <!--div class="col-md-6 mb-3">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Slug Forma de Pagamento</label>
+                                    <input type="text" class="form-control" id="slug" name="slug" title="Slug" placeholder="Slug da Forma de Pagamento" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Situação</label>
                                     <select class="form-select" id="status" name="status" required>
-                                        <option value="1"  >Ativo</option>
+                                        <option value="1">Ativo</option>
                                         <option value="0">Inativo</option>
                                     </select>
-
-                                </div-->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -88,7 +95,7 @@
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{URL::asset('js/moment.js')}}"></script>
-    <script src="{{URL::asset('js/payments.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/payments.js')}}"></script>
 @endpush
 @push("styles")
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/DataTables-1.10.18/css/dataTables.bootstrap4.css')}}">

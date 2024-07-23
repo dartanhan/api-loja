@@ -44,10 +44,13 @@ class FormaPagamentoController extends Controller
      */
     public function create()
     {
+
         try {
             foreach ($this->payment::all() as $value){
                 $data['id'] =  $value->id;
                 $data['nome'] =  $value->nome;
+                $data['slug'] =  $value->slug;
+                $data['status'] =  $value->status;
                 $data['created_at'] =  date('d/m/Y H:i:s', strtotime($value->created_at));
                 $data['updated_at'] =  date('d/m/Y H:i:s', strtotime($value->updated_at));
 
@@ -73,7 +76,7 @@ class FormaPagamentoController extends Controller
     public function store()
     {
         $validator  = Validator::make($this->request->all(), [
-            'nome' => 'required|unique:'.$this->payment->table.'|max:255',
+            'nome' => 'required|unique:'.$this->payment->table.'|max:155',
         ]);
 
         if ($validator->fails()) {
@@ -141,7 +144,7 @@ class FormaPagamentoController extends Controller
         //dd($request->all());
         try {
             $validator = Validator::make($this->request->all(), [
-                'nome' => 'required|max:255|unique:' . $this->payment->table . ',nome,' . $this->request->id
+                'nome' => 'required|max:155|unique:' . $this->payment->table . ',nome,' . $this->request->id
             ]);
 
             if ($validator->fails()) {
@@ -153,7 +156,8 @@ class FormaPagamentoController extends Controller
             $this->payment  = $this->payment::find($this->request->id);
 
             $this->payment->nome = $this->request->nome;
-            //$this->formaPagamento->status = $this->request->status;
+            $this->payment->slug = $this->request->slug;
+            $this->formaPagamento->status = $this->request->status;
 
             $this->payment->save();
 
