@@ -78,6 +78,24 @@
                     <a class="small text-white stretched-link" href="#">Detalhes</a>
                 </div>
             </div>
+            <div class="card bg-success text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalMc" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+                </div>
+            </div>
+            <div class="card bg-success opacity-75 text-white card-custom-width h-25">
+                <div class="d-flex align-items-center" id="totalPmc" name="load">
+                    <div class="card-body" name="card-body"></div>
+                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+                </div>
+            </div>
         </div>
         <div class="d-flex flex-wrap floating-card mt-3 p-2">
             <div class="row date" id="data">

@@ -35,6 +35,12 @@ $(function () {
                 $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
                     " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
                     " </div>");
+                $("#totalMc").html("<div class=\"card-body text-center\">Total Margem Contibuição <br>" +
+                    " <strong class=\"fs-5\">" +json.total_mc+"</strong>" +
+                    " </div>");
+                $("#totalPmc").html("<div class=\"card-body text-center\">Total % Margem Contibuição <br>" +
+                    " <strong class=\"fs-5\">" +json.total_precentual_mc+"</strong>" +
+                    " </div>");
                 return json.data;
             }
         },
