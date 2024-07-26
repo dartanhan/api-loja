@@ -100,7 +100,7 @@ class DashboardController extends Controller
                 "lv.codigo_venda",
                 "lv.id as venda_id",
                 "lv.usuario_id as usuario_id",
-                "users.name as nome",
+                "lu.nome",
                 "loja_vendas_produtos_descontos.valor_desconto",
                 DB::raw("lv.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total"),
                 "loja_forma_pagamentos.nome as nome_pgto",
@@ -115,8 +115,7 @@ class DashboardController extends Controller
               ->leftJoin('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
               ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
-              ->leftJoin('users', 'lv.usuario_id', '=', 'users.id')
-              ->leftJoin('loja_usuarios as lu', 'users.id', '=', 'lu.user_id')
+              ->leftJoin('loja_usuarios as lu', 'lv.usuario_id', '=', 'lu.user_id')
               ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'lv.tipo_venda_id')
               ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
