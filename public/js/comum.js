@@ -62,7 +62,7 @@ export function formatMoneyPress(parm) {
 /**
  * Ajusta para exibição nos inputs e etc.. valor moeda!
  * */
-export function formatMoney(valor)
+export function formatMoney(valor, cifrao = "R$ ")
 {
     try {
 
@@ -84,7 +84,7 @@ export function formatMoney(valor)
 
         const r = m.reverse().join('');
 
-        return "R$ " + r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
+        return cifrao + r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
     } catch (error) {
         console.error('Erro na função formatMoney:', error.message);
         // Você pode decidir o que fazer aqui em caso de erro, como retornar um valor padrão ou lançar novamente o erro

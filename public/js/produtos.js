@@ -118,7 +118,7 @@ $(function() {
                 "<th>VAREJO</th>" +
                 "<th>ATACADO</th>" +
                 "<th>PRODUTO</th>" +
-                "<th>DESCONTOS</th>" +
+                "<th>DESCONTO EM %</th>" +
                 "<th>STATUS</th>" +
                 "<th>AÇÃO</th>" +
                 "</tr>" +
@@ -202,25 +202,21 @@ $(function() {
      * Retorna os campos de variações do produto
      * */
     let fnc_variacao = function (i,val,index,arrayItem,selected) {
-        //console.log(arrayItem);
+        let display = '';
         let icon_remove = "";
         let id = arrayItem != null ? arrayItem.id : '';
         let subcodigo = arrayItem != null ? arrayItem.subcodigo.substring(arrayItem.subcodigo.length-2,arrayItem.subcodigo.length) : val;
         let variacao = arrayItem != null ? arrayItem.variacao : '';
         let valor_varejo = arrayItem != null ? formatMoney(arrayItem.valor_varejo) : typeof $("#valor_varejo0").val() !== "undefined" ? $("#valor_varejo0").val() : '';
         let valor_atacado = arrayItem != null ? formatMoney(arrayItem.valor_atacado) : typeof $("#valor_atacado0").val() !== "undefined" ? $("#valor_atacado0").val() : '';
-        let valor_atacado_5un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_5un) : typeof $("#valor_atacado_5un0").val() !== "undefined" ? $("#valor_atacado_5un0").val() : '';
         let valor_atacado_10un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_10un) : typeof $("#valor_atacado_10un0").val() !== "undefined" ? $("#valor_atacado_10un0").val() : '';
-        let valor_lista = arrayItem != null ? formatMoney(arrayItem.valor_lista) : typeof $("#valor_lista0").val() !== "undefined" ? $("#valor_lista0").val() : '';
         let valor_produto = arrayItem != null ? formatMoney(arrayItem.valor_produto) : typeof $("#valor_produto0").val() !== "undefined" ? $("#valor_produto0").val() : '';
         let quantidade = arrayItem != null ? arrayItem.quantidade : '';
         let estoque = arrayItem != null ? arrayItem.estoque : '';
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
-        let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
-        let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
-
+        let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '';
 
 
         /**
@@ -234,7 +230,11 @@ $(function() {
                 "</div>" ;
         }
 
-        $("#tbl").append("<div class=\"row \" style='padding: 3px;' id=\"div_pai"+i+"\">" +
+        if(arrayItem !== null ){
+            display = arrayItem.status === 'INATIVO' ? 'none' : '';
+        }
+
+        ("#tbl").append("<div class=\"row \" style=\"padding: 3px;display: "+display+"\" id=\"div_pai"+i+"\">" +
             "<input type=\"hidden\" name=\"variacao_id[]\" id=\"variacao_id"+i+"\"" +
             " class=\"form-control\" value=\'"+id+"\'/>"+
             "<div class=\"px-80\">" +
@@ -299,6 +299,14 @@ $(function() {
             "class=\"form-control\" placeholder=\"ESTOQUE\" onkeyup=\"SomenteNumeros(this)\" " +
             "value=\'" + estoque + "\' required/>"+
             "<label for=\"label-estoque\">ESTOQUE</label>"+
+            "</span>"+
+            "</div>" +
+            "<div class=\"col-md-2\" style='padding:unset;left: -8px;width: 80px'>"+
+            "<span class=\"border-lable-flt\">"+
+            " <input type=\"text\" name=\"percentage[]\"  maxlength='5' id=\"percentage"+i+"\""+
+            " class=\"form-control\" placeholder=\"DESC.EM %\" data-tooltip=\"toggle\" title=\"Desconto em %\"" +
+            " onkeyup=\"formatMoneyPress(this);\" value=\'" + percentage + "\' required/>"+
+            " <label for=\"label-estoque\">DESC.EM %</label>"+
             "</span>"+
             "</div>" +
             "<div class=\"col-md-2 date\" style='padding:unset;left: -8px;width: 122px' id=\"data_validade"+i+"\">"+

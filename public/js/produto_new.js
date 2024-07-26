@@ -715,7 +715,7 @@ $(function() {
      * */
 
     let fnc_variacao = function (i,val,index,arrayItem,selected) {
-
+        let display = '';
         let icon_remove = "";
         let id = arrayItem != null ? arrayItem.id : '';
         let subcodigo = arrayItem != null ? arrayItem.subcodigo.substring(arrayItem.subcodigo.length-2,arrayItem.subcodigo.length) : val;
@@ -729,7 +729,7 @@ $(function() {
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
-        let percentage = arrayItem != null ? arrayItem.percentage : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '';
+        let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '';
 
         /**
          * Adiciona o icone de remover do segundo em diante
@@ -742,7 +742,11 @@ $(function() {
                 "</div>" ;
         }
 
-        $("#tbl").append("<div class=\"row \" style='padding: 3px;' id=\"div_pai"+i+"\">" +
+        if(arrayItem !== null ){
+            display = arrayItem.status === 'INATIVO' ? 'none' : '';
+        }
+
+        $("#tbl").append("<div class=\"row \" style=\"padding: 3px;display: "+display+"\" id=\"div_pai"+i+"\">" +
                                 "<input type=\"hidden\" name=\"variacao_id[]\" id=\"variacao_id"+i+"\"" +
                                 " class=\"form-control\" value=\'"+id+"\'/>"+
                                 "<div class=\"px-80\">" +
@@ -774,7 +778,7 @@ $(function() {
                                     "<span class=\"border-lable-flt\">"+
                                     "<input type=\"text\" name=\"valor_atacado_10un[]\"  id=\"valor_atacado_10un"+i+"\""+
                                     "class=\"form-control format-font\" placeholder=\"ATACADO\"  maxlength='9'"+
-                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_10un + "\' required/>"+
+                                    "onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_atacado_10un + "\'  required/>"+
                                     "   <label for=\"label-atacado10un\">ATACADO</label>"+
                                     "</span>"+
                                 "</div>" +
@@ -783,7 +787,7 @@ $(function() {
                                     "<span class=\"border-lable-flt\">"+
                                         " <input type=\"text\" name=\"valor_produto[]\"  id=\"valor_produto"+i+"\" "+
                                         " class=\"form-control\" placeholder=\"VALOR PAGO\"  maxlength='9'"+
-                                        " onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\' required/>"+
+                                        " onkeyup=\"formatMoneyPress(this)\" value=\'" + valor_produto + "\'  required/>"+
                                         " <label for=\"label-produto\">VALOR PAGO</label>"+
                                     "</span>"+
                                 "</div>" +
@@ -799,7 +803,7 @@ $(function() {
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"quantidade_minima[]\"   maxlength='3' id=\"quantidade_minima"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\" onkeyup=\"SomenteNumeros(this)\" " +
-                                        "value=\'" + quantidade_minima + "\' required/>"+
+                                        "value=\'" + quantidade_minima + "\'  required/>"+
                                         "<label for=\"label-qtd\">QTD.MIN</label>"+
                                     "</span>"+
                                 "</div>" +
@@ -823,7 +827,7 @@ $(function() {
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"validade[]\"  id=\"validade"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\"  " +
-                                        "onKeyUp=\"formatDate(this)\" maxlength=\"10\" value=\'" + validade + "\'/>"+
+                                        "onKeyUp=\"formatDate(this)\" maxlength=\"10\" value=\'" + validade + "\' />"+
                                         "<label for=\"label-qtd\">VALIDADE</label>"+
                                     "</span>"+
                                 "</div>" +
@@ -840,7 +844,7 @@ $(function() {
                                 "<div class=\"col-md-2\" style='padding:unset;left: 2px;width: 122px' >"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<SELECT type=\"text\" name=\"fornecedor[]\"  id=\"fornecedor"+i+"\""+
-                                            "class=\"form-control\" placeholder=\"FORNECEDOR\" required/>"+
+                                            "class=\"form-control\" placeholder=\"FORNECEDOR\"  required/>"+
                                             ""+fnc_fornecedor('#fornecedor'+i,fornecedor_id)+""+
                                         "</select>"+
                                         "<label for=\"label-qtd\">FORNECEDOR</label>"+
