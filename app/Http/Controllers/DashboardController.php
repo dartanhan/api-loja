@@ -63,33 +63,12 @@ class DashboardController extends Controller
             $data = null;
             $return = [];
             $imposto_total = 0;
+            $total_mc = 0;
+            $total_precentual_mc =0;
 
             $dataIni = $this->request->dataIni;
             $dataFim = $this->request->dataFim;
-           // dd($dataOneRequest, $dataTwoRequest);
-           /* $dataOne = ($dataOneRequest)
-                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataOneRequest)->format('Y-m-d')
-                        : CarbonImmutable::now()->format('Y-m-d');
 
-            $dataTwo = ($dataTwoRequest)
-                        ? CarbonImmutable::createFromFormat('d/m/Y', $dataTwoRequest)->format('Y-m-d')
-                        : CarbonImmutable::now()->format("Y-m-d");*/
-
-           /* $dataOne = ($this->request->dataOne != 0) ?
-                CarbonImmutable::parse(
-                    Carbon::createFromFormat('dmY', $this->request->dataOne)
-                        ->format('Y-m-d')
-                ) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-
-            $dataTwo = ($this->request->dataTwo != 0) ?
-                CarbonImmutable::parse(Carbon::createFromFormat('dmY', $this->request->dataTwo)
-                    ->format('Y-m-d')) : CarbonImmutable::parse(CarbonImmutable::now()->format("Y-m-d"));
-*/
-
-           /* $valorTotalProdutos = DB::table('loja_produtos_variacao as lvp')
-                    ->select(DB::raw('SUM(lpv.valor_produto * lv.quantidade)'))
-                    ->where('lvp.venda_id', '=', 'lv.id')
-                    ->get();*/
             /**
              * Semana agrupado por dia
              */
@@ -157,9 +136,14 @@ class DashboardController extends Controller
                 $data['valor_produto'] = $this->formatter->formatCurrency($listSale->valor_total_produtos, 'BRL');
                 //MC = SUBTOTAL - DESCONTO -  CASHBACK - TAXA DE CARTÃO - IMPOSTO- VALOR DO PRODUTO
                 $mc = $listSale->sub_total - $listSale->valor_desconto -  $data['cashback'] - $listSale->taxa_pgto - $imposto - $listSale->valor_total_produtos;
+                $total_mc += $mc;
                 $data['mc'] = $this->formatter->formatCurrency($mc, 'BRL');
+
                 if($listSale->valor_total_produtos > 0){
-                    $data['percentual_mc'] =  number_format($mc/$listSale->valor_total_produtos * 100, 2) . '%';
+                    //$data['percentual_mc'] =  number_format($mc/$listSale->valor_total_produtos * 100, 2) . '%';
+                    $pmc =  $mc/$listSale->valor_total_produtos * 100;
+                    $data['percentual_mc'] =  number_format($pmc, 2) . '%';
+                    $total_precentual_mc += $pmc;
                 }
                 $data['nome_cli'] = $listSale->nome_cli == "" ? "Cliente não Identificado" : $listSale->nome_cli;
 
@@ -172,7 +156,9 @@ class DashboardController extends Controller
             return Response::json(['error' => $e->getMessage()], 400);
         }
         return Response::json(array("data" => $return,
-                                "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL')));
+                                "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL'),
+                                "total_mc" =>  $this->formatter->formatCurrency($total_mc , 'BRL'),
+                                "total_precentual_mc" =>  number_format($total_precentual_mc,2) .'%'));
     }
 
     /****
