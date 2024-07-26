@@ -133,12 +133,8 @@ $(function() {
                                     "<th>ESTOQUE</th>" +
                                     "<th>VAREJO</th>" +
                                     "<th>ATACADO</th>" +
-                                    //"<th>ATA.5UN</th>" +
-                                    //"<th>ATA.10UN</th>" +
-                                    //"<th>VAL.LISTA</th>" +
                                     "<th>PRODUTO</th>" +
-                                    //"<th>VAL.CARTÃO/PIX</th>" +
-                                    //"<th>VAL.PARCELADO</th>" +
+                                    "<th>DESCONTO EM %</th>" +
                                     "<th>STATUS</th>" +
                                     "<th>AÇÃO</th>" +
                                 "</tr>" +
@@ -175,14 +171,9 @@ $(function() {
                                         "<td>" + arrayItem.quantidade + "</td>" +
                                         "<td>" + arrayItem.estoque + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_atacado) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_atacado_5un) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_lista) + "</td>" +
                                         "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_cartao_pix) + "</td>" +
-                                        //"<td>" + formatMoney(arrayItem.valor_parcelado) + "</td>" +
+                                        "<td>" + arrayItem.percentage + "% </td>" +
                                         "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
                                         "<td><i class=\"bi-image\" " +
                                         "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
@@ -379,7 +370,7 @@ $(function() {
             valor_cartao_pix0: {
                 required: true
             },
-            valor_parcelado0: {
+            percentage: {
                 required: true
             }
         },
@@ -426,8 +417,8 @@ $(function() {
             valor_cartao_pix: {
                 required: "Informe o Valor?"
             },
-            valor_parcelado: {
-                required: "Informe o Valor?"
+            percentage: {
+                required: "Informe o Valor Percentual de Desconto?"
             }
         }, submitHandler: function(form,event) {
             event.preventDefault();
@@ -498,7 +489,7 @@ $(function() {
             $('#ncm').val(response.data.ncm);
             $('#cest').val(response.data.cest);
             $('#origem').val(response.data.origem_id);
-
+            $('#percentage').val(response.data.percentage);
 
             $('#codigo_produto').prop('readonly', true);
             $('#GerarCodigo').prop('disabled', true);
@@ -722,6 +713,7 @@ $(function() {
     /**
      * Retorna os campos de variações do produto
      * */
+
     let fnc_variacao = function (i,val,index,arrayItem,selected) {
 
         let icon_remove = "";
@@ -729,21 +721,15 @@ $(function() {
         let subcodigo = arrayItem != null ? arrayItem.subcodigo.substring(arrayItem.subcodigo.length-2,arrayItem.subcodigo.length) : val;
         let variacao = arrayItem != null ? arrayItem.variacao : '';
         let valor_varejo = arrayItem != null ? formatMoney(arrayItem.valor_varejo) : typeof $("#valor_varejo0").val() !== "undefined" ? $("#valor_varejo0").val() : '';
-    //    let valor_atacado = arrayItem != null ? formatMoney(arrayItem.valor_atacado) : typeof $("#valor_atacado0").val() !== "undefined" ? $("#valor_atacado0").val() : '';
-    //    let valor_atacado_5un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_5un) : typeof $("#valor_atacado_5un0").val() !== "undefined" ? $("#valor_atacado_5un0").val() : '';
+        let valor_atacado = arrayItem != null ? formatMoney(arrayItem.valor_atacado_10un) : typeof $("#valor_atacado_10un0").val() !== "undefined" ? $("#valor_atacado_10un0").val() : '';
         let valor_atacado_10un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_10un) : typeof $("#valor_atacado_10un0").val() !== "undefined" ? $("#valor_atacado_10un0").val() : '';
-    //    let valor_lista = arrayItem != null ? formatMoney(arrayItem.valor_lista) : typeof $("#valor_lista0").val() !== "undefined" ? $("#valor_lista0").val() : '';
         let valor_produto = arrayItem != null ? formatMoney(arrayItem.valor_produto) : typeof $("#valor_produto0").val() !== "undefined" ? $("#valor_produto0").val() : '';
         let quantidade = arrayItem != null ? arrayItem.quantidade : '';
         let estoque = arrayItem != null ? arrayItem.estoque : '';
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
-
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
-   //     let valor_cartao_pix = arrayItem != null ? formatMoney(arrayItem.valor_cartao_pix) : typeof $("#valor_cartao_pix0").val() !== "undefined" ? $("#valor_cartao_pix0").val() : '';
-   //     let valor_parcelado = arrayItem != null ? formatMoney(arrayItem.valor_parcelado) : typeof $("#valor_parcelado0").val() !== "undefined" ? $("#valor_parcelado0").val() : '';
-
-
+        let percentage = arrayItem != null ? arrayItem.percentage : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '';
 
         /**
          * Adiciona o icone de remover do segundo em diante
@@ -825,7 +811,15 @@ $(function() {
                                         "<label for=\"label-estoque\">ESTOQUE</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2 date\" style='padding:unset;left: -8px;width: 122px' id=\"data_validade"+i+"\">"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -8px;width: 80px'>"+
+                                    "<span class=\"border-lable-flt\">"+
+                                        " <input type=\"text\" name=\"percentage[]\"  maxlength='5' id=\"percentage"+i+"\""+
+                                        " class=\"form-control\" placeholder=\"DESC.EM %\" data-tooltip=\"toggle\" title=\"Desconto em %\"" +
+                                        " onkeyup=\"formatMoneyPress(this);\" value=\'" + percentage + "\' required/>"+
+                                        " <label for=\"label-estoque\">DESC.EM %</label>"+
+                                    "</span>"+
+                                "</div>" +
+                                "<div class=\"col-md-2 date\" style='padding:unset;left: -6px;width: 122px' id=\"data_validade"+i+"\">"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"validade[]\"  id=\"validade"+i+"\""+
                                         "class=\"form-control\" placeholder=\"QTD.MIN\"  " +
@@ -833,7 +827,7 @@ $(function() {
                                         "<label for=\"label-qtd\">VALIDADE</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -4px;width: 78px'>"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: -2px;width: 78px'>"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<SELECT type=\"text\" name=\"status_variacao[]\"  id=\"status_variacao"+i+"\""+
                                             "class=\"form-control status_variacao\" placeholder=\"STATUS\" required/>"+
@@ -843,7 +837,7 @@ $(function() {
                                         "<label for=\"label-qtd\">STATUS</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: -1px;width: 122px' >"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: 2px;width: 122px' >"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<SELECT type=\"text\" name=\"fornecedor[]\"  id=\"fornecedor"+i+"\""+
                                             "class=\"form-control\" placeholder=\"FORNECEDOR\" required/>"+

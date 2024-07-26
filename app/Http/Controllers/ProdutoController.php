@@ -205,19 +205,15 @@ class ProdutoController extends Controller
                 $data["variacao"] = $this->request->input("variacao")[$i];
                 $data["valor_varejo"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_varejo")[$i]));
                 $data["valor_atacado"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_atacado_10un")[$i]));
-               // $data["valor_atacado_5un"] = $formatter->parse($this->request->input("valor_atacado_5un")[$i]);
                 $data["valor_atacado_10un"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_atacado_10un")[$i]));
-               // $data["valor_lista"] = $formatter->parse($this->request->input("valor_lista")[$i]);
                 $data["valor_produto"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_produto")[$i]));
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
                 $data["status"] = $this->request->input("status_variacao")[$i];
-
+                $data["percentage"] = $formatter->parse($this->request->input("percentage")[$i]);
                 $data["validade"] = $formattedDate;
-
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
-              //  $data["descontos"] = $formatter->parse($this->request->input("valor_cartao_pix")[$i]);
 
                 /**
                  * Cria ou Atualiza a variação do produto
