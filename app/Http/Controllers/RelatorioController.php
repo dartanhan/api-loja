@@ -819,7 +819,7 @@ class RelatorioController extends Controller
         try{
 
             $data = $this->salePayments::with('PaymentsList')->where("venda_id",$id)->get();
-            $payments = $this->payments::with('PaymentsTaxes')->orderBy('nome','asc')->get();
+            $payments = $this->payments::with('PaymentsTaxes')->where("status",true)->orderBy('nome','asc')->get();
 
             return Response::json(array('data' =>$data,'payments' =>$payments));
 

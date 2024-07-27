@@ -222,12 +222,18 @@
                             <div class="row">
                                 <div class="col-md-8 form-group">
                                     <div class="col-md-12">
-                                        <select name="payments_sale" id="payments_sale" class="form-select format-font"></select>
+                                        <div class="form-floating">
+                                            <select name="payments_sale" id="payments_sale" class="form-select format-font"></select>
+                                            <label class="form-label" for="floatingSelect">Pagamento a ser Alterado</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-8 form-group">
                                     <div class="col-md-12">
-                                        <select name="payments" id="payments" class="form-select format-font"></select>
+                                        <div class="form-floating">
+                                            <select name="payments" id="payments" class="form-select format-font"></select>
+                                            <label class="form-label" for="floatingSelect">Forma de Pagamento Nova</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
