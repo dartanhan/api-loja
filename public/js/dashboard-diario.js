@@ -1,4 +1,4 @@
-import {fncDataDatatable,getDataFormat} from './comum.js';
+import {fncDataDatatable,getDataFormat,botaoLoad} from './comum.js';
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const url = fncUrl();
@@ -379,8 +379,8 @@ $(function () {
         };
 
         try {
-
-            table =  $('#dataTableModalDinner').DataTable({
+            $('#dataTableModalDinner').DataTable().destroy();
+            $('#dataTableModalDinner').DataTable({
                 "ajax":{
                     "method": 'post',
                     "url": url + "/relatorio/detailDinner",
@@ -431,25 +431,25 @@ $(function () {
      * */
     $(document).on("click", ".btnEdit", async function(event) {
         event.preventDefault();
-
+        let payment_id;
         let venda_id = $(this).data('value');
         let codigo_venda = $(this).data('codigo-venda');
 
         const response = await fetch(url + "/relatorio/editSales/"+venda_id);
         const data = await response.json();
         // console.log(data.data);
-         //console.log(data.payments);
+         console.log(data.payments);
 
         let html = data.data.reduce(function (string, obj) {
+            payment_id = obj.id;
             return string + "<option value="+obj.id+" data-taxa="+obj.taxa+">" + obj.payments_list[0].nome +" - taxa("+ obj.taxa +")</option>"
         }, "<option value='' selected='selected'>Pagamento a ser Alterado </option>");
 
         $("#payments_sale").html(html);
 
-        html = data.payments.reduce(function (string, obj) {
-            if (obj.payments_taxes && obj.payments_taxes.length > 0 && obj.payments_taxes[0].hasOwnProperty('valor_taxa')) {
-                return string + "<option value='" + obj.id + "' data-taxa='" + obj.payments_taxes[0].valor_taxa + "'>" + obj.nome + " - taxa(" + obj.payments_taxes[0].valor_taxa + ")</option>";
-            }
+        let filteredPayments = data.payments.filter(obj => obj.payments_taxes && obj.payments_taxes.length > 0 && obj.payments_taxes[0].hasOwnProperty('valor_taxa'));
+        html = filteredPayments.reduce(function (string, obj) {
+            return string + "<option value='" + obj.id + "' data-taxa='" + obj.payments_taxes[0].valor_taxa + "'>" + obj.nome + " - taxa(" + obj.payments_taxes[0].valor_taxa + ")</option>";
         }, "<option value='' selected='selected'>Forma de Pagamentos </option>");
 
         $("#payments").html(html);
@@ -609,22 +609,24 @@ $(function () {
                 data: myForm,
                 dataType: 'json',
                 beforeSend: function () {
-                    $('#salvar').html('Aguarde... <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>');
+                    //$('#salvar').html('Aguarde... <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>');
+                    botaoLoad('salvar');
                 },
                 success: function (response) {
                     //console.log(response);
 
                     if(response.success) {
-                        swalWithBootstrapButtons.fire({
+                        sweetAlert({
                             title: 'OK!',
                             text: response.message,
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        let d1 =  $('input[name=dataini]').val() !=="" ? $('input[name=dataini]').val().replaceAll("/","") : 0;
-                        let d2 =  $('input[name=dataini]').val() !=="" ? $('input[name=datafim]').val().replaceAll("/","") : 0;
+                      //  let d1 =  $('input[name=dataini]').val() !=="" ? $('input[name=dataini]').val().replaceAll("/","") : 0;
+                      //  let d2 =  $('input[name=dataini]').val() !=="" ? $('input[name=datafim]').val().replaceAll("/","") : 0;
                         fncDataDatatable(table);
+                        $('#divModalUpdate').modal('hide');
                     }
 
                 },

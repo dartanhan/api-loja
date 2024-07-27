@@ -370,3 +370,7 @@ $(document).on("click","#addListaCompra" ,function(event){
             .replace(/[\s_-]+/g, '-') // Substituir espaços e underscores por hífens
             .replace(/^-+|-+$/g, ''); // Remover hífens das extremidades
     }
+
+    export function botaoLoad(parm) {
+        $('#'+parm+'').html('Aguarde... <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>');
+    }

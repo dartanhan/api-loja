@@ -6,6 +6,7 @@ use App\Http\Models\Payments;
 use App\Http\Models\Usuario;
 use App\Http\Models\Vendas;
 use App\Http\Models\VendasCashBack;
+use App\Traits\RelatorioTrait;
 use Illuminate\Http\Request;
 use NumberFormatter;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ use function PHPUnit\Framework\isNull;
 
 class DashboardController extends Controller
 {
-
+    use RelatorioTrait;
     protected $request, $vendas, $formatter, $cashbackVendas,$payments;
 
     public function __construct(Request $request, Vendas $vendas, VendasCashBack $cashbackVendas, Payments $payments)
@@ -65,9 +66,11 @@ class DashboardController extends Controller
             $imposto_total = 0;
             $total_mc = 0;
             $total_precentual_mc =0;
-
+            $total_vendas_dia =0;
             $dataIni = $this->request->dataIni;
             $dataFim = $this->request->dataFim;
+            $store_id = $this->request->id;
+            $orderTotal =0;
 
             /**
              * Semana agrupado por dia
@@ -100,7 +103,7 @@ class DashboardController extends Controller
               ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'lv.id')
               ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
               ->leftJoin('loja_clientes', 'loja_clientes.id', '=', 'lv.cliente_id')
-              ->where('lv.loja_id', $this->request->id)
+              ->where('lv.loja_id', $store_id)
               ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataIni, $dataFim))
                 ->groupBy('lv.codigo_venda')
                 ->orderBy('lv.created_at', 'asc')
@@ -108,7 +111,6 @@ class DashboardController extends Controller
 
 
             foreach ($listSales as $listSale) {
-
                 $data['total'] =  $listSale->total - $this->cashback($listSale->venda_id);
                 $data['data'] =  $listSale->data;
                 $data['loja'] =  $listSale->loja;
@@ -152,13 +154,23 @@ class DashboardController extends Controller
             // Adiciona o total de impostos ao array de retorno
             //array_push($return, ['total' => 'Total de Impostos', 'valor_imposto' => $imposto_total]);
 
+            /**
+             * Pego o as vendas no DIA
+            */
+            $totalPerDay =  $this->totaisPorDia($store_id,$dataIni, $dataFim);
+            if (!$totalPerDay->isEmpty()) {
+                foreach ($totalPerDay as $day) {
+                    $orderTotal += floatval($day->orderTotal);
+                }
+                $orderTotal = ($total_mc / $orderTotal)*100;
+            }
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 400);
         }
         return Response::json(array("data" => $return,
                                 "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL'),
                                 "total_mc" =>  $this->formatter->formatCurrency($total_mc , 'BRL'),
-                                "total_precentual_mc" =>  number_format($total_precentual_mc,2) .'%'));
+                                "total_precentual_mc" => number_format($orderTotal,2).'%' ));
     }
 
     /****
