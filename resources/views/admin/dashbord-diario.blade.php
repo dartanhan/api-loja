@@ -7,93 +7,112 @@
 @endsection
 
 @section('content')
-
-    <div class="container-fluid mt-3">
+    <input type="hidden" name="store_id" id="store_id" value="{{$user_data->loja_id}}">
+    <div class="container-fluid px-4">
         <h1 class="mt-4">Dashboard</h1>
-        <input type="hidden" name="store_id" id="store_id" value="{{$user_data->loja_id}}">
-
-        <div class="d-flex flex-wrap floating-card">
-            <div class="card bg-primary text-white card-custom-width h-25">
-                <div class="d-flex  align-items-center" id="totalDinner" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer">
-                    <a class="small text-white stretched-link detailDinner" href="#"
-                    data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
-                </div>
-            </div>
-            <div class="card bg-warning text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalCartao" name="load">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+        <div class="row">
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-primary text-white mb-2">
+                    <div class="d-flex  align-items-center" id="totalDinner" name="load">
                         <div class="card-body" name="card-body"></div>
                         <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer">
-                    <a class="small text-white stretched-link detailCart" href="#"
-                    data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
-                </div>
-            </div>
-            <div class="card bg-danger text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalDesconto" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
+                    <div class="card-footer">
+                        <a class="small text-white stretched-link detailDinner" href="#"
+                        data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
+                    </div>
                 </div>
             </div>
-            <div class="card bg-info text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalDia" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
-                </div>
-            </div>
-            <div class="card bg-secondary text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalSemana" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-warning text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalCartao" name="load">
+                            <div class="card-body" name="card-body"></div>
+                            <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer">
+                        <a class="small text-white stretched-link detailCart" href="#"
+                        data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
+                    </div>
                 </div>
             </div>
-            <div class="card bg-dark text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalMes" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
-                </div>
-            </div>
-            <div class="card bg-danger opacity-75 text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalImposto" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-danger text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalDesconto" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
                 </div>
             </div>
-            <div class="card bg-success text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalMc" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-info text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalDia" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
                 </div>
             </div>
-            <div class="card bg-success opacity-75 text-white card-custom-width h-25">
-                <div class="d-flex align-items-center" id="totalPmc" name="load">
-                    <div class="card-body" name="card-body"></div>
-                    <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-secondary text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalSemana" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
                 </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">Detalhes</a>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-dark text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalMes" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-danger opacity-75 text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalImposto" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-success text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalMc" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-success opacity-75 text-white mb-2">
+                    <div class="d-flex align-items-center" id="totalPmc" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,17 +122,16 @@
                     <i class="fas fa-chart-area me-1"></i>
                     Filtro:
                 </div>
-                <div class="col-auto input-group-sm" id="dataIni" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
+                <div class="col-auto input-group-sm mb-2" id="dataIni" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
                     <label for="dataini" class="visually-hidden">Data Inicial</label>
                     <input type="text" class="form-control input-group-sm" placeholder="Data Inicial" aria-label="Data Inicial" name="dataIni">
                     <span class="add-on"><i class="icon-th"></i></span>
                 </div>
-                <div class="col-auto input-group-sm" id="dataFim" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
+                <div class="col-auto input-group-sm mb-2" id="dataFim" data-date="{{date("d/m/Y")}}" data-date-format="dd/mm/yyyy">
                     <label for="datafim" class="visually-hidden">Data Final</label>
                     <input type="text" class="form-control input-group-sm" placeholder="Data Final" aria-label="Data Final" name="dataFim">
                     <span class="add-on"><i class="icon-th"></i></span>
                 </div>
-
                 <div class="col-auto input-group-sm">
                     <button class="btn bgBtn btn-enviar" type="button">Filtrar</button>
                     <button class="btn bgBtn btn-limpar" type="button">Limpar</button>

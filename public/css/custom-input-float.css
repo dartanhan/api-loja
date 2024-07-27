@@ -140,13 +140,4 @@ a.bg-primary:focus,a.bg-primary:hover,button.bg-primary:focus,button.bg-primary:
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius:5px;
 }
-.table-responsive {
-    overflow-x: auto;
-}
-table {
-    width: 100%;
-}
-.card-custom-width {
-    width: 15%;
-    margin: 0.5%;
-}
+
