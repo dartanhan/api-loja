@@ -9,6 +9,7 @@ use App\Http\Models\Vendas;
 use App\Http\Models\VendasCashBack;
 use App\Http\Models\VendasProdutosDesconto;
 use App\Http\Models\VendasProdutosTipoPagamento;
+use App\Traits\RelatorioTrait;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Foundation\Application;
@@ -23,6 +24,7 @@ use Yajra\DataTables\DataTables;
 
 class RelatorioController extends Controller
 {
+    use RelatorioTrait;
     protected $request, $vendas, $payments, $lojas, $salePayments,$formatter, $taxaCartao,$vendasCashBack,$vendasProdutosDesconto;
 
     public function __construct(Request $request, Vendas $vendas,
@@ -274,21 +276,22 @@ class RelatorioController extends Controller
 
 
             //totais por dia
-            $totalsDay = $this->vendas->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-                ->leftjoin('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-                ->leftjoin('loja_taxa_cartoes as lc', 'lc.forma_id', '=', 'fp.id')
-                ->select(
-                        "fp.nome as name",
-                        "fp.id as id_payment",
-                        //(DB::raw("FORMAT(SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)),2) AS orderTotal")))
-					    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotal")))
-               // ->where('loja_vendas.loja_id', $store->id)
-               // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
-              //->whereDate('loja_vendas.created_at', Carbon::today())
-               ->where('loja_vendas.loja_id', $store_id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
-                ->groupBy('fp.id')
-                ->get();
+            $totalsDay = $this->totaisPorDia($store_id,$dateOne, $dateTwo);
+//            $totalsDay = $this->vendas->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+//                ->leftjoin('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
+//                ->leftjoin('loja_taxa_cartoes as lc', 'lc.forma_id', '=', 'fp.id')
+//                ->select(
+//                        "fp.nome as name",
+//                        "fp.id as id_payment",
+//                        //(DB::raw("FORMAT(SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)),2) AS orderTotal")))
+//					    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotal")))
+//               // ->where('loja_vendas.loja_id', $store->id)
+//               // ->whereDate('loja_vendas.created_at', Carbon::now()->subDay('4'))
+//              //->whereDate('loja_vendas.created_at', Carbon::today())
+//               ->where('loja_vendas.loja_id', $store_id)
+//                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
+//                ->groupBy('fp.id')
+//                ->get();
 
             //totais descontos por dia
             $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
