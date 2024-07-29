@@ -34,8 +34,8 @@
                         <thead class="text-center">
                         <tr>
                             <th>#</th>
-                            <th data-sortable="true">Nome</th>
-                            <th>Slug</th>
+                            <th class="w-15 p-2" data-sortable="true">Nome</th>
+                            <th class="w-15 p-2">Slug</th>
                             <th>Situação</th>
                             <th>Data Criação</th>
                             <th>Data Atualização</th>
@@ -63,11 +63,11 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label">Nome Forma de Pagamento</label>
+                                    <label class="form-label">Forma de Pagamento</label>
                                     <input type="text" class="form-control" id="nome" name="nome" title="Nome da Forma de Pagamento" placeholder="Nome da Forma de Pagamento">
                                 </div>
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label">Slug Forma de Pagamento</label>
+                                    <label class="form-label">Slug</label>
                                     <input type="text" class="form-control" id="slug" name="slug" title="Slug" placeholder="Slug da Forma de Pagamento" readonly>
                                 </div>
                                 <div class="col-md-6 mb-3">
