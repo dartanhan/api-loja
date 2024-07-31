@@ -76,25 +76,24 @@ class ProdutoController extends Controller
 
             //$ret =  $this->produto::with('products')
             $query =  $this->produto::with('produtoImagens')
-                ->leftJoin('loja_fornecedores','loja_produtos_new.fornecedor_id','=' ,'loja_fornecedores.id')
-                ->leftJoin('loja_categorias','loja_produtos_new.categoria_id','=' ,'loja_categorias.id')
-                //->leftJoin('loja_produtos_variacao','loja_produtos_new.id','=' ,'loja_produtos_variacao.products_id')
+                ->leftJoin('loja_fornecedores','lpn.fornecedor_id','=' ,'loja_fornecedores.id')
+                ->leftJoin('loja_categorias','lpn.categoria_id','=' ,'loja_categorias.id')
                 ->select(
-                    'loja_produtos_new.id',
-                    'loja_produtos_new.codigo_produto',
-                    'loja_produtos_new.descricao',
+                    'lpn.id',
+                    'lpn.codigo_produto',
+                    'lpn.descricao',
                     'loja_categorias.nome as categoria',
-                    (DB::raw('IF((loja_produtos_new.status = 1), \'ATIVO\', \'INATIVO\') as status')),
-                    (DB::raw("DATE_FORMAT(loja_produtos_new.created_at, '%d/%m/%Y %H:%i:%s') as created")),
-                    (DB::raw("DATE_FORMAT(loja_produtos_new.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
+                    (DB::raw('IF((lpn.status = 1), \'ATIVO\', \'INATIVO\') as status')),
+                    (DB::raw("DATE_FORMAT(lpn.created_at, '%d/%m/%Y %H:%i:%s') as created")),
+                    (DB::raw("DATE_FORMAT(lpn.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
 
-                )
-                ->where('loja_produtos_new.status',true) //somente ativos
-                ->orderBy('loja_produtos_new.id', 'DESC');
+                )->from('loja_produtos_new as lpn')
+                ->where('lpn.status',true) //somente ativos
+                ->groupBy('lpn.id')
+                ->orderBy('lpn.id', 'DESC');
 
             if(!empty($query)) {
                 return DataTables::of($query)->make(true);
-              //  return Response()->json($ret);
             }  else {
                 return Response()->json(array('data'=>''));
             }

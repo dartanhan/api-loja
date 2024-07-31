@@ -26,22 +26,22 @@ class Produto extends Model implements Auditable
     function products() {
         return  $this->hasMany(ProdutoVariation::class,'products_id', 'id')
             ->leftJoin('loja_produtos_imagens', 'loja_produtos_variacao.id', '=', 'loja_produtos_imagens.produto_variacao_id')
-            //->where('loja_produtos_variacao.status', 1)
+            ->where('loja_produtos_variacao.status', true)
             ->select("loja_produtos_variacao.*",
                             "loja_produtos_imagens.path","loja_produtos_imagens.id as id_image",
                             "loja_produtos_imagens.produto_variacao_id",
-                            (DB::raw('IF((loja_produtos_variacao.status = 1), "ATIVO", "INATIVO") as status')));
+                            (DB::raw('IF((loja_produtos_variacao.status = true), "ATIVO", "INATIVO") as status')));
     }
 
     function variances()
     {
         return  $this->hasMany(ProdutoVariation::class,'products_id', 'id')
             ->leftJoin('loja_produtos_imagens', 'loja_produtos_variacao.id', '=', 'loja_produtos_imagens.produto_variacao_id')
-            ->where('loja_produtos_variacao.status', 0)
+            ->where('loja_produtos_variacao.status', false)
             ->select("loja_produtos_variacao.*",
                 "loja_produtos_imagens.path","loja_produtos_imagens.id as id_image",
                 "loja_produtos_imagens.produto_variacao_id",
-                (DB::raw('IF((loja_produtos_variacao.status = 1), "ATIVO", "INATIVO") as status')));
+                (DB::raw('IF((loja_produtos_variacao.status = true), "ATIVO", "INATIVO") as status')));
     }
 
     public function listaDeCompras()
