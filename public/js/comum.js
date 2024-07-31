@@ -8,6 +8,7 @@ window.sweetAlert = sweetAlert;
 window.sweetAlertClose = sweetAlertClose;
 window.createSlug = createSlug;
 window.botaoLoad = botaoLoad;
+window.removeCampo = removeCampo;
 
 
 
@@ -375,4 +376,12 @@ $(document).on("click","#addListaCompra" ,function(event){
 
     export function botaoLoad(parm) {
         $('#'+parm+'').html('Aguarde... <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>');
+    }
+
+
+    /**
+     * REMOVE OS INPUTS DINAMICOS DAS VARIAÇÕES
+     * */
+    export function removeCampo(parm) {
+        document.getElementById(parm).remove();
     }

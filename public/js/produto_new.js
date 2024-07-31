@@ -1,4 +1,4 @@
-import {sweetAlert,formatMoney,getFormattedDate,SomenteNumeros,formatMoneyPress,formatDate} from './comum.js';
+import {sweetAlert,formatMoney,getFormattedDate,SomenteNumeros,formatMoneyPress,formatDate,removeCampo} from './comum.js';
 
 
 $(function() {
@@ -156,33 +156,34 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>"
+                                        "<img src='../public/storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>" :
+                                        "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>"
 
                                     let image_filho = "../public/storage/produtos/not-image.png";
-                                    if(arrayItem.path !== null){
-                                        image_filho = '../public/storage/'+arrayItem.path;
+                                    if (arrayItem.path !== null) {
+                                        image_filho = '../public/storage/' + arrayItem.path;
                                     }
-
-                                    tmpRow += "<tr>" +
-                                        "<td>"+image+"</td>" +
-                                        "<td>" + arrayItem.subcodigo + "</td>" +
-                                        "<td>" + arrayItem.variacao + "</td>" +
-                                        "<td>" + arrayItem.quantidade + "</td>" +
-                                        "<td>" + arrayItem.estoque + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
-                                        "<td>" + arrayItem.percentage + "% </td>" +
-                                        "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
-                                        "<td><i class=\"bi-image\" " +
-                                        "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                        "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
-                                        "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
-                                        "   data-subcodigo='"+arrayItem.subcodigo+"' data-image-id='"+arrayItem.id_image+"'" +
-                                        "   data-image-preview='"+image_filho+"'  data-path='"+arrayItem.path+"' data-flag-image='1'>"+
-                                        "</td>"+
-                                    "</tr>"
+                                    if (arrayItem.status !== 'INATIVO'){
+                                        tmpRow += "<tr>" +
+                                            "<td>" + image + "</td>" +
+                                            "<td>" + arrayItem.subcodigo + "</td>" +
+                                            "<td>" + arrayItem.variacao + "</td>" +
+                                            "<td>" + arrayItem.quantidade + "</td>" +
+                                            "<td>" + arrayItem.estoque + "</td>" +
+                                            "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
+                                            "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
+                                            "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
+                                            "<td>" + arrayItem.percentage + "% </td>" +
+                                            "<td>" + "<span class='badge bg-success'>" + arrayItem.status + "</span>" + "</td>" +
+                                            "<td><i class=\"bi-image\" " +
+                                            "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                                            "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
+                                            "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='" + arrayItem.id + "' " +
+                                            "   data-subcodigo='" + arrayItem.subcodigo + "' data-image-id='" + arrayItem.id_image + "'" +
+                                            "   data-image-preview='" + image_filho + "'  data-path='" + arrayItem.path + "' data-flag-image='1'>" +
+                                            "</td>" +
+                                            "</tr>"
+                                    }
                                 });
 
                                 tmpRow  +=      "</table>";
@@ -664,9 +665,24 @@ $(function() {
 
         let i = $("#tbl .row").length; //qtd de divs,linhas
 
-        let val = Number(typeof $('#subcodigo0').val() !== "undefined" ? $('#subcodigo0').val() : 0)+i;
-        val = val >=10 ? val : "0" + val;
-        fnc_variacao(i,val,null,null, '');
+        // Seleciona todos os inputs com o nome 'subcodigo[]'
+        let inputs = document.querySelectorAll('input[name="subcodigo[]"]');
+        if (inputs.length > 0) {
+            // Pega o último input
+            let lastInput = inputs[inputs.length - 1];
+
+            // Pega o valor do último input
+            let lastInputValue = lastInput.value;
+
+            // Mostra o valor no console (ou faça o que você precisar com ele)
+            console.log('Valor do último input:', lastInputValue);
+
+
+            let val = Number(typeof $('#subcodigo0').val() !== "undefined" ? lastInputValue : 0) + 1;
+
+            val = val >= 10 ? val : "0" + val;
+            fnc_variacao(i, val, null, null, '');
+        }
     });
 
     /**
@@ -725,11 +741,11 @@ $(function() {
         let valor_atacado_10un = arrayItem != null ? formatMoney(arrayItem.valor_atacado_10un) : typeof $("#valor_atacado_10un0").val() !== "undefined" ? $("#valor_atacado_10un0").val() : '';
         let valor_produto = arrayItem != null ? formatMoney(arrayItem.valor_produto) : typeof $("#valor_produto0").val() !== "undefined" ? $("#valor_produto0").val() : '';
         let quantidade = arrayItem != null ? arrayItem.quantidade : '';
-        let estoque = arrayItem != null ? arrayItem.estoque : '';
+        let estoque = arrayItem != null ? arrayItem.estoque : 0;
         let quantidade_minima = arrayItem != null ? arrayItem.quantidade_minima : 2;
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
-        let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '';
+        let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '0,00';
 
         /**
          * Adiciona o icone de remover do segundo em diante
@@ -743,10 +759,10 @@ $(function() {
         }
 
         if(arrayItem !== null ){
-            display = arrayItem.status === 'INATIVO' ? 'none' : '';
+            display = arrayItem.status === 'INATIVO' ? 'padding:0px;display:none' : 'padding: 3px;';
         }
 
-        $("#tbl").append("<div class=\"row \" style=\"padding: 3px;display: "+display+"\" id=\"div_pai"+i+"\">" +
+        $("#tbl").append("<div class=\"row \" style=\" "+display+"\" id=\"div_pai"+i+"\">" +
                                 "<input type=\"hidden\" name=\"variacao_id[]\" id=\"variacao_id"+i+"\"" +
                                 " class=\"form-control\" value=\'"+id+"\'/>"+
                                 "<div class=\"px-80\">" +
@@ -936,6 +952,7 @@ $(function() {
      * Exibe os primeiros campos dos inputs da variação ao carregar a página.
      * */
      fnc_variacao(0,1,null,null, '');
+
 });
 
 /**
@@ -969,9 +986,3 @@ $(function() {
             '</table>';
     }
 
-/**
- * REMOVE OS INPUTS DINAMICOS DAS VARIAÇÕES
- * */
-    function removeCampo(parm) {
-        document.getElementById(parm).remove();
-    }
