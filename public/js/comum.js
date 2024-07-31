@@ -7,6 +7,8 @@ window.formatDate = formatDate;
 window.sweetAlert = sweetAlert;
 window.sweetAlertClose = sweetAlertClose;
 window.createSlug = createSlug;
+window.botaoLoad = botaoLoad;
+
 
 
 const swalWithBootstrapButtons = Swal.mixin({
