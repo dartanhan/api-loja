@@ -3,7 +3,7 @@ import {sweetAlert,formatMoney,getFormattedDate,SomenteNumeros,formatMoneyPress,
 
 $(function() {
     let json,id,table;
-
+    const errorMessages = document.getElementById('errorMessages');
     const fileInput = document.getElementById('file');
 
     const url = fncUrl();
@@ -762,7 +762,7 @@ $(function() {
             display = arrayItem.status === 'INATIVO' ? 'padding:0px;display:none' : 'padding: 3px;';
         }
 
-        $("#tbl").append("<div class=\"row \" style=\" "+display+"\" id=\"div_pai"+i+"\">" +
+        $("#tbl").append("<div class=\"row mt-1\" style=\" "+display+"\" id=\"div_pai"+i+"\">" +
                                 "<input type=\"hidden\" name=\"variacao_id[]\" id=\"variacao_id"+i+"\"" +
                                 " class=\"form-control\" value=\'"+id+"\'/>"+
                                 "<div class=\"px-80\">" +
@@ -872,10 +872,54 @@ $(function() {
     }
 
 
+
+    /**
+     * Salva as informações do produdo
+     * */
     let fnc_enviaForm = function (formData) {
-       // const formDataObj = Object.fromEntries(formData.entries());
-        //console.log(formDataObj);
-       // return;
+       const errors = [];
+       const inputs_variacao = document.querySelectorAll('input[name="variacao[]"]');
+       const inputs_qtd = document.querySelectorAll('input[name="quantidade[]"]');
+       const selects = document.querySelectorAll('select[name="fornecedor[]"]');
+       let error = false;
+
+        inputs_variacao.forEach(input => {
+            if (input.value.trim() === '') {
+                //errors.push(`Campo ${input.name} deve ser preencido!`);
+                error = true;
+                input.classList.add('invalid-input');
+            } else {
+                input.classList.remove('invalid-input');
+            }
+        });
+
+        inputs_qtd.forEach(input => {
+            if (input.value.trim() === '') {
+                //errors.push(`Campo ${input.name} deve ser preencido! `);
+                error = true;
+                input.classList.add('invalid-input');
+            } else {
+                input.classList.remove('invalid-input');
+            }
+        });
+
+        selects.forEach(select  => {
+            if (select.value === '') {
+                //errors.push(`Campo ${input.name} deve ser preencido! `);
+                error = true;
+                select.classList.add('invalid-input');
+            } else {
+                select.classList.remove('invalid-input');
+            }
+        });
+
+        //if (errors.length > 0) {
+        if(error){
+            errors.push(`Campos em destaque devem ser preencido(s)! `);
+            displayErrors(errors);
+            return;
+        }
+
         $.ajax({
             url: url + "/produto",
             type: 'POST',
@@ -986,3 +1030,11 @@ $(function() {
             '</table>';
     }
 
+    function displayErrors(errors) {
+        sweetAlert({
+            title: "Error!",
+            text: errors,
+            icon: 'error',
+            showConfirmButton: true
+        });
+    }
