@@ -94,8 +94,8 @@
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
-                <div class="card bg-success text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalMc" name="load">
+                <div class="card bg-success text-white mb-2 p-0">
+                    <div class="d-flex align-items-center p-0" id="totalMc" name="load">
                         <div class="card-body" name="card-body"></div>
                         <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
@@ -105,8 +105,8 @@
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
-                <div class="card bg-success opacity-75 text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalPmc" name="load">
+                <div class="card bg-success opacity-75 text-white mb-2 p-0">
+                    <div class="d-flex align-items-center p-0" id="totalPmc" name="load">
                         <div class="card-body" name="card-body"></div>
                         <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
@@ -148,20 +148,25 @@
                     <table id="datatablesDiario" class="table compact table-striped table-hover">
                         <thead class="text-center">
                             <tr>
+                                <th data-sortable="true">#</th>
                                 <th data-sortable="true">Venda</th>
                                 <th data-sortable="true">Cliente</th>
                                 <th data-sortable="false">Vendedor</th>
                                 <th data-sortable="true">Tipo Venda</th>
-                                <th data-sortable="true">Sub Total</th>
                                 <th data-sortable="true">Forma Pagamento</th>
-                                <th data-sortable="true" style="width:80px">Total</th>
-                                <th data-sortable="true">Desconto</th>
-                                <th data-sortable="true">Cashback</th>
-                                <th data-sortable="true">Imposto</th>
-                                <th data-sortable="true">Taxa</th>
-                                <th data-sortable="true">Valor Produto</th>
-                                <th data-sortable="true" style="width:80px">MC</th>
-                                <th data-sortable="true" style="width:80px">% MC</th>
+                                <th data-sortable="true">Total Venda</th>
+                                <th data-sortable="true">Valor Recebido</th>
+
+{{--                                <th data-sortable="true">Desconto</th>--}}
+{{--                                <th data-sortable="true">Cashback</th>--}}
+{{--                                <th data-sortable="true">Motoboy</th>--}}
+{{--                                <th data-sortable="true" style="width:120px">Total</th>--}}
+{{--                                <th data-sortable="true">Taxa</th>--}}
+{{--                                <th data-sortable="true">Imposto</th>--}}
+{{--                                <th data-sortable="true">Total Final</th>--}}
+{{--                                <th data-sortable="true">Valor Produto</th>--}}
+{{--                                <th data-sortable="true" style="width:80px">MC</th>--}}
+{{--                                <th data-sortable="true" style="width:80px">% MC</th>--}}
                                 <th data-sortable="true">Data</th>
                                 <th data-sortable="false" style="width: 50px">Ações</th>
                             </tr>
@@ -211,37 +216,45 @@
                 <form id="form" name="form">
                     @csrf
                     <input type="hidden" name="new_taxa" id="new_taxa">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Alterar Venda - <span name="codigo_venda"></span></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-8 form-group">
-                                    <div class="col-md-12">
-                                        <div class="form-floating">
-                                            <select name="payments_sale" id="payments_sale" class="form-select format-font"></select>
-                                            <label class="form-label" for="floatingSelect">Pagamento a ser Alterado</label>
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Alterar Forma de Pagamento da Venda</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card text-center">
+                                    <div class="card-header bg-primary text-white justify-content-between p-1">
+                                        Código da Venda : <b><span name="codigo_venda"></span></b>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <div class="container">
+                                            <div class="row justify-content-center">
+                                                <div class="col-md-8 form-group">
+                                                    <div class="form-floating">
+                                                        <select name="payments_sale" id="payments_sale" class="form-select format-font"></select>
+                                                        <label class="form-label" for="floatingSelect">Pagamento a ser Alterado</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-center mt-3">
+                                                <div class="col-md-8 form-group">
+                                                    <div class="form-floating">
+                                                        <select name="payments" id="payments" class="form-select format-font"></select>
+                                                        <label class="form-label" for="floatingSelect">Forma de Pagamento Nova</label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-8 form-group">
-                                    <div class="col-md-12">
-                                        <div class="form-floating">
-                                            <select name="payments" id="payments" class="form-select format-font"></select>
-                                            <label class="form-label" for="floatingSelect">Forma de Pagamento Nova</label>
-                                        </div>
-                                    </div>
+
                                 </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary" id="salvar">Salvar</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" id="salvar">Salvar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            </div>
                     </div>
                 </form>
             </div>

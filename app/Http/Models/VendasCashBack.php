@@ -13,4 +13,8 @@ class VendasCashBack extends Model
      {
          return $this->belongsTo(Vendas::class, 'venda_id');
      }
+
+     public function cliente(){
+         return $this->belongsTo(ClienteModel::class, 'cliente_id');
+     }
 }

@@ -38,6 +38,31 @@ class Vendas extends Model implements Auditable
      }
 
     function cashback() {
-        return  $this->hasMany(VendasCashBack::class,'venda_id');
+        return $this->hasMany(VendasCashBack::class, 'venda_id', 'id');
+    }
+
+    public function loja()
+    {
+        return $this->belongsTo(Lojas::class, 'loja_id');
+    }
+
+    public function tipoVenda(){
+        return $this->belongsTo(TipoVenda::class, 'tipo_venda_id');
+    }
+
+    public function cliente(){
+        return $this->belongsTo(ClienteModel::class, 'cliente_id');
+    }
+
+    public function usuario(){
+        return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function entrega(){
+        return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+    public function frete(){
+        return $this->hasMany(VendasProdutosEntrega::class, 'venda_id');
     }
 }
