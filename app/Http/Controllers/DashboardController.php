@@ -134,7 +134,7 @@ class DashboardController extends Controller
                     $valor_total_produtos =0;
                     $taxa = 0;
                     $imposto =0;
-
+                   // return Response::json($vendas, 400);
                     $cashback = !$venda['cashback'] ? $venda['cashback'][0]->valor : 0; //se tiver cashback pega o valor
                     $valor_desconto = $venda->descontos[0]->valor_desconto;
 
@@ -142,7 +142,11 @@ class DashboardController extends Controller
                     $total = $venda->valor_total - $valor_desconto - $cashback;
                     $data['total'] = $total;
 
-                    $data['total_geral'] = $venda->valor_total +  $venda->frete[0]->valor_entrega - $valor_desconto - $cashback;
+                    $frete = 0;
+                    if(count($venda->frete) > 0){
+                        $frete = $venda->frete[0]->valor_entrega - $valor_desconto - $cashback;
+                    }
+                    $data['total_geral'] = $venda->valor_total + $frete;
                     $data['data'] =  Carbon::parse($venda->created_at)->format('d/m/Y H:i:s');
                     $data['loja'] =  $venda->loja->nome;
                     $data['codigo_venda'] =  $venda->codigo_venda;
