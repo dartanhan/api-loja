@@ -12,6 +12,8 @@ class Cashback extends Model
 
     //data formatada d/m/Y H:i:s
     protected $appends = ['created_at','updated_at'];
+
+
     public function getCreatedAtAttribute()
     {
         return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));

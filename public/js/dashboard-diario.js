@@ -46,6 +46,12 @@ $(function () {
         },
         "columns": [
             {
+                "className": 'details-control',
+                "orderable": false,
+                "data": null,
+                "defaultContent": ''
+            },
+            {
                 //"data": "codigo_venda",
                 "render": function ( data, type, row, meta ) {
                     return "<span data-toggle-tip=\"tooltip\" data-placement=\"top\" title="+row.venda_id+">"+row.codigo_venda+"</span>";
@@ -62,17 +68,18 @@ $(function () {
                     return "<span class='text-danger'>"+row.tipo_venda+"</span>"
                 }
             },
+            {"data": "nome_pgto"},
             {
                 "data": "sub_total",
                 "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
             },
-            {"data": "nome_pgto"},
             {
-                "data": "total",
+                "data": "total_geral",
                 "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+
             },
-            {
+            /*{
                 "data": "valor_desconto",
                 render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
                 //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
@@ -82,8 +89,16 @@ $(function () {
                 render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
                 //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
             },
-            {"data": "imposto"},
+            {
+                "data": "moto_taxa",
+            },
+            {
+                "data": "total",
+                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
+            },
             {"data": "taxa_pgto"},
+            {"data": "imposto"},
+            {"data": "total_final"},
             {"data": "valor_produto"},
             {
                 //"data": "mc"
@@ -108,7 +123,7 @@ $(function () {
                     }
                     return "<span class='text-primary'>"+row.percentual_mc+"</span>"
                 }
-            },
+            },*/
             {
                 "data": "data"
             }, {
@@ -140,7 +155,7 @@ $(function () {
         language: {
             "url": "../public/Portuguese-Brasil.json"
         },
-        "order": [[14, "desc"]],
+        "order": [[7, "desc"]],
         "initComplete": function(settings, json) {
             $('[data-toggle="tooltip"]').tooltip();
         },"xhr": function(settings, json) {
@@ -149,6 +164,87 @@ $(function () {
 
     });//fim datatables
 
+    $('#datatablesDiario tbody').on('click', 'td.details-control', function (event) {
+        event.preventDefault();
+
+        let tr = $(this).closest('tr');
+        let row = table.row( tr );
+
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+             row.child( format(row.data()) ).show();
+             tr.addClass('shown');
+
+            // let tmpRow  ="<table class='table table-striped table-condensed'>" +
+            //     "<thead class=\"text-center\">" +
+            //         "<tr class='bg-secondary '>" +
+            //             "<th>Sub Total</th>" +
+            //             "<th>Desconto</th>" +
+            //             "<th>Cashback</th>" +
+            //             "<th>Frete(Motoboy)</th>" +
+            //             "<th>Taxa</th>" +
+            //             "<th>Imposto</th>" +
+            //             "<th>Total Final</th>" +
+            //             "<th>Valor Produto</th>" +
+            //             "<th>MC</th>" +
+            //             "<th>% MC</th>" +
+            //         "</tr>" +
+            //     "</thead>";
+            // row.child(tmpRow).show();
+        }
+    });
+
+    function format ( d ) {
+        let numero = d.mc.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
+
+        // Converter para número
+        let numeroFloat = parseFloat(numero);
+
+        let mc = "<span class='text-primary'>"+d.mc+"</span>"
+        if(numeroFloat < 0){
+            mc = "<span class='text-danger'>"+d.mc+"</span>"
+        }
+
+        let pmc = "<span class='text-primary'>"+d.percentual_mc+"</span>";
+        if(d.percentual_mc.replace("%","") < 0){
+            pmc = "<span class='text-danger'>"+d.percentual_mc+"</span>"
+        }
+
+
+        return '<table class="table table-striped table-condensed">'+
+                    "<thead class=\"text-center\">" +
+                        "<tr class='bg-secondary '>" +
+                            "<th>Sub Total</th>" +
+                            "<th>Desconto</th>" +
+                            "<th>Cashback</th>" +
+                            "<th>Frete(Motoboy)</th>" +
+                            "<th>Taxa</th>" +
+                            "<th>Imposto</th>" +
+                            "<th>Total Final</th>" +
+                            "<th>Valor Produto</th>" +
+                            "<th>MC</th>" +
+                            "<th>% MC</th>" +
+                        "</tr>" +
+                    "</thead>"+
+                    '<tr>'+
+                        '<td>'+d.sub_total+'</td>'+
+                        '<td>'+d.valor_desconto+'</td>'+
+                        '<td>'+d.cashback+'</td>'+
+                        '<td>'+d.moto_taxa+'</td>'+
+                        '<td>'+d.taxa_pgto+'</td>'+
+                        '<td>'+d.imposto+'</td>'+
+                        '<td>'+d.total_final+'</td>'+
+                        '<td>'+d.valor_produto+'</td>'+
+                        '<td>'+mc+'</td>'+
+                        '<td>'+pmc+'</td>'+
+                    '</tr>'+
+                '</table>';
+    }
     /**
      * #########################################################################
      * ##########  ÁREA DE FILTRO DE DATAS   ###################################

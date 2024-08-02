@@ -8,4 +8,9 @@ class ClienteModel extends Model
 {
     public $table = 'loja_clientes';
     protected $fillable = ['cpf','telefone','nome','cep','logradouro','numero','complemento','bairro','localidade','uf','taxa','email','created_at','update_at'];
+
+    public function vendas()
+    {
+        return $this->hasMany(Vendas::class, 'cliente_id');
+    }
 }
