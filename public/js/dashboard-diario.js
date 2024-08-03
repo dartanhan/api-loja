@@ -32,13 +32,13 @@ $(function () {
             dataSrc: function(json) {
 
                 //console.log(json.total_imposto);
-                $("#totalImposto").html("<div class=\"card-body text-center\">Total Imposto <br>" +
+                $("#totalImposto").html("<div class=\"card-body text-center p-1\">Total Imposto <br>" +
                     " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
                     " </div>");
-                $("#totalMc").html("<div class=\"card-body text-center\">Total Margem Contibuição <br>" +
+                $("#totalMc").html("<div class=\"card-body text-center p-1\">Total Margem Contibuição <br>" +
                     " <strong class=\"fs-5\">" +json.total_mc+"</strong>" +
                     " </div>");
-                $("#totalPmc").html("<div class=\"card-body text-center\">Total % Margem Contibuição <br>" +
+                $("#totalPmc").html("<div class=\"card-body text-center p-1\">Total % Margem Contibuição <br>" +
                     " <strong class=\"fs-5\">" +json.total_precentual_mc+"</strong>" +
                     " </div>");
                 return json.data;
@@ -569,21 +569,21 @@ $(function () {
                     borderColoR.push(dynamicBorderColors(r, g, b));
                 });*/
 
-                $("#totalDinner").html("<div class=\"card-body text-center\">Total Dinheiro <br>" +
+                $("#totalDinner").html("<div class=\"card-body text-center p-1\">Total Dinheiro <br>" +
                     " <strong class=\"fs-5\">" +response.totalOrders.orderTotalDiner+"</strong>" +
                     "</div>");
-                $("#totalCartao").html("<div class=\"card-body text-center\">Total Cartão <br>" +
+                $("#totalCartao").html("<div class=\"card-body text-center p-1\">Total Cartão <br>" +
                     " <strong class=\"fs-5\">" +response.totalOrders.orderTotalCart+"</strong>" +
                     "</div>");
-                $("#totalDesconto").html("<div class=\"card-body text-center\">Total Desconto <br>" +
+                $("#totalDesconto").html("<div class=\"card-body text-center p-1\">Total Desconto <br>" +
                     " <strong class=\"fs-5\">" +response.totalOrderDiscount.totalDiscount+"</strong>" +
                     "</div>");
-                $("#totalDia").html("<div class=\"card-body text-center\">Total Dia <br>" +
+                $("#totalDia").html("<div class=\"card-body text-center p-1\">Total Dia <br>" +
                     " <strong class=\"fs-5\">" +response.totalOrderDay.orderTotalDay+"</strong>" +
                     "</div>");
-                $("#totalMes").html("<div class=\"card-body text-center\">Total Mês <br>" +
+                $("#totalMes").html("<div class=\"card-body text-center p-1\">Total Mês <br>" +
                     " <strong class=\"fs-5\">" +response.totalOrderMonth.totalMes+"</strong></div>");
-                $("#totalSemana").html("<div class=\"card-body text-center\">Total Semana <br>" +
+                $("#totalSemana").html("<div class=\"card-body text-center p-1\">Total Semana <br>" +
                     " <strong class=\"fs-5\">" +response.totalsOrderWeek.totalWeek+"</strong>" +
                     " </div>");
 
