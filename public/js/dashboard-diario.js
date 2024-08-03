@@ -155,7 +155,7 @@ $(function () {
         language: {
             "url": "../public/Portuguese-Brasil.json"
         },
-        "order": [[7, "desc"]],
+        "order": [[8, "desc"]],
         "initComplete": function(settings, json) {
             $('[data-toggle="tooltip"]').tooltip();
         },"xhr": function(settings, json) {
@@ -179,23 +179,6 @@ $(function () {
             // Open this row
              row.child( format(row.data()) ).show();
              tr.addClass('shown');
-
-            // let tmpRow  ="<table class='table table-striped table-condensed'>" +
-            //     "<thead class=\"text-center\">" +
-            //         "<tr class='bg-secondary '>" +
-            //             "<th>Sub Total</th>" +
-            //             "<th>Desconto</th>" +
-            //             "<th>Cashback</th>" +
-            //             "<th>Frete(Motoboy)</th>" +
-            //             "<th>Taxa</th>" +
-            //             "<th>Imposto</th>" +
-            //             "<th>Total Final</th>" +
-            //             "<th>Valor Produto</th>" +
-            //             "<th>MC</th>" +
-            //             "<th>% MC</th>" +
-            //         "</tr>" +
-            //     "</thead>";
-            // row.child(tmpRow).show();
         }
     });
 
@@ -291,7 +274,7 @@ $(function () {
         $('#divModal').modal('show');
 
         let fila = $(this).closest("tr");
-        let codigo_venda = fila.find('td:eq(0)').text();
+        let codigo_venda =  $(this).data('codigo-venda');
 
         // Inicializar a DataTable com a opção ajax
          $('#tableView').DataTable().destroy();

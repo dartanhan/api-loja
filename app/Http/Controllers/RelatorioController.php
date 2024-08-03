@@ -682,6 +682,7 @@ class RelatorioController extends Controller
         $sales = $this->vendas::with('produtos.productsSales','descontos')
                             ->where('loja_vendas.codigo_venda', $codigo_venda)->first();
 
+
             // Decode JSON string into PHP array
             $jsonString  = json_decode($sales, true);
 
