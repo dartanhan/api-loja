@@ -839,8 +839,11 @@ $(function () {
 
     $(".btn-limpar").click(function () {
        // fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
-        dataIni.val("");
-        dataFim.val("");
+        //dataIni.val("");
+        //dataFim.val("");
+
+        $('input[name=dataIni]').val("");
+        $('input[name=dataFim]').val("");
 
         fncLoadChartBar("");
         fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
@@ -898,9 +901,10 @@ $(function () {
     let display = document.querySelector('#contador'); // selecionando o timer
     startTimer(duration, display); // iniciando o timer
 
-    fncDataBarChart(0,0).then();
+    fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
     fncDataLineChart(year).then();
     fncDataLineMultiChart().then();
     fncCardBody("close");
     fncBarChartFunc().then();
+
 });
