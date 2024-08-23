@@ -10,7 +10,7 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\ReposicaoController;
-use App\Http\Controllers\ReposicaoProdutoController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\UploadController;
 
 
@@ -144,5 +144,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
     Route::resource('listaCompras','ListaDeComprasController');
+
+    Route::get('/index',[SalesController::class,'index'])->name('sales.index');
+    Route::get('/sale/table',[SalesController::class,'table'])->name('sales.table');
 
 });
