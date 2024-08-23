@@ -147,5 +147,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::get('/index',[SalesController::class,'index'])->name('sales.index');
     Route::get('/sale/table',[SalesController::class,'table'])->name('sales.table');
+    Route::post('/sale/tableItemSale',[SalesController::class,'tableItemSale'])->name('sales.tableItemSale');
+    Route::post('/sale/updateStatus',[SalesController::class,'updateStatus'])->name('sales.updateStatus');
 
 });

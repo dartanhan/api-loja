@@ -21,7 +21,7 @@
                         Reposição
                     </a>
                     <a class="nav-link {{ Route::current()->getName() === 'sales.index' ? 'active' : '' }}" href="{{route('sales.index')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fa fa-shopping-cart"></i></div>
                         Vendas
                     </a>
                 @endif

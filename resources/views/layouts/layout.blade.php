@@ -29,6 +29,9 @@
 
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 
+    <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{URL::asset('js/chosen.jquery.js')}}"></script>
+
     @stack("styles")
 
 </head>
