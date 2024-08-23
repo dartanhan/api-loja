@@ -46,15 +46,14 @@ class AuthController extends Controller
           //  ->setExpectedHostname('127.0.0.1')
             //->setExpectedAction('homepage')
 
-
         if ($response->getScore()  < 0.5) {
             return redirect()->back()->withInput()->withErrors(['Você é considerado um Bot / Spammer!' . $response->getScore()]);
         }
 
         if ($response->isSuccess()) {
-            // if(!filter_var($request->input("email") , FILTER_VALIDATE_EMAIL)){
-            //     return redirect()->back()->withInput()->withErrors(['Login informado não é valido!']);
-            // }
+//             if(!filter_var($request->input("email") , FILTER_VALIDATE_EMAIL)){
+//                 return redirect()->back()->withInput()->withErrors(['Login informado não é valido!']);
+//             }
 
             // $credentials = [
             //     'email' => $request->input("email"),

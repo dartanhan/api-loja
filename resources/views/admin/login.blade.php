@@ -6,11 +6,11 @@
         <link href="{{URL::asset('assets/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
         <script src="{{URL::asset('assets/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
         <link href="{{URL::asset('assets/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" id="bootstrap-css">
-        <script src="https://www.google.com/recaptcha/api.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <link rel="stylesheet"  type="text/css" href="{{URL::asset('css/custom-input-float.css')}}">
 
         <script>
-            function onSubmit() {
+            function onSubmit(token) {
                 document.getElementById("login-form").submit();
             }
         </script>
@@ -46,7 +46,7 @@
                                 </div>
 
                                 <div class="form-group col-lg-14 mb-4">
-                                    <button class="btn bg-primary btn-block py-12 g-recaptcha" data-sitekey="{{ env('DATA_SITEKEY') }} " data-callback='onSubmit'>
+                                    <button class="btn bg-primary btn-block py-12 g-recaptcha" data-sitekey="{{ env('DATA_SITEKEY') }}" data-callback='onSubmit'>
                                         <span class="font-weight-bold"><i class="fa fa-sign-in"></i> Entrar</span>
                                     </button>
                                 </div>
