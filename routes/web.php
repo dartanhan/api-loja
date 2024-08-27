@@ -80,6 +80,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('/payment','PaymentController');
 
+    Route::resource('/forma','FormaEntregaController');
+
     Route::resource('/origem','OrigemNfceController');
 
     Route::get('/pdv', [PdvController::class,'index'])->name('admin.pdv');

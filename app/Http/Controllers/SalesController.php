@@ -77,19 +77,32 @@ class SalesController extends Controller
         ]);
 
         try {
-            // Atualiza o status da venda
+            //pega os ids do usuario e cliente
             $usuarioId = $request->input('usuarioId');
             $clienteId = $request->input('clienteId');
 
+            //verifico se tem venda aberta para o usuário (atendente)
+            $venda = Carts::where('user_id', $usuarioId)
+               // ->where('cliente_id', $clienteId)
+                ->where('status',StatusVenda::ABERTO)->get();
 
-//            $venda = Carts::findOrFail($request->id);
-//            $venda->status = $request->status;
-//            $venda->save();
+            //caso sim, não permite retorno de venda de outro cliente.
+            if(count($venda) > 0){
+                return response()->json(['success' => false, 'message' => 'Para retornar a venda ao carrinho, finalize a venda que está ativa primeiro!']);
+            }
+
+            //Busca todas as vendas pendentes
+            $venda = Carts::where('user_id', $usuarioId)
+                ->where('cliente_id', $clienteId)
+                ->where('status',StatusVenda::PENDENTE)->get();
+
+            //extrai os ids das vendas
+            $ids = $venda->pluck('id')->toArray();
 
             // Atualiza a tabela Carts com o novo status
-            Carts::where('id', $request->id)->update(['status' => $request->status]);
+            Carts::whereIn('id', $ids)->update(['status' => $request->status]);
 
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message' => 'O status da venda foi atualizado.']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

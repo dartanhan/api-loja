@@ -184,17 +184,18 @@ $(function() {
 
     // Usar delegação de eventos para capturar a mudança nos selects dinâmicos
     $(document).on('change', '.select-status-venda', function() {
-        console.log("status-venda", $(this).val());
+       // console.log("status-venda", $(this).val());
         let cartId = $(this).data('cart-id');
-        let usuarioId = $(this).data('usuario-id');
+        let usuarioId = $(this).data('user-id');
         let clienteId = $(this).data('cliente-id');
         let status = $(this).val();
         let selectElement = $(this);
 
+       // console.log(usuarioId,clienteId);
         if(status !== ''){
             Swal.fire({
                 title: 'Tem certeza?',
-                text: "Deseja alterar o status da venda?",
+                text: "Deseja alterar o status da venda e retornar ao carrinho?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -215,20 +216,32 @@ $(function() {
                             clienteId:clienteId
                         },
                         success: function(response) {
-                            Swal.fire(
-                                'Alterado!',
-                                'O status da venda foi atualizado.',
-                                'success'
-                            );
-                            // Atualize a tabela para refletir a mudança
-                            table.ajax.reload(null, false); // Recarrega a tabela sem resetar a paginação
+                            if(response.success){
+                                sweetAlert({
+                                        title : 'Alterado!',
+                                        text: response.message,
+                                        icon: 'success',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                });
+
+                                // Atualize a tabela para refletir a mudança
+                                table.ajax.reload(null, false); // Recarrega a tabela sem resetar a paginação
+                            }else{
+                                sweetAlert({
+                                        title: 'Atenção!',
+                                        text: response.message,
+                                        icon: 'warning'
+                                    });
+                                selectElement.val('');
+                            }
                         },
                         error: function() {
-                            Swal.fire(
-                                'Erro!',
-                                'Ocorreu um erro ao atualizar o status da venda.',
-                                'error'
-                            );
+                            sweetAlert({
+                                title: 'Erro!',
+                                text: 'Ocorreu um erro ao atualizar o status da venda.',
+                                icon: 'error'
+                            });
                         }
                     });
                 }else {
