@@ -29,7 +29,7 @@
                         <th data-sortable="true">Cliente</th>
                         <th data-sortable="true">Status</th>
                         <th data-sortable="true">Data</th>
-                        <th data-sortable="true" style="width: 140px">Ação</th>
+                        <th data-sortable="true" style="width: 120px;">Ação</th>
                     </tr>
                     </thead>
                     <tbody class="text-center"></tbody>
