@@ -23,11 +23,13 @@
                     <thead class="text-center">
                     <tr>
                         <th>#</th>
+                        <th>user_id</th>
+                        <th>client_id</th>
                         <th data-sortable="true">Atendente</th>
                         <th data-sortable="true">Cliente</th>
                         <th data-sortable="true">Status</th>
                         <th data-sortable="true">Data</th>
-                        <th data-sortable="true">Ação</th>
+                        <th data-sortable="true" style="width: 120px;">Ação</th>
                     </tr>
                     </thead>
                     <tbody class="text-center"></tbody>
@@ -41,6 +43,7 @@
 @push("scripts")
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
+    <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script type="module" src="{{URL::asset('js/sale.js')}}"></script>
 
 @endpush

@@ -21,7 +21,7 @@
                         Reposição
                     </a>
                     <a class="nav-link {{ Route::current()->getName() === 'sales.index' ? 'active' : '' }}" href="{{route('sales.index')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div class="sb-nav-link-icon"><i class="fa fa-shopping-cart"></i></div>
                         Vendas
                     </a>
                 @endif
@@ -81,6 +81,10 @@
                         <a class="nav-link {{ Route::current()->getName() === 'payment.index' ? 'active' : '' }}" href="{{route('payment.index')}}">
                             <div class="sb-nav-link-icon"><i class="far fa-credit-card"></i></div>
                                 Forma de Pagamentos
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'forma.index' ? 'active' : '' }}" href="{{route('forma.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-motorcycle"></i></div>
+                            Forma de Entrega
                         </a>
                         <a class="nav-link {{ Route::current()->getName() === 'fornecedor.index' ? 'active' : '' }}" href="{{route('fornecedor.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>

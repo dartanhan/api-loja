@@ -9,6 +9,7 @@ class StatusVenda
     const PENDENTE = 'PENDENTE';
     const PAGO = 'PAGO';
     const CANCELADO = 'CANCELADO';
+    const ABERTO = 'ABERTO';
 
     public static function getValues()
     {
@@ -16,6 +17,7 @@ class StatusVenda
             self::PENDENTE,
             self::PAGO,
             self::CANCELADO,
+            self::ABERTO
         ];
     }
 }

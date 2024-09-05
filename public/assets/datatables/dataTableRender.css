@@ -83,3 +83,10 @@ table.dataTable tbody td {
     font-size: 20px;
     color: #007bff;
 }
+
+.select-status-venda{
+    height: 20px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: small;
+    padding: 2px;
+}
