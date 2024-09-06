@@ -132,7 +132,7 @@ class ProdutoController extends Controller
                             'origem' => 'required|max:5',
                             'cest' => 'required|max:15',
                             'ncm' => 'required|max:15',
-                            'categoria_id' => 'required|max:5',
+                            'categoria_id' => 'required|max:5'
                         ];
             }
 
@@ -147,7 +147,6 @@ class ProdutoController extends Controller
                 'cest.required'=> 'O cest é obrigatório!',
                 'ncm.required'=> 'O ncm é obrigatório!',
                 'categoria_id.required'=> 'A Categoria é obrigatória!',
-           //     'cor_id.required'=> 'A Cor é obrigatória!'
             ]);
 
             //Verifica se temos erros no form
@@ -213,6 +212,7 @@ class ProdutoController extends Controller
                 $data["validade"] = $formattedDate;
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
                 $data["estoque"] = $this->request->input("estoque")[$i];
+                $data["gtin"] = $this->request->input("gtin")[$i];
 
                 /**
                  * Cria ou Atualiza a variação do produto
