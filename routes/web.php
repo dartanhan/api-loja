@@ -82,6 +82,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('/forma','FormaEntregaController');
 
+    Route::resource('/tipoTroca','TipoTrocaController');
+
     Route::resource('/origem','OrigemNfceController');
 
     Route::get('/pdv', [PdvController::class,'index'])->name('admin.pdv');
