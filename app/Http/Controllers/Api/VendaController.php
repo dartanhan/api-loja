@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Models\Cashback;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoQuantidade;
+use App\Http\Models\ProdutoVariacao;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TaxaCartao;
 use App\Http\Models\Vendas;
@@ -27,9 +28,22 @@ use Throwable;
 
 class VendaController extends Controller
 {
-    protected  $request, $product, $vendas,$vendasProdutos, $vendasDescontos,$productVariation,
-                        $tipoPagamento,$valorCartao, $valorDuplo,$produtoQuantidade,$taxaCartao,$cashbackVendas,
-                        $cashback, $cashBackValor,$vendasPdv;
+    protected VendasPdv $vendasPdv;
+    protected VendasCashBackValor $cashBackValor;
+    protected Cashback $cashback;
+    protected VendasCashBack $cashbackVendas;
+    protected TaxaCartao $taxaCartao;
+    protected ProdutoQuantidade $produtoQuantidade;
+    protected VendasProdutosValorDupla $valorDuplo;
+    protected VendasProdutosValorCartao $valorCartao;
+    protected VendasProdutosTipoPagamento $tipoPagamento;
+    protected ProdutoVariation $productVariation;
+    protected VendasProdutosDesconto $vendasDescontos;
+    protected VendasProdutos $vendasProdutos;
+    protected Vendas $vendas;
+    protected Produto $product;
+    protected Request $request;
+
 
     public function __construct(Request $request,
                                     Produto $product,
@@ -120,14 +134,14 @@ class VendaController extends Controller
                         $data['troca'] = false;
                         $data['path'] = $variations->path;
 
-          
+
                         //Verifica qual o host para pegar a imagem no destino certo
-                        $storage = $this->request->secure() === true ? 'https://'.$this->request->getHttpHost() : 
+                        $storage = $this->request->secure() === true ? 'https://'.$this->request->getHttpHost() :
                                                                         'http://'.$this->request->getHttpHost().$this->request->getBasePath();
 
                         //concatena o pasta publica
                         $storage = $storage."/public/storage/";
-                        
+
                         //Verifica se existe o diretorio
                         $result =  Storage::exists($variations->path);
 
@@ -312,7 +326,7 @@ class VendaController extends Controller
                 $id = $dados["produtos"][$i]["id"]; // id do produto pai
                 $sub_codigo = $dados["produtos"][$i]["codigo_produto"]; // subcodigo do produto
                 //$loja_id = $dados["loja_id"]; //id da loja
-                
+
                 $productVariation =  $this->productVariation
                                 ->where('products_id', '=', $id)
                                 ->where('subcodigo', '=', $sub_codigo)
@@ -353,7 +367,7 @@ class VendaController extends Controller
                     $this->cashbackVendas->valor = $valor_cashback;
                     $this->cashbackVendas->save();
                 }
-                
+
             }
 
             if ($affected > 0) {
@@ -607,5 +621,6 @@ class VendaController extends Controller
         $retorno = $this->taxaCartao::select('valor_taxa')->where('forma_id', $idPagamento)->first();
         return $retorno->valor_taxa;
     }
+
 }
 

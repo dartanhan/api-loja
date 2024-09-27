@@ -26,14 +26,15 @@ Route::group(['middleware' => ['apiJwt'], 'prefix' => 'auth'], function() {
     Route::get('users', 'Api\UserController@index');
     Route::post('logout', 'Api\AuthController@logout');
 
-    Route::Resource('vendaapi','Api\VendaController');
+    Route::apiResource('vendaapi','Api\VendaController');
     Route::apiResource('loginapi','Api\LoginApiUserController');
     Route::apiResource('formaapi','Api\FormaPagamentoController');
     Route::apiResource('empresaapi','Api\LojasController');
+    Route::get('/produtoapi/search','Api\ProdutoController@search')->name('auth.search');
     Route::apiResource('produtoapi','Api\ProdutoController');
     Route::apiResource('fluxoapi','Api\FluxoController');
     Route::apiResource('trocaapi','Api\TrocaController');
-    Route::Resource('clienteapi','Api\ClienteController');
+    Route::apiResource('clienteapi','Api\ClienteController');
     Route::apiResource('cashbackapi','Api\CashBackController');
 
 });
