@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Models\ProdutoVariation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,11 @@ use Throwable;
 
 class ProdutoController extends Controller
 {
+    /**
+     * @var mixed
+     */
+    private $searchTerm;
+
     /**
      * Display a listing of the resource.
      *
@@ -95,5 +101,27 @@ class ProdutoController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Chamado na tela de PDV online
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request)
+    {
+        $this->searchTerm = $request->input('term');
+
+        return response()->json(ProdutoVariation::with('images')->where(function($query) {
+            $query->where('variacao', 'like', '%' . $this->searchTerm . '%')
+                ->orWhere('subcodigo', 'like', '%' . $this->searchTerm . '%')
+                ->orWhere('descricao', 'like', '%' . $this->searchTerm . '%')
+                ->orWhere('gtin', 'like', '%' . $this->searchTerm . '%');
+        })->where('quantidade', '>', 0)
+            ->join('loja_produtos_new as lpn', 'lpn.id', '=', 'loja_produtos_variacao.products_id')
+            ->select('loja_produtos_variacao.*', 'lpn.descricao as produto_descricao',  'lpn.categoria_id', 'lpn.fornecedor_id')
+            ->where('loja_produtos_variacao.status',true)
+            ->orderBy('variacao', 'asc')->take(10)->get());
+
     }
 }

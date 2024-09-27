@@ -44,7 +44,7 @@ $(function() {
             { "visible": false, "targets": 5 }
         ],*/
         language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": "../public/Portuguese-Brasil.json"
         },
         "order": [[ 0, "asc" ]]
     });

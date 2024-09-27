@@ -368,7 +368,7 @@ $(function() {
             cest: {
                 required: true
             },
-            valor_cartao_pix0: {
+            gtin0: {
                 required: true
             },
             percentage: {
@@ -391,7 +391,7 @@ $(function() {
             subcodigo: {
                 required: "Informe o subCodigo?"
             },
-            variacao0: {
+            'variacao[]': {
                 required: "Informe a variação?"
             },
             valor_varejo0: {
@@ -415,8 +415,8 @@ $(function() {
             cest: {
                 required: "Informe o número CEST do produto?"
             },
-            valor_cartao_pix: {
-                required: "Informe o Valor?"
+            'gtin[]': {
+                required: "Informe o Gtin?"
             },
             percentage: {
                 required: "Informe o Valor Percentual de Desconto?"
@@ -746,6 +746,7 @@ $(function() {
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
         let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '0,00';
+        let gtin = arrayItem != null ? arrayItem.gtin : '';
 
         /**
          * Adiciona o icone de remover do segundo em diante
@@ -773,11 +774,19 @@ $(function() {
                                         "<label for=\"label-subcodigo\">SUBCOD</label>"+
                                     "</span>"+
                                 "</div>"+
-                                "<div class=\"col-md-2\" style='left: -12px;width: 300px'>" +
+                                "<div class=\"col-md-2\" style='left: -2px;width: 200px'>" +
+                                    "<span class=\"border-lable-flt\">"+
+                                        "<input type=\"number\" name=\"gtin[]\"  maxlength='15' id=\"gtin"+i+"\" " +
+                                        "class=\"form-control format-font\" placeholder=\"GTIN\" maxlength='15' " +
+                                        "value=\'" + gtin + "\' required/>" +
+                                        "<label for=\"label-gtin\">GTIN</label>"+
+                                    "</span>"+
+                                "</div>"+
+                                "<div class=\"col-md-2\" style='left: -12px;width: 250px'>" +
                                     "<span class=\"border-lable-flt\">"+
                                         "<input type=\"text\" name=\"variacao[]\"  maxlength='150' id=\"variacao"+i+"\" " +
                                             "class=\"form-control format-font\" placeholder=\"VARIAÇÃO\" maxlength='9' " +
-                                            "value=\'" + variacao + "\'/>" +
+                                            "value=\'" + variacao + "\' required/>" +
                                         "<label for=\"label-variacao\">VARIAÇÃO</label>"+
                                     "</span>"+
                                 "</div>"+
@@ -857,7 +866,7 @@ $(function() {
                                         "<label for=\"label-qtd\">STATUS</label>"+
                                     "</span>"+
                                 "</div>" +
-                                "<div class=\"col-md-2\" style='padding:unset;left: 2px;width: 122px' >"+
+                                "<div class=\"col-md-2\" style='padding:unset;left: 2px;width: 150px' >"+
                                     "<span class=\"border-lable-flt\">"+
                                         "<SELECT type=\"text\" name=\"fornecedor[]\"  id=\"fornecedor"+i+"\""+
                                             "class=\"form-control\" placeholder=\"FORNECEDOR\"  required/>"+
@@ -881,7 +890,18 @@ $(function() {
        const inputs_variacao = document.querySelectorAll('input[name="variacao[]"]');
        const inputs_qtd = document.querySelectorAll('input[name="quantidade[]"]');
        const selects = document.querySelectorAll('select[name="fornecedor[]"]');
+        const inputs_gtin = document.querySelectorAll('input[name="gtin[]"]');
        let error = false;
+
+        inputs_gtin.forEach(input => {
+            if (input.value.trim() === '') {
+                //errors.push(`Campo ${input.name} deve ser preencido!`);
+                error = true;
+                input.classList.add('invalid-input');
+            } else {
+                input.classList.remove('invalid-input');
+            }
+        });
 
         inputs_variacao.forEach(input => {
             if (input.value.trim() === '') {

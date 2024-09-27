@@ -99,6 +99,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-percent"></i></div>
                                 Tarifas
                         </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'tipoTroca.index' ? 'active' : '' }}" href="{{route('tipoTroca.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-recycle"></i></div>
+                            Tipo Troca
+                        </a>
                         <a class="nav-link {{ Route::current()->getName() === 'usuario.index' ? 'active' : '' }}" href="{{route('usuario.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
                                 Usuários

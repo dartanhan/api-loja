@@ -14,7 +14,7 @@ class CreateLojaProdutos extends Migration
     public function up()
     {
 
-        Schema::create('loja_produtos', function (Blueprint $table) {
+        Schema::create('loja_produtos_new', function (Blueprint $table) {
            $table->unsignedBigInteger('id')->autoIncrement();
            $table->string('codigo_produto', 25)->unique();
            $table->string('descricao', 255);
@@ -23,20 +23,24 @@ class CreateLojaProdutos extends Migration
            $table->decimal('valor_cartao', 9,2)->default('0.00');
            $table->decimal('valor_dinheiro', 9,2)->default('0.00');
            $table->decimal('percentual', 9,2)->default('99.9');
-           //$table->boolean('block')->default(false);
-            $table->bigInteger('fornecedor_id')->unsigned()->nullable(true);
-            $table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
-            $table->bigInteger('categoria_id')->unsigned();
-            $table->foreign('categoria_id')->references('id')->on('loja_categorias');
-            $table->bigInteger('cor_id')->unsigned()->nullable(true);;
-            $table->foreign('cor_id')->references('id')->on('loja_cores');
-            $table->bigInteger('origem_id')->unsigned();
-            $table->foreign('origem_id')->references('id')->on('loja_produto_origem_nfces');
-            $table->Integer('cest')->nullable(false);
-            $table->Integer('ncm')->nullable(false);
-            $table->string('imagem',250);
 
-            $table->timestamps();
+           $table->bigInteger('fornecedor_id')->unsigned()->nullable(true);
+           $table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
+
+           $table->bigInteger('categoria_id')->unsigned();
+           $table->foreign('categoria_id')->references('id')->on('loja_categorias');
+
+           $table->bigInteger('cor_id')->unsigned()->nullable(true);;
+           $table->foreign('cor_id')->references('id')->on('loja_cores');
+
+           $table->bigInteger('origem_id')->unsigned();
+           $table->foreign('origem_id')->references('id')->on('loja_produto_origem_nfces');
+
+           $table->Integer('cest')->nullable(false);
+           $table->Integer('ncm')->nullable(false);
+           $table->string('imagem',250);
+
+           $table->timestamps();
         });
     }
 
@@ -47,6 +51,6 @@ class CreateLojaProdutos extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('loja_produtos');
+        Schema::dropIfExists('loja_produtos_new');
     }
 }
