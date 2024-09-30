@@ -746,7 +746,7 @@ $(function() {
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
         let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '0,00';
-        let gtin = arrayItem != null ? arrayItem.gtin : '';
+        let gtin = arrayItem && arrayItem.gtin !== null ? arrayItem.gtin : 0;
 
         /**
          * Adiciona o icone de remover do segundo em diante
