@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Models\Carts;
 use App\Http\Models\Cashback;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoQuantidade;
@@ -23,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 
@@ -548,67 +550,86 @@ class VendaController extends Controller
     /**
      * Salva itens da venda
     **/
-    public function saveProductsSale(){
+    public function saveProductSale() {
         try {
+            // Validação de dados
+            $validated = $this->request->validate([
+                'user_id' => 'required|integer',
+                'codigo_produto' => 'required|integer',
+                'variacao_id' => 'required|integer',
+                'descricao' => 'required|string',
+                'valor_venda' => 'required|numeric',
+                'quantidade' => 'required|integer',
+                'imagem' => 'nullable|string',
+                'status' => 'required|string'
+            ]);
 
-        $request = $this->request->all();
+            // Buscar produto no carrinho e suas informações reais
+            $cart = Carts::with('variations.images')
+                ->where([
+                    ['user_id', '=', $validated['user_id']],
+                    ['codigo_produto', '=', $validated['codigo_produto']],
+                    ['status', '=', $validated['status']]
+                ])->first();
+            //return response()->json(['success' => true, 'data' => $cart], 200);
 
-            $store =  DB::table('loja_vendas_pdv')->where('codigo_produto', $request['codigo_produto'])->first();
-
-            if($store){
-                DB::table('loja_vendas_pdv')
-                    ->where('id', '=',$store->id)
-                    ->update(['quantidade' => intval($store->quantidade) + intval($request['quantidade'])]);
-
-            }else{
-                // print_r($request);
-                $this->vendasPdv = new VendasPdv();
-                $this->vendasPdv->codigo_produto = $request['codigo_produto'];
-                $this->vendasPdv->descricao = $request['descricao'];
-                $this->vendasPdv->valor_varejo = $request['valor_venda'];
-                $this->vendasPdv->valor_atacado = $request['valor_atacado'];
-                $this->vendasPdv->quantidade = $request['quantidade'];
-                $this->vendasPdv->fornecedor_id = $request['fornecedor_id'];
-                $this->vendasPdv->categoria_id = $request['categoria_id'];
-
-                $this->vendasPdv->save();
+            // Se o produto já estiver no carrinho, somar a quantidade
+            if ($cart) {
+                $cart->quantidade = intval($cart->quantidade) + intval($validated['quantidade']);
+                $cart->save();
+                $msg = "Produto atualizado com sucesso!";
+            } else {
+                // Se o produto não estiver no carrinho, criar um novo registro
+                Carts::create([
+                    'user_id' => $validated['user_id'],
+                    'produto_variation_id' => $validated['variacao_id'],
+                    'codigo_produto' => $validated['codigo_produto'],
+                    'name' => $validated['descricao'],
+                    'price' => $validated['valor_venda'],
+                    'quantidade' => $validated['quantidade'], // quantidade passada diretamente
+                    'imagem' => $validated['imagem'],
+                    'status' => $validated['status']
+                ]);
+                $msg = "Produto adicionado com sucesso!";
             }
 
+            return response()->json(['success' => true, 'message' => $msg], 200);
 
-
+        }catch (ValidationException $e) {
+            // Captura a exceção de validação e retorna o erro em formato JSON
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro: A validação falhou.',
+                'errors' => $e->errors() // Detalhes dos erros de validação
+            ], 422);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return response()->json(['success' => false, 'message' => 'Erro no banco de dados: ' . $e->getMessage()], 500);
         } catch (Throwable $e) {
-            return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);
+            return response()->json(['success' => false, 'message' => 'Erro: ' . $e->getMessage()], 500);
         }
-        return true;
     }
 
+
     /**
-    *
+     * @return JsonResponse
      */
-    public function getPdv(){
+    public function carts(){
         try {
-            $stores =  DB::table('loja_vendas_pdv')->orderBy('id', 'asc')->get();
 
+            $user_id =  $this->request->input('user_id');
+           // $cliente_id =  $this->request->input('cliente_id');
+            $status =  $this->request->input('status');
 
-            foreach ($stores as $store){
-                $data['id'] = $store->id;
-                $data['descricao'] = $store->descricao;
-                $data['codigo_produto'] = $store->codigo_produto;
-                $data['fornecedor_id'] = $store->fornecedor_id;
-                $data['categoria_id'] = $store->categoria_id;
-                $data['quantidade'] = $store->quantidade;
+            $carts = Carts::with('variations','clientes','usuario','cashback')
+                ->where('user_id', $user_id)
+             //   ->where('cliente_id', $cliente_id)
+                ->where('status', $status)
+                ->get();
 
-                if(intval($data['quantidade']) >= 3) {
-                    $data['valor'] = $store->valor_atacado;
-                } else if(intval($data['quantidade']) >= 6){
-                        $data['valor'] = 120.00;
-                }else{
-                    $data['valor'] = $store->valor_varejo;
-                }
-                $s[] =  $data;
-            }
-
-            return Response::json($s , 200);
+            if (!$carts->isEmpty())
+                return Response::json(['success' => true,'message' => "sucesso", 'data' => $carts], 200,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            else
+                return Response::json(['success' => false,'message' => "Carrinho cliente não localizado! ", 'data' => $carts], 201,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         } catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);
