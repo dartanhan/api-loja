@@ -79,51 +79,6 @@ $(function () {
                 "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
 
             },
-            /*{
-                "data": "valor_desconto",
-                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-            },
-            {
-                "data": "cashback",
-                render: $.fn.dataTable.render.number('.', ',', 2, 'R$', '')
-                //render: $.fn.dataTable.render.number(',', '.', 0, '', '%')
-            },
-            {
-                "data": "moto_taxa",
-            },
-            {
-                "data": "total",
-                "render": $.fn.dataTable.render.number('.', ',', 2, 'R$ ').display
-            },
-            {"data": "taxa_pgto"},
-            {"data": "imposto"},
-            {"data": "total_final"},
-            {"data": "valor_produto"},
-            {
-                //"data": "mc"
-                "render": function ( data, type, row, meta ) {
-                    var numero = row.mc.replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.');
-
-                    // Converter para número
-                    var numeroFloat = parseFloat(numero);
-
-                    if(numeroFloat < 0){
-                        return "<span class='text-danger'>"+row.mc+"</span>"
-                    }
-                    return "<span class='text-primary'>"+row.mc+"</span>"
-                }
-
-            },
-            {
-                //"data": "percentual_mc"
-                "render": function ( data, type, row, meta ) {
-                    if(row.percentual_mc.replace("%","") < 0){
-                        return "<span class='text-danger'>"+row.percentual_mc+"</span>"
-                    }
-                    return "<span class='text-primary'>"+row.percentual_mc+"</span>"
-                }
-            },*/
             {
                 "data": "data"
             }, {
@@ -727,4 +682,30 @@ $(function () {
                 }
             });
         }
+    });
+
+    /**
+     verificar esse status e exibir o botão de alerta se necessário:
+    * */
+    document.addEventListener('DOMContentLoaded', function () {
+        const alertaButton = document.getElementById('alertaBaixoEstoque');
+
+        function verificarEstoque() {
+            fetch(url + "/dashboardDiario/estoqueBaixo")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.existe_estoque_baixo) {
+                        alertaButton.style.display = 'block'; // Exibe o botão se houver estoque baixo
+                    } else {
+                        alertaButton.style.display = 'none'; // Caso contrário, esconde
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar estoque:', error);
+                });
+        }
+
+        // Verifica a cada 30 segundos
+        //setInterval(verificarEstoque, 30000);
+        verificarEstoque(); // Primeira verificação ao carregar a página
     });

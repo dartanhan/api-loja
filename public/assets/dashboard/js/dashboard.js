@@ -277,7 +277,8 @@ $(function () {
         }
     });
 
-    /**
+
+      /**
      * #########################################################################
      * ##########  CRIAÇÃO DO CHART E CONFIGURAÇÕES  ###########################
      * #########################################################################
@@ -906,5 +907,5 @@ $(function () {
     fncDataLineMultiChart().then();
     fncCardBody("close");
     fncBarChartFunc().then();
-
+   //fncProdutosMaisVendidosMes().then();
 });

@@ -46,10 +46,15 @@
                                 Produtos Inativos
                             </a>
                         @endif
-                        <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
-                            Produtos
-                        </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'produtos.baixo_estoque' ? 'active' : '' }}" href="{{route('produtos.baixo_estoque')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                                Baixo Estoque
+                            </a>
+
+{{--                        <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">--}}
+{{--                            <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>--}}
+{{--                            Produtos--}}
+{{--                        </a>--}}
                         <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
                                 Lista de Compras

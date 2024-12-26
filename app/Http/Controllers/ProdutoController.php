@@ -340,4 +340,25 @@ class ProdutoController extends Controller
         return redirect()->route('admin.login');
 
     }
+
+
+    public function fornecedoresProdutosBaixoEstoque ()
+    {
+        $inicioPeriodo = now()->subDays(30);
+        $fimPeriodo = now();
+
+        $fornecedores = Fornecedor::with(['variacoes' => function ($query) use ($inicioPeriodo, $fimPeriodo) {
+            $query
+                ->where('quantidade', '<=', 5)
+                ->where('status', true)
+                ->withCount(['vendas as total_vendido' => function ($vendaQuery) use ($inicioPeriodo, $fimPeriodo) {
+                    $vendaQuery->whereBetween('created_at', [$inicioPeriodo, $fimPeriodo]);
+                }])
+                ->orderBy('total_vendido', 'desc') // Ordena pelo total vendido
+                ->with(['produtoPai', 'images']);
+        }])->get();
+
+        return view('admin.baixoEstoque', compact('fornecedores', 'inicioPeriodo', 'fimPeriodo'));
+    }
+
 }

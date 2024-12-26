@@ -8,11 +8,20 @@
 
 @section('content')
     <input type="hidden" name="store_id" id="store_id" value="{{$user_data->loja_id}}">
+
     <div class="container-fluid px-4">
         <h1 class="mt-4">Dashboard</h1>
+        <div id="estoque-alerta" class="d-flex mb-3 mt-2">
+            <!-- Botão de Alerta transformado em um link -->
+            <a id="alertaBaixoEstoque" href="{{ route('produtos.baixo_estoque') }}" class="btn btn-warning alerta-piscante" style="display: none;">
+                ⚠️ Produtos com estoque baixo
+            </a>
+        </div>
+
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item active">Dashboard</li>
         </ol>
+
         <div class="row">
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-primary text-white mb-2">

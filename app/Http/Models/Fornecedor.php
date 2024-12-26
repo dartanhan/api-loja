@@ -16,19 +16,24 @@ class Fornecedor extends Model
 
     protected $fillable = ['id','nome','status','updated_at'];
     //protected $dates = ['created_at','updated_at'];
-    protected $appends = ['datacriacao','dataatualizacao'];
+   // protected $appends = ['datacriacao','dataatualizacao'];
 
 
    function produtos() {
-       return  $this->hasMany('App\Http\Models\Fornecedor');
+       return $this->hasMany(Produto::class, 'fornecedor_id', 'id');
    }
 
-  /*  public function getDatacriacaoAttribute()
+    public function variacoes()
     {
-        return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));
+        return $this->hasMany(ProdutoVariation::class, 'fornecedor', 'id');
     }
-    public function getDataatualizacaoAttribute()
-    {
-        return date('d/m/Y H:i:s', strtotime($this->attributes['updated_at']));
-    }*/
+
+//    public function getDatacriacaoAttribute()
+//    {
+//        return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));
+//    }
+//    public function getDataatualizacaoAttribute()
+//    {
+//        return date('d/m/Y H:i:s', strtotime($this->attributes['updated_at']));
+//    }
 }
