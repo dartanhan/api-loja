@@ -17,7 +17,7 @@
                         <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                     <div class="card-footer">
-                        <a class="small text-white stretched-link detailDinner" href="#" 
+                        <a class="small text-white stretched-link detailDinner" href="#"
                         data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                             <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                     <div class="card-footer">
-                        <a class="small text-white stretched-link detailCart" href="#" 
+                        <a class="small text-white stretched-link detailCart" href="#"
                         data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                 </div>
             </div>
             <div>
-                
-                    
+
+
                     <div class="card-body">
 
                         <div class="card mb-4">
@@ -113,7 +113,7 @@
                                    </div>
                                 </div>
                                 <div class="mt-03"><br/>
-                                  
+
                                     <table id="table" class="table table-striped table-condensed table-hover  responsive" style="width:100%">
                                         <thead class="text-center">
                                             <tr>
@@ -132,11 +132,11 @@
                             </div>
                         </div>
                     </div>
-              
+
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Image -->
        <div class="modal fade" id="divModalImageProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -167,18 +167,24 @@
             </div>
         </div>
     </div>
-    
+
 @endsection
 @push("scripts")
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
-    <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>    
+    <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script type="module" src="{{URL::asset('js/resposicao.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/bootstrap-datepicker.pt-BR.min.js')}}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
     <script src="{{URL::asset('js/moment.min.js')}}"></script>
- 
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+    <!-- Biblioteca para gerar o arquivo Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 @endpush
 @push("styles")
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap-datepicker.min.css')}}">
@@ -186,4 +192,5 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('assets/datatables/dataTableRender.css')}}">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="{{URL::asset('assets/sweetalert2/animate.min.css')}}"/>
+
 @endpush

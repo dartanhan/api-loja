@@ -1,5 +1,5 @@
 import { sweetAlert,getDataFormat,fncDataDatatable } from "./comum.js";
-    
+
     let table;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const url = fncUrl();
@@ -8,8 +8,8 @@ import { sweetAlert,getDataFormat,fncDataDatatable } from "./comum.js";
     let periodo;
 
 $(function() {
-    
-    
+
+
      /**
      * #########################################################################
      * ##########  ÁREA DATATABLE ###################################
@@ -19,8 +19,8 @@ $(function() {
         table = $('#table').DataTable({
             responsive: true,
             processing: true,
-            serverSide: true,
-           
+            //serverSide: true,
+            dom: 'Bfrtip', // Ativa os botões de exportação
            "ajax":{
                 "method": 'post',
                 "dataType":"json",
@@ -29,7 +29,7 @@ $(function() {
                     data._token = csrfToken,
                     data.startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
                     data.endDate = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
-                }, 
+                },
             },
             columns: [
                 {"data": "imagem",name: 'imagem'},
@@ -43,29 +43,42 @@ $(function() {
                     render: function(data, type, row) {
                         return "ações";
                     }
-                }        
+                }
+            ],
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Exportar para Excel',
+                    title: 'Minha Tabela',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        modifier: {
+                            search: 'applied',
+                            order: 'applied'
+                        }
+                    }
+                }
             ],
             language: {
                 "url": "../public/Portuguese-Brasil.json"
             },
+            //page: 50, // Define o número de linhas exibidas por padrão
             "order": [[3, "desc"]],
             initComplete: function(settings, json) {
-                //console.log(json);           
+                //console.log(json);
             }
-
-           
         });
-    
+
 
         table.on('draw', function() {
-            $('[data-toggle="tooltip"]').tooltip();   
-                
+            $('[data-toggle="tooltip"]').tooltip();
+
             if(dataIni.val() !== ''){
                 periodo = "- Período pesquisado : " + dataIni.val() + " até " + dataFim.val();
             }else{
-                periodo = "- Período pesquisado : " + 
+                periodo = "- Período pesquisado : " +
                     moment().format('DD/MM/YYYY')
-                    + " até " + 
+                    + " até " +
                     moment().format('DD/MM/YYYY');
             }
             $("#data-periodo").html(periodo);
@@ -74,7 +87,7 @@ $(function() {
      *********** FILTRO **********************
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
-        
+
         let isValid = true;
         let msg = '';
 
@@ -104,7 +117,7 @@ $(function() {
                showConfirmButton: false,
                timer: 1500
            });
-          
+
        }
    });
 
@@ -144,7 +157,7 @@ $(function() {
         'minViewMode': "years"
     });
 
-    
+
     /****
      * LOAD DE FUNÇOES
      */
