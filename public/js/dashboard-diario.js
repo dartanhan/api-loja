@@ -17,6 +17,7 @@ $(function () {
      * */
 
     table =  $('#datatablesDiario').DataTable({
+        dom: 'Bfrtip', // Ativa os botões de exportação
         "ajax":{
             "method": 'post',
             "url": url + "/dashboardDiario/vendasDia",
@@ -107,6 +108,20 @@ $(function () {
                 }
             }
         ],
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Exportar para Excel',
+                    title: 'Minha Tabela',
+                    className: 'btn btn-success',
+                    exportOptions: {
+                        modifier: {
+                            search: 'applied',
+                            order: 'applied'
+                        }
+                    }
+                }
+            ],
         language: {
             "url": "../public/Portuguese-Brasil.json"
         },
