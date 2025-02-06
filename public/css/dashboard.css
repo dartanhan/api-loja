@@ -158,3 +158,16 @@ table.dataTable tbody tr:hover {
     position: relative;
 }
 
+.list-group-item {
+    background-color: #f9f9f9; /* Cor padrão para as linhas */
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item:nth-child(odd) {
+    background-color: #ffffff; /* Cor para as linhas ímpares */
+}
+
+.list-group-item:hover {
+    background-color: #e9ecef; /* Cor ao passar o mouse */
+    cursor: pointer; /* Indica que o item é interativo */
+}

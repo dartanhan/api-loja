@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Models\Fornecedor;
 use App\Http\Models\Payments;
+use App\Http\Models\ProdutoVariation;
 use App\Http\Models\Usuario;
 use App\Http\Models\Vendas;
 use App\Http\Models\VendasCashBack;
@@ -11,24 +13,27 @@ use Illuminate\Http\Request;
 use NumberFormatter;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 use Illuminate\Support\Facades\Response;
-use function PHPUnit\Framework\isNull;
+
 
 class DashboardController extends Controller
 {
     use RelatorioTrait;
-    protected $request, $vendas, $formatter, $cashbackVendas,$payments;
+    protected $request, $vendas, $formatter, $cashbackVendas,$payments, $produtoVariation;
+    protected Fornecedor $fornecedor;
 
-    public function __construct(Request $request, Vendas $vendas, VendasCashBack $cashbackVendas, Payments $payments)
+    public function __construct(Request $request, Vendas $vendas, VendasCashBack $cashbackVendas, Payments $payments,
+                                ProdutoVariation $produtoVariation, Fornecedor $fornecedor)
     {
         $this->request = $request;
         $this->vendas = $vendas;
         $this->cashbackVendas = $cashbackVendas;
         $this->payments = $payments;
+        $this->produtoVariation = $produtoVariation;
+        $this->fornecedor = $fornecedor;
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
     }
 
@@ -71,7 +76,6 @@ class DashboardController extends Controller
             $store_id = $this->request->id;
             $orderTotal =0;
 
-
             /**
              * Semana agrupado por dia
              */
@@ -84,47 +88,7 @@ class DashboardController extends Controller
                //->groupBy('lv.codigo_venda')
                 ->orderBy('lv.created_at', 'asc')
                 ->get();
-//return Response::json($vendas, 400);
 
-          /*  $listSales = $this->vendas->with('formaPgto')->select(
-                "lv.valor_total AS total",
-                DB::raw('DATE_FORMAT(lv.created_at, "%d/%m/%Y %H:%i:%s") as data'),
-                "loja_lojas.nome as loja",
-                "lv.codigo_venda",
-                "lv.id as venda_id",
-                "lv.usuario_id as usuario_id",
-                "u.name as nome",
-                "lvpd.valor_desconto",
-                DB::raw("lv.valor_total + lvpd.valor_desconto as sub_total"),
-                //"loja_forma_pagamentos.nome as nome_pgto",
-               // "tp.taxa as taxa_pgto",
-                "lv.loja_id as taxa_pgto",
-               // "loja_forma_pagamentos.id as id_pgto",
-                "loja_tipo_vendas.descricao as tipo_venda",
-                "loja_vendas_produtos.quantidade as quantidade",
-                "loja_produtos_variacao.valor_produto",
-                DB::raw('SUM(CAST(loja_produtos_variacao.valor_produto AS DECIMAL(9, 2)) * loja_vendas_produtos.quantidade) as valor_total_produtos'),
-               // DB::raw('(' . $valorTotalProdutos->getQuery()->toSql() . ') as valor_total_produtos'),
-                "loja_clientes.nome as nome_cli"
-            )->from('loja_vendas as lv')
-              ->Join('loja_lojas', 'loja_lojas.id', '=', 'lv.loja_id')
-              ->Join('loja_vendas_produtos_descontos as lvpd', 'lv.id' , '=','lvpd.venda_id')
-             // ->Join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
-             // ->leftJoin('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'tp.forma_pagamento_id')
-              ->leftJoin('loja_usuarios as lu', 'lv.usuario_id', '=', 'lu.id')
-              ->leftJoin('users as u', 'lu.user_id', '=', 'u.id')
-              ->leftJoin('loja_tipo_vendas', 'loja_tipo_vendas.id', '=', 'lv.tipo_venda_id')
-              ->leftJoin('loja_vendas_produtos', 'loja_vendas_produtos.venda_id', '=', 'lv.id')
-              ->leftJoin('loja_produtos_variacao', 'loja_produtos_variacao.subcodigo', '=', 'loja_vendas_produtos.codigo_produto')
-              ->leftJoin('loja_clientes', 'loja_clientes.id', '=', 'lv.cliente_id')
-              ->where('lv.loja_id', $store_id)
-                ->where('lv.codigo_venda','KN378406')
-              ->whereBetween(DB::raw('DATE(lv.created_at)'), array($dataIni, $dataFim))
-                ->groupBy('lv.codigo_venda')
-                ->orderBy('lv.created_at', 'asc')
-                ->get();
-
-            */
 
             if(count($vendas) > 0){
 
@@ -169,7 +133,7 @@ class DashboardController extends Controller
 
                             //se igual a forma de pagamento DINHEIRO não calcula imposto
                             if($payment->slug !== 'dinheiro'){
-                                $imposto += ($total * 4)/100;
+                                $imposto += ($total * 6)/100;
                             }
 
                         }
@@ -233,6 +197,34 @@ class DashboardController extends Controller
                                 "total_imposto" => $this->formatter->formatCurrency($imposto_total, 'BRL'),
                                 "total_mc" =>  $this->formatter->formatCurrency($total_mc , 'BRL'),
                                 "total_precentual_mc" => number_format($orderTotal,2).'%' ));
+    }
+
+    public function estoqueBaixo()
+    {
+        try {
+            // Verifica se existe pelo menos um produto com estoque baixo
+            $produtosComEstoqueBaixo = $this->produtoVariation->where('quantidade', '<=', 5)->exists();
+
+            // Retorna um JSON simples com o status
+            return response()->json([
+                'existe_estoque_baixo' => $produtosComEstoqueBaixo
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function show(){
+      //
+    }
+
+    public function create(){
+
     }
 
     /****

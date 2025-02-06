@@ -54,4 +54,9 @@ class Produto extends Model implements Auditable
         return $this->hasMany(ProdutoImagem::class, 'produto_id', 'id');
     }
 
+    public function variacoes()
+    {
+        return $this->hasMany(ProdutoVariation::class, 'products_id', 'id');
+    }
+
 }

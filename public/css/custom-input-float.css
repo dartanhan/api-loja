@@ -144,3 +144,25 @@ a.bg-primary:focus,a.bg-primary:hover,button.bg-primary:focus,button.bg-primary:
 .invalid-input {
     border: 2px solid red;
 }
+.alerta-piscante {
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+#produtosMaisVendidosTable tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+#produtosMaisVendidosTable tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+#produtosMaisVendidosTable tbody tr.table-primary {
+    background-color: #d1ecf1;
+    font-weight: bold;
+}

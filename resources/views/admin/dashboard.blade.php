@@ -169,6 +169,29 @@
                     <div class="card-body"><canvas id="myBarChartFunc" width="100%" height="40"></canvas></div>
                 </div>
             </div>
+{{--            <div class="col-xl-6">--}}
+{{--                <div class="card mb-4">--}}
+{{--                    <div class="card-header">--}}
+{{--                        <i class="fas fa-chart-bar me-1"></i>Resumo produtos mais vendidos mês--}}
+{{--                    </div>--}}
+{{--                    <div class="card-body">--}}
+{{--                        <div style="max-height: 300px; overflow-y: auto;">--}}
+{{--                            <table class="table table-bordered" id="produtosMaisVendidosTable">--}}
+{{--                                <thead>--}}
+{{--                                <tr>--}}
+{{--                                    <th>Produto</th>--}}
+{{--                                    <th>Total Vendido</th>--}}
+{{--                                    <th>Estoque Atual</th>--}}
+{{--                                </tr>--}}
+{{--                                </thead>--}}
+{{--                                <tbody>--}}
+{{--                                <!-- Dados serão preenchidos dinamicamente -->--}}
+{{--                                </tbody>--}}
+{{--                            </table>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
         </div>
         <div class="card mb-4">
             <div class="card-header">

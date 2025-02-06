@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Models\Carts;
 use App\Http\Models\Cashback;
+use App\Http\Models\ErrorLogs;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoQuantidade;
-use App\Http\Models\ProdutoVariacao;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TaxaCartao;
 use App\Http\Models\Vendas;
@@ -22,6 +22,7 @@ use App\Http\Models\VendasProdutosValorDupla;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -42,6 +43,7 @@ class VendaController extends Controller
     protected ProdutoVariation $productVariation;
     protected VendasProdutosDesconto $vendasDescontos;
     protected VendasProdutos $vendasProdutos;
+    protected ErrorLogs $errorLogs;
     protected Vendas $vendas;
     protected Produto $product;
     protected Request $request;
@@ -61,7 +63,8 @@ class VendaController extends Controller
                                     VendasCashBack $cashbackVendas,
                                     Cashback $cashback,
                                     VendasCashBackValor $cashBackValor,
-                                    VendasPdv $vendasPdv){
+                                    VendasPdv $vendasPdv,
+                                    ErrorLogs $errorLogs){
          $this->request = $request;
          $this->product = $product;
          $this->vendas = $vendas;
@@ -77,7 +80,7 @@ class VendaController extends Controller
          $this->cashback = $cashback;
          $this->cashBackValor = $cashBackValor;
          $this->vendasPdv = $vendasPdv;
-
+         $this->errorLogs = $errorLogs;
     }
 
     /**
@@ -249,139 +252,393 @@ class VendaController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * SALVA A VENDA
+     * SALVA A VENDA alterado para a possibilidade de venda offline
      * @return JsonResponse
      */
-    public function store()
+    /*public function store()
     {
+        DB::beginTransaction();
 
-     //   DB::beginTransaction();
         try {
-            $dados  = $this->request->all();
-          //  dd($dados);
-            $affected = 0;
+            $requestAll  = $this->request->all();
 
-            // Convert JSON string to Array
-            //$dados = json_decode($dadosVendaJson['json']);
+           // dd($this->request->all());
+
+            // Validação detalhada
+            $erros = [];
+
+            // Verificar se "codigo_venda" está vazio
+            if (empty($requestAll['codigo_venda'])) {
+                $erros[] = "O campo 'codigo_venda' é obrigatório e não pode estar vazio.";
+            }
+
+            // Verificar se "produtos" está definido e não vazio
+            if (!isset($requestAll['produtos']) || count($requestAll['produtos']) === 0) {
+                $erros[] = "O campo 'produtos' é obrigatório e deve conter pelo menos um item.";
+            }
+
+            // Verificar outros campos, se necessário
+            if (empty($requestAll['loja_id'])) {
+                $erros[] = "O campo 'loja_id' é obrigatório.";
+            }
+
+            // Retornar erro se houver problemas
+            if (!empty($erros)) {
+                throw new \Exception('Erro nos dados enviados: ' . implode(' | ', $erros));
+            }
 
             //Salvo a venda
-            $sale = $this->vendas->create(["codigo_venda" =>  $dados["codigo_venda"],
-                                           "loja_id" =>  $dados["loja_id"],
-                                           "valor_total" =>  $dados["valor_total"],
-                                            "usuario_id" =>  isset($dados["usuario_id"]) ? $dados["usuario_id"] : 3,
-                                            "cliente_id" =>  $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
-                                            "tipo_venda_id" => $dados["tipoEntregaCliente"]]);
+            $sale = $this->vendas->create(["codigo_venda" =>  $requestAll["codigo_venda"],
+                                           "loja_id" =>  $requestAll["loja_id"],
+                                           "valor_total" =>  $requestAll["valor_total"],
+                                            "usuario_id" => $requestAll["usuario_id"] ?? 3,
+                                            "cliente_id" =>  $requestAll["clienteModel"]["id"] !== 0 ? $requestAll["clienteModel"]["id"] : null,
+                                            "tipo_venda_id" => $requestAll["tipoEntregaCliente"]]);
 
-            //Pega o total de produtos no array
-            $total = count($dados["produtos"]);
-            $totalPayment = count($dados["listTipoPagamento"]);
-
-            //Salva os produtos da venda
-            if ($sale->exists) {
-                for ($i = 0; $i < $total; $i++) {
-                    $this->vendasProdutos = new VendasProdutos();
-                    $this->vendasProdutos->venda_id = $sale->id;
-                    $this->vendasProdutos->codigo_produto = $dados["produtos"][$i]["codigo_produto"];
-                    $this->vendasProdutos->descricao = $dados["produtos"][$i]["descricao"];
-                    $this->vendasProdutos->valor_produto = $dados["produtos"][$i]["valor_produto"];
-                    $this->vendasProdutos->quantidade = $dados["produtos"][$i]["quantidade"];
-                    $this->vendasProdutos->troca = $dados["produtos"][$i]["troca"];
-                    $this->vendasProdutos->fornecedor_id = $dados["produtos"][$i]["fornecedor_id"];
-                    $this->vendasProdutos->categoria_id = $dados["produtos"][$i]["categoria_id"];
-                    $this->vendasProdutos->save();
-                }
-
-                //Salva o desconto, valor percentual e valor recebido da venda
-                $this->vendasDescontos = new VendasProdutosDesconto();
-                $this->vendasDescontos->venda_id = $sale->id;
-                $this->vendasDescontos->valor_desconto = $dados["valor_desconto"];
-                $this->vendasDescontos->valor_recebido = $dados["valor_recebido"];
-                $this->vendasDescontos->valor_percentual = $dados["percentual"];
-                $this->vendasDescontos->save();
-
-
-                for ($i = 0; $i < $totalPayment; $i++) {
-                    $this->tipoPagamento = new VendasProdutosTipoPagamento();
-                    $this->tipoPagamento->venda_id = $sale->id;
-                    $this->tipoPagamento->forma_pagamento_id = $dados["listTipoPagamento"][$i]["id"];
-                    $this->tipoPagamento->valor_pgto = $dados["listValorRecebido"][$i];
-                    $this->tipoPagamento->taxa = $this->buscaTaxa($dados["listTipoPagamento"][$i]["id"]);
-                    $this->tipoPagamento->save();
-                }
-
-                //Salva valor cashback
-                //$this->valorCartao  = new VendasProdutosValorCartao();
-                //$this->valorCartao->venda_id = $sale->id;
-               // $this->valorCartao->valor_cartao = $dados["valor_cartao"];
-              //  $this->valorCartao->save();
-
-                //Salva valor venda dupla ou cartao apenas
-               // $this->valorDuplo   = new VendasProdutosValorDupla();
-              //  $this->valorDuplo->venda_id = $sale->id;
-               // $this->valorDuplo->valor_cartao = $dados["valor_cartao"];
-               // $this->valorDuplo->valor_dinheiro = $dados["valor_recebido"];
-               // $this->valorDuplo->save();
+            if (!$sale) {
+                throw new \Exception('Erro ao salvar venda.');
             }
 
-            //Realizar baixa do produto
-            for ($i = 0; $i < $total; $i++) {
-                $id = $dados["produtos"][$i]["id"]; // id do produto pai
-                $sub_codigo = $dados["produtos"][$i]["codigo_produto"]; // subcodigo do produto
-                //$loja_id = $dados["loja_id"]; //id da loja
 
-                $productVariation =  $this->productVariation
-                                ->where('products_id', '=', $id)
-                                ->where('subcodigo', '=', $sub_codigo)
-                                ->select('id','quantidade')->first();
+            // Processa os produtos da venda
+            foreach ($requestAll["produtos"] as $produto) {
+                $this->vendasProdutos->create([
+                    "venda_id" => $sale->id,
+                    "codigo_produto" => $produto["codigo_produto"],
+                    "descricao" => $produto["descricao"],
+                    "valor_produto" => $produto["valor_produto"],
+                    "quantidade" => $produto["quantidade"],
+                    "troca" => $produto["troca"],
+                    "fornecedor_id" => $produto["fornecedor_id"],
+                    "categoria_id" => $produto["categoria_id"]
+                ]);
 
-                if($dados["produtos"][$i]["troca"] === false){
-                    $productVariation->quantidade -= $dados["produtos"][$i]["quantidade"];
-                }else{
-                    $productVariation->quantidade += $dados["produtos"][$i]["quantidade"];
+                // Atualiza estoque
+                $productVariation = $this->productVariation
+                    ->where('products_id', $produto["id"])
+                    ->where('subcodigo', $produto["codigo_produto"])
+                    ->where('status', true)
+                    ->first();
+
+                if (!$productVariation) {
+                    throw new \Exception("Produto não encontrado: {$produto['codigo_produto']}");
                 }
 
-                $affected = $productVariation->save();
+                if (!$produto["troca"]) {
+                    if ($productVariation->quantidade < $produto["quantidade"]) {
+                        throw new \Exception("Estoque insuficiente para o produto: {$produto['codigo_produto']}");
+                    }
+                    $productVariation->quantidade -= $produto["quantidade"];
+                } else {
+                    $productVariation->quantidade += $produto["quantidade"];
+                }
+
+                $productVariation->save();
             }
 
-            //Salva valor cashback
-            if($sale->cliente_id) {
-                //Se tiver valor de cashback, entendo que foi usado, seta status true
-                if ($dados["clienteModel"]["cashback"] > 0){
-                   $this->cashbackVendas
-                        ->where('cliente_id', '=',$sale->cliente_id)
+
+            // Salva desconto, valor recebido e percentual
+            $this->vendasDescontos->create([
+                "venda_id" => $sale->id,
+                "valor_desconto" => $requestAll["valor_desconto"],
+                "valor_recebido" => $requestAll["valor_recebido"],
+                "valor_percentual" => $requestAll["percentual"]
+            ]);
+
+            // Salva os tipos de pagamento
+            foreach ($requestAll["listTipoPagamento"] as $index => $pagamento) {
+                $this->tipoPagamento->create([
+                    "venda_id" => $sale->id,
+                    "forma_pagamento_id" => $pagamento["id"],
+                    "valor_pgto" => $requestAll["listValorRecebido"][$index],
+                    "taxa" => $this->buscaTaxa($pagamento["id"])
+                ]);
+            }
+
+            // Processa cashback
+            if ($sale->cliente_id) {
+                $cashbackUsado = $requestAll["clienteModel"]["cashback"] ?? 0;
+                if ($cashbackUsado > 0) {
+                    $this->cashbackVendas
+                        ->where('cliente_id', $sale->cliente_id)
                         ->update(['status' => 1]);
                 }
 
-                $cashbacks = $this->cashback::all();
-                $taxa = 0.05;
-                foreach ($cashbacks as $valor) {
-                    if ($valor->valor < $sale->valor_total) {
-                        $taxa = $valor->taxa;
-                    }
-                }
-                $valor_cashback = ($sale->valor_total * $taxa) / 100;
+                $taxaCashback = 0.05; // Taxa padrão
+                $valorCashback = ($sale->valor_total * $taxaCashback);
 
-                //Salva o cashback caso tenha valor acima de 0
-                if($valor_cashback > 0){
-                    $this->cashbackVendas = new VendasCashBack();
-                    $this->cashbackVendas->cliente_id = $sale->cliente_id;
-                    $this->cashbackVendas->venda_id = $sale->id;
-                    $this->cashbackVendas->valor = $valor_cashback;
-                    $this->cashbackVendas->save();
+                if ($valorCashback > 0) {
+                    $this->cashbackVendas->create([
+                        "cliente_id" => $sale->cliente_id,
+                        "venda_id" => $sale->id,
+                        "valor" => $valorCashback
+                    ]);
                 }
-
             }
 
-            if ($affected > 0) {
-              return Response::json(array('success' => true), 200);
-            }else{
-                return Response::json(array('success' => false, 'message' => 'Ocorreu um erro no fechamento da venda!!'), 400);
-            }
+            DB::commit();
+
+            //Pega o total de produtos no array
+            //$total = count($dados["produtos"]);
+            //$totalPayment = count($dados["listTipoPagamento"]);
+
+            //Salva os produtos da venda
+ //           if ($sale->exists) {
+//                for ($i = 0; $i < $total; $i++) {
+//                    $this->vendasProdutos = new VendasProdutos();
+//                    $this->vendasProdutos->venda_id = $sale->id;
+//                    $this->vendasProdutos->codigo_produto = $dados["produtos"][$i]["codigo_produto"];
+//                    $this->vendasProdutos->descricao = $dados["produtos"][$i]["descricao"];
+//                    $this->vendasProdutos->valor_produto = $dados["produtos"][$i]["valor_produto"];
+//                    $this->vendasProdutos->quantidade = $dados["produtos"][$i]["quantidade"];
+//                    $this->vendasProdutos->troca = $dados["produtos"][$i]["troca"];
+//                    $this->vendasProdutos->fornecedor_id = $dados["produtos"][$i]["fornecedor_id"];
+//                    $this->vendasProdutos->categoria_id = $dados["produtos"][$i]["categoria_id"];
+//                    $this->vendasProdutos->save();
+//                }
+
+                //Salva o desconto, valor percentual e valor recebido da venda
+//                $this->vendasDescontos = new VendasProdutosDesconto();
+//                $this->vendasDescontos->venda_id = $sale->id;
+//                $this->vendasDescontos->valor_desconto = $dados["valor_desconto"];
+//                $this->vendasDescontos->valor_recebido = $dados["valor_recebido"];
+//                $this->vendasDescontos->valor_percentual = $dados["percentual"];
+//                $this->vendasDescontos->save();
+
+
+//                for ($i = 0; $i < $totalPayment; $i++) {
+//                    $this->tipoPagamento = new VendasProdutosTipoPagamento();
+//                    $this->tipoPagamento->venda_id = $sale->id;
+//                    $this->tipoPagamento->forma_pagamento_id = $dados["listTipoPagamento"][$i]["id"];
+//                    $this->tipoPagamento->valor_pgto = $dados["listValorRecebido"][$i];
+//                    $this->tipoPagamento->taxa = $this->buscaTaxa($dados["listTipoPagamento"][$i]["id"]);
+//                    $this->tipoPagamento->save();
+//                }
+
+                //Realizar baixa do produto
+//                for ($i = 0; $i < $total; $i++) {
+//                    $id = $dados["produtos"][$i]["id"]; // id do produto pai
+//                    $sub_codigo = $dados["produtos"][$i]["codigo_produto"]; // subcodigo do produto
+//                    //$loja_id = $dados["loja_id"]; //id da loja
+//
+//                    $productVariation = $this->productVariation
+//                        ->where('products_id', '=', $id)
+//                        ->where('subcodigo', '=', $sub_codigo)
+//                        ->select('id', 'quantidade')->first();
+//
+//                    if ($dados["produtos"][$i]["troca"] === false) {
+//                        $productVariation->quantidade -= $dados["produtos"][$i]["quantidade"];
+//                    } else {
+//                        $productVariation->quantidade += $dados["produtos"][$i]["quantidade"];
+//                    }
+//
+//                    $affected = $productVariation->save();
+//                }
+
+                //Salva valor cashback
+//                if ($sale->cliente_id) {
+//                    //Se tiver valor de cashback, entendo que foi usado, seta status true
+//                    if ($dados["clienteModel"]["cashback"] > 0) {
+//                        $this->cashbackVendas
+//                            ->where('cliente_id', '=', $sale->cliente_id)
+//                            ->update(['status' => 1]);
+//                    }
+//
+//                    $cashbacks = $this->cashback::all();
+//                    $taxa = 0.05;
+//                    foreach ($cashbacks as $valor) {
+//                        if ($valor->valor < $sale->valor_total) {
+//                            $taxa = $valor->taxa;
+//                        }
+//                    }
+//                    $valor_cashback = ($sale->valor_total * $taxa) / 100;
+//
+//                    //Salva o cashback caso tenha valor acima de 0
+//                    if ($valor_cashback > 0) {
+//                        $this->cashbackVendas = new VendasCashBack();
+//                        $this->cashbackVendas->cliente_id = $sale->cliente_id;
+//                        $this->cashbackVendas->venda_id = $sale->id;
+//                        $this->cashbackVendas->valor = $valor_cashback;
+//                        $this->cashbackVendas->save();
+//                    }
+//
+//                }
+//
+//                if ($affected > 0) {
+//                    return Response::json(array('success' => true), 200);
+//                } else {
+//                    return Response::json(array('success' => false, 'message' => 'Ocorreu um erro no fechamento da venda!!'), 400);
+//                }
+//            }
+            return Response::json(['success' => true,'message' => 'Venda processada com sucesso.'], 200);
 
     } catch (Throwable $e) {
-        return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
+        //return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
+            DB::rollback();
+
+            // Salva o erro na tabela
+            $this->errorLogs->create([
+                'codigo_venda' => $requestAll['codigo_venda'] ?? null,
+                'mensagem' => $e->getMessage(),
+                'dados' => json_encode($requestAll),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Responde ao cliente
+            return Response::json([
+                'success' => false,
+                'message' => 'Erro ao processar venda. O problema foi registrado para análise.'
+            ], 500);
     }
 }
+*/
+    public function store()
+    {
+
+        DB::beginTransaction();
+        try {
+            $dados = $this->request->all();
+
+            // Validação detalhada
+            $erros = [];
+
+            // Verificar se "codigo_venda" está vazio
+            if (empty($dados['codigo_venda'])) {
+                $erros[] = "O campo 'codigo_venda' é obrigatório e não pode estar vazio.";
+            }
+
+            // Verificar se "produtos" está definido e não vazio
+            if (!isset($dados['produtos']) || count($dados['produtos']) === 0) {
+                $erros[] = "O campo 'produtos' é obrigatório e deve conter pelo menos um item.";
+            }
+
+            // Verificar outros campos, se necessário
+            if (empty($dados['loja_id'])) {
+                $erros[] = "O campo 'loja_id' é obrigatório.";
+            }
+
+        // Retornar erro se houver problemas
+            if (!empty($erros)) {
+                throw new \Exception('Erro nos dados enviados: ' . implode(' | ', $erros));
+            }
+
+            // Cria a venda
+            $sale = $this->vendas->create([
+                "codigo_venda" => $dados["codigo_venda"],
+                "loja_id" => $dados["loja_id"],
+                "valor_total" => $dados["valor_total"],
+                "usuario_id" => $dados["usuario_id"] ?? 3,
+                "cliente_id" => $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
+                "tipo_venda_id" => $dados["tipoEntregaCliente"]
+            ]);
+
+            if (!$sale) {
+                throw new \Exception('Erro ao salvar venda.');
+            }
+
+            // Processa os produtos da venda
+            foreach ($dados["produtos"] as $produto) {
+                $this->vendasProdutos->create([
+                    "venda_id" => $sale->id,
+                    "codigo_produto" => $produto["codigo_produto"],
+                    "descricao" => $produto["descricao"],
+                    "valor_produto" => $produto["valor_produto"],
+                    "quantidade" => $produto["quantidade"],
+                    "troca" => $produto["troca"],
+                    "fornecedor_id" => $produto["fornecedor_id"],
+                    "categoria_id" => $produto["categoria_id"]
+                ]);
+
+                // Atualiza estoque
+                $productVariation = $this->productVariation
+                    ->where('products_id', $produto["id"])
+                    ->where('subcodigo', $produto["codigo_produto"])
+                    ->where('status', 1) //true
+                    ->first();
+
+                if (!$productVariation) {
+                    throw new \Exception("Produto não encontrado: {$produto['codigo_produto']}");
+                }
+
+                if (!$produto["troca"]) {
+                    if ($productVariation->quantidade < $produto["quantidade"]) {
+                        throw new \Exception("Estoque insuficiente para o produto: {$produto['codigo_produto']}");
+                    }
+                    $productVariation->quantidade -= $produto["quantidade"];
+                } else {
+                    $productVariation->quantidade += $produto["quantidade"];
+                }
+
+                $productVariation->save();
+            }
+
+            // Salva os tipos de pagamento
+            foreach ($dados["listTipoPagamento"] as $index => $pagamento) {
+                $this->tipoPagamento->create([
+                    "venda_id" => $sale->id,
+                    "forma_pagamento_id" => $pagamento["id"],
+                    "valor_pgto" => $dados["listValorRecebido"][$index],
+                    "taxa" => $this->buscaTaxa($pagamento["id"])
+                ]);
+            }
+
+            // Salva desconto, valor recebido e percentual
+            $this->vendasDescontos->create([
+                "venda_id" => $sale->id,
+                "valor_desconto" => $dados["valor_desconto"],
+                "valor_recebido" => $dados["valor_recebido"],
+                "valor_percentual" => $dados["percentual"]
+            ]);
+
+            // Processa cashback
+            if ($sale->cliente_id) {
+                $cashbackUsado = $dados["clienteModel"]["cashback"] ?? 0;
+                if ($cashbackUsado > 0) {
+                    $this->cashbackVendas
+                        ->where('cliente_id', $sale->cliente_id)
+                        ->update(['status' => 1]);
+                }
+
+                $taxaCashback = 0.10; // Taxa padrão
+                $valorCashback = ($sale->valor_total * $taxaCashback);
+
+                if ($valorCashback > 0) {
+                    $this->cashbackVendas->create([
+                        "cliente_id" => $sale->cliente_id,
+                        "venda_id" => $sale->id,
+                        "valor" => $valorCashback
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return Response::json([
+                'success' => true,
+                'message' => 'Venda processada com sucesso.'
+            ], 200);
+
+
+        } catch (Throwable $e) {
+            DB::rollback();
+
+            // Salva o erro na tabela
+            $this->errorLogs->create([
+                'codigo_venda' => $dados['codigo_venda'] ?? null,
+                'mensagem' => $e->getMessage(),
+                'dados' => json_encode($dados),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            // Responde ao cliente
+            return Response::json([
+                'success' => false,
+                'message' => 'Erro ao processar venda. O problema foi registrado para análise.'
+            ], 500);
+        }
+    }
 
     /**
      * Display the specified resource.
@@ -622,14 +879,22 @@ class VendaController extends Controller
 
             $carts = Carts::with('variations','clientes','usuario','cashback')
                 ->where('user_id', $user_id)
-             //   ->where('cliente_id', $cliente_id)
-                ->where('status', $status)
+                ->whereIn('status', $status)
+                ->orderBy('id','desc')
                 ->get();
 
             if (!$carts->isEmpty())
                 return Response::json(['success' => true,'message' => "sucesso", 'data' => $carts], 200,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             else
                 return Response::json(['success' => false,'message' => "Carrinho cliente não localizado! ", 'data' => $carts], 201,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        } catch (Throwable $e) {
+            return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);
+        }
+    }
+
+    public function getItemsCart(){
+        try {
 
         } catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);

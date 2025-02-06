@@ -9,6 +9,8 @@ class Usuario extends Model
 {
     public $table = 'loja_usuarios';
     protected $fillable = ['nome','login','senha','status','admin','loja_id','sexo'];
+    // Ocultando colunas específicas
+    protected $hidden = ['senha', 'password','sexo','created_at','updated_at','admin'];
 
     public function vendas()
     {

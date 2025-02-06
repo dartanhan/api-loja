@@ -3,6 +3,7 @@
 namespace App\Http\Models;
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
@@ -36,4 +37,23 @@ class ProdutoVariation extends Model implements Auditable
     {
         return $this->hasMany(ListaDeCompras::class, 'produto_variacao_id', 'id')->where('status',true); //somente ativos;
     }
+
+    public function fornecedor()
+    {
+        return $this->belongsTo(Fornecedor::class, 'fornecedor', 'id');
+    }
+
+    public function produtoPai()
+    {
+        return $this->belongsTo(Produto::class, 'products_id', 'id');
+    }
+
+    // No modelo ProdutoVariation (ou Produto)
+    public function vendas()
+    {
+        return $this->hasMany(VendasProdutos::class, 'codigo_produto', 'subcodigo')
+            ->whereMonth('created_at', Carbon::now()->month); // Filtrar vendas do mês
+    }
+
+
 }
