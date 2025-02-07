@@ -21,8 +21,9 @@ use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -523,15 +524,23 @@ class VendaController extends Controller
                 throw new \Exception('Erro nos dados enviados: ' . implode(' | ', $erros));
             }
 
-            // Cria a venda
-            $sale = $this->vendas->create([
+            //monta array com dados da venda
+            $dados_venda = [
                 "codigo_venda" => $dados["codigo_venda"],
                 "loja_id" => $dados["loja_id"],
                 "valor_total" => $dados["valor_total"],
                 "usuario_id" => $dados["usuario_id"] ?? 3,
                 "cliente_id" => $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
                 "tipo_venda_id" => $dados["tipoEntregaCliente"]
-            ]);
+            ];
+
+            // Só adiciona "created_at" se "data" existir
+            if (isset($dados["data"])) {
+                $dados_venda["created_at"] = $dados["data"];
+            }
+
+            // Cria a venda
+            $sale = $this->vendas->create($dados_venda);
 
             if (!$sale) {
                 throw new \Exception('Erro ao salvar venda.');
@@ -903,9 +912,13 @@ class VendaController extends Controller
 
     //pega o valor da taxa e associa ao tipo de
     // pagmaento da venda, para no futuro alterar a taxa não influenciar nos relatórios
-    function buscaTaxa(int $idPagamento){
-        $retorno = $this->taxaCartao::select('valor_taxa')->where('forma_id', $idPagamento)->first();
-        return $retorno->valor_taxa;
+    public function buscaTaxa(int $paymentId): ?float
+    {
+        return Cache::remember("taxa_cartao_{$paymentId}", 60, function () use ($paymentId) {
+            return optional($this->taxaCartao::select('valor_taxa')
+                ->where('forma_id', $paymentId)
+                ->first())->valor_taxa;
+        });
     }
 
 }
