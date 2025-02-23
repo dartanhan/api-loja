@@ -15,4 +15,8 @@ class VendasProdutosEntrega extends Model
         return $this->belongsTo(Vendas::class, 'venda_id');
     }
 
+    function formaEntrega(){
+        return $this->belongsTo(FormaEntrega::class, 'forma_id');
+    }
+
 }

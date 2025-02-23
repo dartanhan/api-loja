@@ -16,6 +16,7 @@ use App\Http\Models\VendasCashBackValor;
 use App\Http\Models\VendasPdv;
 use App\Http\Models\VendasProdutos;
 use App\Http\Models\VendasProdutosDesconto;
+use App\Http\Models\VendasProdutosEntrega;
 use App\Http\Models\VendasProdutosTipoPagamento;
 use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
@@ -48,6 +49,7 @@ class VendaController extends Controller
     protected Vendas $vendas;
     protected Produto $product;
     protected Request $request;
+    protected VendasProdutosEntrega $vendasProdutosEntrega;
 
 
     public function __construct(Request $request,
@@ -65,7 +67,8 @@ class VendaController extends Controller
                                     Cashback $cashback,
                                     VendasCashBackValor $cashBackValor,
                                     VendasPdv $vendasPdv,
-                                    ErrorLogs $errorLogs){
+                                    ErrorLogs $errorLogs,
+                                    VendasProdutosEntrega $vendasProdutosEntrega){
          $this->request = $request;
          $this->product = $product;
          $this->vendas = $vendas;
@@ -82,6 +85,7 @@ class VendaController extends Controller
          $this->cashBackValor = $cashBackValor;
          $this->vendasPdv = $vendasPdv;
          $this->errorLogs = $errorLogs;
+         $this->vendasProdutosEntrega = $vendasProdutosEntrega;
     }
 
     /**
@@ -90,6 +94,61 @@ class VendaController extends Controller
      * @return JsonResponse
      */
     public function index()
+    {
+        $codigo_produto = $this->request->header('product-code');
+        $tipo_pgto = intval($this->request->header('tipo-id'));
+
+        $variations = $this->productVariation::with('produtoPai', 'images')->where('subcodigo', $codigo_produto)->first();
+
+        if (!$variations) {
+            return response()->json(['success' => false, 'message' => 'Produto não encontrado!'], 201);
+        }
+
+        if ($variations->status == 0) {
+            return response()->json(['success' => false, 'message' => 'Produto Inativado para Venda!'], 201);
+        }
+
+        if ($variations->quantidade == 0) {
+            return response()->json(['success' => false, 'message' => 'Produto sem Estoque para Venda!'], 201);
+        }
+
+        $product = $variations->produtoPai;
+
+        if (!$product || $product->status == 0) {
+            return response()->json(['success' => false, 'message' => 'Produto Bloqueado para venda!'], 201);
+        }
+
+        // Construção do JSON de resposta
+        $storage = url('public','storage');
+
+        $imagePath = !empty($variations->images) && isset($variations->images[0]->path) && Storage::exists($variations->images[0]->path)
+            ? $storage . '/' . $variations->images[0]->path
+            : $storage . '/produtos/not-image.png';
+
+        return response()->json([
+            'success' => true,
+            'id' => $product->id,
+            'codigo_produto' => $codigo_produto,
+            'descricao' => "{$product->descricao} - {$variations->variacao}",
+            'status' => $variations->status,
+            'fornecedor_id' => $variations->fornecedor,
+            'categoria_id' => $product->categoria_id,
+            'id_forma_pgto' => $tipo_pgto,
+            'quantidade' => 1,
+            'valor_produto' => $variations->valor_produto,
+            'valor_atacado' => $variations->valor_atacado_10un,
+            'valor_varejo' => $variations->valor_varejo,
+            'valor_venda' => $variations->valor_varejo,
+            'percentual' => $variations->percentage,
+            'qtdestoque' => $variations->quantidade,
+            'loja_id' => 2,
+            'troca' => false,
+            'path' => $imagePath,
+            'path_image' => $imagePath
+        ], 200);
+    }
+
+    /*public function index()
     {
         //dd($this->request->header('product-code'));
         $codigo_produto = $this->request->header('product-code');
@@ -163,10 +222,14 @@ class VendaController extends Controller
             } else {
                 return Response::json(array('success' => false, 'message' => 'Produto não encontrado!'), 201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
-    }
+    }*/
 
     /**
      * Show the form for creating a new resource.
+     *
+     * imprime a venda pelo seu código ou pega a ultima venda realizada
+     *
+     * @param codigo_venda
      *
      * @return JsonResponse
      */
@@ -174,21 +237,92 @@ class VendaController extends Controller
     {
 
         try {
-            $pro = [];
-            $code_store = $this->request->header('store-id');
+            $store_id = $this->request->header('store-id');
+            $code_store = $this->request->header('code-store');
 
             /**
             PEGA A ÚLTIMA VENDA DA LOJA ESPECIFICA
              */
-            $store =  DB::table('loja_vendas')->where('loja_id',$code_store)->orderBy('id', 'DESC')->first();
+            $lastSale = $this->vendas
+                ->where('loja_id', $store_id)
+                ->when(!empty($code_store), function ($query) use ($code_store) {
+                    return $query->where('codigo_venda', $code_store);
+                })
+                ->orderBy('id', 'DESC')
+                ->first();
 
-            if( $store != null) {
+
+            if (!$lastSale) {
+                return Response::json([
+                    'success' => false,
+                    'message' => "Venda não localizada [ {$code_store} ]"
+                ], 200);
+            }
+
+            // Busca detalhes da venda e seus produtos
+            $products = $this->vendas->where('codigo_venda', $lastSale->codigo_venda)
+                ->with([
+                    'produtos:id,venda_id,quantidade,descricao,codigo_produto,valor_produto',
+                    'pagamentos' => function ($query) {
+                        $query->select('id', 'venda_id', 'forma_pagamento_id', 'valor_pgto')->with('formaPagamento:id,nome');
+                    },
+                    'descontos:valor_desconto,valor_percentual,valor_recebido,venda_id',
+                    'cashback.cliente:id,nome',
+                    'entregas.formaEntrega:id,nome'
+                ])
+                ->select('id','codigo_venda', 'loja_id', 'valor_total', 'created_at')
+                ->first();
+
+            return Response::json(['success'=>true,"data"=>$products], 200);
+
+            // Monta resposta JSON
+           /* return Response::json([
+                'success'        => true,
+                'produtos'       => $products,
+                'percentual'     => $products->descontos[0]->valor_percentual ?? 0,
+                'valor_desconto' => $products->descontos[0]->valor_desconto ?? 0,
+                'valor_recebido' => $products->descontos[0]->valor_recebido ?? 0,
+                'loja_id'        => $products->loja_id,
+                'listTipoPagamento' => $products->pagamentos,
+                'codigo_venda'   => $code_store,
+                'valor_total'    => $lastSale->valor_total,
+                'valor_troco'    => $products->descontos[0]->valor_recebido - $lastSale->valor_total,
+                'valor_sub_total'=> $lastSale->valor_total + $products->descontos[0]->valor_desconto,
+//                'clienteModel'   => [
+//                    'nome'     => $products->cashback[0]->cliente->nome ?? 'Não informado',
+//                    'cashback' => $products->cashback[0]->valor ?? 0,
+//                    //'clientes' => [$products->cashback ?? (object) []],
+//                ],
+            ], 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);*/
+
+
+
+//            return response()->json($products, 201);
+//
+//            $products = $this->vendas->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
+//                ->where('loja_vendas.codigo_venda', $code_store)
+//                ->select(
+//                    'loja_vendas.*',
+//                    'loja_vendas_produtos.quantidade',
+//                    'loja_vendas_produtos.descricao',
+//                    'loja_vendas_produtos.codigo_produto',
+//                    'loja_vendas_produtos.valor_produto'
+//                )
+//                ->get();
+
+//            if ($products->isEmpty()) {
+//                return Response::json([
+//                    'success' => false,
+//                    'message' => "Venda não localizada [ {$code_store} ]"
+//                ], 400);
+//            }
+
+            /*if( $store != null) {
 
                 $total_store = $store->valor_total;
                 $code_store = $store->codigo_venda; //Pega o código venda KNxxx
 
-                $store = DB::table('loja_vendas')
-                    ->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
+                $store = $this->vendas->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
                     ->where('loja_vendas.codigo_venda', '=', $code_store)
                     ->select('loja_vendas.*', 'loja_vendas_produtos.quantidade',
                         'loja_vendas_produtos.descricao',
@@ -197,8 +331,7 @@ class VendaController extends Controller
 
                 if (count($store) > 0) {
                     //Desconto
-                    $discount = DB::table('loja_vendas')
-                        ->join('loja_vendas_produtos_descontos', 'loja_vendas.id', '=', 'loja_vendas_produtos_descontos.venda_id')
+                    $discount = $this->vendas->join('loja_vendas_produtos_descontos', 'loja_vendas.id', '=', 'loja_vendas_produtos_descontos.venda_id')
                         ->where('loja_vendas.codigo_venda', '=', $code_store)
                         ->select('loja_vendas_produtos_descontos.valor_desconto',
                             'loja_vendas_produtos_descontos.valor_percentual',
@@ -207,15 +340,14 @@ class VendaController extends Controller
                             DB::raw('loja_vendas.valor_total + loja_vendas_produtos_descontos.valor_desconto as sub_total'))->first();
 
                     //Forma de pagamento
-                    $payment = DB::table('loja_vendas')
-                        ->join('loja_vendas_produtos_tipo_pagamentos', 'loja_vendas.id', '=', 'loja_vendas_produtos_tipo_pagamentos.venda_id')
+                    $payment = $this->vendas->join('loja_vendas_produtos_tipo_pagamentos', 'loja_vendas.id', '=', 'loja_vendas_produtos_tipo_pagamentos.venda_id')
                         ->join('loja_forma_pagamentos', 'loja_forma_pagamentos.id', '=', 'loja_vendas_produtos_tipo_pagamentos.forma_pagamento_id')
                         ->where('loja_vendas.codigo_venda', '=', $code_store)
                         //->select('loja_forma_pagamentos.id','loja_forma_pagamentos.nome')->first();
                         ->select('loja_forma_pagamentos.id', 'loja_forma_pagamentos.nome')->get();
 
-                    $clienteCashBack = DB::table('loja_vendas')
-                        ->leftJoin('loja_vendas_cashback', 'loja_vendas.id', '=',  'loja_vendas_cashback.venda_id')
+                    //cashback
+                    $clienteCashBack = $this->vendas->leftJoin('loja_vendas_cashback', 'loja_vendas.id', '=',  'loja_vendas_cashback.venda_id')
                         ->leftJoin('loja_clientes', 'loja_vendas_cashback.cliente_id' ,'=', 'loja_clientes.id')
                         ->where('loja_vendas.codigo_venda', '=', $code_store)
                     ->select('loja_clientes.nome', 'loja_vendas_cashback.valor as cashback')->first();
@@ -244,7 +376,7 @@ class VendaController extends Controller
                 return Response::json($pro, 200,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }else{
                 return Response::json(array('success' => false, 'message' => 'Venda não localizada [ ' . $code_store . ' ]'), 400);
-            }
+            }*/
 
         } catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);
@@ -556,14 +688,16 @@ class VendaController extends Controller
                     "quantidade" => $produto["quantidade"],
                     "troca" => $produto["troca"],
                     "fornecedor_id" => $produto["fornecedor_id"],
-                    "categoria_id" => $produto["categoria_id"]
+                    "categoria_id" => $produto["categoria_id"],
+                    'loja_venda_id_troca' => $dados['venda_id']
                 ]);
+
 
                 // Atualiza estoque
                 $productVariation = $this->productVariation
                     ->where('products_id', $produto["id"])
                     ->where('subcodigo', $produto["codigo_produto"])
-                    ->where('status', 1) //true
+                    ->where('status', true) //true
                     ->first();
 
                 if (!$productVariation) {
@@ -578,9 +712,20 @@ class VendaController extends Controller
                 } else {
                     $productVariation->quantidade += $produto["quantidade"];
                 }
-
                 $productVariation->save();
-            }
+
+                //atualiza a venda de origem com termo troca e atualiza a coluna troca do produto trocado para true
+                if (!empty($produto['troca'])) { // Verifica se troca está definido e não é falso
+                    $this->vendasProdutos
+                        ->where('venda_id', $dados['venda_id'])
+                        ->where('codigo_produto', $produto['codigo_produto'])
+                        ->update(
+                            [
+                                'troca' => true,
+                                'descricao' => DB::raw("CONCAT(descricao,' (Troca)')")
+                            ]);
+                }
+            }//100905- 7 e 100901 -0 100102 - 9
 
             // Salva os tipos de pagamento
             foreach ($dados["listTipoPagamento"] as $index => $pagamento) {
@@ -609,7 +754,7 @@ class VendaController extends Controller
                         ->update(['status' => 1]);
                 }
 
-                $taxaCashback = 0.10; // Taxa padrão
+                $taxaCashback = 0.8; // Taxa padrão
                 $valorCashback = ($sale->valor_total * $taxaCashback);
 
                 if ($valorCashback > 0) {

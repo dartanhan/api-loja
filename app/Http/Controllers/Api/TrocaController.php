@@ -61,6 +61,7 @@ class TrocaController extends Controller
                     'loja_vendas.created_at as created_at',
                     'loja_vendas.updated_at as updated_at',
                     'loja_vendas_produtos.codigo_produto',
+                    'loja_vendas_produtos.descricao as desc_varicacao_venda',
                     'loja_produtos_new.descricao',
                     'loja_vendas_produtos.valor_produto',
                     'loja_vendas_produtos.quantidade',
@@ -85,7 +86,7 @@ class TrocaController extends Controller
         if(count($return) > 0){
             foreach ($return as $key => $value){
                 $store['venda_id'] = $value->venda_id;
-                $store['descricao'] = $value->descricao . " - " . $value->variacao;
+                $store['descricao'] = $value->desc_varicacao_venda;
                 $store['quantidade'] = $value->quantidade;
                 $store['codigo_produto'] = $value-> codigo_produto;
                 $store['valor_produto'] = $value->valor_produto;
