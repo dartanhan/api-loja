@@ -386,6 +386,7 @@ class VendaController extends Controller
     /**
      * Store a newly created resource in storage.
      * SALVA A VENDA alterado para a possibilidade de venda offline
+     * @param Request $request
      * @return JsonResponse
      */
     /*public function store()
@@ -626,108 +627,76 @@ class VendaController extends Controller
     }
 }
 */
+
     public function store()
     {
-
         DB::beginTransaction();
         try {
             $dados = $this->request->all();
-
-            // Validação detalhada
             $erros = [];
 
-            // Verificar se "codigo_venda" está vazio
-            if (empty($dados['codigo_venda'])) {
-                $erros[] = "O campo 'codigo_venda' é obrigatório e não pode estar vazio.";
-            }
+            // ✅ Validação inicial
+            if (empty($dados['codigo_venda'])) $erros[] = "O campo 'codigo_venda' é obrigatório.";
+            if (!isset($dados['produtos']) || count($dados['produtos']) === 0) $erros[] = "A venda deve ter pelo menos um produto.";
+            if (empty($dados['loja_id'])) $erros[] = "O campo 'loja_id' é obrigatório.";
 
-            // Verificar se "produtos" está definido e não vazio
-            if (!isset($dados['produtos']) || count($dados['produtos']) === 0) {
-                $erros[] = "O campo 'produtos' é obrigatório e deve conter pelo menos um item.";
-            }
+            if (!empty($erros)) throw new \Exception('Erro nos dados: ' . implode(' | ', $erros));
 
-            // Verificar outros campos, se necessário
-            if (empty($dados['loja_id'])) {
-                $erros[] = "O campo 'loja_id' é obrigatório.";
-            }
-
-        // Retornar erro se houver problemas
-            if (!empty($erros)) {
-                throw new \Exception('Erro nos dados enviados: ' . implode(' | ', $erros));
-            }
-
-            //monta array com dados da venda
+            // ✅ Criar nova venda (mantém original se for troca)
             $dados_venda = [
                 "codigo_venda" => $dados["codigo_venda"],
                 "loja_id" => $dados["loja_id"],
                 "valor_total" => $dados["valor_total"],
                 "usuario_id" => $dados["usuario_id"] ?? 3,
-                "cliente_id" => $dados["clienteModel"]["id"] !== 0 ? $dados["clienteModel"]["id"] : null,
-                "tipo_venda_id" => $dados["tipoEntregaCliente"]
+                "cliente_id" => $dados["clienteModel"]["id"] ?: null,
+                "tipo_venda_id" => $dados["tipoEntregaCliente"],
+                "created_at" => $dados["data"] ?? now()
             ];
 
-            // Só adiciona "created_at" se "data" existir
-            if (isset($dados["data"])) {
-                $dados_venda["created_at"] = $dados["data"];
-            }
-
-            // Cria a venda
             $sale = $this->vendas->create($dados_venda);
+            if (!$sale) throw new \Exception('Erro ao salvar venda.');
 
-            if (!$sale) {
-                throw new \Exception('Erro ao salvar venda.');
-            }
-
-            // Processa os produtos da venda
+            // ✅ Processa os produtos da venda
             foreach ($dados["produtos"] as $produto) {
-                $this->vendasProdutos->create([
-                    "venda_id" => $sale->id,
-                    "codigo_produto" => $produto["codigo_produto"],
-                    "descricao" => $produto["descricao"],
-                    "valor_produto" => $produto["valor_produto"],
-                    "quantidade" => $produto["quantidade"],
-                    "troca" => $produto["troca"],
-                    "fornecedor_id" => $produto["fornecedor_id"],
-                    "categoria_id" => $produto["categoria_id"],
-                    'loja_venda_id_troca' => $dados['venda_id']
-                ]);
-
-
-                // Atualiza estoque
-                $productVariation = $this->productVariation
-                    ->where('products_id', $produto["id"])
-                    ->where('subcodigo', $produto["codigo_produto"])
-                    ->where('status', true) //true
-                    ->first();
-
-                if (!$productVariation) {
-                    throw new \Exception("Produto não encontrado: {$produto['codigo_produto']}");
-                }
-
-                if (!$produto["troca"]) {
-                    if ($productVariation->quantidade < $produto["quantidade"]) {
-                        throw new \Exception("Estoque insuficiente para o produto: {$produto['codigo_produto']}");
-                    }
-                    $productVariation->quantidade -= $produto["quantidade"];
-                } else {
-                    $productVariation->quantidade += $produto["quantidade"];
-                }
-                $productVariation->save();
-
-                //atualiza a venda de origem com termo troca e atualiza a coluna troca do produto trocado para true
-                if (!empty($produto['troca'])) { // Verifica se troca está definido e não é falso
+                if (!empty($produto['troca'])) {
+                    // Atualiza a venda original, indicando que o produto foi trocado
                     $this->vendasProdutos
                         ->where('venda_id', $dados['venda_id'])
                         ->where('codigo_produto', $produto['codigo_produto'])
-                        ->update(
-                            [
-                                'troca' => true,
-                                'descricao' => DB::raw("CONCAT(descricao,' (Troca)')")
-                            ]);
+                        ->update([
+                            'troca' => true,
+                            'descricao' => DB::raw("CONCAT(descricao, ' (Trocado)')")
+                        ]);
                 }
-            }//100905- 7 e 100901 -0 100102 - 9
 
-            // Salva os tipos de pagamento
+                // ✅ Criar novo registro na venda (marcando que foi troca) 47 - 7 -13 (8, 3, 5)
+                $this->vendasProdutos->create([
+                    "venda_id" => $sale->id,
+                    "codigo_produto" => $produto["codigo_produto"],
+                    "descricao" => $produto["descricao"], // . (!empty($produto['troca']) ? " (Troca)" : ""),
+                    "valor_produto" => $produto["valor_produto"],
+                    "quantidade" => $produto["quantidade"],
+                    "troca" => !empty($produto['troca']),  // Marca se foi troca
+                    "fornecedor_id" => $produto["fornecedor_id"],
+                    "categoria_id" => $produto["categoria_id"],
+                    "loja_venda_id_troca" => !empty($produto['troca']) ? $dados['venda_id'] : null
+                ]);
+
+                // ✅ Atualizar o estoque corretamente
+                $productVariation = $this->productVariation
+                    ->where('products_id', $produto["id"])
+                    ->where('subcodigo', $produto["codigo_produto"])
+                    ->where('status', true)
+                    ->first();
+
+                if (!$productVariation) throw new \Exception("Produto não encontrado: {$produto['codigo_produto']}");
+
+                // Se for troca, adiciona ao estoque; se for venda normal, reduz
+                $productVariation->quantidade += !empty($produto["troca"]) ? $produto["quantidade"] : -$produto["quantidade"];
+                $productVariation->save();
+            }
+
+            // ✅ Salva os pagamentos
             foreach ($dados["listTipoPagamento"] as $index => $pagamento) {
                 $this->tipoPagamento->create([
                     "venda_id" => $sale->id,
@@ -737,7 +706,7 @@ class VendaController extends Controller
                 ]);
             }
 
-            // Salva desconto, valor recebido e percentual
+            // ✅ Salva desconto e cashback
             $this->vendasDescontos->create([
                 "venda_id" => $sale->id,
                 "valor_desconto" => $dados["valor_desconto"],
@@ -745,18 +714,13 @@ class VendaController extends Controller
                 "valor_percentual" => $dados["percentual"]
             ]);
 
-            // Processa cashback
             if ($sale->cliente_id) {
                 $cashbackUsado = $dados["clienteModel"]["cashback"] ?? 0;
                 if ($cashbackUsado > 0) {
-                    $this->cashbackVendas
-                        ->where('cliente_id', $sale->cliente_id)
-                        ->update(['status' => 1]);
+                    $this->cashbackVendas->where('cliente_id', $sale->cliente_id)->update(['status' => 1]);
                 }
 
-                $taxaCashback = 0.8; // Taxa padrão
-                $valorCashback = ($sale->valor_total * $taxaCashback);
-
+                $valorCashback = ($sale->valor_total * 0.8);
                 if ($valorCashback > 0) {
                     $this->cashbackVendas->create([
                         "cliente_id" => $sale->cliente_id,
@@ -772,12 +736,9 @@ class VendaController extends Controller
                 'success' => true,
                 'message' => 'Venda processada com sucesso.'
             ], 200);
-
-
         } catch (Throwable $e) {
             DB::rollback();
 
-            // Salva o erro na tabela
             $this->errorLogs->create([
                 'codigo_venda' => $dados['codigo_venda'] ?? null,
                 'mensagem' => $e->getMessage(),
@@ -786,13 +747,13 @@ class VendaController extends Controller
                 'updated_at' => now()
             ]);
 
-            // Responde ao cliente
             return Response::json([
                 'success' => false,
-                'message' => 'Erro ao processar venda. O problema foi registrado para análise.'
+                'message' => 'Erro ao processar venda. O problema foi registrado.'
             ], 500);
         }
     }
+
 
     /**
      * Display the specified resource.

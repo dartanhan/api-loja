@@ -75,4 +75,9 @@ class Vendas extends Model implements Auditable
     public function frete(){
         return $this->hasMany(VendasProdutosEntrega::class, 'venda_id');
     }
+
+    public function troca()
+    {
+        return $this->hasOne(VendasTroca::class, 'nova_venda_id');
+    }
 }
