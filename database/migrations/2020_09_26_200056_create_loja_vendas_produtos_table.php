@@ -25,6 +25,16 @@ class CreateLojaVendasProdutosTable extends Migration
             $table->integer('quantidade');
             $table->boolean('troca')->default(false);
 
+            $table->unsignedBigInteger('fornecedor_id');
+            $table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
+
+            $table->unsignedBigInteger('categoria_id');
+            $table->foreign('categoria_id')->references('id')->on('loja_categorias');
+
+            $table->unsignedBigInteger('loja_venda_id_troca');
+            $table->foreign('loja_venda_id_troca')->references('id')->on('loja_vendas');
+    
+
         });
     }
 

@@ -134,12 +134,13 @@ class VendaController extends Controller
 
         return response()->json([
             'success' => true,
-            'id' => $product->id,
+            'id' => $product->id, //id do pai
             'codigo_produto' => $codigo_produto,
             'descricao' => "{$product->descricao} - {$variations->variacao}",
             'status' => $variations->status,
             'fornecedor_id' => $variations->fornecedor,
             'categoria_id' => $product->categoria_id,
+            'variation_id' => $variations->id,
             'id_forma_pgto' => $tipo_pgto,
             'quantidade' => 1,
             'valor_produto' => $variations->valor_produto,
