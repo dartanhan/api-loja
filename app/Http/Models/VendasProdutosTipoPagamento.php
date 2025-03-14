@@ -19,4 +19,9 @@ class VendasProdutosTipoPagamento extends Model
     {
         return $this->hasMany(Payments::class,'id','forma_pagamento_id');
     }
+
+    public function formaPagamento()
+    {
+        return $this->belongsTo(Payments::class, 'forma_pagamento_id', 'id');
+    }
 }

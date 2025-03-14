@@ -18,4 +18,9 @@ class Payments extends Model
     {
         return $this->hasMany( TaxaCartao::class,'forma_id','id');
     }
+
+    public function formaPagamento()
+    {
+        return $this->belongsTo(VendasProdutosTipoPagamento::class, 'forma_pagamento_id', 'id');
+    }
 }

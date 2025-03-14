@@ -11,8 +11,10 @@ class VendasProdutos extends Model implements Auditable
 
     public $table = 'loja_vendas_produtos';
     public $timestamps = false;
-    protected $fillable = ['venda_id','codigo_produto','descricao','valor_produto','quantidade','categoria_id','fornecedor_id','created_at'];
-
+    protected $fillable = ['venda_id','codigo_produto','descricao','valor_produto','troca','quantidade','categoria_id','loja_venda_id_troca','fornecedor_id','created_at'];
+    protected $casts = [
+        'troca' => 'boolean',
+    ];
      // Define o relacionamento belongsTo
      public function vendas()
      {

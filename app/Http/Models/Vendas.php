@@ -33,12 +33,22 @@ class Vendas extends Model implements Auditable
         return $this->hasMany(VendasProdutosDesconto::class ,'venda_id');
     }
 
+    public function pagamentos()
+    {
+       // return $this->belongsToMany(Payments::class, 'loja_vendas_produtos_tipo_pagamentos', 'venda_id', 'forma_pagamento_id');
+        return $this->hasMany(VendasProdutosTipoPagamento::class, 'venda_id', 'id')->with('formaPagamento');
+    }
+
     function formaPgto(){
         return $this->hasMany(VendasProdutosTipoPagamento::class, 'venda_id');
      }
 
     function cashback() {
         return $this->hasMany(VendasCashBack::class, 'venda_id', 'id');
+    }
+
+    function entregas() {
+        return $this->hasMany(VendasProdutosEntrega::class, 'venda_id', 'id');
     }
 
     public function loja()
@@ -64,5 +74,10 @@ class Vendas extends Model implements Auditable
 
     public function frete(){
         return $this->hasMany(VendasProdutosEntrega::class, 'venda_id');
+    }
+
+    public function troca()
+    {
+        return $this->hasOne(VendasTroca::class, 'nova_venda_id');
     }
 }
