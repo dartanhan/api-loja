@@ -13,7 +13,7 @@ class Vendas extends Model implements Auditable
     use AuditableTrait;
 
     public $table = 'loja_vendas';
-    protected $fillable = ['codigo_venda','loja_id','valor_total','troca','cliente_id','tipo_venda_id','usuario_id','created_at'];
+    protected $fillable = ['codigo_venda','loja_id','valor_total','troca','cliente_id','tipo_venda_id','forma_entrega_id','usuario_id','created_at'];
 
     // Define o relacionamento hasMany
     public function produtos()
