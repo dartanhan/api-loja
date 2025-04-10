@@ -416,7 +416,8 @@ class VendaController extends Controller
                 "cliente_id" => $dados["clienteModel"]["id"] != 0 ? $dados["clienteModel"]["id"] : null,
                 "usuario_id" => $dados["usuario_id"] ?? null,
                 "tipo_venda_id" => $dados["tipoEntregaCliente"],
-                "forma_entrega_id" => $dados["forma_entrega_id"],
+               "forma_entrega_id" => $dados["forma_entrega_id"],
+                "created_at" => $dados["data"],
             ]);
 
             if (!$venda) {
