@@ -397,7 +397,6 @@ class VendaController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-
     public function store(Request $request)
     {
         DB::beginTransaction();
