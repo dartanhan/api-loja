@@ -23,104 +23,216 @@
         </ol>
 
         <div class="row">
+            <div class="d-flex justify-content-end mb-3">
+                <button id="toggle-todos" class="btn btn-outline-primary">
+                    <i class="fas fa-eye-slash"></i> Mostrar Valores
+                </button>
+            </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-primary text-white mb-2">
-                    <div class="d-flex  align-items-center" id="totalDinner" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                               <strong> Total Dinheiro</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="diner" data-valor="" id="valor-1">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-1" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer">
-                        <a class="small text-white stretched-link detailDinner" href="#"
-                        data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#" data-toggle="modal" data-target="#divModalDinner" data-content="2">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
+
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-warning text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalCartao" name="load">
-                            <div class="card-body" name="card-body"></div>
-                            <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Cartão</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="cart" data-valor="" id="valor-2">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-2" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer">
-                        <a class="small text-white stretched-link detailCart" href="#"
-                        data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
+                        <a class="small text-white detailCart detailDinner" href="#" data-toggle="modal" data-target="#divModalCart" data-content="2">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-danger text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalDesconto" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Desconto</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="discount" data-valor="" id="valor-3">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-3" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-info text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalDia" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Dia</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="day" data-valor="" id="valor-4">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-4" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-secondary text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalSemana" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Semana</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="week" data-valor="" id="valor-5">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-5" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-dark text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalMes" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Mês</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="month" data-valor="" id="valor-6">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-6" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-danger opacity-75 text-white mb-2">
-                    <div class="d-flex align-items-center" id="totalImposto" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <strong> Total Imposto</strong>
+                            </h6>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto" data-key="taxes" data-valor="" id="valor-7">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-7" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-success text-white mb-2 p-0">
-                    <div class="d-flex align-items-center p-0" id="totalMc" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="mb-0">
+                                <strong>Tot. Marg. Contibuição</strong>
+                            </span>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto"  data-key="tmc" data-valor="" id="valor-8">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-8" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-success opacity-75 text-white mb-2 p-0">
-                    <div class="d-flex align-items-center p-0" id="totalPmc" name="load">
-                        <div class="card-body" name="card-body"></div>
-                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="mb-0">
+                                <strong>Tot.% Marg Contibuição</strong>
+                            </span>
+                            <h5 class="mb-0">
+                                <strong class="fs-5">
+                                    <span class="valor-oculto"  data-key="tpmc" data-valor="" id="valor-9">****</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <span class="toggle-visibilidade" data-target="valor-9" style="cursor: pointer;" title="Exibir/ocultar valor">
+                            <i class="fas fa-eye-slash fa-lg text-white"></i>
+                        </span>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <a class="small text-white detailDinner" href="#">Detalhes</a>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
@@ -355,6 +467,7 @@
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap-datepicker.min.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/dataTableRender.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/DataTables-1.10.18/css/dataTables.bootstrap4.css')}}">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+{{--    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">--}}
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
+
 @endpush
