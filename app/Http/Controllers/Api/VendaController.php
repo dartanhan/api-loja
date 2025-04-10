@@ -422,7 +422,6 @@ class VendaController extends Controller
             if (!$venda) {
                 throw new \Exception('Erro ao salvar a venda.');
             }
-
             foreach ($dados["produtos"] as $produto) {
                 $produtoVenda = $this->vendasProdutos::create([
                     "venda_id" => $venda->id,
