@@ -77,7 +77,7 @@ class TrocaController extends Controller
                 ->where('loja_vendas.codigo_venda', $code_store)
                 ->get();
 
-     //  print_r($return);
+     //  print_r($return);darta
       //  $count = count($return);
       //  print_r($count);
       // die();

@@ -166,3 +166,7 @@ a.bg-primary:focus,a.bg-primary:hover,button.bg-primary:focus,button.bg-primary:
     background-color: #d1ecf1;
     font-weight: bold;
 }
+.detailDinner {
+    cursor: pointer;
+    text-decoration: none;
+}

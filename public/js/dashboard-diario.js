@@ -1,4 +1,4 @@
-import {fncDataDatatable,getDataFormat,botaoLoad} from './comum.js';
+import {fncDataDatatable,getDataFormat,botaoLoad,getIconHideMoney} from './comum.js';
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const url = fncUrl();
@@ -33,15 +33,10 @@ $(function () {
             dataSrc: function(json) {
 
                 //console.log(json.total_imposto);
-                $("#totalImposto").html("<div class=\"card-body text-center p-1\">Total Imposto <br>" +
-                    " <strong class=\"fs-5\">" +json.total_imposto+"</strong>" +
-                    " </div>");
-                $("#totalMc").html("<div class=\"card-body text-center p-1\">Total Margem Contibuição <br>" +
-                    " <strong class=\"fs-5\">" +json.total_mc+"</strong>" +
-                    " </div>");
-                $("#totalPmc").html("<div class=\"card-body text-center p-1\">Total % Margem Contibuição <br>" +
-                    " <strong class=\"fs-5\">" +json.total_precentual_mc+"</strong>" +
-                    " </div>");
+                $("[data-key='taxes']").attr("data-valor", json.total_imposto);
+                $("[data-key='tmc']").attr("data-valor", json.total_mc);
+                $("[data-key='tpmc']").attr("data-valor", json.total_precentual_mc);
+
                 return json.data;
             }
         },
@@ -538,38 +533,81 @@ $(function () {
                     bgColoR.push(dynamicColors());
                     borderColoR.push(dynamicBorderColors(r, g, b));
                 });*/
+                $("[data-key='diner']").attr("data-valor", response.totalOrders.orderTotalDiner);
+                $("[data-key='cart']").attr("data-valor", response.totalOrders.orderTotalCart);
+                $("[data-key='discount']").attr("data-valor", response.totalOrderDiscount.totalDiscount);
+                $("[data-key='day']").attr("data-valor", response.totalOrderDay.orderTotalDay);
+                $("[data-key='week']").attr("data-valor", response.totalsOrderWeek.totalWeek);
+                $("[data-key='month']").attr("data-valor", response.totalOrderMonth.totalMes);
 
-                $("#totalDinner").html("<div class=\"card-body text-center p-1\">Total Dinheiro <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrders.orderTotalDiner+"</strong>" +
-                    "</div>");
-                $("#totalCartao").html("<div class=\"card-body text-center p-1\">Total Cartão <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrders.orderTotalCart+"</strong>" +
-                    "</div>");
-                $("#totalDesconto").html("<div class=\"card-body text-center p-1\">Total Desconto <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderDiscount.totalDiscount+"</strong>" +
-                    "</div>");
-                $("#totalDia").html("<div class=\"card-body text-center p-1\">Total Dia <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderDay.orderTotalDay+"</strong>" +
-                    "</div>");
-                $("#totalMes").html("<div class=\"card-body text-center p-1\">Total Mês <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderMonth.totalMes+"</strong></div>");
-                $("#totalSemana").html("<div class=\"card-body text-center p-1\">Total Semana <br>" +
-                    " <strong class=\"fs-5\">" +response.totalsOrderWeek.totalWeek+"</strong>" +
-                    " </div>");
-
+                //esconde o spinner
+                $(".spinner-border").hide();
              //   fncBarChart();
             });
     };
+    /**
+     * Habilita e desabilita a visão do dinheiro nos cards
+     * */
+    $(document).ready(function () {
+        let todosVisiveis = false;
+
+        // Alterna todos os valores ao clicar no botão global
+        $("#toggle-todos").on("click", function () {
+            todosVisiveis = !todosVisiveis;
+
+            $(".valor-oculto").each(function () {
+                let valor = $(this).data("valor");
+
+                if (todosVisiveis) {
+                    $(this).text(valor);
+                } else {
+                    $(this).text("****");
+                }
+            });
+
+            // Atualiza todos os ícones individuais
+            $(".toggle-visibilidade i").each(function () {
+                $(this)
+                    .removeClass(todosVisiveis ? "fa-eye-slash" : "fa-eye")
+                    .addClass(todosVisiveis ? "fa-eye" : "fa-eye-slash");
+            });
+
+            // Atualiza o ícone e texto do botão global
+            const icon = $(this).find("i");
+            const label = todosVisiveis ? "Ocultar Valores" : "Mostrar Valores";
+
+            icon
+                .removeClass(todosVisiveis ? "fa-eye-slash" : "fa-eye")
+                .addClass(todosVisiveis ? "fa-eye" : "fa-eye-slash");
+
+            $(this).html(`<i class="fas ${todosVisiveis ? 'fa-eye' : 'fa-eye-slash'}"></i> ${label}`);
+        });
+
+        // Ainda permite usar o toggle individual
+        $(".toggle-visibilidade").on("click", function () {
+            const targetId = $(this).data("target");
+            const $valor = $("#" + targetId);
+            const $icon = $(this).find("i");
+
+            const visivel = !$valor.text().includes("*");
+
+            if (visivel) {
+                $valor.text("****");
+                $icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            } else {
+                $valor.text($valor.data("valor"));
+                $icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            }
+        });
+    });
 
 
-
-     /*******************************************************
+/*******************************************************
      *********** FILTRO ALL BAR CHART **********************
      * *****************************************************/
      $( ".btn-enviar" ).on("click", function() {
+         $(".spinner-border").show();//exibe o spinner
 
-         //dataIni = $('input[name=dataIni]').val();
-         //dataFim = $('input[name=dataFim]').val();
          let isValid = true;
          let msg = '';
 
