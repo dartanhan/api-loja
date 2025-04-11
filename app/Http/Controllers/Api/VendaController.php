@@ -436,30 +436,25 @@ class VendaController extends Controller
                     "variacao_id" => $produto["variacao_id"] ?? null
                 ]);
 
-                // Baixa no estoque (Venda normal)
-                $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
-                if ($variacao) {
-                    $variacao->decrement('quantidade', $produto["quantidade"]);
-                }
-
                 // Se for troca
                 if (!empty($produto['troca']) && !empty($dados['venda_id_original'])) {
-                    $this->vendasProdutosTroca::create([
-                        "troca_id" => $dados['venda_id_original'],
-                        "produto_id" => $produtoVenda->id,
-                        "codigo_produto" => $produto["codigo_produto"],
-                        "descricao" => $produto["descricao"],
-                        "valor_produto" => $produto["valor_produto"],
-                        "quantidade" => $produto["quantidade"],
-                    ]);
 
-                    $this->vendasTroca::updateOrCreate(
+                    $troca = $this->vendasTroca::updateOrCreate(
                         ['venda_id_original' => $dados['venda_id_original']],
                         [
                             'nova_venda_id' => $venda->id,
                             'valor_total_troca' => $dados["valor_total"]
                         ]
                     );
+
+                    $this->vendasProdutosTroca::create([
+                        "troca_id" => $troca->id,
+                        "produto_id" => $produtoVenda->id,
+                        "codigo_produto" => $produto["codigo_produto"],
+                        "descricao" => $produto["descricao"],
+                        "valor_produto" => $produto["valor_produto"],
+                        "quantidade" => $produto["quantidade"],
+                    ]);
 
                     $this->vendasProdutos::where('venda_id', $dados['venda_id_original'])
                         ->where('codigo_produto', $produto['codigo_produto'])
@@ -469,9 +464,14 @@ class VendaController extends Controller
                         ]);
 
                     // Repor no estoque o produto devolvido
+                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
                     if ($variacao) {
                         $variacao->increment('quantidade', $produto["quantidade"]);
                     }
+                }else {
+                    // Baixa no estoque (Venda normal)
+                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
+                    $variacao->decrement('quantidade', $produto["quantidade"]);
                 }
             }
 
