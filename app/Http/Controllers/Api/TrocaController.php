@@ -50,72 +50,78 @@ class TrocaController extends Controller
     {
       // dd($this->vendas::where('loja_vendas.codigo_venda', $code_store)->get());
 
-        $return = $this->vendas::join('loja_vendas_produtos', 'loja_vendas.id', '=','loja_vendas_produtos.venda_id')
-                ->join('loja_vendas_produtos_descontos', 'loja_vendas.id', '=','loja_vendas_produtos_descontos.venda_id')
-                ->join('loja_vendas_produtos_tipo_pagamentos', 'loja_vendas.id', '=','loja_vendas_produtos_tipo_pagamentos.venda_id')
-                ->join('loja_produtos_variacao', 'loja_vendas_produtos.codigo_produto', '=','loja_produtos_variacao.subcodigo')
-                ->join('loja_produtos_new', 'loja_produtos_variacao.products_id', '=','loja_produtos_new.id')
-                ->select('loja_vendas.id as venda_id',
-                    'loja_vendas.loja_id as loja_id',
-                    'loja_vendas.valor_total as valor_total',
-                    'loja_vendas.created_at as created_at',
-                    'loja_vendas.updated_at as updated_at',
-                    'loja_vendas_produtos.codigo_produto',
-                    'loja_vendas_produtos.descricao as desc_varicacao_venda',
-                    'loja_produtos_new.descricao',
-                    'loja_vendas_produtos.valor_produto',
-                    'loja_vendas_produtos.quantidade',
-                    //'loja_vendas_produtos.troca',
-                    'loja_vendas_produtos_descontos.valor_desconto',
-                    'loja_vendas_produtos_descontos.valor_recebido',
-                    'loja_vendas_produtos_descontos.valor_percentual',
-                    'loja_vendas_produtos_tipo_pagamentos.forma_pagamento_id',
-                    'loja_produtos_variacao.products_id as produto_id',
-                    'loja_produtos_variacao.variacao',
-                    'loja_vendas_produtos.fornecedor_id',
-                    'loja_vendas_produtos.categoria_id')
-                ->where('loja_vendas.codigo_venda', $code_store)
-                ->get();
+        $return = $this->vendas
+            ->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
+            ->join('loja_vendas_produtos_descontos', 'loja_vendas.id', '=', 'loja_vendas_produtos_descontos.venda_id')
+            ->join('loja_vendas_produtos_tipo_pagamentos', 'loja_vendas.id', '=', 'loja_vendas_produtos_tipo_pagamentos.venda_id')
+            ->join('loja_produtos_variacao', 'loja_vendas_produtos.codigo_produto', '=', 'loja_produtos_variacao.subcodigo')
+            ->join('loja_produtos_new', 'loja_produtos_variacao.products_id', '=', 'loja_produtos_new.id')
+            ->select([
+                'loja_vendas.id as venda_id',
+                'loja_vendas.loja_id',
+                'loja_vendas.valor_total',
+                'loja_vendas.created_at',
+                'loja_vendas.updated_at',
+                'loja_vendas_produtos.codigo_produto',
+                'loja_vendas_produtos.descricao as descricao_variacao_venda',
+                'loja_produtos_new.descricao as descricao_produto',
+                'loja_vendas_produtos.valor_produto',
+                'loja_vendas_produtos.quantidade',
+                'loja_vendas_produtos.fornecedor_id',
+                'loja_vendas_produtos.categoria_id',
+                'loja_vendas_produtos_descontos.valor_desconto',
+                'loja_vendas_produtos_descontos.valor_recebido',
+                'loja_vendas_produtos_descontos.valor_percentual',
+                'loja_vendas_produtos_tipo_pagamentos.forma_pagamento_id',
+                'loja_produtos_variacao.products_id as produto_id',
+                'loja_produtos_variacao.variacao',
+                'loja_produtos_variacao.id as variacao_id'
+            ])
+            ->where('loja_vendas.codigo_venda', $code_store)
+            ->get();
 
-     //  print_r($return);darta
-      //  $count = count($return);
-      //  print_r($count);
-      // die();
-        //Total de produtos na venda
-       // $count = count($return);
-        if(count($return) > 0){
-            foreach ($return as $key => $value){
-                $store['venda_id'] = $value->venda_id;
-                $store['descricao'] = $value->desc_varicacao_venda;
-                $store['quantidade'] = $value->quantidade;
-                $store['codigo_produto'] = $value-> codigo_produto;
-                $store['valor_produto'] = $value->valor_produto;
-                $store['codigo_venda'] =  $code_store;
-                $store['troca'] =  true;
-                $store['data'] = date('Y-m-d H:i:s', strtotime(  $return[0]->created_at));
-                $store['id'] = $value->produto_id;
-                $store['fornecedor_id'] =  $value->fornecedor_id;
-                $store['categoria_id'] = $value->categoria_id;
-
-                $ret['produtos'][$key] =  $store;
-            }
-           // dd($store);
-
-            $ret['valor_total'] =  $return[0]->valor_total;
-            $ret['valor_sub_total'] =  $return[0]->valor_total -  $return[0]->valor_desconto;
-            $ret['valor_desconto'] =  $return[0]->valor_desconto;
-            $ret['valor_recebido'] =  $return[0]->valor_recebido;
-            $ret['percentual'] =  $return[0]->valor_percentual;
-            $ret['id_forma_pagamento'] =  $return[0]->forma_pagamento_id;
-            $ret['loja_id'] = $return[0]->loja_id;
-            $ret['venda_id'] = $return[0]->venda_id;
-            $ret['success'] =  true;
-            $ret['troca'] =  true;
-
-            return Response::json(array($ret), 200, [],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        }else{
-            return Response::json(array(array('success' => false, "message" => 'Venda não localizada!')), 400, [],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if ($return->isEmpty()) {
+            return response()->json([
+                ['success' => false, 'message' => 'Venda não localizada!']
+            ], 400, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
+
+        // monta os produtos
+        $produtos = [];
+        foreach ($return as $key => $venda) {
+            $produtos[] = [
+                'venda_id'       => $venda->venda_id,
+                'descricao'      => $venda->descricao_variacao_venda,
+                'quantidade'     => $venda->quantidade,
+                'codigo_produto' => $venda->codigo_produto,
+                'valor_produto'  => $venda->valor_produto,
+                'codigo_venda'   => $code_store,
+                'troca'          => true,
+                'data'           => $venda->created_at->format('Y-m-d H:i:s'),
+                'id'             => $venda->produto_id,
+                'fornecedor_id'  => $venda->fornecedor_id,
+                'categoria_id'   => $venda->categoria_id,
+                'variacao_id'    => $venda->variacao_id, // cuidado: não sobrescreva com categoria_id
+            ];
+        }
+
+        // response final
+        $retorno = [
+            'produtos'         => $produtos,
+            'valor_total'      => $return[0]->valor_total,
+            'valor_sub_total'  => $return[0]->valor_total - $return[0]->valor_desconto,
+            'valor_desconto'   => $return[0]->valor_desconto,
+            'valor_recebido'   => $return[0]->valor_recebido,
+            'percentual'       => $return[0]->valor_percentual,
+            'id_forma_pagamento' => $return[0]->forma_pagamento_id,
+            'loja_id'          => $return[0]->loja_id,
+            'venda_id'         => $return[0]->venda_id,
+            'success'          => true,
+            'troca'            => true,
+        ];
+
+        return response()->json([$retorno], 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
     }
 
     /**
