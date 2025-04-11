@@ -11,12 +11,7 @@
 
     <div class="container-fluid px-4">
         <h1 class="mt-4">Dashboard</h1>
-        <div id="estoque-alerta" class="d-flex mb-3 mt-2">
-            <!-- Botão de Alerta transformado em um link -->
-            <a id="alertaBaixoEstoque" href="{{ route('produtos.baixo_estoque') }}" class="btn btn-warning alerta-piscante" style="display: none;">
-                ⚠️ Produtos com estoque baixo
-            </a>
-        </div>
+
 
         <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item active">Dashboard</li>
@@ -24,9 +19,20 @@
 
         <div class="row">
             <div class="d-flex justify-content-end mb-3">
-                <button id="toggle-todos" class="btn btn-outline-primary">
-                    <i class="fas fa-eye-slash"></i> Mostrar Valores
-                </button>
+                <div id="estoque-alerta" class="d-flex mb-3 mt-2">
+                    <div class="col-md-8">
+                    <!-- Botão de Alerta transformado em um link -->
+                    <a id="alertaBaixoEstoque" href="{{ route('produtos.baixo_estoque') }}" class="btn btn-warning alerta-piscante" style="display: none;">
+                        ⚠️ Produtos com estoque baixo
+                    </a>
+                    </div>
+                    <div class="col-md-6 mr-5">
+                    <button id="toggle-todos" class="btn btn-outline-primary">
+                        <i class="fas fa-eye-slash"></i> Mostrar Valores
+                    </button>
+                    </div>
+                </div>
+
             </div>
             <div class="col-xl-2 col-md-6">
                 <div class="card bg-primary text-white mb-2">
