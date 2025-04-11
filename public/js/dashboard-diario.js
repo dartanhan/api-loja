@@ -6,6 +6,7 @@ let table;
 let startDate,endDate,id;
 let dataIni = $('input[name=dataIni]');
 let dataFim = $('input[name=dataFim]');
+let todosVisiveis = false;
 
 $(function () {
 
@@ -32,10 +33,32 @@ $(function () {
             responsive: true,
             dataSrc: function(json) {
 
-                //console.log(json.total_imposto);
-                $("[data-key='taxes']").attr("data-valor", json.total_imposto);
+                $("[data-key='taxes']")
+                    .attr("data-valor",json.total_imposto)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(json.total_imposto);
+                        }
+                    });
+
+                $("[data-key='tmc']")
+                    .attr("data-valor", json.total_mc)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(json.total_mc);
+                        }
+                    });
+
+                $("[data-key='tpmc']")
+                    .attr("data-valor", json.total_precentual_mc)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(rjson.total_precentual_mc);
+                        }
+                    });
+                /*$("[data-key='taxes']").attr("data-valor", json.total_imposto);
                 $("[data-key='tmc']").attr("data-valor", json.total_mc);
-                $("[data-key='tpmc']").attr("data-valor", json.total_precentual_mc);
+                $("[data-key='tpmc']").attr("data-valor", json.total_precentual_mc);*/
 
                 return json.data;
             }
@@ -533,30 +556,76 @@ $(function () {
                     bgColoR.push(dynamicColors());
                     borderColoR.push(dynamicBorderColors(r, g, b));
                 });*/
-                $("[data-key='diner']").attr("data-valor", response.totalOrders.orderTotalDiner);
-                $("[data-key='cart']").attr("data-valor", response.totalOrders.orderTotalCart);
-                $("[data-key='discount']").attr("data-valor", response.totalOrderDiscount.totalDiscount);
-                $("[data-key='day']").attr("data-valor", response.totalOrderDay.orderTotalDay);
-                $("[data-key='week']").attr("data-valor", response.totalsOrderWeek.totalWeek);
-                $("[data-key='month']").attr("data-valor", response.totalOrderMonth.totalMes);
+                $("[data-key='diner']")
+                    .attr("data-valor", response.totalOrders.orderTotalDiner)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalOrders.orderTotalDiner);
+                        }
+                    });
+                $("[data-key='cart']")
+                    .attr("data-valor", response.totalOrders.orderTotalCart)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalOrders.orderTotalCart);
+                        }
+                    });
+
+                $("[data-key='discount']")
+                    .attr("data-valor", response.totalOrderDiscount.totalDiscount)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalOrderDiscount.totalDiscount);
+                        }
+                    });
+
+                $("[data-key='day']")
+                    .attr("data-valor", response.totalOrderDay.orderTotalDay)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalOrderDay.orderTotalDay);
+                        }
+                    });
+
+                $("[data-key='week']")
+                    .attr("data-valor", response.totalsOrderWeek.totalWeek)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalsOrderWeek.totalWeek);
+                        }
+                    });
+
+                $("[data-key='month']")
+                    .attr("data-valor", response.totalOrderMonth.totalMes)
+                    .each(function () {
+                        if (!$(this).text().includes("*")) {
+                            $(this).text(response.totalOrderMonth.totalMes);
+                        }
+                    });
+
+                // $("[data-key='cart']").attr("data-valor", response.totalOrders.orderTotalCart);
+                // $("[data-key='discount']").attr("data-valor", response.totalOrderDiscount.totalDiscount);
+                // $("[data-key='day']").attr("data-valor", response.totalOrderDay.orderTotalDay);
+                // $("[data-key='week']").attr("data-valor", response.totalsOrderWeek.totalWeek);
+                // $("[data-key='month']").attr("data-valor", response.totalOrderMonth.totalMes);
 
                 //esconde o spinner
                 $(".spinner-border").hide();
-             //   fncBarChart();
+                atualizarValoresVisiveis();
             });
     };
     /**
      * Habilita e desabilita a visão do dinheiro nos cards
      * */
     $(document).ready(function () {
-        let todosVisiveis = false;
 
         // Alterna todos os valores ao clicar no botão global
         $("#toggle-todos").on("click", function () {
             todosVisiveis = !todosVisiveis;
 
+
             $(".valor-oculto").each(function () {
-                let valor = $(this).data("valor");
+                const valor = $(this).attr("data-valor");
 
                 if (todosVisiveis) {
                     $(this).text(valor);
@@ -595,11 +664,24 @@ $(function () {
                 $valor.text("****");
                 $icon.removeClass("fa-eye").addClass("fa-eye-slash");
             } else {
-                $valor.text($valor.data("valor"));
+                // PEGA O VALOR ATUALIZADO!
+                const novoValor = $valor.attr("data-valor");
+                $valor.text(novoValor);
                 $icon.removeClass("fa-eye-slash").addClass("fa-eye");
             }
         });
+
     });
+
+
+    function atualizarValoresVisiveis() {
+        if (todosVisiveis) {
+            $(".valor-oculto").each(function () {
+                const valorAtual = $(this).attr("data-valor"); // <- aqui está a diferença
+                $(this).text(valorAtual);
+            });
+        }
+    }
 
 
 /*******************************************************
@@ -633,6 +715,7 @@ $(function () {
 
             fncDataBarChart(startDate,endDate); // atualiza os cards de totais
             fncDataDatatable(table);
+
         }else{
             sweetAlert({
                 title: "Atenção",
@@ -655,6 +738,7 @@ $(function () {
 
         fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
         fncDataDatatable(table);
+        atualizarValoresVisiveis();
     });
 
     /***
