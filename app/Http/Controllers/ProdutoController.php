@@ -113,7 +113,8 @@ class ProdutoController extends Controller
         try{
              // dd($this->request->all());
             //   dd(count($this->request->allFiles()['images0']));
-            if($this->request->input("id") == null){
+            $produto_id = $this->request->input("produto_id");
+            if($produto_id == null){
                 $msg = "Produto Cadastrado com sucesso!";
                 $rules = [
                             'codigo_produto' => 'required|unique:'.$this->produto->table.'|max:15',
@@ -127,7 +128,7 @@ class ProdutoController extends Controller
             }else{
                 $msg = "Produto Atualizado com sucesso!";
                 $rules = [
-                            'codigo_produto' => 'required|max:15|unique:'.$this->produto->table.',codigo_produto,'. $this->request->input("id"),
+                            'codigo_produto' => 'required|max:15|unique:'.$this->produto->table.',codigo_produto,'. $produto_id,
                             'descricao' => 'required|max:155',
                             'origem' => 'required|max:5',
                             'cest' => 'required|max:15',
@@ -168,7 +169,7 @@ class ProdutoController extends Controller
 
             //Cria o produto
             //$products = $this->produto::create($data);
-            $matchThese = array('id' => $this->request->input("id"));
+            $matchThese = array('id' => $produto_id);
             $products = $this->produto::updateOrCreate($matchThese, $data);
 
            // dd($products);
@@ -207,7 +208,8 @@ class ProdutoController extends Controller
                 $data["valor_produto"] = $formatter->parse(str_replace(['R$', ' '], '',$this->request->input("valor_produto")[$i]));
                 $data["quantidade"] = $this->request->input("quantidade")[$i];
                 $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
-                $data["status"] = $this->request->input("status_variacao")[$i];
+                //se o status do Pai for INATIVO (0), seta 0 para os filhos
+                $data["status"] = $this->request->input("status") == 0 ? 0 : $this->request->input("status_variacao")[$i];
                 $data["percentage"] = $formatter->parse($this->request->input("percentage")[$i]);
                 $data["validade"] = $formattedDate;
                 $data["fornecedor"] = $this->request->input("fornecedor")[$i];
@@ -356,9 +358,9 @@ class ProdutoController extends Controller
                 }])
                 ->orderBy('total_vendido', 'desc') // Ordena pelo total vendido
                 ->with(['produtoPai', 'images']);
-        }])->get();
+        }])->where('status', true)->get();
 
-        return view('admin.baixoEstoque', compact('fornecedores', 'inicioPeriodo', 'fimPeriodo'));
+        return view('admin.baixoEstoque', compact('fornecedores','inicioPeriodo', 'fimPeriodo'));
     }
 
 }
