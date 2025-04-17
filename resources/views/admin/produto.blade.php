@@ -14,7 +14,7 @@
             <div class="card" style="padding:unset">
                 <form method="post" autocomplete="off" id="form" name="form" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="id" id="id">
+                    <input type="hidden" name="produto_id" id="produto_id">
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto input-group-sm ">

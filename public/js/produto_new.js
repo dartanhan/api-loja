@@ -424,7 +424,7 @@ $(function() {
         }, submitHandler: function(form,event) {
             event.preventDefault();
                 let formData = "";
-                let update = ($("#id").val() === "") ? false : true;
+                let update = ($("#produto_id").val() === "") ? false : true;
 
                 if(update){
                     let selectElements  = document.querySelectorAll('select[name="status_variacao[]"]');
@@ -482,7 +482,7 @@ $(function() {
         }).then( function (response) {
             //console.log(JSON.stringify(response.data));
 
-            $('#id').val(response.data.id);
+            $('#produto_id').val(response.data.id);
             $('#codigo_produto').val(response.data.codigo_produto);
             $('#descricao').val(response.data.descricao);
             $('#status').val(response.data.status);
@@ -969,7 +969,7 @@ $(function() {
                     //table.destroy();
                     //initialiseTable();
 
-                    $("#id").val('');
+                    $("#produto_id").val('');
                     $("#tbl").html('');
                     $("#tbl").append(fnc_variacao(0,null,1,null,1));
                     $("#descricao").val('');
@@ -1058,3 +1058,27 @@ $(function() {
             showConfirmButton: true
         });
     }
+
+    /***
+     * Ao mudar o status do produto PAI para inativo, informar que os filhos serão desabilitados.
+     * */
+    document.addEventListener("DOMContentLoaded", function () {
+        const statusSelect = document.getElementById("status");
+        const produtoIdField = document.getElementById("produto_id");
+
+        statusSelect.addEventListener("change", function () {
+            const selectedValue = this.value;
+            const isProdutoExistente = produtoIdField.value.trim() !== "";
+
+            if (selectedValue === "0" && isProdutoExistente) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção!',
+                    text: 'Ao inativar o produto PAI, todos os produtos filhos também serão inativados automaticamente.',
+                    confirmButtonText: 'Entendi',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+    });
+
