@@ -33,8 +33,11 @@ use Illuminate\Support\Facades\Route;
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
 
     // Em web.php
-    Route::get('/debug-env', function () {
-        return config('app.debug') ? 'Debug está ATIVO' : 'Debug está DESATIVADO';
+    Route::get('/ver-debug', function () {
+        return [
+            'env' => env('APP_DEBUG'),
+            'config' => config('app.debug'),
+        ];
     });
 
 
