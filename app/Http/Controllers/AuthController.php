@@ -6,7 +6,6 @@ use App\Http\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use ReCaptcha\ReCaptcha;
-use function Psy\debug;
 
 
 class AuthController extends Controller

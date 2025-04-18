@@ -32,6 +32,12 @@ use Illuminate\Support\Facades\Route;
     Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
 
+    // Em web.php
+    Route::get('/debug-env', function () {
+        return config('app.debug') ? 'Debug está ATIVO' : 'Debug está DESATIVADO';
+    });
+
+
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
 
