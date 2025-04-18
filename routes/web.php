@@ -32,18 +32,6 @@ use Illuminate\Support\Facades\Route;
     Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
 
-    // Em web.php
-    Route::get('/qual-env', function () {
-        return [
-            'base_path' => base_path(),
-            '.env existe?' => file_exists(base_path('.env')) ? 'SIM' : 'NÃO',
-            '.env path' => base_path('.env'),
-            'env_debug' => env('APP_DEBUG'),
-            'config_debug' => config('app.debug'),
-            'app_url' => config('app.url'),
-        ];
-    });
-
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
