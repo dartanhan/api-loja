@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Models\Usuario;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use ReCaptcha\ReCaptcha;
+use Illuminate\Support\Facades\Validator;
+
 
 
 class AuthController extends Controller
@@ -37,48 +39,62 @@ class AuthController extends Controller
         return view('admin.login');
     }
 
-    function login(Request $request) {
+    public function login(Request $request)
+    {
+        // Validação básica dos campos
+        $validator = Validator::make($request->all(), [
+            'login' => 'required',
+            'password' => 'required',
+            'g-recaptcha-response' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // ReCaptcha v3 via Guzzle
         $secret = env('DATA_SECRET_KEY');
+        $recaptcha = $request->input('g-recaptcha-response');
+        $client = new Client();
 
-        $response = (new ReCaptcha($secret))->verify($request->input('g-recaptcha-response'), $request->ip());
-          //  ->setExpectedHostname('127.0.0.1')
-            //->setExpectedAction('homepage')
+        try {
+            $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
+                'form_params' => [
+                    'secret' => $secret,
+                    'response' => $recaptcha,
+                    'remoteip' => $request->ip()
+                ],
+                'verify' => true // pode colocar false temporariamente se o SSL estiver falhando ainda
+            ]);
 
-        if ($response->getScore()  < 0.5) {
-            return redirect()->back()->withInput()->withErrors(['Você é considerado um Bot / Spammer!' . $response->getScore()]);
+            $body = json_decode((string) $response->getBody(), true);
+
+            if (!isset($body['success']) || $body['success'] !== true || $body['score'] < 0.5) {
+                return redirect()->back()->withInput()->withErrors([
+                    'recaptcha' => 'Você é considerado um bot ou spammer! Score: ' . ($body['score'] ?? 'sem score')
+                ]);
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors([
+                'recaptcha' => 'Erro ao verificar reCAPTCHA: ' . $e->getMessage()
+            ]);
         }
 
-        if ($response->isSuccess()) {
-//             if(!filter_var($request->input("email") , FILTER_VALIDATE_EMAIL)){
-//                 return redirect()->back()->withInput()->withErrors(['Login informado não é valido!']);
-//             }
+        // Autenticação por email ou usuário
+        $loginField = $request->input('login');
+        $password = $request->input('password');
 
-            // $credentials = [
-            //     'email' => $request->input("email"),
-            //     'password' => $request->input("password")
-            // ];
+        $credentials = filter_var($loginField, FILTER_VALIDATE_EMAIL)
+            ? ['email' => $loginField, 'password' => $password]
+            : ['login' => $loginField, 'password' => $password];
 
-            $loginField = $request->input('login');
-            $password = $request->input('password');
-
-            if (filter_var($loginField, FILTER_VALIDATE_EMAIL)) {
-                // Se for um email, tenta fazer login usando email
-                $credentials = ['email' => $loginField,'password' => $password];
-            } else {
-                // Se não for um email, tenta fazer login usando o nome de usuário
-                $credentials = ['login' => $loginField, 'password' => $password];
-            }
-
-            if(Auth::attempt($credentials)){
-                return redirect()->route('admin.home');
-            }
-            return redirect()->back()->withInput()->withErrors(['Dados informados são inválidos!']);
-        } else {
-            //$errors = $response->getErrorCodes();
-            return redirect()->back()->withInput()->withErrors(['Parece que você é um robô!']);
+        if (Auth::attempt($credentials)) {
+            return redirect()->route('admin.home');
         }
+
+        return redirect()->back()->withInput()->withErrors(['login' => 'Dados informados são inválidos!']);
     }
+
 
     function logout() {
         Auth::logout();
