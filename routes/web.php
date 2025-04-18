@@ -33,10 +33,14 @@ use Illuminate\Support\Facades\Route;
     Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
 
     // Em web.php
-    Route::get('/ver-debug', function () {
+    Route::get('/qual-env', function () {
         return [
-            'env' => env('APP_DEBUG'),
-            'config' => config('app.debug'),
+            'base_path' => base_path(),
+            '.env existe?' => file_exists(base_path('.env')) ? 'SIM' : 'NÃO',
+            '.env path' => base_path('.env'),
+            'env_debug' => env('APP_DEBUG'),
+            'config_debug' => config('app.debug'),
+            'app_url' => config('app.url'),
         ];
     });
 
