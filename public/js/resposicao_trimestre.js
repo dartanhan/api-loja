@@ -93,7 +93,7 @@ $(function() {
 
         let tr = $(this).closest('tr');
         let row = table.row( tr );
-        
+
         if ( row.child.isShown() ) {
             // This row is already open - close it
             row.child.hide();
@@ -104,7 +104,8 @@ $(function() {
            // row.child( format(row.data()) ).show();
             tr.addClass('shown');
 
-            let tmpRow  ="<table class='table table-striped table-condensed'>" +
+            let tmpRow  = "";
+            /*let tmpRow  ="<table class='table table-striped table-condensed'>" +
                             "<thead class=\"text-center\">" +
                                 "<tr class='bg-secondary '>" +
                                     "<th>IMAGEM</th>" +
@@ -112,14 +113,14 @@ $(function() {
                                     "<th>VARIAÇÃO</th>" +
                                     "<th>QTD</th>" +
                                     "<th>ESTOQUE</th>" +
-                                    "<th>VALOR PAGO</th>" +
+                                    "<th>VALOR PAGO</th>"+
                                     "<th>30D</th>" +
                                     "<th>60D</th>" +
                                     "<th>90D</th>" +
                                     "<th>STATUS</th>" +
                                     "<th>AÇÕES</th>" +
                                 "</tr>" +
-                            "</thead>";
+                            "</thead>";*/
 
                     $.ajax({
                         url: url + "/reposicao/"+row.data().id,
@@ -130,27 +131,34 @@ $(function() {
                             row.child('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>').show();
                         },
                         success: function (response) {
-                            // console.log(response.data);
-                           
+                            // console.log(response.is_admin);
+
                            if (response.success) {
                            // Iterar sobre cada objeto no array
                            response.data.forEach(function(obj) {
                                 let image = obj.imagem !== null ?
-                                                "<img src='../public/storage/"+ obj.imagem + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+obj.variacao+"'></img>" :
-                                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+obj.variacao+"'></img>"
+                                                "<img src='../public/storage/" + obj.imagem + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='" + obj.variacao + "'/>" :
+                                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='" + obj.variacao + "'/>"
 
                                     let image_filho = "../public/storage/produtos/not-image.png";
                                     if(obj.imagem !== null){
                                         image_filho = '../public/storage/'+obj.imagem;
                                     }
 
+                                    //monta o header diferetne para casao não seja ADMIN
+                                    tmpRow = getTmpRow(response.is_admin);
+
+                                    let valor_pago ="";
+                                    if(response.is_admin === 1){
+                                        valor_pago = "<td>" + formatMoney(obj.valor_pago) + "</td>" ;
+                                    }
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
                                         "<td>" + obj.subcodigo + "</td>" +
                                         "<td>" + obj.variacao + "</td>" +
                                         "<td>" + obj.qtd + "</td>" +
-                                        "<td>" + obj.estoque + "</td>" +
-                                        "<td>" + formatMoney(obj.valor_pago) + "</td>" +
+                                        "<td>" + obj.estoque + "</td>"
+                                        + valor_pago +
                                         "<td>" + obj.qtd_total_venda_30d + "</td>" +
                                         "<td>" + obj.qtd_total_venda_60d + "</td>" +
                                         "<td>" + obj.qtd_total_venda_90d + "</td>" +
@@ -188,11 +196,34 @@ $(function() {
         }
     } );
 
+   function  getTmpRow(valor){
+       let addCampo = "";
+       if(valor === 1){
+           addCampo = "<th>VALOR PAGO</th>";
+       }
+
+       return  "<table class='table table-striped table-condensed'>" +
+        "<thead class=\"text-center\">" +
+        "<tr class='bg-secondary '>" +
+        "<th>IMAGEM</th>" +
+        "<th>SUB CÓDIGO</th>" +
+        "<th>VARIAÇÃO</th>" +
+        "<th>QTD</th>" +
+        "<th>ESTOQUE</th>"
+           +addCampo +
+        "<th>30D</th>" +
+        "<th>60D</th>" +
+        "<th>90D</th>" +
+        "<th>STATUS</th>" +
+        "<th>AÇÕES</th>" +
+        "</tr>" +
+        "</thead>";
+    }
 
     // Captura o clique no ícone de imagem com a classe "abrir-modal"
     $(document).on("click",".bi-image" ,function(event){
         event.preventDefault();
-    
+
         // Obtém o valor do atributo "data-imagem"
         var imagem = $(this).data('image');
         var variacaoId = $(this).data('variacao-id');
@@ -249,7 +280,7 @@ $(function() {
                         timer: 2500
                     });
                 }
-                    
+
                 },
                 error:function(response){
                   //  console.log(response.responseJSON);
@@ -279,7 +310,7 @@ $(function() {
             dateTwo: dateTwo,
             idLoja: idLoja
         };
-    
+
         try {
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -289,11 +320,11 @@ $(function() {
                 },
                 body: JSON.stringify(data)
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-    
+
             const result = await response.json();
             console.log("totalProdutoVenda", result);
         } catch (error) {

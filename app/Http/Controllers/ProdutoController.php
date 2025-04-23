@@ -352,13 +352,13 @@ class ProdutoController extends Controller
         $fornecedores = Fornecedor::with(['variacoes' => function ($query) use ($inicioPeriodo, $fimPeriodo) {
             $query
                 ->where('quantidade', '<=', 5)
-                ->where('status', true)
+                ->where('status', 1) //ativo
                 ->withCount(['vendas as total_vendido' => function ($vendaQuery) use ($inicioPeriodo, $fimPeriodo) {
                     $vendaQuery->whereBetween('created_at', [$inicioPeriodo, $fimPeriodo]);
                 }])
                 ->orderBy('total_vendido', 'desc') // Ordena pelo total vendido
                 ->with(['produtoPai', 'images']);
-        }])->where('status', true)->get();
+        }])->where('status', 1)->get();
 
         return view('admin.baixoEstoque', compact('fornecedores','inicioPeriodo', 'fimPeriodo'));
     }
