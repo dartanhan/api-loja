@@ -33,7 +33,11 @@ class CreateLojaVendasProdutosTable extends Migration
 
             $table->unsignedBigInteger('loja_venda_id_troca');
             $table->foreign('loja_venda_id_troca')->references('id')->on('loja_vendas');
-    
+
+            $table->unsignedBigInteger('variacao_id');
+            $table->foreign('variacao_id')->references('id')->on('loja_produtos_variacao');
+
+            $table->timestamps();
 
         });
     }
