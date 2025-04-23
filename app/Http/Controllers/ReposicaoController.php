@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Models\ListaDeCompras;
 use App\Http\Models\Produto;
-use App\Http\Models\ProdutoVariation;
-use App\Http\Models\Reposicao;
-use App\Http\Models\VendasProdutos;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\View\View;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -27,12 +28,13 @@ class ReposicaoController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Application|Factory|\Illuminate\View\View
+     * @return Application|Factory|View
      */
     public function index()
     {
-
-        return view('admin.resposicao_trimestre');
+        if(Auth::check() === true) {
+            return view('admin.resposicao_trimestre');
+        }
     }
 
     public function store(){
@@ -87,13 +89,14 @@ class ReposicaoController extends Controller
                         DB::raw('IF((va.status = 1), "ATIVO", "INATIVO") as status')
                 )
                 ->groupBy('vp.codigo_produto')
-                ->where('va.status',true) //somente ativos
+                ->where('va.status',1) //somente ativos
                 ->where('va.products_id',$id)->get();
 
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 500);
         }
-        return Response::json(array('success' => true, "data" => $informacoes), 200);
+        //dd($informacoes);
+        return Response::json(array('success' => true, "data" => $informacoes, 'is_admin' =>Auth()->user()->is_admin), 200);
     }
 
 
@@ -144,12 +147,12 @@ class ReposicaoController extends Controller
      * Nova tela de resposição
      */
     public function filter(){
-        
+
        // $startDate = Carbon::createFromFormat('d/m/Y', $this->request->input('startDate'))->startOfDay();
        // $endDate = Carbon::createFromFormat('d/m/Y', $this->request->input('endDate'))->endOfDay();
        $startDate = $this->request->input('startDate');
        $endDate = $this->request->input('endDate');
-       
+
        //dd([$startDate ,$endDate]);
         $vendas = $this->listSales($startDate,$endDate);
 
@@ -163,7 +166,7 @@ class ReposicaoController extends Controller
             })
             ->rawColumns(['imagem'])
             ->make(true);
-    
+
     }
 
     public function listSales($startDate,$endDate){
@@ -181,7 +184,7 @@ class ReposicaoController extends Controller
         return DB::table('loja_vendas_produtos as lv')
             ->leftJoin('loja_produtos_variacao as v', 'lv.codigo_produto', '=', 'v.subcodigo')
             ->leftJoin('loja_produtos_imagens as i', 'v.id', '=', 'i.produto_variacao_id')
-            
+
             ->select(
                 'lv.descricao',
                 'lv.codigo_produto',
@@ -190,7 +193,7 @@ class ReposicaoController extends Controller
                 DB::raw("DATE_FORMAT(lv.created_at, '%d/%m/%Y') AS venda_data"),
                 DB::raw('SUM(lv.quantidade) AS quantidade'),
                 'i.path AS imagem'
-                
+
             )
             ->whereBetween('lv.created_at', [$startDate, $endDate])
             ->groupBy('lv.codigo_produto', 'lv.descricao', 'i.path')

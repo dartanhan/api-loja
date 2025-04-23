@@ -1,17 +1,20 @@
 import {formatMoney,getFormattedDate} from './comum.js';
 
- const url = fncUrl();
-let json,table;
+const url = fncUrl();
+let json = "",table = "";
 
 $(function() {
 
     table = $('#table').DataTable({
-            ajax:{
+        ajax:{
             method: 'get',
+            url: url + "/produto/create",
             processing: true,
             serverSide: true,
-            url: url + "/produto/create",
-
+            cache: false,
+            data: function (d) {
+                d._ = $.now(); // isso adiciona um timestamp e impede o cache
+            }
         },
         "columns": [
             {
@@ -26,9 +29,9 @@ $(function() {
                 render: function (data, type, row) {
                     if(row.produto_imagens.length > 0){
                         let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                        return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable"></img>';
+                        return '<img src="../public/storage/product/' + row.id + '/' + path + '" class="image img-datatable"/>';
                     }else{
-                        return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';
+                        return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"/>';
                     }
                 }
             },
@@ -37,38 +40,38 @@ $(function() {
             {
                 "data": "status",
                 render: function (data, type, row) {
-                    return "<span class=\"badge bg-success\">" + row.status + "</span>";
+                    return "<span class=\"badge bg-success\">ATIVO</span>";
                 }
             },
             {"data": "created", "defaultContent": ""},
             {"data": "updated", "defaultContent": ""},
-            {
-                "data": "defaultContent",
-                render: function (data, type, row) {
-                    let image = "../public/storage/produtos/not-image.png";
-                    let image_id = null;
-                    let path = null;
-                    //if(row.imagem !== null){
-                    if(row.produto_imagens.length > 0){
-                        path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                        image = '../public/storage/product/'+row.id+'/'+ path;
-                        image_id = row.produto_imagens[0].id;
-                    }
-
-                    return "<div class='text-center'>" +
-                        "<i class=\"bi-image\" " +
-                        "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                        "   title='Imagem do Produto' data-bs-toggle=\"modal\" " +
-                        "   data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
-                        "   data-image-preview='"+image+"'  data-path='"+path+"' data-flag-image='0'  " +
-                        "   data-image-id='"+image_id+"'></i>"+
-                        "<i class=\"bi-pencil-square btnUpdateProduct\" " +
-                        "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                        "               title=\"Atualizar Produto\" data-id='"+row.id+"'>" +
-                        "</i>" +
-                        "</div>";
-                }
-            }
+            // {
+            //     "data": "defaultContent",
+            //     render: function (data, type, row) {
+            //         let image = "../public/storage/produtos/not-image.png";
+            //         let image_id = null;
+            //         let path = null;
+            //         //if(row.imagem !== null){
+            //         if(row.produto_imagens.length > 0){
+            //             path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+            //             image = '../public/storage/product/'+row.id+'/'+ path;
+            //             image_id = row.produto_imagens[0].id;
+            //         }
+            //
+            //         return "<div class='text-center'>" +
+            //             "<i class=\"bi-image\" " +
+            //             "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+            //             "   title='Imagem do Produto' data-bs-toggle=\"modal\" " +
+            //             "   data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
+            //             "   data-image-preview='"+image+"'  data-path='"+path+"' data-flag-image='0'  " +
+            //             "   data-image-id='"+image_id+"'></i>"+
+            //             "<i class=\"bi-pencil-square btnUpdateProduct\" " +
+            //             "               style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+            //             "               title=\"Atualizar Produto\" data-id='"+row.id+"'>" +
+            //             "</i>" +
+            //             "</div>";
+            //     }
+            // }
 
         ],
         scrollX: true,
@@ -117,10 +120,10 @@ $(function() {
                 "<th>ESTOQUE</th>" +
                 "<th>VAREJO</th>" +
                 "<th>ATACADO</th>" +
-                "<th>PRODUTO</th>" +
-                "<th>DESCONTO EM %</th>" +
+               // "<th>PRODUTO</th>" +
+               // "<th>DESCONTO EM %</th>" +
                 "<th>STATUS</th>" +
-                "<th>AÇÃO</th>" +
+                //"<th>AÇÃO</th>" +
                 "</tr>" +
                 "</thead>";
 
@@ -138,10 +141,10 @@ $(function() {
                         let arrayProducts = JSON.stringify(response.data.products);
 
                         JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
-                            // console.log(arrayItem.subcodigo);
+                             console.log(arrayItem.subcodigo);
                             let image = arrayItem.path !== null ?
-                                "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>" :
-                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='"+arrayItem.variacao+"'></img>"
+                                "<img src='../public/storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>" :
+                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>"
 
                             let image_filho = "../public/storage/produtos/not-image.png";
                             if(arrayItem.path !== null){
@@ -149,30 +152,30 @@ $(function() {
                             }
 
                             tmpRow += "<tr>" +
-                                        "<td>"+image+"</td>" +
-                                        "<td>" + arrayItem.subcodigo + "</td>" +
-                                        "<td>" + arrayItem.variacao + "</td>" +
-                                        "<td>" + arrayItem.quantidade + "</td>" +
-                                        "<td>" + arrayItem.estoque + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
-                                        "<td>" + formatMoney(arrayItem.descontos) + "</td>" +
-                                        "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
-                                        "<td>" +
-                                        "   <i class=\"bi-image\" " +
-                                            "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                            "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
-                                            "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
-                                            "   data-subcodigo='"+arrayItem.subcodigo+"' data-image-id='"+arrayItem.id_image+"'" +
-                                            "   data-image-preview='"+image_filho+"'  data-path='"+arrayItem.path+"' data-flag-image='1'>" +
-                                        "   </i>"+
-                                        "   <i class=\"bi-pencil-square openModalBtn\"  " +
-                                        "       style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                        "       title=\"Atualizar Produto\" data-id='"+arrayItem.id+"'>" +
-                                        "   </i>" +
-                                        "</td>"+
-                                    "</tr>"
+                                "<td>"+image+"</td>" +
+                                "<td>" + arrayItem.subcodigo + "</td>" +
+                                "<td>" + arrayItem.variacao + "</td>" +
+                                "<td>" + arrayItem.quantidade + "</td>" +
+                                "<td>" + arrayItem.estoque + "</td>" +
+                                "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
+                                "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
+                               // "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
+                               // "<td>" + formatMoney(arrayItem.percentage) + "</td>" +
+                                "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
+                                // "<td>" +
+                                // "   <i class=\"bi-image\" " +
+                                // "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                                // "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
+                                // "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
+                                // "   data-subcodigo='"+arrayItem.subcodigo+"' data-image-id='"+arrayItem.id_image+"'" +
+                                // "   data-image-preview='"+image_filho+"'  data-path='"+arrayItem.path+"' data-flag-image='1'>" +
+                                // "   </i>"+
+                                // "   <i class=\"bi-pencil-square openModalBtn\"  " +
+                                // "       style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
+                                // "       title=\"Atualizar Produto\" data-id='"+arrayItem.id+"'>" +
+                                // "   </i>" +
+                                // "</td>"+
+                                "</tr>"
                         });
 
                         tmpRow  +=      "</table>";
@@ -225,7 +228,7 @@ $(function() {
         if(i > 0){
             icon_remove =  "<div class=\"col-md-1\" style='padding:unset;left: -6px;width: 10px' >"+
                 "<a href=\"javascript:void(0)\" onclick=\"removeCampo('div_pai" + i + "')\" " +
-                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\"></img>" +
+                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\"/>" +
                 "</a>"+
                 "</div>" ;
         }

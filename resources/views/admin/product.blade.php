@@ -39,7 +39,7 @@
                                         <th data-sortable="true">Status</th>
                                         <th data-sortable="true">Criado</th>
                                         <th data-sortable="true">Atualizado</th>
-                                        <th data-sortable="true">Ação</th>
+{{--                                        <th data-sortable="true">Ação</th>--}}
                                     </tr>
                                     </thead>
                                     <tbody class="text-center"></tbody>
@@ -92,8 +92,8 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script type="module" src="{{URL::asset('js/produto.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/product.js?v1.0.0')}}"></script>
 @endpush
 @push("styles")
     <link rel="stylesheet" type="text/css" href="{{URL::asset('assets/datatables/DataTables-1.10.18/css/dataTables.bootstrap4.css')}}">

@@ -27,7 +27,7 @@
                 @endif
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                    Produtos
+                    @if( Auth::user()->is_admin) Produtos @else Menu @endif
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
@@ -51,14 +51,18 @@
                                 Baixo Estoque
                             </a>
 
-{{--                        <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">--}}
-{{--                            <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>--}}
-{{--                            Produtos--}}
-{{--                        </a>--}}
-                        <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
-                                Lista de Compras
-                        </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                                Produtos
+                            </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
+                                    Lista de Compras
+                            </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+                                Visão Trimestre
+                            </a>
                     </nav>
                 </div>
                 @if( Auth::user()->is_admin)
