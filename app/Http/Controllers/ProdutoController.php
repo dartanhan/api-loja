@@ -83,12 +83,12 @@ class ProdutoController extends Controller
                     'lpn.codigo_produto',
                     'lpn.descricao',
                     'loja_categorias.nome as categoria',
-                    (DB::raw('IF((lpn.status = 1), \'ATIVO\', \'INATIVO\') as status')),
+                    'lpn.status',
                     (DB::raw("DATE_FORMAT(lpn.created_at, '%d/%m/%Y %H:%i:%s') as created")),
                     (DB::raw("DATE_FORMAT(lpn.updated_at, '%d/%m/%Y %H:%i:%s') as updated"))
 
                 )->from('loja_produtos_new as lpn')
-                ->where('lpn.status',true) //somente ativos
+                ->where('lpn.status',1) //somente ativos
                 ->groupBy('lpn.id')
                 ->orderBy('lpn.id', 'DESC');
 

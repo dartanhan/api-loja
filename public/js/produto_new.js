@@ -24,6 +24,10 @@ $(function() {
                 processing: true,
                 serverSide: true,
                 url: url + "/produto/create",
+                cache: false,
+                data: function (d) {
+                    d._ = $.now(); // isso adiciona um timestamp e impede o cache
+                }
             },
             "columns": [
                 {
@@ -38,9 +42,9 @@ $(function() {
                     render: function (data, type, row) {
                         if(row.produto_imagens.length > 0){
                             let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                            return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" ></img>';
+                            return '<img src="../public/storage/product/' + row.id + '/' + path + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
                         }else{
-                            return '<img src="../public/storage/produtos/not-image.png" class="image img-datatable"></img>';
+                            return '<img src="../public/storage/produtos/not-image.png" class="image img-datatable"/>';
                         }
                     }
                 },
@@ -49,7 +53,7 @@ $(function() {
                 {
                     "data": "status",
                     render: function (data, type, row) {
-                        return "<span class=\"badge bg-success\">" + row.status + "</span>";
+                        return "<span class='badge bg-success'>ATIVO</span>";
                     }
                 },
                 {"data": "created", "defaultContent": ""},

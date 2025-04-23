@@ -224,7 +224,7 @@
             </div>
         </div>
     </div>
-    <input onkeypress="formatMoneyPress(this)">
+
 
 @endsection
 @push("scripts")
