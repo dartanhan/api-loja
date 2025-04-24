@@ -95,3 +95,9 @@ table.dataTable tbody td {
     height: 1rem;
     border-width: 0.1em;
 }
+.zebra-detalhes .item-produto:nth-child(even) {
+    background-color: #f8f9fa; /* bg-light */
+}
+.zebra-detalhes .item-produto:nth-child(odd) {
+    background-color: #ffffff; /* bg-white */
+}
