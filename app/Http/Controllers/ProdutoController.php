@@ -377,7 +377,7 @@ class ProdutoController extends Controller
         $dados = DB::table('loja_vendas_produtos as vp')
           // ->join('loja_vendas as v', 'vp.venda_id', '=', 'v.id')
             ->join('loja_produtos_variacao as pv', 'vp.codigo_produto', '=', 'pv.subcodigo')
-            ->join('loja_fornecedores as f', 'vp.fornecedor_id', '=', 'f.id')
+            ->join('loja_fornecedores as f', 'pv.fornecedor', '=', 'f.id')
             ->join('loja_produtos_imagens as i', 'pv.id', '=', 'i.produto_variacao_id')
             ->select(
                 'f.nome as fornecedor',
