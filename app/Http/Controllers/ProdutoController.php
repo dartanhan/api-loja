@@ -375,7 +375,7 @@ class ProdutoController extends Controller
         $fim = $request->input('data_fim', now()->endOfMonth());
 
         $dados = DB::table('loja_vendas_produtos as vp')
-            ->join('loja_vendas as v', 'vp.venda_id', '=', 'v.id')
+          // ->join('loja_vendas as v', 'vp.venda_id', '=', 'v.id')
             ->join('loja_produtos_variacao as pv', 'vp.codigo_produto', '=', 'pv.subcodigo')
             ->join('loja_fornecedores as f', 'vp.fornecedor_id', '=', 'f.id')
             ->join('loja_produtos_imagens as i', 'pv.id', '=', 'i.produto_variacao_id')
@@ -387,7 +387,7 @@ class ProdutoController extends Controller
                 'pv.quantidade',
                 'i.path as imagem'
             )
-            ->whereBetween('v.created_at', [$inicio, $fim])
+            ->whereBetween('vp.created_at', [$inicio, $fim])
             ->groupBy('vp.codigo_produto', 'vp.descricao', 'pv.quantidade', 'f.nome')
             ->havingRaw('pv.quantidade < SUM(vp.quantidade)')
             ->get()
