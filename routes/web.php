@@ -50,6 +50,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/produto/getProducts/{id}',[ProdutoController::class,'getProducts'])->name('getProducts');
     Route::get('/indexNew',[ProdutoController::class,'index'])->name('produto.indexNew');
     Route::get('/produto/produtos-baixo-estoque', [ProdutoController::class, 'fornecedoresProdutosBaixoEstoque'])->name('produtos.baixo_estoque');
+    Route::get('/produto/produtos-estourados', [ProdutoController::class, 'getProdutosEstourados']);
     Route::resource('produto','ProdutoController');
 
     Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');

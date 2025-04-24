@@ -346,21 +346,61 @@ class ProdutoController extends Controller
 
     public function fornecedoresProdutosBaixoEstoque ()
     {
-        $inicioPeriodo = now()->subDays(30);
-        $fimPeriodo = now();
+//        $inicioPeriodo = now()->subDays(30);
+//        $fimPeriodo = now();
+//
+//        $fornecedores = Fornecedor::with(['variacoes' => function ($query) use ($inicioPeriodo, $fimPeriodo) {
+//            $query
+//                ->where('quantidade', '<=', 5)
+//                ->where('status', 1) //ativo
+//                ->withCount(['vendas as total_vendido' => function ($vendaQuery) use ($inicioPeriodo, $fimPeriodo) {
+//                    $vendaQuery->whereBetween('created_at', [$inicioPeriodo, $fimPeriodo]);
+//                }])
+//                ->orderBy('total_vendido', 'desc') // Ordena pelo total vendido
+//                ->with(['produtoPai', 'images']);
+//        }])->where('status', 1)->get();
+//
+//        return view('admin.baixoEstoque', compact('fornecedores','inicioPeriodo', 'fimPeriodo'));
 
-        $fornecedores = Fornecedor::with(['variacoes' => function ($query) use ($inicioPeriodo, $fimPeriodo) {
-            $query
-                ->where('quantidade', '<=', 5)
-                ->where('status', 1) //ativo
-                ->withCount(['vendas as total_vendido' => function ($vendaQuery) use ($inicioPeriodo, $fimPeriodo) {
-                    $vendaQuery->whereBetween('created_at', [$inicioPeriodo, $fimPeriodo]);
-                }])
-                ->orderBy('total_vendido', 'desc') // Ordena pelo total vendido
-                ->with(['produtoPai', 'images']);
-        }])->where('status', 1)->get();
 
-        return view('admin.baixoEstoque', compact('fornecedores','inicioPeriodo', 'fimPeriodo'));
+        return view('admin.produtosEstourados');
+
+    }
+
+    public function getProdutosEstourados(Request $request)
+    {
+       // $inicio = now()->subDays(30);
+       // $fim = Carbon::now();
+        $inicio = $request->input('data_inicio',  now()->startOfMonth());
+        $fim = $request->input('data_fim', now()->endOfMonth());
+
+        $dados = DB::table('loja_vendas_produtos as vp')
+            ->join('loja_vendas as v', 'vp.venda_id', '=', 'v.id')
+            ->join('loja_produtos_variacao as pv', 'vp.codigo_produto', '=', 'pv.subcodigo')
+            ->join('loja_fornecedores as f', 'vp.fornecedor_id', '=', 'f.id')
+            ->join('loja_produtos_imagens as i', 'pv.id', '=', 'i.produto_variacao_id')
+            ->select(
+                'f.nome as fornecedor',
+                'vp.codigo_produto',
+                'vp.descricao',
+                DB::raw('SUM(vp.quantidade) as quantidade_vendida'),
+                'pv.quantidade',
+                'i.path as imagem'
+            )
+            ->whereBetween('v.created_at', [$inicio, $fim])
+            ->groupBy('vp.codigo_produto', 'vp.descricao', 'pv.quantidade', 'f.nome')
+            ->havingRaw('pv.quantidade < SUM(vp.quantidade)')
+            ->get()
+            ->groupBy('fornecedor');
+
+        $resultado = $dados->map(function ($produtos, $fornecedor) {
+            return [
+                'fornecedor' => $fornecedor,
+                'produtos' => $produtos->values()
+            ];
+        })->values();
+
+        return response()->json(['data' => $resultado]);
     }
 
 }
