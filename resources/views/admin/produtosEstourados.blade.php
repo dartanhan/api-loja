@@ -52,12 +52,27 @@
             </div>
         </div>
     </div>
+    <!-- Modal de Exibição da Imagem -->
+    <div class="modal fade" id="modalImage" tabindex="-1" aria-labelledby="modalImageLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalImageLabel">Imagem do Produto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImageContent" src="" alt="Imagem maior" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
 @push('scripts')
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
+
     <script>
         let table;
 
@@ -72,8 +87,10 @@
 
                 html += `
                         <div class="item-produto d-flex align-items-center border-bottom pb-2 w-100 rounded p-2">
-                            <img src="${imagem}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px;" class="rounded border" />
-
+                            <img src="${imagem}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; cursor:pointer"
+                                class="rounded border" class="img-thumbnail"
+                                data-bs-toggle="modal" data-bs-target="#modalImage"
+                                data-image="${imagem}" title="Clique para ampliar imagem do Produto"/>
                             <div>
                                 <strong>${produto.descricao}</strong><br>
                                 Código: ${produto.codigo_produto}<br>
@@ -123,19 +140,6 @@
                 },
                 order: [[1, 'asc']]
             });
-
-            // $('#tableProdutos tbody').on('click', 'td.details-control', function () {
-            //     let tr = $(this).closest('tr');
-            //     let row = table.row(tr);
-            //
-            //     if (row.child.isShown()) {
-            //         row.child.hide();
-            //         tr.removeClass('shown');
-            //     } else {
-            //         row.child(formatDetalhes(row.data())).show();
-            //         tr.addClass('shown');
-            //     }
-            // });
         }
 
         $('#btnFiltrar').on('click', function () {
@@ -163,6 +167,19 @@
         $(document).ready(function () {
             $('#btnFiltrar').click();
         });
+
+        // Quando a imagem for clicada, atualize o conteúdo do modal com a imagem maior
+        let modalImage = document.getElementById('modalImage');
+        modalImage.addEventListener('show.bs.modal', function (event) {
+            // Obtém a imagem clicada
+            let button = event.relatedTarget; // Botão que foi clicado
+            let imagePath = button.getAttribute('data-image'); // Caminho da imagem
+
+            // Atualiza o conteúdo do modal com a imagem maior
+            let modalImageContent = modalImage.querySelector('#modalImageContent');
+            modalImageContent.src = imagePath;
+        });
+        $('[data-toggle="tooltip"]').tooltip();
     </script>
 @endpush
 @push("styles")
