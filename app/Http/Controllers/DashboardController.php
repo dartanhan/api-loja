@@ -66,7 +66,7 @@ class DashboardController extends Controller
     {
        // dd($this->request->all());
         try {
-            $data = null;
+            $data = [];
             $return = [];
             $imposto_total = 0;
             $total_mc = 0;
@@ -79,16 +79,27 @@ class DashboardController extends Controller
             /**
              * Semana agrupado por dia
              */
-            $vendas = Vendas::with('formaPgto.PaymentsList','loja','descontos',
-                'tipoVenda','produtos.produtoVariation','cliente','cashback.cliente','usuario.users','frete')
-            ->from('loja_vendas as lv')
-                ->where('lv.loja_id', $store_id)
-               // ->where('lv.codigo_venda','KN378406')
-                ->whereBetween(DB::raw('DATE(lv.created_at)'), array($startDate, $endDate))
-               //->groupBy('lv.codigo_venda')
-                ->orderBy('lv.created_at', 'asc')
+            $vendas = Vendas::with([
+                'formaPgto.PaymentsList',
+                'loja',
+                'descontos',
+                'tipoVenda',
+                'cliente',
+                'cashback.cliente',
+                'usuario.users',
+                'frete',
+                'produtos' => function ($query) {
+                    $query->where('troca', '!=', 1);
+                },
+                'produtos.produtoVariation'
+            ])
+                ->whereHas('produtos', function ($query) {
+                    $query->where('troca', '!=', 1);
+                })
+                ->where('loja_id', $store_id)
+                ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+                ->orderBy('created_at', 'asc')
                 ->get();
-
 
             if(count($vendas) > 0){
 
@@ -99,8 +110,9 @@ class DashboardController extends Controller
                     $taxa = 0;
                     $imposto =0;
                    // return Response::json($vendas, 400);
-                    $cashback = !$venda['cashback'] ? $venda['cashback'][0]->valor : 0; //se tiver cashback pega o valor
-                    $valor_desconto = $venda->descontos[0]->valor_desconto;
+                    //$cashback = !$venda['cashback'] ? $venda['cashback'][0]->valor : 0; //se tiver cashback pega o valor
+                    $cashback = $venda->cashback->first()->valor ?? 0;
+                    $valor_desconto = $venda->descontos->first()->valor_desconto ?? 0;
 
                     //total o valor subtraido de "desconto e cashback"
                     $total = $venda->valor_total - $valor_desconto - $cashback;
@@ -108,7 +120,9 @@ class DashboardController extends Controller
 
                     $frete = 0;
                     if(count($venda->frete) > 0){
-                        $frete = $venda->frete[0]->valor_entrega - $valor_desconto - $cashback;
+                        //$frete = $venda->frete[0]->valor_entrega - $valor_desconto - $cashback;
+                        $freteObj = $venda->frete->first();
+                        $frete = $freteObj ? $freteObj->valor_entrega - $valor_desconto - $cashback : 0;
                     }
                     $data['total_geral'] = $venda->valor_total + $frete;
                     $data['data'] =  Carbon::parse($venda->created_at)->format('d/m/Y H:i:s');
@@ -178,7 +192,8 @@ class DashboardController extends Controller
                         $total_precentual_mc += $pmc;
                     }
 
-                    $data['nome_cli'] = !$venda->cliente ? "Cliente não Identificado" : $venda->cliente->nome;
+                    //$data['nome_cli'] = !$venda->cliente ? "Cliente não Identificado" : $venda->cliente->nome;
+                    $data['nome_cli'] = optional($venda->cliente)->nome ?? "Cliente não Identificado";
 
                     $data['total_final'] = $this->formatter->formatCurrency($total_final, 'BRL');
                     array_push($return,$data);
