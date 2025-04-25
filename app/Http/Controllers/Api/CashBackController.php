@@ -74,22 +74,19 @@ class CashBackController extends Controller
      *         description="The data"
      *     )
      * )
-
      * Display the specified resource.
      *
-     * @param $param
+     * @param int $id
      * @return JsonResponse
      */
-    public function show($param)
+    public function show(int $id)
     {
         try{
-             $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->where( 'status', 0)->sum('valor');
-           // $cashBackTotal = $this->vendasCashBackModel::where('cliente_id', $param)->sum('valor');
+             $cashBackTotal = VendasCashBack::cashback('cliente_id', $id);
 
             $this->vendasCashBackModel = new VendasCashBack();
-
-            $this->vendasCashBackModel->cliente_id = $param;
-            $this->vendasCashBackModel->valor_total = $cashBackTotal;
+            $this->vendasCashBackModel->cliente_id = $id;
+            $this->vendasCashBackModel->valor = $cashBackTotal;
 
             if ($this->vendasCashBackModel) {
                 return Response::json($this->vendasCashBackModel, 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
