@@ -521,14 +521,22 @@ class VendaController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            $this->errorLogs->create([
-                'codigo_venda' => $dados['codigo_venda'] ?? null,
-                'mensagem' => $e->getMessage(),
-                'dados' => json_encode($dados),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            // Verifica se já existe um log semelhante
+            $jaExiste = $this->errorLogs
+                ->where('codigo_venda', $dados['codigo_venda'])
+                ->where('mensagem', $e->getMessage())
+                ->where('dados', json_encode($dados))
+                ->exists();
 
+            if (!$jaExiste) {
+                $this->errorLogs->create([
+                    'codigo_venda' => $dados['codigo_venda'] ?? null,
+                    'mensagem' => $e->getMessage(),
+                    'dados' => json_encode($dados),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
             return Response::json([
                 'success' => false,
                 'message' => 'Erro ao processar venda. O problema foi registrado.'
