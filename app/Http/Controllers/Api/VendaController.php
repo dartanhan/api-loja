@@ -521,20 +521,28 @@ class VendaController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            // Verifica se já existe um log semelhante
+            // Tenta capturar código de erro SQL, se existir
+            $sqlErrorCode = null;
+            if (property_exists($e, 'errorInfo') && is_array($e->errorInfo) && isset($e->errorInfo[1])) {
+                $sqlErrorCode = $e->errorInfo[1]; // Código MySQL (ex: 1452)
+            } else {
+                $sqlErrorCode = $e->getCode(); // Pode retornar 0 ou um código genérico
+            }
+
+            // Evita duplicidade de logs para o mesmo erro e venda
             $jaExiste = $this->errorLogs
                 ->where('codigo_venda', $dados['codigo_venda'])
-                ->where('mensagem', $e->getMessage())
-                ->where('dados', json_encode($dados))
+                ->where('codigo_erro', $sqlErrorCode)
                 ->exists();
 
             if (!$jaExiste) {
                 $this->errorLogs->create([
                     'codigo_venda' => $dados['codigo_venda'] ?? null,
-                    'mensagem' => $e->getMessage(),
-                    'dados' => json_encode($dados),
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'codigo_erro' => $sqlErrorCode,
+                    'mensagem'     => $e->getMessage(),
+                    'dados'        => json_encode($dados),
+                    'created_at'   => now(),
+                    'updated_at'   => now()
                 ]);
             }
             return Response::json([

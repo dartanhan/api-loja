@@ -9,5 +9,5 @@ class ErrorLogs extends Model
 {
     use HasFactory;
     public $table = 'loja_error_logs';
-    protected $fillable = ['codigo_venda','mensagem','dados'];
+    protected $fillable = ['codigo_venda','mensagem','dados','codigo_erro'];
 }
