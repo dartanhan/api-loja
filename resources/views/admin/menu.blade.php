@@ -24,6 +24,10 @@
                         <div class="sb-nav-link-icon"><i class="fa fa-shopping-cart"></i></div>
                         Vendas
                     </a>
+                    <a class="nav-link {{ Route::current()->getName() === 'monitoramento.index' ? 'active' : '' }}" href="{{route('monitoramento.index')}}">
+                        <div class="sb-nav-link-icon"><i class="fa fa-eye"></i></div>
+                        Monitoramento
+                    </a>
                 @endif
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>

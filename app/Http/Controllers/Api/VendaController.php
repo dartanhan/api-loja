@@ -22,6 +22,7 @@ use App\Http\Models\VendasProdutosTroca;
 use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
 use App\Http\Models\VendasTroca;
+use App\Http\Models\MovimentacaoEstoque;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -54,6 +55,7 @@ class VendaController extends Controller
     protected VendasProdutosEntrega $vendasProdutosEntrega;
     protected VendasProdutosTroca $vendasProdutosTroca;
     protected VendasTroca $vendasTroca;
+    protected MovimentacaoEstoque $movimentacaoEstoque;
 
     public function __construct(Request $request,
                                 Produto $product,
@@ -73,7 +75,8 @@ class VendaController extends Controller
                                 ErrorLogs $errorLogs,
                                 VendasProdutosEntrega $vendasProdutosEntrega,
                                 VendasProdutosTroca $vendasProdutosTroca,
-                                VendasTroca $vendasTroca){
+                                VendasTroca $vendasTroca,
+                                MovimentacaoEstoque $movimentacaoEstoque){
         $this->request = $request;
         $this->product = $product;
         $this->vendas = $vendas;
@@ -93,6 +96,7 @@ class VendaController extends Controller
         $this->vendasProdutosEntrega = $vendasProdutosEntrega;
         $this->vendasProdutosTroca = $vendasProdutosTroca;
         $this->vendasTroca = $vendasTroca;
+        $this->movimentacaoEstoque = $movimentacaoEstoque;
     }
 
     /**
@@ -399,6 +403,7 @@ class VendaController extends Controller
      */
     public function store(Request $request)
     {
+
         DB::beginTransaction();
 
         try {
@@ -473,6 +478,14 @@ class VendaController extends Controller
                     $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
                     $variacao->decrement('quantidade', $produto["quantidade"]);
                 }
+
+                $this->movimentacaoEstoque::create([
+                    'variacao_id' => $produto["variacao_id"],
+                    'venda_id' => $venda->id,
+                    'tipo' => 'saida',
+                    'quantidade' => $produto["quantidade"],
+                    'motivo' => 'Venda finalizada',
+                ]);
             }
 
             // Processa pagamentos
