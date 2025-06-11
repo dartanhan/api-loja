@@ -17,7 +17,7 @@ class LojaMovimentacoesEstoqueTable extends Migration
             $table->id();
 
             // Correção do nome da tabela de variações
-            $table->unsignedBigInteger('variacao_id');
+            $table->unsignedBigInteger('variacao_id')->nullable();
             $table->foreign('variacao_id')
                   ->references('id')->on('loja_produtos_variacao')->onDelete('cascade');
 

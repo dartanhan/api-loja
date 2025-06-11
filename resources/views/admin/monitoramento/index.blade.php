@@ -34,6 +34,7 @@
                 <th>ID</th>
                 <th>Data</th>
                 <th>Tipo</th>
+                <th>Venda</th>
                 <th>Produto</th>
                 <th>Variação</th>
                 <th>Subcódigo</th>
@@ -42,6 +43,7 @@
             </tr>
         </thead>
         <tbody>
+{{--        @dd($movimentacoes)--}}
             @forelse ($movimentacoes as $mov)
                 <tr>
                     <td>{{ $mov->id }}</td>
@@ -51,7 +53,8 @@
                             {{ ucfirst($mov->tipo) }}
                         </span>
                     </td>
-                    <td>{{ optional($mov->variacao->produto)->descricao ?? '-' }}</td>
+                    <td>{{ $mov->venda->codigo_venda ?? '-' }}</td>
+                    <td>{{ optional($mov->variacao->produtoPai)->descricao ?? '-' }}</td>
                     <td>{{ $mov->variacao->variacao ?? '-' }}</td>
                     <td>{{ $mov->variacao->subcodigo ?? '-' }}</td>
                     <td>{{ $mov->quantidade }}</td>

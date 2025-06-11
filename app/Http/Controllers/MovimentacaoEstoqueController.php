@@ -12,7 +12,7 @@ class MovimentacaoEstoqueController extends Controller
     {
         $filtros = $request->only(['tipo', 'codigo']);
 
-        $movimentacoes = MovimentacaoEstoque::with(['variacao.produto'])
+        $movimentacoes = MovimentacaoEstoque::with(['variacao.produtoPai','venda'])
             ->when($request->tipo, function ($query) use ($request) {
                 $query->where('tipo', $request->tipo);
             })

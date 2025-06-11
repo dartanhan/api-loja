@@ -23,9 +23,9 @@ use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
 use App\Http\Models\VendasTroca;
 use App\Http\Models\MovimentacaoEstoque;
+use App\Traits\MovimentacaoTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
@@ -36,6 +36,7 @@ use Throwable;
 
 class VendaController extends Controller
 {
+    use MovimentacaoTrait;
     protected VendasPdv $vendasPdv;
     protected VendasCashBackValor $cashBackValor;
     protected Cashback $cashback;
@@ -479,13 +480,10 @@ class VendaController extends Controller
                     $variacao->decrement('quantidade', $produto["quantidade"]);
                 }
 
-                $this->movimentacaoEstoque::create([
-                    'variacao_id' => $produto["variacao_id"],
-                    'venda_id' => $venda->id,
-                    'tipo' => 'saida',
-                    'quantidade' => $produto["quantidade"],
-                    'motivo' => 'Venda finalizada',
-                ]);
+                /**
+                 *Salva a movimentação do estoque
+                 */
+                $this->movimentacaoSaida($produto,$venda,'Venda finalizada');
             }
 
             // Processa pagamentos
