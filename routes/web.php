@@ -105,7 +105,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/relatorio/card/{ano}',[RelatorioController::class,'card']);
     Route::get('/relatorio/chartLineGroupYear/{year}',[RelatorioController::class,'chartLineGroupYear']);
     Route::get('/relatorio/chartLineMultiGroupYear',[RelatorioController::class,'chartLineMultiGroupYear']);
-    Route::get('/relatorio/chartFunc',[RelatorioController::class,'chartFunc']);
+    Route::get('/relatorio/chartFunc/{ano}',[RelatorioController::class,'chartFunc']);
 
 
     Route::resource('/relatorio','RelatorioController');
@@ -161,7 +161,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/sale/updateStatus',[SalesController::class,'updateStatus'])->name('sales.updateStatus');
 
     Route::get('/monitoramento-estoque', [MovimentacaoEstoqueController::class, 'index'])->name('monitoramento.index');
-
+    Route::get('/monitoramento/historico', [MovimentacaoEstoqueController::class, 'historicoProduto'])->name('monitoramento.historico');
 });
 
 

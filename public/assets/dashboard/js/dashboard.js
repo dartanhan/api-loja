@@ -1,4 +1,4 @@
-import {fncDataDatatable,getDataFormat,sweetAlert} from '../../../js/comum.js';
+import {fncDataDatatable,getDataFormat,sweetAlert,getDataYear} from '../../../js/comum.js';
 
 let dataIni = $('input[name=dataIni]');
 let dataFim = $('input[name=dataFim]');
@@ -30,6 +30,7 @@ $(function () {
     let newCtxChartBarFunc = new Chart(ctxBarFunc);
     let startDate;
     let endDate;
+    let myChart = null;
 
         /***
      * Id da loja, para retorno do dados referente a loja
@@ -433,7 +434,10 @@ $(function () {
 
     //Gráfico com dados dos funcionarios por venda
      let fncBarChartFunc = async function() {
-        await fetch(url+ "/relatorio/chartFunc/")
+       //  year = $('input[name=dataIni]').val() === "" ? year : getDataYear($('input[name=dataIni]').val());
+         $('#anoPesquisa').html($('input[name=dataIni]').val() === "" ? year : getDataYear($('input[name=dataIni]').val()));
+
+        await fetch(url+ "/relatorio/chartFunc/"+year)
             .then(function (response) {
 
                 return response.json()
@@ -463,9 +467,14 @@ $(function () {
                     };
                 });
 
+                // Destruir gráfico antigo antes de criar um novo
+                if (myChart) {
+                    myChart.destroy();
+                }
+
                 // Criar o gráfico usando Chart.js
                 const ctx = document.getElementById('myBarChartFunc').getContext('2d');
-                const myChart = new Chart(ctx, {
+                myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -831,11 +840,15 @@ $(function () {
         //fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
         fncLoadChartBar();
         fncDataDatatable(table);
+        fncBarChartFunc().then();
 
         dataIni = getDataFormat($('input[name=dataIni]').val(),'DD/MM/YYYY','YYYY-MM-DD');
         dataFim = getDataFormat($('input[name=dataFim]').val(),'DD/MM/YYYY','YYYY-MM-DD');
         fncDataBarChart(dataIni,dataFim).then();
 
+       //console.log(getDataYear($('input[name=dataIni]').val()));
+       // year  = getDataYear($('input[name=dataIni]').val());
+       // fncBarChartFunc(getDataYear($('input[name=dataIni]').val())).then();
     });
 
     $(".btn-limpar").click(function () {

@@ -164,7 +164,7 @@
             <div class="col-xl-6">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <i class="fas fa-chart-bar me-1"></i>Total Vendas por Funcionário
+                        <i class="fas fa-chart-bar me-1"></i>Total Vendas por Funcionário - ANO [ <span name="anoPesquisa" id="anoPesquisa"></span> ]
                     </div>
                     <div class="card-body"><canvas id="myBarChartFunc" width="100%" height="40"></canvas></div>
                 </div>
