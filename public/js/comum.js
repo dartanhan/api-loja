@@ -9,7 +9,7 @@ window.sweetAlertClose = sweetAlertClose;
 window.createSlug = createSlug;
 window.botaoLoad = botaoLoad;
 window.removeCampo = removeCampo;
-
+window.getDataYear = getDataYear;
 
 
 const swalWithBootstrapButtons = Swal.mixin({
@@ -113,6 +113,12 @@ export function formatMoney(valor, cifrao = "R$ ")
  */
 export function getDataFormat(data, mascara_to, mascara_old){
     return (data !== "") ? moment(data, mascara_to).format(mascara_old) : moment().format('YYYY-MM-DD');
+}
+
+export function getDataYear(data){
+    return (data && data.trim() !== "")
+        ? moment(data, 'DD/MM/YYYY').format('YYYY')
+        : moment().format('YYYY');
 }
 
 /***

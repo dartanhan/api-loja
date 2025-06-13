@@ -851,9 +851,11 @@ class RelatorioController extends Controller
     }
 
     /**
-    * Gráfico de vendas dos funcionarios
+     * Gráfico de vendas dos funcionarios
+     * @param int $ano
+     * @return JsonResponse
      */
-    function chartFunc(){
+    function chartFunc(int $ano){
        // dd("ok");
 
         // Construir a consulta SQL dinâmica para agrupar por funcionário
@@ -864,7 +866,7 @@ class RelatorioController extends Controller
                 DB::raw('MONTH(loja_vendas.created_at) AS mes'), // Extrair o mês da data_venda
                 DB::raw('SUM(loja_vendas.valor_total) AS total_vendas') // Calcular a soma das vendas para cada funcionário
             )
-           // ->whereYear('loja_vendas.created_at', date('Y')) // Filtrar pelo ano atual
+            ->whereYear('loja_vendas.created_at', $ano) // Filtrar pelo ano atual
             ->groupBy('funcionario_nome', 'mes'); // Agrupar por funcionário e mês
 
         // Executar a consulta e obter os resultados
