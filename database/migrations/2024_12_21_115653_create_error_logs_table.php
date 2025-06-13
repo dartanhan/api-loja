@@ -16,6 +16,7 @@ class CreateErrorLogsTable extends Migration
         Schema::create('loja_error_logs', function (Blueprint $table) {
             $table->id();
             $table->string('codigo_venda')->nullable();
+            $table->string('codigo_error')->nullable();
             $table->text('mensagem');
             $table->json('dados')->nullable();
             $table->timestamps();

@@ -12,6 +12,7 @@ use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\ReposicaoController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\MovimentacaoEstoqueController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -158,6 +159,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/sale/table',[SalesController::class,'table'])->name('sales.table');
     Route::post('/sale/tableItemSale',[SalesController::class,'tableItemSale'])->name('sales.tableItemSale');
     Route::post('/sale/updateStatus',[SalesController::class,'updateStatus'])->name('sales.updateStatus');
+
+    Route::get('/monitoramento-estoque', [MovimentacaoEstoqueController::class, 'index'])->name('monitoramento.index');
 
 });
 

@@ -22,9 +22,10 @@ use App\Http\Models\VendasProdutosTroca;
 use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
 use App\Http\Models\VendasTroca;
+use App\Http\Models\MovimentacaoEstoque;
+use App\Traits\MovimentacaoTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
@@ -35,6 +36,7 @@ use Throwable;
 
 class VendaController extends Controller
 {
+    use MovimentacaoTrait;
     protected VendasPdv $vendasPdv;
     protected VendasCashBackValor $cashBackValor;
     protected Cashback $cashback;
@@ -54,6 +56,7 @@ class VendaController extends Controller
     protected VendasProdutosEntrega $vendasProdutosEntrega;
     protected VendasProdutosTroca $vendasProdutosTroca;
     protected VendasTroca $vendasTroca;
+    protected MovimentacaoEstoque $movimentacaoEstoque;
 
     public function __construct(Request $request,
                                 Produto $product,
@@ -73,7 +76,8 @@ class VendaController extends Controller
                                 ErrorLogs $errorLogs,
                                 VendasProdutosEntrega $vendasProdutosEntrega,
                                 VendasProdutosTroca $vendasProdutosTroca,
-                                VendasTroca $vendasTroca){
+                                VendasTroca $vendasTroca,
+                                MovimentacaoEstoque $movimentacaoEstoque){
         $this->request = $request;
         $this->product = $product;
         $this->vendas = $vendas;
@@ -93,6 +97,7 @@ class VendaController extends Controller
         $this->vendasProdutosEntrega = $vendasProdutosEntrega;
         $this->vendasProdutosTroca = $vendasProdutosTroca;
         $this->vendasTroca = $vendasTroca;
+        $this->movimentacaoEstoque = $movimentacaoEstoque;
     }
 
     /**
@@ -399,6 +404,7 @@ class VendaController extends Controller
      */
     public function store(Request $request)
     {
+
         DB::beginTransaction();
 
         try {
@@ -473,6 +479,11 @@ class VendaController extends Controller
                     $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
                     $variacao->decrement('quantidade', $produto["quantidade"]);
                 }
+
+                /**
+                 *Salva a movimentação do estoque
+                 */
+                $this->movimentacaoSaida($produto,$venda,'Venda finalizada');
             }
 
             // Processa pagamentos

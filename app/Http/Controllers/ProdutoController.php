@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Models\Categoria;
 use App\Http\Models\Cor;
 use App\Http\Models\Fornecedor;
+use App\Http\Models\MovimentacaoEstoque;
 use App\Http\Models\OrigemNfce;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoControle;
 use App\Http\Models\ProdutoImagem;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\Usuario;
+use App\Traits\MovimentacaoTrait;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -27,11 +29,22 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ProdutoController extends Controller
 {
-    protected $request, $produto, $fornecedor, $category, $cor, $produtoImage, $produtoVariation, $produtoControle, $origem_nfce;
+    use MovimentacaoTrait;
+
+    protected Request $request;
+    protected OrigemNfce $origem_nfce;
+    protected ProdutoControle $produtoControle;
+    protected ProdutoVariation $produtoVariation;
+    protected ProdutoImagem $produtoImage;
+    protected Cor $cor;
+    protected Categoria $category;
+    protected Fornecedor $fornecedor;
+    protected Produto $produto;
+    protected MovimentacaoEstoque $movimentacaoEstoque;
 
     public function __construct(Request $request, Produto $produto, Fornecedor $fornecedor, Categoria $category,
                                 Cor $cor, ProdutoImagem $produto_image, ProdutoVariation $produtoVariation,
-                                ProdutoControle $produtoControle, OrigemNfce $origem_nfce)
+                                ProdutoControle $produtoControle, OrigemNfce $origem_nfce,MovimentacaoEstoque $movimentacaoEstoque)
     {
         $this->request = $request;
         $this->produto = $produto;
@@ -42,6 +55,7 @@ class ProdutoController extends Controller
         $this->produtoVariation = $produtoVariation;
         $this->produtoControle = $produtoControle;
         $this->origem_nfce = $origem_nfce;
+        $this->movimentacaoEstoque = $movimentacaoEstoque;
     }
 
     /**
@@ -221,6 +235,12 @@ class ProdutoController extends Controller
                  */
                 $matchThese = array('id' => $this->request->input("variacao_id")[$i]);
                 $controle = ProdutoVariation::updateOrCreate($matchThese, $data);
+               // dd($controle->valor_varejo);
+
+                /**
+                 *Salva a movimentação do estoque
+                 */
+                $this->movimentacaoEntrada($controle);
             }
 
         } catch (Throwable $e) {
