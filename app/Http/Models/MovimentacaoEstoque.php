@@ -10,7 +10,7 @@ class MovimentacaoEstoque extends Model
     use HasFactory;
 
     public $table = 'loja_movimentacoes_estoque';
-    protected $fillable = ['variacao_id','venda_id','tipo','quantidade','motivo'];
+    protected $fillable = ['variacao_id','venda_id','tipo','quantidade','quantidade_antes','quantidade_movimentada','quantidade_depois','motivo'];
 
     public function variacao()
     {

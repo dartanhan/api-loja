@@ -409,6 +409,7 @@ class VendaController extends Controller
 
         try {
             $dados = $request->all();
+            $variacao = "";
 
             if (empty($dados['codigo_venda']) || empty($dados['loja_id']) || !isset($dados['produtos'])) {
                 throw new \Exception("Dados obrigatórios ausentes.");
@@ -483,7 +484,11 @@ class VendaController extends Controller
                 /**
                  *Salva a movimentação do estoque
                  */
-                $this->movimentacaoSaida($produto,$venda,'Venda finalizada');
+                $data["antes"] = $variacao->quantidade;
+                $data["movimentada"] = $produto["quantidade"];
+                $data["depois"] =  $data["antes"] - $data["movimentada"];
+
+                $this->movimentacaoSaida($produto,$venda,$data);
             }
 
             // Processa pagamentos
