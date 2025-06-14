@@ -13,7 +13,6 @@ use App\Http\Models\ProdutoImagem;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\Usuario;
 use App\Traits\MovimentacaoTrait;
-use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -126,128 +125,268 @@ class ProdutoController extends Controller
     public function store()
     {
         try {
+            DB::beginTransaction();
             // dd($this->request->all());
             //   dd(count($this->request->allFiles()['images0']));
+
             $produto_id = $this->request->input("produto_id");
-            if ($produto_id == null) {
-                $msg = "Produto Cadastrado com sucesso!";
-                $rules = [
-                    'codigo_produto' => 'required|unique:' . $this->produto->table . '|max:15',
-                    'descricao' => 'required|max:155',
-                    'origem' => 'required|max:5',
-                    'cest' => 'required|max:15',
-                    'ncm' => 'required|max:15',
-                    'categoria_id' => 'required|max:5',
-                ];
 
-            } else {
-                $msg = "Produto Atualizado com sucesso!";
-                $rules = [
-                    'codigo_produto' => 'required|max:15|unique:' . $this->produto->table . ',codigo_produto,' . $produto_id,
-                    'descricao' => 'required|max:155',
-                    'origem' => 'required|max:5',
-                    'cest' => 'required|max:15',
-                    'ncm' => 'required|max:15',
-                    'categoria_id' => 'required|max:5'
-                ];
-            }
+            $rules = $this->getValidationRules($produto_id);
+            $validated = Validator::make($this->request->all(), $rules, $this->getValidationMessages());
 
-            //Valida o form
-            $validated = Validator::make($this->request->all(), $rules, $messages = [
-                'codigo_produto.required' => 'Código do produto é obrigatório!',
-                'codigo_produto.unique' => 'Código do produto já cadastrado!',
-                'codigo_produto.max' => 'Código do produto deve ser menos que 15 caracteres!',
-                'descricao.required' => 'Descrição do produto é obrigatório!',
-                'descricao.max' => 'Descrição limtado a 155 caracteres!',
-                'origem.required' => 'A origem é obrigatório!',
-                'cest.required' => 'O cest é obrigatório!',
-                'ncm.required' => 'O ncm é obrigatório!',
-                'categoria_id.required' => 'A Categoria é obrigatória!',
-            ]);
-
-            //Verifica se temos erros no form
             if ($validated->fails()) {
-                $error = $validated->errors()->first();
-                return Response::json(array('success' => false, 'message' => $error), 400);
+                return Response::json(['success' => false, 'message' => $validated->errors()->first()], 400);
             }
 
-            $data["codigo_produto"] = $this->request->input("codigo_produto");
-            $data["descricao"] = $this->request->input("descricao");
-            $data["status"] = $this->request->input("status");
-            $data["origem_id"] = $this->request->input("origem");
-            $data["ncm"] = $this->request->input("ncm");
-            $data["cest"] = $this->request->input("cest");
-            $data["categoria_id"] = $this->request->input("categoria_id");
-            $data["cor_id"] = 1;
+            /**
+             * Salvar produto
+            */
+            $produto = $this->salvarProduto($produto_id);
 
+            /**
+             * Salvar as variações
+             */
 
-            //Cria o produto
-            //$products = $this->produto::create($data);
-            $matchThese = array('id' => $produto_id);
-            $products = $this->produto::updateOrCreate($matchThese, $data);
+            $this->salvarVariacoes($produto->id);
 
-            // dd($products);
-            // echo $produtos->id;
+//            $data["codigo_produto"] = $this->request->input("codigo_produto");
+//            $data["descricao"] = $this->request->input("descricao");
+//            $data["status"] = $this->request->input("status");
+//            $data["origem_id"] = $this->request->input("origem");
+//            $data["ncm"] = $this->request->input("ncm");
+//            $data["cest"] = $this->request->input("cest");
+//            $data["categoria_id"] = $this->request->input("categoria_id");
+//            $data["cor_id"] = 1;
+//
+//
+//            //Cria o produto
+//            //$products = $this->produto::create($data);
+//            $matchThese = array('id' => $produto_id);
+//            $products = $this->produto::updateOrCreate($matchThese, $data);
+
             /**
              * Quantidade de variações
              */
-            $qtd_lines = count($this->request->input("variacao"));
+ //           $qtd_lines = count($this->request->input("variacao"));
             //     dd($qtd_lines);
 
             /**
              * Exibindo os dados
              */
-            $data["products_id"] = $products->id;
+      //      $data["products_id"] = $products->id;
 
             //dd($data);
             /**
              *   Formata em decimal par o banco
              */
-            $formatter = new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
+    //        $formatter = new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
 
-            for ($i = 0; $i < $qtd_lines; $i++) {
-                $dateString = $this->request->input("validade")[$i];
+            /**
+             * Salva a variação vinculada ao produto PAI
+            */
+//            for ($i = 0; $i < $qtd_lines; $i++) {
+//                $dateString = $this->request->input("validade")[$i];
+//
+//                if ($dateString === "00/00/0000") {
+//                    $formattedDate = "0000-00-00";
+//                } else {
+//                    $formattedDate = Carbon::createFromFormat('d/m/Y', $dateString)->format('Y-m-d');
+//                }
+//
+//                $data["subcodigo"] = $data["codigo_produto"] . $this->request->input("subcodigo")[$i];
+//                $data["variacao"] = $this->request->input("variacao")[$i];
+//                $data["valor_varejo"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_varejo")[$i]));
+//                $data["valor_atacado"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_atacado_10un")[$i]));
+//                $data["valor_atacado_10un"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_atacado_10un")[$i]));
+//                $data["valor_produto"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_produto")[$i]));
+//                $data["quantidade"] = $this->request->input("quantidade")[$i];
+//                $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
+//                //se o status do Pai for INATIVO (0), seta 0 para os filhos
+//                $data["status"] = $this->request->input("status") == 0 ? 0 : $this->request->input("status_variacao")[$i];
+//                $data["percentage"] = $formatter->parse($this->request->input("percentage")[$i]);
+//                $data["validade"] = $formattedDate;
+//                $data["fornecedor"] = $this->request->input("fornecedor")[$i];
+//                $data["estoque"] = $this->request->input("estoque")[$i];
+//                $data["gtin"] = $this->request->input("gtin")[$i];
+//                $data["variacao_id"] = $this->request->input("variacao_id")[$i];
+//
+//                /**
+//                 *Salva a movimentação do estoque
+//                 */
+//                $variacao = ProdutoVariation::where('id',  $data["variacao_id"])->first();
+//                if($variacao){
+//                    $data["antes"] = $variacao->quantidade;
+//                    $data["movimentada"] = $data["quantidade"];
+//                    $data["depois"] = $data["antes"] + $data["movimentada"];
+//                }else{
+//                    $data["antes"] = 0;
+//                    $data["movimentada"] = $data["quantidade"];
+//                    $data["depois"] = $data["antes"] + $data["movimentada"];
+//                }
+//
+//                $this->movimentacaoEntrada($data);
+//
+//                /**
+//                 * Cria ou Atualiza a variação do produto
+//                 */
+//                $matchThese = array('id' => $this->request->input("variacao_id")[$i]);
+//                $controle = ProdutoVariation::updateOrCreate($matchThese, $data);
+//            }
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollBack(); // Faz rollback em caso de erro
+            return Response::json(array('success' => false, 'message' => $e->getMessage(),'trace' => $e->getTraceAsString(), 'cod_retorno' => 500), 500);
+        }
 
-                if ($dateString === "00/00/0000") {
-                    $formattedDate = "0000-00-00";
-                } else {
-                    $formattedDate = Carbon::createFromFormat('d/m/Y', $dateString)->format('Y-m-d');
+        $msg = $produto_id ? "Produto Atualizado com sucesso!" : "Produto Cadastrado com sucesso!";
+        return Response::json(['success' => true, 'message' => $msg], 201);
+    }
+
+    /**
+     * Método: validação de regras
+     * @param $produto_id
+     * @return string[]
+     */
+    private function getValidationRules($produto_id)
+    {
+        $table = $this->produto->getTable();
+        if (!$produto_id) {
+            return [
+                'codigo_produto' => "required|unique:$table|max:15",
+                'descricao' => 'required|max:155',
+                'origem' => 'required|max:5',
+                'cest' => 'required|max:15',
+                'ncm' => 'required|max:15',
+                'categoria_id' => 'required|max:5',
+            ];
+        }
+
+        return [
+            'codigo_produto' => "required|max:15|unique:$table,codigo_produto,$produto_id",
+            'descricao' => 'required|max:155',
+            'origem' => 'required|max:5',
+            'cest' => 'required|max:15',
+            'ncm' => 'required|max:15',
+            'categoria_id' => 'required|max:5',
+        ];
+    }
+
+    /**
+     *  Mensagens de validação
+    */
+    private function getValidationMessages()
+    {
+        return [
+            'codigo_produto.required' => 'Código do produto é obrigatório!',
+            'codigo_produto.unique' => 'Código do produto já cadastrado!',
+            'codigo_produto.max' => 'Código do produto deve ter no máximo 15 caracteres!',
+            'descricao.required' => 'Descrição do produto é obrigatória!',
+            'descricao.max' => 'Descrição limitada a 155 caracteres!',
+            'origem.required' => 'A origem é obrigatória!',
+            'cest.required' => 'O CEST é obrigatório!',
+            'ncm.required' => 'O NCM é obrigatório!',
+            'categoria_id.required' => 'A categoria é obrigatória!',
+        ];
+    }
+
+    /**
+     * 🧩 Salvar produto
+     * @param $produto_id
+     * @return
+     * @throws \Exception
+     */
+    private function salvarProduto($produto_id)
+    {
+        try {
+            $data = [
+                "codigo_produto" => $this->request->input("codigo_produto"),
+                "descricao" => $this->request->input("descricao"),
+                "status" => $this->request->input("status"),
+                "origem_id" => $this->request->input("origem"),
+                "ncm" => $this->request->input("ncm"),
+                "cest" => $this->request->input("cest"),
+                "categoria_id" => $this->request->input("categoria_id"),
+                "cor_id" => 1,
+            ];
+
+            return $this->produto::updateOrCreate(['id' => $produto_id], $data);
+        } catch (Throwable $e) {
+            throw new \Exception("Erro em salvarProduto: " . $e->getMessage(), 500, $e);
+        }
+    }
+
+    /**
+     * Salvar variações
+     * @param $produto_id
+     * @throws \Exception
+     */
+    private function salvarVariacoes($produto_id)
+    {
+        try{
+                $formatter = new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
+                $qtd = count($this->request->input("variacao"));
+
+                for ($i = 0; $i < $qtd; $i++) {
+                    $dateString = $this->request->input("validade")[$i];
+                    $validade = $this->formatarData($dateString);
+
+                    $valorVarejo = $this->formatarValor($this->request->input("valor_varejo")[$i], $formatter);
+                    $valorAtacado = $this->formatarValor($this->request->input("valor_atacado_10un")[$i], $formatter);
+                    $valorProduto = $this->formatarValor($this->request->input("valor_produto")[$i], $formatter);
+                    $percentage = $this->formatarValor($this->request->input("percentage")[$i], $formatter);
+                    $statusPai = $this->request->input("status");
+                    $statusVariacao = $statusPai == 0 ? 0 : $this->request->input("status_variacao")[$i];
+
+                    $data = [
+                        "products_id" => $produto_id,
+                        "subcodigo" => $this->request->input("codigo_produto") . $this->request->input("subcodigo")[$i],
+                        "variacao" => $this->request->input("variacao")[$i],
+                        "valor_varejo" => $valorVarejo,
+                        "valor_atacado" => $valorAtacado,
+                        "valor_atacado_10un" => $valorAtacado,
+                        "valor_produto" => $valorProduto,
+                        "quantidade" => $this->request->input("quantidade")[$i],
+                        "quantidade_minima" => $this->request->input("quantidade_minima")[$i],
+                        "status" => $statusVariacao,
+                        "percentage" => $percentage,
+                        "validade" => $validade,
+                        "fornecedor" => $this->request->input("fornecedor")[$i],
+                        "estoque" => $this->request->input("estoque")[$i],
+                        "gtin" => $this->request->input("gtin")[$i],
+                        "variacao_id" => $this->request->input("variacao_id")[$i],
+                    ];
+
+                    $this->registrarMovimentacaoEstoque($data);
+                    ProdutoVariation::updateOrCreate(['id' => $data["variacao_id"]], $data);
                 }
 
-                $data["subcodigo"] = $data["codigo_produto"] . $this->request->input("subcodigo")[$i];
-                $data["variacao"] = $this->request->input("variacao")[$i];
-                $data["valor_varejo"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_varejo")[$i]));
-                $data["valor_atacado"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_atacado_10un")[$i]));
-                $data["valor_atacado_10un"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_atacado_10un")[$i]));
-                $data["valor_produto"] = $formatter->parse(str_replace(['R$', ' '], '', $this->request->input("valor_produto")[$i]));
-                $data["quantidade"] = $this->request->input("quantidade")[$i];
-                $data["quantidade_minima"] = $this->request->input("quantidade_minima")[$i];
-                //se o status do Pai for INATIVO (0), seta 0 para os filhos
-                $data["status"] = $this->request->input("status") == 0 ? 0 : $this->request->input("status_variacao")[$i];
-                $data["percentage"] = $formatter->parse($this->request->input("percentage")[$i]);
-                $data["validade"] = $formattedDate;
-                $data["fornecedor"] = $this->request->input("fornecedor")[$i];
-                $data["estoque"] = $this->request->input("estoque")[$i];
-                $data["gtin"] = $this->request->input("gtin")[$i];
-
-                /**
-                 * Cria ou Atualiza a variação do produto
-                 */
-                $matchThese = array('id' => $this->request->input("variacao_id")[$i]);
-                $controle = ProdutoVariation::updateOrCreate($matchThese, $data);
-               // dd($controle->valor_varejo);
-
-                /**
-                 *Salva a movimentação do estoque
-                 */
-                $this->movimentacaoEntrada($controle);
-            }
-
-        } catch (Throwable $e) {
-            return Response::json(array('success' => false, 'message' => $e->getMessage(), 'cod_retorno' => 500), 500);
+            } catch (Throwable $e) {
+            throw new \Exception("Erro em salvarVariacoes: " . $e->getMessage(), 500, $e);
         }
-        return Response::json(array('success' => true, 'message' => $msg), 201);
     }
+
+    /**
+     *  Registrar movimentação de estoque
+     * @param $data
+     * @throws \Exception
+     */
+    private function registrarMovimentacaoEstoque(array $data): void
+    {
+        try {
+            $variacao = ProdutoVariation::find($data["variacao_id"]);
+
+            $dataMovimentacao["variacao_id"] = $variacao->id;
+            $dataMovimentacao["antes"] = $variacao ? $variacao->quantidade : 0;
+            $dataMovimentacao["movimentada"] = $data["quantidade"] - $dataMovimentacao["antes"];
+            $dataMovimentacao["depois"] = $dataMovimentacao["antes"] + $dataMovimentacao["movimentada"];
+            $dataMovimentacao["quantidade"] = $dataMovimentacao["movimentada"];
+
+            $this->movimentacaoEntrada($dataMovimentacao);
+        } catch (Throwable $e) {
+            throw new \Exception("Erro em registrarMovimentacaoEstoque: " . $e->getMessage(), 500, $e);
+        }
+    }
+
 
     /**
      * Display the specified resource.

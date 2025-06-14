@@ -16,6 +16,8 @@ class LojaMovimentacoesEstoqueTable extends Migration
         Schema::create('loja_movimentacoes_estoque', function (Blueprint $table) {
             $table->id();
 
+            $table->enum('tipo', ['saida', 'entrada']);
+
             // Correção do nome da tabela de variações
             $table->unsignedBigInteger('variacao_id')->nullable();
             $table->foreign('variacao_id')
@@ -25,8 +27,10 @@ class LojaMovimentacoesEstoqueTable extends Migration
             $table->foreign('venda_id')
                   ->references('id')->on('loja_vendas')->onDelete('set null');
 
-            $table->enum('tipo', ['saida', 'entrada']);
-            $table->integer('quantidade');
+            $table->integer('quantidade_antes');
+            $table->integer('quantidade_movimentada');
+            $table->integer('quantidade_depois');
+
             $table->string('motivo')->nullable();
             $table->timestamps();
         });

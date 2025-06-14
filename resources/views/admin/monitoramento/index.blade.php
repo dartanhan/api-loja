@@ -18,12 +18,12 @@
                 </div>
                 <div class="card-body">
                     <form method="GET" id="formFiltro" action="{{ route('monitoramento.index') }}" class="row g-3 mb-4">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="data" class="form-label">Período</label>
                             <input type="text" name="data_range" id="data_range" class="form-control"
                                    value="{{ request('data_range') }}" autocomplete="off">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="tipo" class="form-label">Tipo</label>
                             <select name="tipo" id="tipo" class="form-control">
                                 <option value="">Todos</option>
@@ -31,7 +31,7 @@
                                 <option value="saida" {{ ($filtros['tipo'] ?? '') == 'saida' ? 'selected' : '' }}>Saída</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label for="codigo" class="form-label">Subcódigo da Variação</label>
                             <input type="text" name="codigo" class="form-control" value="{{ $filtros['codigo'] ?? '' }}">
                         </div>
@@ -61,7 +61,7 @@
                                 <th>PRODUTO</th>
                                 <th>VARIAÇÃO</th>
                                 <th>SUBCÓDIGO</th>
-                                <th>QTD SAIDA</th>
+                                <th>QTD SAIDA/ENTRADA</th>
                                 <th>MOTIVO</th>
                                 <th>Ações</th>
                             </tr>
@@ -100,8 +100,7 @@
                             @endforelse
                         </tbody>
                     </table>
-
-                {{ $movimentacoes->withQueryString()->links() }}
+                {{ $movimentacoes->withQueryString()->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>
@@ -114,7 +113,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="conteudoHistorico" class="table-responsive">
+                    <div id="conteudoHistorico" class="table-responsive" >
                         <p>Carregando...</p>
                     </div>
                 </div>
@@ -165,6 +164,12 @@
                 $(this).addClass('disabled');
             });
 
+            document.addEventListener('DOMContentLoaded', () => {
+                const maxAltura = window.innerHeight * 0.6; // 60% da altura da tela
+                const conteudo = document.getElementById('conteudoHistorico');
+                conteudo.style.maxHeight = `${maxAltura}px`;
+                conteudo.style.overflowY = 'auto';
+            });
         });
 
         function carregarHistorico(subcodigo, produto) {
@@ -183,24 +188,26 @@
                     $('#conteudoHistorico').html('<p>Nenhuma movimentação encontrada.</p>');
                 } else {
                     let tabela = `<table class="table table-hover table-striped table-sm">
-                <thead class="table-dark text-uppercase text-monospace text-center" style="font-size: small"><tr>
-                    <th>Data</th>
-                    <th>Tipo</th>
-                    <th>Qtd Atual</th>
-                    <th>Qtd Saida/Entrada</th>
-                    <th>Motivo</th>
-                    <th>Venda</th>
-                </tr></thead><tbody class="text-uppercase text-monospace text-center" style="font-size: small">`;
+                    <thead class="table-dark text-uppercase text-monospace text-center align-middle" style="font-size: small;"><tr>
+                        <th class="text-center align-middle">Data</th>
+                        <th class="text-center align-middle">Tipo</th>
+                        <th class="text-center align-middle">Qtd. Antes</th>
+                        <th class="text-center align-middle">Qtd. Movimentada</th>
+                        <th class="text-center align-middle">Qtd. Depois</th>
+                        <th class="text-center align-middle">Motivo</th>
+                        <th class="text-center align-middle">Venda</th>
+                    </tr></thead><tbody class="text-uppercase text-monospace text-center" style="font-size: small">`;
 
-                    data.forEach(item => {
-                        tabela += `<tr>
-                    <td>${formatarData(item.created_at)}</td>
-                    <td><span class="badge bg-${item.tipo === 'entrada' ? 'success' : 'danger'}">${item.tipo}</span></td>
-                    <td>${item.variacao.quantidade}</td>
-                    <td>${item.quantidade}</td>
-                    <td>${item.motivo ?? '-'}</td>
-                    <td>${item.venda?.codigo_venda ?? '-'}</td>
-                </tr>`;
+                        data.forEach(item => {
+                            tabela += `<tr>
+                        <td>${formatarData(item.created_at)}</td>
+                        <td><span class="badge bg-${item.tipo === 'entrada' ? 'success' : 'danger'}">${item.tipo}</span></td>
+                        <td>${item.quantidade_antes}</td>
+                        <td>${item.quantidade_movimentada}</td>
+                        <td>${item.quantidade_depois}</td>
+                        <td>${item.motivo ?? '-'}</td>
+                        <td>${item.venda?.codigo_venda ?? '-'}</td>
+                    </tr>`;
                     });
 
                     tabela += '</tbody></table>';
@@ -220,4 +227,5 @@
 @push("styles")
     <!-- Daterangepicker CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <style></style>
 @endpush
