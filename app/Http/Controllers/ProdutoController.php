@@ -104,7 +104,7 @@ class ProdutoController extends Controller
                 )->from('loja_produtos_new as lpn')
                 ->where('lpn.status', 1) //somente ativos
                 ->groupBy('lpn.id')
-                ->orderBy('lpn.id', 'DESC');
+                ->orderBy('lpn.id', 'DESC')->limit(10);
 
             if (!empty($query)) {
                 return DataTables::of($query)->make(true);
@@ -350,10 +350,10 @@ class ProdutoController extends Controller
                         "status" => $statusVariacao,
                         "percentage" => $percentage,
                         "validade" => $validade,
-                        "fornecedor" => $this->request->input("fornecedor")[$i],
-                        "estoque" => $this->request->input("estoque")[$i],
+                        "fornecedor" => (int)$this->request->input("fornecedor")[$i],
+                        "estoque" => (int)$this->request->input("estoque")[$i],
                         "gtin" => $this->request->input("gtin")[$i],
-                        "variacao_id" => $this->request->input("variacao_id")[$i],
+                        "variacao_id" => (int)$this->request->input("variacao_id")[$i],
                     ];
 
                     $this->registrarMovimentacaoEstoque($data);
@@ -370,10 +370,15 @@ class ProdutoController extends Controller
      * @param $data
      * @throws \Exception
      */
-    private function registrarMovimentacaoEstoque(array $data): void
+    private function registrarMovimentacaoEstoque(array $data): \Exception
     {
         try {
+
             $variacao = ProdutoVariation::find($data["variacao_id"]);
+
+            if (!$variacao){
+                throw new \Exception("Variação com ID {$data["variacao_id"]} não encontrada.");
+            }
 
             $dataMovimentacao["variacao_id"] = $variacao->id;
             $dataMovimentacao["antes"] = $variacao ? $variacao->quantidade : 0;
