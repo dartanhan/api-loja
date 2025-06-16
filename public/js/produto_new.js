@@ -690,11 +690,12 @@ $(function() {
     });
 
     /**
-     * Busac os Fornecedores
+     * Busca os Fornecedores no localStorage
      * */
     let fnc_fornecedor = async function(name,value){
-       // localStorage.clear();
-        /*if(localStorage.getItem("data-suppliers") !== null){
+       // console.log("aquii >>>> " + localStorage.getItem("data-suppliers"));
+        //pega do local, após qualquer mudança no fornecedor em fornecedor.js
+        if(localStorage.getItem("data-suppliers") !== null){
             let myArray = JSON.parse(localStorage.getItem("data-suppliers"));
            // console.log("localStorage");
             await Promise.all(myArray).then(valores=> {
@@ -708,7 +709,8 @@ $(function() {
                 });
             });
 
-        }else {*/
+        }
+        else {
               fetch(url + "/fornecedor/1")
                 .then(function (response) {
                     return response.json()
@@ -719,7 +721,7 @@ $(function() {
                     /**
                      * set local os dados do fornecedor para não ficar indo na api
                      */
-                 //   localStorage.setItem("data-suppliers", JSON.stringify(response));
+                    localStorage.setItem("data-suppliers", JSON.stringify(response));
                     $(name).append('<option value="">SELECIONE?</option>');
                     response.forEach(function (ret) {
                         //       console.log(ret.id +" - "+ value);
@@ -728,7 +730,7 @@ $(function() {
                         $(name).append("<option value=" + ret.id + " " + sel + ">" + ret.nome + "</option>");
                     });
                 });
-       // }
+        }
     }
     /**
      * Retorna os campos de variações do produto
@@ -960,7 +962,7 @@ $(function() {
                 $("#modal-title").addClass( "alert alert-info" );
             },*/
             success: function (response) {
-                // console.log(response);
+                 console.log(response);
                 if(response.success) {
                     sweetAlert({
                         title: "Sucesso!",
@@ -986,17 +988,33 @@ $(function() {
                     $('#btnLote').prop('disabled', false);
                     $('#btnSalvar').html("<i class=\"fas fa-check\"></i> Salvar");
                     code();
+                }else{
+                    sweetAlert({
+                        title: "Error!",
+                        text: response.message,
+                        icon: 'danger',
+                        showCloseButton: true,
+                    });
                 }
             },
-            error: function(response){
-                json = $.parseJSON(response.responseText);
-                //$("#modal-title").addClass( "alert alert-danger" );
-                $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
-                sweetAlert(
-                    'error!',
-                    json.message,
-                    'error'
-                )
+            error: function(xhr){
+                let json = {};
+                try {
+                    json = xhr.responseJSON ?? JSON.parse(xhr.responseText);
+                } catch (e) {
+                    console.error("Erro ao processar JSON de erro:", e);
+                    return;
+                }
+
+                console.error("Erro na requisição:", json);
+
+                $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + (json.message || 'Erro desconhecido') + '</strong></p>');
+
+                Swal.fire({
+                    title: 'Erro!',
+                    text: json.message || 'Ocorreu um erro inesperado.',
+                    icon: 'error'
+                });
             },
         });
     }

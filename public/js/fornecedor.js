@@ -136,7 +136,8 @@ $(document).ready(function() {
 
                 },
                 success: function(data) {
-                    console.log(data);
+                    // console.log(data);
+                    // console.log("passou aquiiiii");
 
                     if(data.success) {
                         swalWithBootstrapButtons.fire({
@@ -146,12 +147,28 @@ $(document).ready(function() {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        table.ajax.reload(null, false);
+
 
                         //usado para no combo de fornecedor não ficar indo sempre no banco buscar as informações
-                        localStorage.clear();
+                        fetch(urlApi + "/fornecedor/1")
+                             .then(function (response) {
+                                 return response.json()
+                             })
+                             .then(function (response){
+                                 //console.log(response);
+
+                                 // 🔥 Apaga cache antigo
+                                localStorage.removeItem("data-suppliers");
+
+                              // set local os dados do fornecedor para não ficar indo na api
+                                 localStorage.setItem("data-suppliers", JSON.stringify(response));
+
+                                 //console.log("localStorage >> " + localStorage.getItem("data-suppliers"));
+                            });
 
                     }
+
+                    table.ajax.reload(null, false);
                 },
                 error: function(data){
                     //console.log(data.responseText);
