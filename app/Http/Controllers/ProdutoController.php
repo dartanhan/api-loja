@@ -356,8 +356,20 @@ class ProdutoController extends Controller
                         "variacao_id" => (int)$this->request->input("variacao_id")[$i],
                     ];
 
-                    $this->registrarMovimentacaoEstoque($data);
-                    ProdutoVariation::updateOrCreate(['id' => $data["variacao_id"]], $data);
+                    $variationId = $this->request->input("variacao_id")[$i] ?? null;
+                    $variacaoExistente = ProdutoVariation::find($variationId); // retorna null se não existir
+                    $quantidadeAntes = $variacaoExistente ? $variacaoExistente->quantidade : 0;
+
+                    //array_push($var,  $this->registrarMovimentacaoEstoque($data));
+                    $variacao = ProdutoVariation::updateOrCreate(['id' => $data["variacao_id"]], $data);
+
+                    // Agora que temos a variação salva com ID e quantidade, registramos a movimentação
+                    // Movimentação
+                    $this->registrarMovimentacaoEstoque([
+                        "variacao_id" => $variacao->id,
+                        "quantidade" => $data["quantidade"],
+                        "antes" => $quantidadeAntes,
+                    ]);
                 }
 
             } catch (Throwable $e) {
@@ -370,27 +382,41 @@ class ProdutoController extends Controller
      * @param $data
      * @throws \Exception
      */
-    private function registrarMovimentacaoEstoque(array $data): \Exception
+    private function registrarMovimentacaoEstoque(array $data)
     {
         try {
-
             $variacao = ProdutoVariation::find($data["variacao_id"]);
-
-            if (!$variacao){
-                throw new \Exception("Variação com ID {$data["variacao_id"]} não encontrada.");
+            if (!$variacao) {
+                throw new \Exception("Variação não encontrada para ID " . $data["variacao_id"]);
             }
 
-            $dataMovimentacao["variacao_id"] = $variacao->id;
-            $dataMovimentacao["antes"] = $variacao ? $variacao->quantidade : 0;
-            $dataMovimentacao["movimentada"] = $data["quantidade"] - $dataMovimentacao["antes"];
-            $dataMovimentacao["depois"] = $dataMovimentacao["antes"] + $dataMovimentacao["movimentada"];
-            $dataMovimentacao["quantidade"] = $dataMovimentacao["movimentada"];
+            // Usa o valor passado ou assume 0
+            $antes = $data["antes"] ?? 0;
+            $depois = $data["quantidade"];
+            $movimentada = $depois - $antes;
+
+            $dataMovimentacao = [
+                "variacao_id" => $variacao->id,
+                "antes" => $antes,
+                "movimentada" => $movimentada,
+                "depois" => $depois,
+                "quantidade" => $movimentada,
+            ];
+
+//            $dataMovimentacao["variacao_id"] = $variacao->id;
+//            $dataMovimentacao["antes"] = $variacao ? $variacao->quantidade : 0;
+//            $dataMovimentacao["movimentada"] = $data["quantidade"] - $dataMovimentacao["antes"];
+//            $dataMovimentacao["depois"] = $dataMovimentacao["antes"] + $dataMovimentacao["movimentada"];
+//            $dataMovimentacao["quantidade"] = $dataMovimentacao["movimentada"];
 
             $this->movimentacaoEntrada($dataMovimentacao);
-        } catch (Throwable $e) {
+
+           // return $dataMovimentacao;
+        } catch (\Throwable $e) {
             throw new \Exception("Erro em registrarMovimentacaoEstoque: " . $e->getMessage(), 500, $e);
         }
     }
+
 
 
     /**

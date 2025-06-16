@@ -136,8 +136,8 @@ $(document).ready(function() {
 
                 },
                 success: function(data) {
-                    console.log(data);
-                    console.log("passou aquiiiii");
+                    // console.log(data);
+                    // console.log("passou aquiiiii");
 
                     if(data.success) {
                         swalWithBootstrapButtons.fire({

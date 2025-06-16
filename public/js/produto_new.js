@@ -710,27 +710,27 @@ $(function() {
             });
 
         }
-        // else {
-        //       fetch(url + "/fornecedor/1")
-        //         .then(function (response) {
-        //             return response.json()
-        //         })
-        //         .then(function (response) {
-        //          //    console.log("aqui2 >> " + value);
-        //            // console.log("fetch api");
-        //             /**
-        //              * set local os dados do fornecedor para não ficar indo na api
-        //              */
-        //             localStorage.setItem("data-suppliers", JSON.stringify(response));
-        //             $(name).append('<option value="">SELECIONE?</option>');
-        //             response.forEach(function (ret) {
-        //                 //       console.log(ret.id +" - "+ value);
-        //                 let sel = ret.id === value ? 'selected' : '';
-        //
-        //                 $(name).append("<option value=" + ret.id + " " + sel + ">" + ret.nome + "</option>");
-        //             });
-        //         });
-        // }
+        else {
+              fetch(url + "/fornecedor/1")
+                .then(function (response) {
+                    return response.json()
+                })
+                .then(function (response) {
+                 //    console.log("aqui2 >> " + value);
+                   // console.log("fetch api");
+                    /**
+                     * set local os dados do fornecedor para não ficar indo na api
+                     */
+                    localStorage.setItem("data-suppliers", JSON.stringify(response));
+                    $(name).append('<option value="">SELECIONE?</option>');
+                    response.forEach(function (ret) {
+                        //       console.log(ret.id +" - "+ value);
+                        let sel = ret.id === value ? 'selected' : '';
+
+                        $(name).append("<option value=" + ret.id + " " + sel + ">" + ret.nome + "</option>");
+                    });
+                });
+        }
     }
     /**
      * Retorna os campos de variações do produto
