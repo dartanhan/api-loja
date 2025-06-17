@@ -23,6 +23,7 @@ use App\Http\Models\VendasProdutosValorCartao;
 use App\Http\Models\VendasProdutosValorDupla;
 use App\Http\Models\VendasTroca;
 use App\Http\Models\MovimentacaoEstoque;
+use App\Service\VendaService;
 use App\Traits\MovimentacaoTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,6 +38,9 @@ use Throwable;
 class VendaController extends Controller
 {
     use MovimentacaoTrait;
+
+    protected VendaService $vendaService;
+
     protected VendasPdv $vendasPdv;
     protected VendasCashBackValor $cashBackValor;
     protected Cashback $cashback;
@@ -77,7 +81,8 @@ class VendaController extends Controller
                                 VendasProdutosEntrega $vendasProdutosEntrega,
                                 VendasProdutosTroca $vendasProdutosTroca,
                                 VendasTroca $vendasTroca,
-                                MovimentacaoEstoque $movimentacaoEstoque){
+                                MovimentacaoEstoque $movimentacaoEstoque,
+                                VendaService $vendaService){
         $this->request = $request;
         $this->product = $product;
         $this->vendas = $vendas;
@@ -98,6 +103,7 @@ class VendaController extends Controller
         $this->vendasProdutosTroca = $vendasProdutosTroca;
         $this->vendasTroca = $vendasTroca;
         $this->movimentacaoEstoque = $movimentacaoEstoque;
+        $this->vendaService = $vendaService;
     }
 
     /**
@@ -402,129 +408,37 @@ class VendaController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
+
     public function store(Request $request)
     {
-
         DB::beginTransaction();
 
         try {
             $dados = $request->all();
-            $variacao = "";
 
+            // Validação básica
             if (empty($dados['codigo_venda']) || empty($dados['loja_id']) || !isset($dados['produtos'])) {
                 throw new \Exception("Dados obrigatórios ausentes.");
             }
 
-            // Criando a venda
-            $venda = $this->vendas::create([
-                "codigo_venda" => $dados["codigo_venda"],
-                "loja_id" => $dados["loja_id"],
-                "valor_total" => $dados["valor_total"],
-                "cliente_id" => $dados["clienteModel"]["id"] != 0 ? $dados["clienteModel"]["id"] : null,
-                "usuario_id" => $dados["usuario_id"] ?? null,
-                "tipo_venda_id" => $dados["tipoEntregaCliente"],
-               "forma_entrega_id" => $dados["forma_entrega_id"],
-                "created_at" => $dados["data"],
-            ]);
+            // Cria a venda
+            $venda = $this->vendaService->criarVenda($dados);
 
             if (!$venda) {
                 throw new \Exception('Erro ao salvar a venda.');
             }
-            foreach ($dados["produtos"] as $produto) {
-                $produtoVenda = $this->vendasProdutos::create([
-                    "venda_id" => $venda->id,
-                    "codigo_produto" => $produto["codigo_produto"],
-                    "descricao" => $produto["descricao"],
-                    "valor_produto" => $produto["valor_produto"],
-                    "quantidade" => $produto["quantidade"],
-                    "troca" => $produto["troca"] ?? false,
-                    "fornecedor_id" => $produto["fornecedor_id"] ?? null,
-                    "categoria_id" => $produto["categoria_id"] ?? null,
-                    "variacao_id" => $produto["variacao_id"] ?? null
-                ]);
 
-                // Se for troca
-                if (!empty($produto['troca']) && !empty($dados['venda_id_original'])) {
+            // Processa produtos (incluindo baixa/entrada no estoque)
+            $this->vendaService->processarProdutosVenda($dados["produtos"], $venda, $dados);
 
-                    $troca = $this->vendasTroca::updateOrCreate(
-                        ['venda_id_original' => $dados['venda_id_original']],
-                        [
-                            'nova_venda_id' => $venda->id,
-                            'valor_total_troca' => $dados["valor_total"]
-                        ]
-                    );
+            // Pagamentos
+            $this->vendaService->processarPagamentos($dados["pagamentos"], $venda->id);
 
-                    $this->vendasProdutosTroca::create([
-                        "troca_id" => $troca->id,
-                        "produto_id" => $produtoVenda->id,
-                        "codigo_produto" => $produto["codigo_produto"],
-                        "descricao" => $produto["descricao"],
-                        "valor_produto" => $produto["valor_produto"],
-                        "quantidade" => $produto["quantidade"],
-                    ]);
+            // Desconto
+            $this->vendaService->registrarDesconto($dados["desconto"] ?? [], $venda->id);
 
-                    $this->vendasProdutos::where('venda_id', $dados['venda_id_original'])
-                        ->where('codigo_produto', $produto['codigo_produto'])
-                        ->update([
-                            'troca' => true,
-                            'descricao' => DB::raw("CONCAT(descricao, ' (Trocado)')")
-                        ]);
-
-                    // Repor no estoque o produto devolvido
-                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
-                    if ($variacao) {
-                        $variacao->increment('quantidade', $produto["quantidade"]);
-                    }
-                }else {
-                    // Baixa no estoque (Venda normal)
-                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
-                    $variacao->decrement('quantidade', $produto["quantidade"]);
-                }
-
-                /**
-                 *Salva a movimentação do estoque
-                 */
-                $data["antes"] = $variacao->quantidade;
-                $data["movimentada"] = $produto["quantidade"];
-                $data["depois"] =  $data["antes"] - $data["movimentada"];
-
-                $this->movimentacaoSaida($produto,$venda,$data);
-            }
-
-            // Processa pagamentos
-            foreach ($dados["pagamentos"] as $pagamento) {
-                $this->tipoPagamento::create([
-                    "venda_id" => $venda->id,
-                    "forma_pagamento_id" => $pagamento["id"],
-                    "valor_pgto" => $pagamento["valor_pagamento"],
-                    "taxa" => $this->buscaTaxa($pagamento["id"])
-                ]);
-            }
-
-            // Registra desconto
-            $this->vendasDescontos::create([
-                "venda_id" => $venda->id,
-                "valor_percentual" => $dados["desconto"]["percentual"] ?? 0,
-                "valor_recebido" => $dados["desconto"]["valor_recebido"] ?? 0,
-                "valor_desconto" => $dados["desconto"]["valor_desconto"] ?? 0,
-            ]);
-
-            // Registra cashback
-            if (!empty($dados["clienteModel"]["id"]) && $dados["clienteModel"]["id"] != 0) {
-                $cashbackUsado = $dados["clienteModel"]["cashback"] ?? 0;
-                if ($cashbackUsado > 0) {
-                    $this->cashbackVendas->where('cliente_id', $dados["clienteModel"]["id"])->update(['status' => 1]);
-                }
-
-                $valorCashback = ($venda->valor_total * 0.08)/100;
-                if ($valorCashback > 0) {
-                    $this->cashbackVendas->create([
-                        "cliente_id" => $venda->cliente_id,
-                        "venda_id" => $venda->id,
-                        "valor" => $valorCashback
-                    ]);
-                }
-            }
+            // Cashback
+            $this->vendaService->registrarCashback($dados["clienteModel"], $venda);
 
             DB::commit();
 
@@ -537,36 +451,182 @@ class VendaController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            // Tenta capturar código de erro SQL, se existir
-            $sqlErrorCode = null;
-            if (property_exists($e, 'errorInfo') && is_array($e->errorInfo) && isset($e->errorInfo[1])) {
-                $sqlErrorCode = $e->errorInfo[1]; // Código MySQL (ex: 1452)
-            } else {
-                $sqlErrorCode = $e->getCode(); // Pode retornar 0 ou um código genérico
-            }
+            $this->vendaService->logarErro($dados['codigo_venda'] ?? '', $e, $dados);
 
-            // Evita duplicidade de logs para o mesmo erro e venda
-            $jaExiste = $this->errorLogs
-                ->where('codigo_venda', $dados['codigo_venda'])
-                ->where('codigo_erro', $sqlErrorCode)
-                ->exists();
-
-            if (!$jaExiste) {
-                $this->errorLogs->create([
-                    'codigo_venda' => $dados['codigo_venda'] ?? null,
-                    'codigo_erro' => $sqlErrorCode,
-                    'mensagem'     => $e->getMessage(),
-                    'dados'        => json_encode($dados),
-                    'created_at'   => now(),
-                    'updated_at'   => now()
-                ]);
-            }
             return Response::json([
                 'success' => false,
                 'message' => 'Erro ao processar venda. O problema foi registrado.'
             ], 500);
         }
     }
+
+//    public function store(Request $request)
+//    {
+//
+//        DB::beginTransaction();
+//
+//        try {
+//            $dados = $request->all();
+//            $variacao = "";
+//
+//            if (empty($dados['codigo_venda']) || empty($dados['loja_id']) || !isset($dados['produtos'])) {
+//                throw new \Exception("Dados obrigatórios ausentes.");
+//            }
+//
+//            // Criando a venda
+//            $venda = $this->vendas::create([
+//                "codigo_venda" => $dados["codigo_venda"],
+//                "loja_id" => $dados["loja_id"],
+//                "valor_total" => $dados["valor_total"],
+//                "cliente_id" => $dados["clienteModel"]["id"] != 0 ? $dados["clienteModel"]["id"] : null,
+//                "usuario_id" => $dados["usuario_id"] ?? null,
+//                "tipo_venda_id" => $dados["tipoEntregaCliente"],
+//               "forma_entrega_id" => $dados["forma_entrega_id"],
+//                "created_at" => $dados["data"],
+//            ]);
+//
+//            if (!$venda) {
+//                throw new \Exception('Erro ao salvar a venda.');
+//            }
+//            foreach ($dados["produtos"] as $produto) {
+//                $produtoVenda = $this->vendasProdutos::create([
+//                    "venda_id" => $venda->id,
+//                    "codigo_produto" => $produto["codigo_produto"],
+//                    "descricao" => $produto["descricao"],
+//                    "valor_produto" => $produto["valor_produto"],
+//                    "quantidade" => $produto["quantidade"],
+//                    "troca" => $produto["troca"] ?? false,
+//                    "fornecedor_id" => $produto["fornecedor_id"] ?? null,
+//                    "categoria_id" => $produto["categoria_id"] ?? null,
+//                    "variacao_id" => $produto["variacao_id"] ?? null
+//                ]);
+//
+//                // Se for troca
+//                if (!empty($produto['troca']) && !empty($dados['venda_id_original'])) {
+//
+//                    $troca = $this->vendasTroca::updateOrCreate(
+//                        ['venda_id_original' => $dados['venda_id_original']],
+//                        [
+//                            'nova_venda_id' => $venda->id,
+//                            'valor_total_troca' => $dados["valor_total"]
+//                        ]
+//                    );
+//
+//                    $this->vendasProdutosTroca::create([
+//                        "troca_id" => $troca->id,
+//                        "produto_id" => $produtoVenda->id,
+//                        "codigo_produto" => $produto["codigo_produto"],
+//                        "descricao" => $produto["descricao"],
+//                        "valor_produto" => $produto["valor_produto"],
+//                        "quantidade" => $produto["quantidade"],
+//                    ]);
+//
+//                    $this->vendasProdutos::where('venda_id', $dados['venda_id_original'])
+//                        ->where('codigo_produto', $produto['codigo_produto'])
+//                        ->update([
+//                            'troca' => true,
+//                            'descricao' => DB::raw("CONCAT(descricao, ' (Trocado)')")
+//                        ]);
+//
+//                    // Repor no estoque o produto devolvido
+//                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
+//                    $data["antes"] = $variacao->quantidade;
+//                    if ($variacao) {
+//                        $variacao->increment('quantidade', $produto["quantidade"]);
+//                    }
+//                }else {
+//                    // Baixa no estoque (Venda normal)
+//                    $variacao = $this->productVariation::where('id', $produto["variacao_id"])->first();
+//                    $data["antes"] = $variacao->quantidade;
+//                    $variacao->decrement('quantidade', $produto["quantidade"]);
+//                }
+//
+//                /**
+//                 *Salva a movimentação do estoque
+//                 */
+//                //$data["antes"] = $variacao->quantidade;
+//                $data["movimentada"] = $produto["quantidade"];
+//                $data["depois"] =  $data["antes"] - $data["movimentada"];
+//
+//                $this->movimentacaoSaida($produto,$venda,$data);
+//            }
+//
+//            // Processa pagamentos
+//            foreach ($dados["pagamentos"] as $pagamento) {
+//                $this->tipoPagamento::create([
+//                    "venda_id" => $venda->id,
+//                    "forma_pagamento_id" => $pagamento["id"],
+//                    "valor_pgto" => $pagamento["valor_pagamento"],
+//                    "taxa" => $this->buscaTaxa($pagamento["id"])
+//                ]);
+//            }
+//
+//            // Registra desconto
+//            $this->vendasDescontos::create([
+//                "venda_id" => $venda->id,
+//                "valor_percentual" => $dados["desconto"]["percentual"] ?? 0,
+//                "valor_recebido" => $dados["desconto"]["valor_recebido"] ?? 0,
+//                "valor_desconto" => $dados["desconto"]["valor_desconto"] ?? 0,
+//            ]);
+//
+//            // Registra cashback
+//            if (!empty($dados["clienteModel"]["id"]) && $dados["clienteModel"]["id"] != 0) {
+//                $cashbackUsado = $dados["clienteModel"]["cashback"] ?? 0;
+//                if ($cashbackUsado > 0) {
+//                    $this->cashbackVendas->where('cliente_id', $dados["clienteModel"]["id"])->update(['status' => 1]);
+//                }
+//
+//                $valorCashback = ($venda->valor_total * 0.08)/100;
+//                if ($valorCashback > 0) {
+//                    $this->cashbackVendas->create([
+//                        "cliente_id" => $venda->cliente_id,
+//                        "venda_id" => $venda->id,
+//                        "valor" => $valorCashback
+//                    ]);
+//                }
+//            }
+//
+//            DB::commit();
+//
+//            return response()->json([
+//                'success' => true,
+//                'message' => 'Venda registrada com sucesso.',
+//                'venda_id' => $venda->id
+//            ], 201);
+//
+//        } catch (\Throwable $e) {
+//            DB::rollBack();
+//
+//            // Tenta capturar código de erro SQL, se existir
+//            $sqlErrorCode = null;
+//            if (property_exists($e, 'errorInfo') && is_array($e->errorInfo) && isset($e->errorInfo[1])) {
+//                $sqlErrorCode = $e->errorInfo[1]; // Código MySQL (ex: 1452)
+//            } else {
+//                $sqlErrorCode = $e->getCode(); // Pode retornar 0 ou um código genérico
+//            }
+//
+//            // Evita duplicidade de logs para o mesmo erro e venda
+//            $jaExiste = $this->errorLogs
+//                ->where('codigo_venda', $dados['codigo_venda'])
+//                ->where('codigo_erro', $sqlErrorCode)
+//                ->exists();
+//
+//            if (!$jaExiste) {
+//                $this->errorLogs->create([
+//                    'codigo_venda' => $dados['codigo_venda'] ?? null,
+//                    'codigo_erro' => $sqlErrorCode,
+//                    'mensagem'     => $e->getMessage(),
+//                    'dados'        => json_encode($dados),
+//                    'created_at'   => now(),
+//                    'updated_at'   => now()
+//                ]);
+//            }
+//            return Response::json([
+//                'success' => false,
+//                'message' => 'Erro ao processar venda. O problema foi registrado.'
+//            ], 500);
+//        }
+//    }
 
     /**
      * Display the specified resource.

@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Http\Models\MovimentacaoEstoque;
+use Exception;
 use Illuminate\Support\Carbon;
 use Throwable;
 
@@ -9,11 +11,14 @@ trait MovimentacaoTrait
 {
     /**
      * salva a movimentacaoSaida
-     * @throws \Exception
+     * @param $produto
+     * @param $venda
+     * @param $data
+     * @throws Exception
      */
     function movimentacaoSaida($produto, $venda,$data){
         try {
-            $this->movimentacaoEstoque::create([
+            MovimentacaoEstoque::create([
                 'variacao_id' => $produto["variacao_id"],
                 'venda_id' => $venda->id,
                 'tipo' => 'saida',
@@ -24,13 +29,13 @@ trait MovimentacaoTrait
                 'quantidade_depois' => $data["depois"]
             ]);
         } catch (Throwable $e) {
-            throw new \Exception("Erro em movimentacaoSaida: " . $e->getMessage(), 500, $e);
+            throw new Exception("Erro em movimentacaoSaida: " . $e->getMessage(), 500, $e);
         }
     }
 
     /**
      * salva a movimentacaoEntrada
-     * @throws \Exception
+     * @throws Exception
      */
     function movimentacaoEntrada($data){
         try {
@@ -46,7 +51,7 @@ trait MovimentacaoTrait
 
             $this->movimentacaoEstoque::create($save);
         } catch (Throwable $e) {
-            throw new \Exception("Erro em movimentacaoEntrada: " . $e->getMessage(), 500, $e);
+            throw new Exception("Erro em movimentacaoEntrada: " . $e->getMessage(), 500, $e);
         }
     }
 
@@ -74,7 +79,7 @@ trait MovimentacaoTrait
 
         try {
             return Carbon::createFromFormat('d/m/Y', $data)->format('Y-m-d');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }
