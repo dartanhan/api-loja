@@ -33,7 +33,7 @@ class MovimentacaoEstoqueController extends Controller
                 $query->whereDate('created_at', Carbon::today());
             })
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate(20);
 
         return view('admin.monitoramento.index', compact('movimentacoes', 'filtros'));
     }
