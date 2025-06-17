@@ -104,7 +104,7 @@ class ProdutoController extends Controller
                 )->from('loja_produtos_new as lpn')
                 ->where('lpn.status', 1) //somente ativos
                 ->groupBy('lpn.id')
-                ->orderBy('lpn.id', 'DESC')->limit(10);
+                ->orderBy('lpn.id', 'DESC');
 
             if (!empty($query)) {
                 return DataTables::of($query)->make(true);
@@ -116,7 +116,6 @@ class ProdutoController extends Controller
             return Response::json(['error' => $e->getMessage()], 500);
         }
     }
-
     /**
      * Store a newly created resource in storage.
      *
