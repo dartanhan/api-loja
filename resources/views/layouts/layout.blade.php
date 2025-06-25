@@ -9,22 +9,22 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>KN Cosméticos - Admin</title>
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap.css')}}">
-    <link href="{{URL::asset('css/dashboard/styles.css')}}" rel="stylesheet" />
-    <script src="{{URL::asset('assets/jquery/jquery-3.6.0.min.js')}}"></script>
-    <script src="{{URL::asset('assets/jquery/jquery.modal.min.js')}}"></script>
+    <link href="{{asset('css/dashboard/styles.css')}}" rel="stylesheet" />
+    <script src="{{asset('assets/jquery/jquery-3.6.0.min.js')}}"></script>
+    <script src="{{asset('assets/jquery/jquery.modal.min.js')}}"></script>
 {{--    <script src="{{URL::asset('assets/font-awesome/all.min.js')}}"></script>--}}
-    <script src="{{URL::asset('assets/bootstrap/js/popper.min.js')}}"></script>
-    <script src="{{URL::asset('assets/bootstrap/js/bootstrap.min.js')}}"></script>
-    <script src="{{URL::asset('js/bootstrap/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{URL::asset('assets/dashboard/js/scripts.js')}}"></script>
-    <script src="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
+    <script src="{{asset('assets/bootstrap/js/popper.min.js')}}"></script>
+    <script src="{{asset('assets/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{asset('js/bootstrap/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{asset('assets/dashboard/js/scripts.js')}}"></script>
+    <script src="{{asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
 
-    <link href="{{URL::asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
+    <link href="{{asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
-    <link href="{{URL::asset('assets/fontawesome-free-6.7.2-web/css/all.min.css')}}" rel="stylesheet" />
+    <link href="{{asset('assets/fontawesome-free-6.7.2-web/css/all.min.css')}}" rel="stylesheet" />
 
-    <script src="{{URL::asset('js/url.js')}}"></script>
+    <script src="{{asset('js/url.js')}}"></script>
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
     <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
@@ -32,11 +32,12 @@
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
 
     <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
-    <script src="{{URL::asset('js/chosen.jquery.js')}}"></script>
+    <script src="{{ asset('js/chosen.jquery.js') }}"></script>
 
 
     @stack("styles")
 
+    @livewireStyles
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -85,5 +86,8 @@
     </div>
 
     @stack("scripts")
+
+    @livewireScripts
+
 </body>
 </html>

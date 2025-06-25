@@ -79,6 +79,10 @@ class ProdutoController extends Controller
 
     }
 
+    public function produtos_livewire()
+    {
+        return view('admin.produtos.index');
+    }
     /**
      * Show the form for creating a new resource.
      *

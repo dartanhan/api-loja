@@ -1,4 +1,3 @@
-
 @extends('layouts.layout', ['page' => __('Produtos'), 'pageSlug' => 'product'])
 
 @section('menu')

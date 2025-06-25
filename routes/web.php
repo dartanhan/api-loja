@@ -13,8 +13,7 @@ use App\Http\Controllers\ReposicaoController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\MovimentacaoEstoqueController;
-
-
+use App\Http\Livewire\ProdutosVariacoes;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +52,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/produto/produtos-baixo-estoque', [ProdutoController::class, 'fornecedoresProdutosBaixoEstoque'])->name('produtos.baixo_estoque');
     Route::get('/produto/produtos-estourados', [ProdutoController::class, 'getProdutosEstourados']);
     Route::resource('produto','ProdutoController');
+    Route::resource('variacao','ProdutoVariacaoController');
+
+    Route::get('/produtos-livewire', [ProdutoController::class,'produtos_livewire'])->name('produtos.produtos_livewire');
+
 
     Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');
     Route::resource('produtoInativo','ProdutoInativoController');

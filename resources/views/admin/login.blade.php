@@ -2,10 +2,10 @@
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8">
-        <script src="{{URL::asset('assets/jquery/jquery-3.3.1.min.js')}}"></script>
-        <link href="{{URL::asset('assets/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
-        <script src="{{URL::asset('assets/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-        <link href="{{URL::asset('assets/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" id="bootstrap-css">
+        <script src="{{asset('assets/jquery/jquery-3.3.1.min.js')}}"></script>
+        <link href="{{asset('assets/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" id="bootstrap-css">
+        <script src="{{asset('assets/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+        <link href="{{asset('assets/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" id="bootstrap-css">
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <link rel="stylesheet"  type="text/css" href="{{URL::asset('css/custom-input-float.css')}}">
 

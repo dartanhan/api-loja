@@ -37,6 +37,11 @@
                 <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         @if( Auth::user()->is_admin)
+                            <a href="{{ route('produtos.produtos_livewire') }}" class="nav-link {{ request()->routeIs('produtos.produtos_livewire') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-box"></i>
+                                <p>Gerenciar Produtos</p>
+                            </a>
+
                             <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
                                 Produtos Ativos
