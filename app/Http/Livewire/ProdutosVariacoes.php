@@ -19,6 +19,8 @@ class ProdutosVariacoes extends Component
     protected $queryString = ['search'];
     public $variacoesCarregadas = [];
     public $loadingProdutoId = null;
+    public $loadingVariaId = null;
+
 
     public function updatingSearch()
     {
@@ -32,43 +34,49 @@ class ProdutosVariacoes extends Component
 
     public function toggleExpand($produtoId)
     {
-        $this->loadingProdutoId = $produtoId;
-
         if ($this->isExpanded($produtoId)) {
-            $this->expanded = array_values(array_diff($this->expanded, [$produtoId]));
+            $this->expanded = array_filter($this->expanded, fn($id) => $id != $produtoId);
         } else {
             $this->expanded[] = $produtoId;
 
-            if (!isset($this->variacoesCarregadas[$produtoId])) {
-                $this->variacoesCarregadas[$produtoId] = ProdutoVariation::where('products_id', $produtoId)
-                    ->where('status', 1)
-                    ->get();
-            }
+            // Sempre recarrega as variações ao expandir
+            $this->variacoesCarregadas[$produtoId] = ProdutoVariation::where('products_id', $produtoId)
+                ->where('status', 1)
+                ->get()
+                ->filter(); // Remove nulls, objetos vazios etc.
         }
-
-        $this->loadingProdutoId = null;
     }
 
     public function incrementar($variacaoId)
     {
+        $this->loadingVariaId = $variacaoId;
+
         $variacao = ProdutoVariation::findOrFail($variacaoId);
         $variacao->quantidade += 1;
         $variacao->save();
 
         $this->refreshVariacao($variacao);
+        $this->loadingVariaId = null;
     }
 
     public function decrementar($variacaoId)
     {
+        $this->loadingVariaId = $variacaoId;
+
         $variacao = ProdutoVariation::findOrFail($variacaoId);
         $variacao->quantidade = max(0, $variacao->quantidade - 1);
         $variacao->save();
 
         $this->refreshVariacao($variacao);
+        $this->loadingVariaId = null;
     }
 
     public function atualizarCampo($variacaoId, $campo, $valor)
     {
+        // Remove R$, pontos e substitui vírgula por ponto
+        $valor = str_replace(['R$', '.', ' '], '', $valor);
+        $valor = str_replace(',', '.', $valor);
+
         $variacao = ProdutoVariation::findOrFail($variacaoId);
         $variacao->$campo = $valor;
         $variacao->save();
@@ -88,20 +96,34 @@ class ProdutosVariacoes extends Component
 
     private function refreshVariacao($variacao)
     {
+        if (!$variacao || !isset($variacao->products_id)) return;
+
         $produtoId = $variacao->products_id;
 
         if (isset($this->variacoesCarregadas[$produtoId])) {
             $this->variacoesCarregadas[$produtoId] = ProdutoVariation::where('products_id', $produtoId)
                 ->where('status', 1)
-                ->get();
+                ->get()
+                ->filter();
         }
     }
 
     public function render()
     {
+        $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))
+            ->filter(); // remove termos vazios
+
         $produtos = Produto::where('status', 1)
-            ->where(function ($query) {
-                $query->where('descricao', 'like', "%{$this->search}%");
+            ->where(function ($query) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $query->where(function ($sub) use ($term) {
+                        $sub->whereRaw('UPPER(descricao) LIKE ?', ["%{$term}%"])
+                            ->orWhereHas('variacoes', function ($q) use ($term) {
+                                $q->whereRaw('UPPER(variacao) LIKE ?', ["%{$term}%"])
+                                    ->orWhereRaw('subcodigo LIKE ?', ["%{$term}%"]);
+                            });
+                    });
+                }
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
@@ -112,4 +134,5 @@ class ProdutosVariacoes extends Component
             'loadingProdutoId' => $this->loadingProdutoId
         ])->layout('layouts.layout');
     }
+
 }

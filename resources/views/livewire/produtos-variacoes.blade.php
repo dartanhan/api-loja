@@ -6,6 +6,10 @@
         <div class="mb-3">
             <input type="text" class="form-control" placeholder="Buscar por produto ou variação..."
                    wire:model.debounce.500ms="search">
+            <div wire:loading.delay class="text-center mt-3">
+                <span class="spinner-border text-primary" role="status"></span>
+                <span>Carregando dados...</span>
+            </div>
         </div>
 
         <table class="table table-bordered table-striped table-hover">
@@ -57,34 +61,52 @@
                 </tr>
 
                 @if($this->isExpanded($produto->id))
-                    @foreach($variacoesCarregadas[$produto->id] ?? [] as $variacao)
-                        <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
-                            <td colspan="5">
-                                <div class="row align-items-center px-3 py-2">
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control"
-                                               wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)"
-                                               value="{{ $variacao->variacao }}">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="input-group">
-                                            <button wire:click="decrementar({{ $variacao->id }})"
-                                                    wire:loading.attr="disabled"
-                                                    class="btn btn-outline-danger btn-sm">−</button>
-                                            <input type="text" class="form-control text-center" value="{{ $variacao->quantidade }}" readonly>
-                                            <button wire:click="incrementar({{ $variacao->id }})"
-                                                    wire:loading.attr="disabled"
-                                                    class="btn btn-outline-success btn-sm">+</button>
+                    @foreach($variacoesCarregadas[$produto->id] as $variacao)
+
+                        @if($variacao && is_object($variacao))
+                                <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
+                                    <td colspan="5">
+                                        <div class="row align-items-center px-3 py-2">
+                                            <div class="col-md-1 p-0">
+                                                <input type="text" class="form-control" value="{{ $variacao->subcodigo }}" disabled />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control"
+                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)"
+                                                       value="{{ $variacao->variacao }}">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="input-group">
+                                                    <!-- Botão de diminuir -->
+                                                    <button wire:click="decrementar({{ $variacao->id }})"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="decrementar({{ $variacao->id }})"
+                                                            class="btn btn-outline-danger btn-sm">
+                                                        <span wire:loading wire:target="decrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
+                                                        <span wire:loading.remove wire:target="decrementar({{ $variacao->id }})">−</span>
+                                                    </button>
+                                                    <input type="text" class="form-control text-center" value="{{ $variacao->quantidade }}" readonly>
+                                                    <!-- Botão de aumentar -->
+                                                    <button wire:click="incrementar({{ $variacao->id }})"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="incrementar({{ $variacao->id }})"
+                                                            class="btn btn-outline-success btn-sm">
+                                                        <span wire:loading wire:target="incrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
+                                                        <span wire:loading.remove wire:target="incrementar({{ $variacao->id }})">+</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text"
+                                                       class="form-control moeda"
+                                                       wire:model.defer="variacoesCarregadas.{{ $produto->id }}.{{ $loop->index }}.valor_varejo"
+                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)">
+
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control"
-                                               wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)"
-                                               value="{{ $variacao->valor_varejo }}">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                 @endif
             @endforeach
@@ -95,10 +117,6 @@
             {!! $produtos->links('vendor.pagination.bootstrap-4') !!}
         </div>
 
-        <div wire:loading.delay class="text-center mt-3">
-            <span class="spinner-border text-primary" role="status"></span>
-            <span>Carregando dados...</span>
-        </div>
     </div>
 
     <style>
@@ -122,3 +140,35 @@
         }
     </style>
 </div>
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.6.0"></script>
+    <script>
+        function iniciarMascarasMoeda() {
+            document.querySelectorAll('.moeda').forEach(el => {
+                if (!el.autoNumeric) {
+                    new AutoNumeric(el, {
+                        currencySymbol: 'R$ ',
+                        decimalCharacter: ',',
+                        digitGroupSeparator: '.',
+                        minimumValue: '0',
+                        decimalPlaces: 2,
+                        modifyValueOnWheel: false,
+                        rawValueDivisor: 100, // <- essa linha faz 5000 virar 50.00
+                        unformatOnSubmit: true
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', iniciarMascarasMoeda);
+
+        document.addEventListener('livewire:load', () => {
+            iniciarMascarasMoeda();
+
+            Livewire.hook('message.processed', () => {
+                iniciarMascarasMoeda();
+            });
+        });
+    </script>
+@endpush
+
