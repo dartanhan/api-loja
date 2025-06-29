@@ -153,7 +153,6 @@
                         minimumValue: '0',
                         decimalPlaces: 2,
                         modifyValueOnWheel: false,
-                        rawValueDivisor: 100, // <- essa linha faz 5000 virar 50.00
                         unformatOnSubmit: true
                     });
                 }

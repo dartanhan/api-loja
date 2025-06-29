@@ -110,6 +110,7 @@ class ProdutosVariacoes extends Component
 
     public function render()
     {
+
         $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))
             ->filter(); // remove termos vazios
 
