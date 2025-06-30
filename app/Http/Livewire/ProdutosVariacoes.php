@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Models\Categoria;
+use App\Http\Models\Fornecedor;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
 use Livewire\Component;
@@ -20,6 +22,17 @@ class ProdutosVariacoes extends Component
     public $variacoesCarregadas = [];
     public $loadingProdutoId = null;
     public $loadingVariaId = null;
+    public $fornecedores = [];
+    public $categorias = [];
+
+
+    protected $listeners = ['atualizarCampoValor'];
+
+    public function mount()
+    {
+        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->get();
+        $this->categorias = Categoria::select('id', 'nome')->where('status',1)->get();
+    }
 
 
     public function updatingSearch()
@@ -73,16 +86,28 @@ class ProdutosVariacoes extends Component
 
     public function atualizarCampo($variacaoId, $campo, $valor)
     {
-        // Remove R$, pontos e substitui vírgula por ponto
+        // Limpeza básica do valor
         $valor = str_replace(['R$', '.', ' '], '', $valor);
         $valor = str_replace(',', '.', $valor);
 
         $variacao = ProdutoVariation::findOrFail($variacaoId);
-        $variacao->$campo = $valor;
+
+        if ($campo === 'quantidade') {
+            $valor = (float) $valor;
+
+            // Ignora valores zerados ou negativos
+            if ($valor > 0) {
+                $variacao->quantidade += $valor;
+            }
+        } else {
+            $variacao->$campo = $valor;
+        }
+
         $variacao->save();
 
         $this->refreshVariacao($variacao);
     }
+
 
     public function sortBy($field)
     {
@@ -129,10 +154,13 @@ class ProdutosVariacoes extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
 
+
         return view('livewire.produtos-variacoes', [
             'produtos' => $produtos,
             'expanded' => $this->expanded,
-            'loadingProdutoId' => $this->loadingProdutoId
+            'loadingProdutoId' => $this->loadingProdutoId,
+            'fornecedores' => $this->fornecedores,
+            'categorias' => $this->categorias,
         ])->layout('layouts.layout');
     }
 

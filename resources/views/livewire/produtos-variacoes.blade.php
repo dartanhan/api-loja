@@ -61,51 +61,144 @@
                 </tr>
 
                 @if($this->isExpanded($produto->id))
-                    @foreach($variacoesCarregadas[$produto->id] as $variacao)
+
+                    @foreach($variacoesCarregadas[$produto->id] as $index => $variacao)
 
                         @if($variacao && is_object($variacao))
-                                <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
-                                    <td colspan="5">
-                                        <div class="row align-items-center px-3 py-2">
-                                            <div class="col-md-1 p-0">
-                                                <input type="text" class="form-control" value="{{ $variacao->subcodigo }}" disabled />
-                                            </div>
-                                            <div class="col-md-4">
-                                                <input type="text" class="form-control"
-                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)"
-                                                       value="{{ $variacao->variacao }}">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <div class="input-group">
-                                                    <!-- Botão de diminuir -->
-                                                    <button wire:click="decrementar({{ $variacao->id }})"
-                                                            wire:loading.attr="disabled"
-                                                            wire:target="decrementar({{ $variacao->id }})"
-                                                            class="btn btn-outline-danger btn-sm">
-                                                        <span wire:loading wire:target="decrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                        <span wire:loading.remove wire:target="decrementar({{ $variacao->id }})">−</span>
-                                                    </button>
-                                                    <input type="text" class="form-control text-center" value="{{ $variacao->quantidade }}" readonly>
-                                                    <!-- Botão de aumentar -->
-                                                    <button wire:click="incrementar({{ $variacao->id }})"
-                                                            wire:loading.attr="disabled"
-                                                            wire:target="incrementar({{ $variacao->id }})"
-                                                            class="btn btn-outline-success btn-sm">
-                                                        <span wire:loading wire:target="incrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                        <span wire:loading.remove wire:target="incrementar({{ $variacao->id }})">+</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <input type="text"
-                                                       class="form-control moeda"
-                                                       wire:model.defer="variacoesCarregadas.{{ $produto->id }}.{{ $loop->index }}.valor_varejo"
-                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)">
+                            <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
+                                <td colspan="12">
+                                    <div class="row align-items-start g-1 px-3 py-2">
 
+                                        {{-- Subcódigo --}}
+                                        <div class="col-md-1">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Subcód.</label>
+                                            @endif
+                                            <input type="text" class="form-control form-control-sm" value="{{ $variacao->subcodigo }}" disabled />
+                                        </div>
+
+                                        {{-- Variação --}}
+                                        <div class="col-md-3">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Variação</label>
+                                            @endif
+                                            <input type="text"
+                                                   class="form-control form-control-sm"
+                                                   value="{{ $variacao->variacao }}"
+                                                   wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)">
+                                        </div>
+
+                                        {{-- Quantidade com botões --}}
+                                        <div class="col-md-2">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Qtd.</label>
+                                            @endif
+                                            <div class="input-group input-group-sm">
+                                                <button wire:click="decrementar({{ $variacao->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="decrementar({{ $variacao->id }})"
+                                                        class="btn btn-outline-danger btn-sm">
+                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
+                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }})">−</span>
+                                                </button>
+
+                                                <input type="text"
+                                                       class="form-control text-center form-control-sm"
+                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
+                                                       value="{{ $variacao->quantidade }}">
+
+                                                <button wire:click="incrementar({{ $variacao->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="incrementar({{ $variacao->id }})"
+                                                        class="btn btn-outline-success btn-sm">
+                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
+                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }})">+</span>
+                                                </button>
                                             </div>
                                         </div>
+
+
+                                        {{-- Valor Unitário --}}
+                                        <div class="col-md-2">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Valor Varejo</label>
+                                            @endif
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">R$</span>
+                                                <input type="text"
+                                                       class="form-control moeda form-control-sm"
+                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)"
+                                                       value="{{ number_format($variacao->valor_varejo, 2, ',', '.') }}">
+                                            </div>
+                                        </div>
+
+                                        {{-- Valor Produto --}}
+                                        <div class="col-md-2">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Valor Produto</label>
+                                            @endif
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">R$</span>
+                                                <input type="text"
+                                                       class="form-control moeda form-control-sm"
+                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_produto', $event.target.value)"
+                                                       value="{{ number_format($variacao->valor_produto, 2, ',', '.') }}">
+                                            </div>
+                                        </div>
+
+                                        {{-- Fornecedor --}}
+                                        <div class="col-md-2">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Fornecedor</label>
+                                            @endif
+                                                <select class="form-select form-select-sm"
+                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor_id', $event.target.value)">
+                                                    <option value="">Selecione</option>
+                                                    @foreach($fornecedores as $fornecedor)
+                                                        <option value="{{ $fornecedor->id }}"
+                                                            {{ $fornecedor->id == $variacao->fornecedor ? 'selected' : '' }}>
+                                                            {{ strtoupper($fornecedor->nome) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                        </div>
+
+                                        {{-- Categoria --}}
+                                        <div class="col-md-2">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Categoria</label>
+                                            @endif
+                                            <select class="form-select form-select-sm"
+                                                    wire:change="atualizarCampo({{ $variacao->id }}, 'categoria_id', $event.target.value)">
+                                                <option value="">Selecione</option>
+                                                @foreach($categorias as $categoria)
+                                                    <option value="{{ $categoria['id']}}">
+                                                        {{ $categoria['nome'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        {{-- Ações --}}
+                                        <div class="col-md-1 text-center">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1 d-block">Ações</label>
+                                            @endif
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-outline-danger btn-sm" wire:click="excluirVariacao({{ $variacao->id }})" title="Excluir">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" wire:click="abrirFotos({{ $variacao->id }})" title="Fotos">
+                                                    <i class="fas fa-image"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </td>
                             </tr>
+
                         @endif
                     @endforeach
                 @endif
@@ -141,33 +234,26 @@
     </style>
 </div>
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.6.0"></script>
     <script>
-        function iniciarMascarasMoeda() {
-            document.querySelectorAll('.moeda').forEach(el => {
-                if (!el.autoNumeric) {
-                    new AutoNumeric(el, {
-                        currencySymbol: 'R$ ',
-                        decimalCharacter: ',',
-                        digitGroupSeparator: '.',
-                        minimumValue: '0',
-                        decimalPlaces: 2,
-                        modifyValueOnWheel: false,
-                        unformatOnSubmit: true
-                    });
-                }
+        $('.quantidade').mask('000000', { reverse: false });
+
+        function aplicarMascaraMoeda() {
+            $('.moeda').mask('R$ 000.000.000,00', {
+                reverse: true,
+                placeholder: 'R$ 0,00'
             });
         }
 
-        document.addEventListener('DOMContentLoaded', iniciarMascarasMoeda);
+        document.addEventListener("livewire:load", function () {
+            // Aplica na primeira renderização
+            aplicarMascaraMoeda();
 
-        document.addEventListener('livewire:load', () => {
-            iniciarMascarasMoeda();
-
+            // Reaplica após DOM ser atualizado por Livewire
             Livewire.hook('message.processed', () => {
-                iniciarMascarasMoeda();
+                aplicarMascaraMoeda();
             });
         });
     </script>
 @endpush
+
 

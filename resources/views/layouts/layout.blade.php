@@ -74,22 +74,24 @@
         </div>
     </div>
 
-    <script src="{{asset('assets/jquery/jquery-3.6.0.min.js')}}"></script>
-    <script src="{{asset('assets/jquery/jquery.modal.min.js')}}"></script>
-    <script src="{{asset('js/bootstrap/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{asset('assets/dashboard/js/scripts.js')}}"></script>
-    <script src="{{asset('assets/sweetalert2/dist/sweetalert2.min.js')}}"></script>
-    <script src="{{asset('js/url.js')}}"></script>
+    <script src="{{ asset('assets/jquery/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('assets/jquery/jquery.modal.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/dashboard/js/scripts.js') }}"></script>
+    <script src="{{ asset('assets/sweetalert2/dist/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('js/url.js') }}"></script>
+
+    <!-- Filepond plugins -->
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
     <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
-
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
-    <script src="{{ asset('js/chosen.jquery.js') }}"></script>
 
+    <!-- Chosen + jQuery Mask -->
+    <script src="{{ asset('js/chosen.jquery.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
     @livewireScripts
-
     @stack("scripts")
 
 </body>
