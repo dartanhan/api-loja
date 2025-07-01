@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use App\Http\Models\ProdutoVariation;
 
@@ -40,4 +41,13 @@ class ProdutoVariacaoController extends Controller
 
         return redirect()->back()->with('success', 'Variação atualizada com sucesso!');
     }
+
+
+    public function edit(ProdutoVariation $variacao)
+    {
+        return view('admin.produtos.editar', [
+            'produtoId' => $variacao->id
+        ]);
+    }
+
 }

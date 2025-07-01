@@ -51,7 +51,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/indexNew',[ProdutoController::class,'index'])->name('produto.indexNew');
     Route::get('/produto/produtos-baixo-estoque', [ProdutoController::class, 'fornecedoresProdutosBaixoEstoque'])->name('produtos.baixo_estoque');
     Route::get('/produto/produtos-estourados', [ProdutoController::class, 'getProdutosEstourados']);
+
     Route::resource('produto','ProdutoController');
+
     Route::resource('variacao','ProdutoVariacaoController');
 
     Route::get('/produtos-livewire', [ProdutoController::class,'produtos_livewire'])->name('produtos.produtos_livewire');

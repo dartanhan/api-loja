@@ -442,12 +442,12 @@ class ProdutoController extends Controller
     /**
      * Retorna os produtos inativos
      *
-     * @param int $id
+     * @param Produto $produto
      * @return void
      */
-    public function edit($id)
+    public function edit(Produto $produto)
     {
-
+      //
     }
 
     /**
