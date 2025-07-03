@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    <div class="container mt-4">
+    <div class="container-fluid mt-4">
         <h4>Editar Produto</h4>
         @livewire('produto-editar', ['produto' => $produtoId])
     </div>

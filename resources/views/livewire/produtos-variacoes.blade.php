@@ -1,5 +1,5 @@
 <div xmlns:wire="http://www.w3.org/1999/xhtml">
-    <div class="container mt-4">
+    <div class="container-fluid mt-4">
         <h4>Gerenciar Produtos e Variações</h4>
 
         <!-- Campo de busca -->
@@ -78,7 +78,7 @@
                                         </div>
 
                                         {{-- Variação --}}
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Variação</label>
                                             @endif
@@ -177,7 +177,7 @@
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Fornecedor</label>
                                             @endif
-                                                <select class="form-select form-select-sm"
+                                                <select class="form-select form-select-sm {{ $variacao->status == 0 ? 'bg-warning' : '' }}"
                                                         wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor_id', $event.target.value)">
                                                     <option value="">Selecione</option>
                                                     @foreach($fornecedores as $fornecedor)
@@ -189,21 +189,17 @@
                                                 </select>
                                         </div>
 
-                                        {{-- Categoria --}}
-{{--                                        <div class="col-md-2">--}}
-{{--                                            @if ($loop->first)--}}
-{{--                                                <label class="form-label form-label-sm mb-1">Categoria</label>--}}
-{{--                                            @endif--}}
-{{--                                            <select class="form-select form-select-sm"--}}
-{{--                                                    wire:change="atualizarCampo({{ $variacao->id }}, 'categoria_id', $event.target.value)">--}}
-{{--                                                <option value="">Selecione</option>--}}
-{{--                                                @foreach($categorias as $categoria)--}}
-{{--                                                    <option value="{{ $categoria['id']}}">--}}
-{{--                                                        {{ $categoria['nome'] }}--}}
-{{--                                                    </option>--}}
-{{--                                                @endforeach--}}
-{{--                                            </select>--}}
-{{--                                        </div>--}}
+
+                                        <div class="col-md-1">
+                                            @if ($loop->first)
+                                                <label class="form-label form-label-sm mb-1">Status</label>
+                                            @endif
+                                                <select class="form-select form-select-sm "
+                                                        wire:change="atualizarCampo({{ $variacao->id}}, 'status', $event.target.value)">
+                                                    <option value="1" {{ $variacao->status == 1 ? 'selected' : '' }}>Ativo</option>
+                                                    <option value="0" {{ $variacao->status == 0 ? 'selected' : '' }}>Inativo</option>
+                                                </select>
+                                        </div>
 
                                         {{-- Ações --}}
                                         <div class="col-md-1 text-end">
