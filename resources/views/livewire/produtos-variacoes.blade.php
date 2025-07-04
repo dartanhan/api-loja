@@ -207,12 +207,17 @@
                                                 <label class="form-label form-label-sm mb-1 d-block">Ações</label>
                                             @endif
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('variacao.edit', ['variacao' => $variacao->id]) }}"
-                                                   class="btn btn-outline-primary btn-sm"
-                                                   title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-
+                                                <button class="btn btn-outline-primary btn-sm"
+                                                        wire:click="editarVariacao({{ $variacao->id }})"
+                                                        wire:loading.attr="disabled"
+                                                        title="Editar">
+                                                        <span wire:loading.remove wire:target="editarVariacao({{ $variacao->id }})">
+                                                            <i class="fas fa-edit"></i>
+                                                        </span>
+                                                            <span wire:loading wire:target="editarVariacao({{ $variacao->id }})">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                        </span>
+                                                </button>
                                             </div>
                                         </div>
 

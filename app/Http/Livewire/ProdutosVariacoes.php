@@ -6,6 +6,8 @@ use App\Http\Models\Categoria;
 use App\Http\Models\Fornecedor;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -131,6 +133,16 @@ class ProdutosVariacoes extends Component
                 ->get()
                 ->filter();
         }
+    }
+
+    /**
+     * Redireciona para  tela de editar a variação
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function editarVariacao($id)
+    {
+        return Redirect::route('variacao.edit', ['variacao' => $id]);
     }
 
     public function render()

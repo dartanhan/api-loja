@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Models\OrigemNfce;
+use Illuminate\Support\Carbon;
 use Livewire\Component;
 
 use App\Http\Models\Produto;
@@ -15,6 +17,8 @@ class ProdutoEditar extends Component
     public $produto;
     public $variacoes = [];
     public $fornecedores = [];
+    public $categorias = [];
+    public $origem_nfces =[];
     public $codigoPai; // nova propriedade
     public $produtoId;
 
@@ -31,16 +35,22 @@ class ProdutoEditar extends Component
                 'subcodigo' => $produto->subcodigo,
                 'variacao' => $produto->variacao,
                 'quantidade' => $produto->quantidade,
-                'valor_varejo' => $produto->valor_varejo,
-                'valor_produto' => $produto->valor_produto,
+                'valor_varejo' => number_format($produto->valor_varejo, 2, ',', '.'),
+                'valor_produto' => number_format($produto->valor_produto, 2, ',', '.'),
+                'gtin' => $produto->gtin,
+                'estoque' => $produto->estoque,
+                'quantidade_minima' => $produto->quantidade_minima,
+                'percentage' => number_format($produto->percentage, 2, ',', '.'),
+                'validade' => Carbon::parse($produto->validade)->format('d/m/Y'),
                 'fornecedor_id' => $produto->fornecedor ??  $this->produto->fornecedor_id ?? null, // ← ajustado aqui
             ]
         ];
 
-        $this->fornecedores = Fornecedor::select('id', 'nome')
-            ->where('status', 1)
-            ->get()
-            ->toArray();
+        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status', 1)->get()->toArray();
+
+        $this->categorias = Categoria::select('id', 'nome')->where('status', 1)->get();
+
+        $this->origem_nfces = OrigemNfce::get();
     }
 
 
@@ -83,6 +93,7 @@ class ProdutoEditar extends Component
             'quantidade' => 0,
             'valor_varejo' => '',
             'valor_produto' => '',
+            'gtin' => '',
             'fornecedor_id' => $produto->fornecedor ?? null, // ← aqui também
         ];
     }
@@ -108,6 +119,10 @@ class ProdutoEditar extends Component
         // Salva o produto pai
         $produto = Produto::findOrFail($this->produtoId);
         $produto->descricao = $this->produto['descricao'] ?? '';
+        $produto->ncm = $this->produto['ncm'] ?? 0;
+        $produto->cest = $this->produto['cest'] ?? 0;
+        $produto->origem_id = $this->produto['origem_id'] ?? 0;
+        $produto->categoria_id = $this->produto['categoria_id'] ?? 0;
         $produto->status = $this->produto['status'] ?? 0;
         $produto->save();
 
@@ -126,6 +141,18 @@ class ProdutoEditar extends Component
                 $variacao->valor_varejo = $dados['valor_varejo'] ?? 0;
                 $variacao->valor_produto = $dados['valor_produto'] ?? 0;
                 $variacao->fornecedor = $dados['fornecedor_id'] ?? null;
+                $variacao->gtin = $dados['gtin'] ?? 0;
+                $variacao->estoque = $dados['estoque'] ?? 0;
+                $variacao->quantidade_minima = $dados['quantidade_minima'] ?? 0;
+                $variacao->percentage = $dados['percentage'] ?? 0;
+
+                if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dados['validade'])) {
+                    $variacao->validade = Carbon::createFromFormat('d/m/Y', $dados['validade'])->format('Y-m-d');
+                } else {
+                    $variacao->validade = '0000-00-00';
+                }
+
+
                 $variacao->save();
             }
         }
