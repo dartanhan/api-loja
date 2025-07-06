@@ -11,10 +11,6 @@
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap.css')}}">
     <link href="{{asset('css/dashboard/styles.css')}}" rel="stylesheet" />
 
-{{--    <script src="{{asset('assets/bootstrap/js/popper.min.js')}}"></script>--}}
-{{--    <script src="{{asset('assets/bootstrap/js/bootstrap.min.js')}}"></script>--}}
-
-
     <link href="{{asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
@@ -76,7 +72,7 @@
 
     <script src="{{ asset('assets/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.modal.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/dashboard/js/scripts.js') }}"></script>
     <script src="{{ asset('assets/sweetalert2/dist/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('js/url.js') }}"></script>
@@ -93,6 +89,10 @@
 
     @livewireScripts
     @stack("scripts")
-
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 </body>
 </html>

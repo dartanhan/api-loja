@@ -3,7 +3,11 @@
 namespace App\Http\Livewire;
 
 use App\Http\Models\OrigemNfce;
+use App\Http\Models\ProdutoImagem;
+use App\Http\Models\TemporaryFile;
+use http\Client\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 use App\Http\Models\Produto;
@@ -21,6 +25,10 @@ class ProdutoEditar extends Component
     public $origem_nfces =[];
     public $codigoPai; // nova propriedade
     public $produtoId;
+    public $imagens = [];
+    public array $pastasImagens = [];
+
+    protected $listeners = ['setPastasImagens', 'salvar'];
 
     public function mount(ProdutoVariation $produto)
     {
@@ -28,6 +36,7 @@ class ProdutoEditar extends Component
         $this->produto = $produto->produtoPai->toArray();// acessa o pai pela relação
         $this->produtoId = $this->produto['id'];
         $this->codigoPai = $this->produto['codigo_produto'] ?? '0000';
+        $this->imagens = $produto->images; // Ajuste conforme relacionamento
 
         $this->variacoes = [
             [
@@ -42,7 +51,8 @@ class ProdutoEditar extends Component
                 'quantidade_minima' => $produto->quantidade_minima,
                 'percentage' => number_format($produto->percentage, 2, ',', '.'),
                 'validade' => Carbon::parse($produto->validade)->format('d/m/Y'),
-                'fornecedor_id' => $produto->fornecedor ??  $this->produto->fornecedor_id ?? null, // ← ajustado aqui
+                'fornecedor_id' => $produto->fornecedor ??  $this->produto->fornecedor_id ?? null,
+                'status' => $produto->status
             ]
         ];
 
@@ -95,6 +105,7 @@ class ProdutoEditar extends Component
             'valor_produto' => '',
             'gtin' => '',
             'fornecedor_id' => $produto->fornecedor ?? null, // ← aqui também
+            'status' => null
         ];
     }
 
@@ -157,8 +168,69 @@ class ProdutoEditar extends Component
             }
         }
 
+        // Após salvar o produto e variações...
+        foreach ($this->pastasImagens as $folder) {
+            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
+
+            if ($temporaryFile && Storage::exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
+                $file = $temporaryFile->file;
+                $pathTemp = 'tmp/' . $folder . '/' . $file;
+                $produtoVariacaoId = $this->variacoes[0]['id']; // ou conforme o loop se tiver várias
+                $pathFinal = 'produtos/' . $produtoVariacaoId . '/' . $file;
+
+                // Move
+                Storage::makeDirectory('produtos/' . $produtoVariacaoId);
+                Storage::move($pathTemp, $pathFinal);
+
+                // Cria imagem associada ao produto ou variação (ajuste se for produto_id)
+                ProdutoImagem::create([
+                    'produto_variacao_id' => $this->variacoes[0]['id'], // ou ajuste para loop se forem várias
+                    'path' => $pathFinal,
+                    'produto_id' => null
+                ]);
+
+                // Limpa temporário
+                Storage::deleteDirectory('tmp/' . $folder);
+                $temporaryFile->delete();
+            }
+        }
+
         session()->flash('success', 'Produto e variações atualizados com sucesso!');
     }
+
+    public function setPastasImagens($pastas)
+    {
+        $this->pastasImagens = $pastas ?? [];
+    }
+
+    public function uploadImagem(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('produtos/' . $this->produto->id, 'public');
+
+            // Salvar no banco se desejar
+            $this->produto->imagens()->create([
+                'caminho' => $path
+            ]);
+
+            return response()->json(['path' => $path], 200);
+        }
+
+        return response()->json(['error' => 'Nenhum arquivo enviado'], 400);
+    }
+
+    public function deletarImagem($imagemId)
+    {
+        $imagem = ProdutoImagem::find($imagemId);
+
+        if ($imagem && Storage::disk('public')->exists($imagem->path)) {
+            Storage::disk('public')->delete($imagem->path);
+            $imagem->delete();
+            //carregue o produto novamente com findOrFail (ou find) antes de acessar
+            $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
+        }
+    }
+
 
     public function render()
     {

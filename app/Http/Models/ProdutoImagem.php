@@ -17,7 +17,7 @@ class ProdutoImagem extends Model implements Auditable
     public $table = 'loja_produtos_imagens';
     protected $fillable = ['produto_variacao_id','path','produto_id'];
 
-    public function images() {
-        return $this->belongsTo(ProdutoImagem::class);
-    }
+//    public function images() {
+//        return $this->belongsTo(ProdutoImagem::class);
+//    }
 }
