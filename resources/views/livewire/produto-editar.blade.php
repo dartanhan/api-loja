@@ -41,29 +41,29 @@
             <div class="mt-2 p-2">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+                        <button class="nav-link active" id="tab-geral" data-toggle="tab" data-target="#aba-geral" type="button" role="tab" aria-controls="geral" aria-selected="true">
                             <i class="fas fa-info-circle me-1"></i><strong>Inf. Gerais</strong>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                        <button class="nav-link" id="tab-imagens" data-toggle="tab" data-target="#aba-imagens" type="button" role="tab" aria-controls="imagens" aria-selected="false">
                             <i class="fas fa-image me-1"></i> <strong>Imagens</strong>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                        <button class="nav-link" id="tab-variacoes" data-toggle="tab" data-target="#aba-variacoes" type="button" role="tab" aria-controls="variacoes" aria-selected="false">
                             <i class="fas fa-tags me-1"></i> <strong>Variação</strong>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="fiscal-tab" data-bs-toggle="tab" data-target="#fiscal" type="button" role="tab" aria-controls="fiscal" aria-selected="false">
+                        <button class="nav-link" id="tab-fiscal" data-toggle="tab" data-target="#aba-fiscal" type="button" role="tab" aria-controls="fiscal" aria-selected="false">
                             <i class="fas fa-file-invoice-dollar me-1"></i> <strong>Inf. Fiscais</strong>
                         </button>
                     </li>
                 </ul>
             </div>
             <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="tab-pane fade show active" id="aba-geral" role="tabpanel" aria-labelledby="tab-geral">
                             <div class="card-body mb-3">
                                 <div class="row g-2">
                                     <div class="col-md-2">
@@ -116,14 +116,14 @@
                             </div>
                     </div>
 
-                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="tab-pane fade" id="aba-imagens" role="tabpanel" aria-labelledby="tab-imagens">
                         <div class="card mb-3 p-2">
                             <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
                                 @csrf
                                 <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$variacoes[0]['id']}}">
                                 <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
 
-                                    <div class="card-body mb-3 p-2">
+                                    <div class="card-body mb-3 p-2" id="filepond-wrapper">
                                         <input type="file"
                                                multiple
                                                id="image"
@@ -138,17 +138,29 @@
                             </form>
                             <div class="row">
                                 @foreach($imagens as $imagem)
-                                    <div class="col-md-2 text-center mb-3 position-relative">
-                                        <img src="{{ asset('storage/' . $imagem->path) }}" class="img-thumbnail" style="max-height: 150px;">
-                                        <button wire:click="deletarImagem({{ $imagem->id }})" class="btn btn-sm btn-danger position-absolute" style="top: 5px; right: 10px;">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                    <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
+                                        <div class="border rounded p-2 text-center position-relative">
+                                            <img src="{{ asset('storage/' . $imagem->path) }}"
+                                                 alt="Imagem"
+                                                 class="img-fluid mb-2 rounded"
+                                                 style="max-height: 150px; object-fit: cover;">
+
+                                            <div class="d-flex justify-content-center">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="confirmarExclusaoImagem({{ $imagem->id }})"
+                                                        data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                        id="btn-excluir-{{ $imagem->id }}">
+                                                    <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="tab-pane fade" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
                         <div class="card-body mb-3">
                             <div class="row g-2">
 {{--                                <div class="text-end mb-3">--}}
@@ -298,7 +310,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
+                    <div class="tab-pane fade" id="aba-fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
                         <div class="card-body mb-3">
                             <div class="row g-2">
                                 <div class="col-md-2">
@@ -369,6 +381,7 @@
                             <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
                         </span>
                     </button>
+                    <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
 
                     <a href="{{ route('produtos.produtos_livewire') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Voltar
@@ -438,6 +451,12 @@
         document.addEventListener('livewire:load', function () {
             $('.valor-mask').mask('#.##0,00', {reverse: true});
             $('.data-mask').mask('##/##/####', {reverse: true});
+
+            const activeTab = sessionStorage.getItem('activeTab');
+
+            if (activeTab) {
+                $('#myTab a[href="' + activeTab + '"]').tab('show');
+            }
         });
 
         Livewire.hook('message.processed', () => {
@@ -445,38 +464,132 @@
             $('.data-mask').mask('##/##/####', {reverse: true});
             $('[data-toggle="tooltip"]').tooltip();
 
-            // Recria o FilePond após re-render
-            const inputElement = document.querySelector('input[id="image"]');
-            if (inputElement && !inputElement._pond) {
-                FilePond.create(inputElement, {
-                    server: {
-                        process: {
-                            url: '/admin/upload/tmp-upload',
-                            method: 'POST',
-                            headers: { 'X-CSRF-TOKEN': csrfToken },
-                            onload: (res) => {
-                                foldersEnviados.push(res);
-                                return res;
-                            }
-                        },
-                        revert: '/admin/upload/tmp-delete',
-                    },
-                    labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>'
-                });
+            //reativa as abas
+            const activeTab = sessionStorage.getItem('activeTab');
+            if (activeTab) {
+                $('#myTab a[href="' + activeTab + '"], #myTab button[data-target="' + activeTab + '"]').tab('show');
             }
+            loadFilePond();
         });
 
+        //Controla as tabs
         $('#myTab button').on('click', function (event) {
             event.preventDefault()
             $(this).tab('show')
         })
 
+        //Ao clicar em salvar aciona o Livewire
         document.getElementById('btn-salvar-produto').addEventListener('click', function () {
+            //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
+            // Chama o botão invisível com wire:click="salvar"
+            document.getElementById('btn-livewire-salvar').click();
             if (typeof Livewire !== 'undefined') {
                 Livewire.emit('setPastasImagens', foldersEnviados);
                 Livewire.emit('salvar');
+                loadFilePond();
             }
         });
+
+
+        //Função SweetAlert de confirmação deleção
+        function confirmarExclusaoImagem(id) {
+            Swal.fire({
+                title: 'Excluir imagem?',
+                text: "Essa ação não poderá ser desfeita!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Muda ícone para spinner
+                    const icon = document.getElementById(`icon-trash-${id}`);
+                    icon.classList.remove('fa-trash-alt');
+                    icon.classList.add('fa-spinner', 'fa-spin');
+
+                    // Dispara o evento Livewire
+                    Livewire.emit('deletarImagem', id);
+                }
+            });
+        }
+
+        //exibe a mesangem an tela
+        window.addEventListener('livewire:event', event => {
+            const { type, message, id } = event.detail;
+
+            switch (type) {
+                case 'alert':
+                    Swal.fire({
+                        toast: true,
+                        icon: event.detail.icon || 'success',
+                        title: message,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    break;
+
+                case 'imagemRemovida':
+                    const el = document.getElementById(`imagem-${id}`);
+                    if (el) {
+                        $(el).fadeOut(300, () => el.remove());
+                    }
+                    break;
+
+                // Você pode adicionar mais tipos aqui no futuro
+                default:
+                    console.warn('Tipo de evento Livewire não tratado:', type);
+            }
+        });
+
+        // Salva a aba ativa no sessionStorage ao trocar
+        $('#myTab button[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            const tabId = $(e.target).data('target');
+            //console.log('tabId', tabId);
+            sessionStorage.setItem('activeTab', tabId);
+        });
+
+        //para centralizar re-render o Filepond quando for rendreizado pleo livewire
+        function loadFilePond() {
+            const container = document.getElementById('filepond-wrapper');
+            if (!container) return;
+
+            // Remove conteúdo anterior
+            container.innerHTML = `
+                <input type="file"
+                       multiple
+                       id="image"
+                       name="image[]"
+                       data-max-files="10"
+                       data-allow-reorder="true"
+                       data-max-file-size="3MB"
+                       data-allow-multiple="true"
+                       class="filepond" />
+            `;
+
+            const inputElement = container.querySelector('input');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            FilePond.create(inputElement, {
+                server: {
+                    process: {
+                        url: '/admin/upload/tmp-upload',
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrfToken },
+                        onload: (res) => {
+                            foldersEnviados.push(res);
+                            return res;
+                        }
+                    },
+                    revert: '/admin/upload/tmp-delete',
+                },
+                labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
+                allowMultiple: true
+            });
+        }
+
 
     </script>
 @endpush

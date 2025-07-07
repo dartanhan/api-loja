@@ -28,7 +28,7 @@ class ProdutoEditar extends Component
     public $imagens = [];
     public array $pastasImagens = [];
 
-    protected $listeners = ['setPastasImagens', 'salvar'];
+    protected $listeners = ['setPastasImagens', 'salvar','deletarImagem'];
 
     public function mount(ProdutoVariation $produto)
     {
@@ -162,8 +162,6 @@ class ProdutoEditar extends Component
                 } else {
                     $variacao->validade = '0000-00-00';
                 }
-
-
                 $variacao->save();
             }
         }
@@ -194,8 +192,15 @@ class ProdutoEditar extends Component
                 $temporaryFile->delete();
             }
         }
+        //carregue o produto novamente com findOrFail (ou find) antes de acessar
+        $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
 
-        session()->flash('success', 'Produto e variações atualizados com sucesso!');
+        //envia a mensagem no browser
+        $this->dispatchBrowserEvent('livewire:event', [
+            'type' => 'alert',
+            'icon' => 'success',
+            'message' => 'Produto e variações atualizados com sucesso!'
+        ]);
     }
 
     public function setPastasImagens($pastas)
@@ -219,15 +224,32 @@ class ProdutoEditar extends Component
         return response()->json(['error' => 'Nenhum arquivo enviado'], 400);
     }
 
+
+    //acionado através d listener via js
     public function deletarImagem($imagemId)
     {
         $imagem = ProdutoImagem::find($imagemId);
 
         if ($imagem && Storage::disk('public')->exists($imagem->path)) {
+            // Apaga do storage
             Storage::disk('public')->delete($imagem->path);
+            // Remove do banco
             $imagem->delete();
             //carregue o produto novamente com findOrFail (ou find) antes de acessar
             $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
+
+            //envia a mensagem no browser
+            $this->dispatchBrowserEvent('livewire:event', [
+                'type' => 'alert',
+                'icon' => 'success',
+                'message' => 'Imagem deletada com sucesso!'
+            ]);
+            //atualiza a lista de imagens
+            $this->dispatchBrowserEvent('livewire:event', [
+                'type' => 'imagemRemovida',
+                'id' => $imagem->id
+            ]);
+
         }
     }
 
