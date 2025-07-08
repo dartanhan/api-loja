@@ -62,24 +62,26 @@ class ProdutosVariacoes extends Component
         }
     }
 
-    public function incrementar($variacaoId)
+    public function incrementar($variacaoId, $campo = 'quantidade')
     {
         $this->loadingVariaId = $variacaoId;
 
         $variacao = ProdutoVariation::findOrFail($variacaoId);
-        $variacao->quantidade += 1;
+        $valorAtual = $variacao->$campo ?? 0;
+        $variacao->$campo = $valorAtual + 1;
         $variacao->save();
 
         $this->refreshVariacao($variacao);
         $this->loadingVariaId = null;
     }
 
-    public function decrementar($variacaoId)
+    public function decrementar($variacaoId, $campo='quantidade')
     {
         $this->loadingVariaId = $variacaoId;
 
         $variacao = ProdutoVariation::findOrFail($variacaoId);
-        $variacao->quantidade = max(0, $variacao->quantidade - 1);
+        $valorAtual = $variacao->$campo ?? 0;
+        $variacao->$campo = max(0, $valorAtual - 1); // Garante que não fique negativo;
         $variacao->save();
 
         $this->refreshVariacao($variacao);

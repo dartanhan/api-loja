@@ -94,12 +94,14 @@
                                                 <label class="form-label form-label-sm mb-1">Qtd.</label>
                                             @endif
                                             <div class="input-group input-group-sm">
-                                                <button wire:click="decrementar({{ $variacao->id }})"
+                                                <button wire:click="incrementar({{ $variacao->id }}, 'quantidade')"
                                                         wire:loading.attr="disabled"
-                                                        wire:target="decrementar({{ $variacao->id }})"
-                                                        class="btn btn-outline-danger btn-sm">
-                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }})">−</span>
+                                                        wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                        class="btn btn-outline-success btn-sm">
+                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                          class="spinner-border spinner-border-sm">
+                                                    </span>
+                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'quantidade')">+</span>
                                                 </button>
 
                                                 <input type="text"
@@ -107,12 +109,14 @@
                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
                                                        value="{{ $variacao->quantidade }}">
 
-                                                <button wire:click="incrementar({{ $variacao->id }})"
+                                                <button wire:click="decrementar({{ $variacao->id }}, 'quantidade')"
                                                         wire:loading.attr="disabled"
-                                                        wire:target="incrementar({{ $variacao->id }})"
-                                                        class="btn btn-outline-success btn-sm">
-                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }})">+</span>
+                                                        wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
+                                                        class="btn btn-outline-danger btn-sm">
+                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
+                                                          class="spinner-border spinner-border-sm">
+                                                    </span>
+                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'quantidade')">−</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -122,12 +126,13 @@
                                                 <label class="form-label form-label-sm mb-1">Estoque.</label>
                                             @endif
                                             <div class="input-group input-group-sm">
-                                                <button wire:click="decrementar({{ $variacao->id }})"
+                                                <button wire:click="incrementar({{ $variacao->id }}, 'estoque')"
                                                         wire:loading.attr="disabled"
-                                                        wire:target="decrementar({{ $variacao->id }})"
-                                                        class="btn btn-outline-danger btn-sm">
-                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }})">−</span>
+                                                        wire:target="incrementar({{ $variacao->id }}, 'estoque')"
+                                                        class="btn btn-outline-success btn-sm">
+                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'estoque')"
+                                                          class="spinner-border spinner-border-sm"></span>
+                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'estoque')">+</span>
                                                 </button>
 
                                                 <input type="text"
@@ -135,12 +140,13 @@
                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'estoque', $event.target.value)"
                                                        value="{{ $variacao->estoque }}">
 
-                                                <button wire:click="incrementar({{ $variacao->id }})"
+                                                <button wire:click="decrementar({{ $variacao->id }}, 'estoque')"
                                                         wire:loading.attr="disabled"
-                                                        wire:target="incrementar({{ $variacao->id }})"
-                                                        class="btn btn-outline-success btn-sm">
-                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }})" class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }})">+</span>
+                                                        wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                        class="btn btn-outline-danger btn-sm">
+                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                          class="spinner-border spinner-border-sm"></span>
+                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'estoque')">−</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -178,7 +184,7 @@
                                                 <label class="form-label form-label-sm mb-1">Fornecedor</label>
                                             @endif
                                                 <select class="form-select form-select-sm {{ $variacao->status == 0 ? 'bg-warning' : '' }}"
-                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor_id', $event.target.value)">
+                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor', $event.target.value)">
                                                     <option value="">Selecione</option>
                                                     @foreach($fornecedores as $fornecedor)
                                                         <option value="{{ $fornecedor->id }}"
@@ -188,8 +194,6 @@
                                                     @endforeach
                                                 </select>
                                         </div>
-
-
                                         <div class="col-md-1">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Status</label>

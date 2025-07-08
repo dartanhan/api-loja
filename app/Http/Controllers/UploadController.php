@@ -39,7 +39,9 @@ class UploadController extends Controller
 
                 $temp_file = $image->encode('jpeg');
 
-                Storage::put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded, 'public');
+                //Storage::put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded, 'public')
+                Storage::disk('public')->put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded);
+
 
                 $this->temporaryFile->create([
                     'folder' => $folder,
@@ -84,7 +86,8 @@ class UploadController extends Controller
             $temp_file = $image->encode('jpeg');
 
             // Armazenar imagem redimensionada
-            Storage::put($destinoFile.'/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+            //Storage::put($destinoFile.'/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+            Storage::disk('public')->put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded);
 
             $this->temporaryFile->folder = $folder;
             $this->temporaryFile->file =  $nome_unico;

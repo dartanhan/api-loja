@@ -21,11 +21,18 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="4">
+          <list size="11">
             <item index="0" class="java.lang.String" itemvalue="name" />
             <item index="1" class="java.lang.String" itemvalue="placeholder" />
             <item index="2" class="java.lang.String" itemvalue="@selected($fornecedor[" />
             <item index="3" class="java.lang.String" itemvalue="wire:model.defer" />
+            <item index="4" class="java.lang.String" itemvalue="wire:loading.remove" />
+            <item index="5" class="java.lang.String" itemvalue="wire:loading" />
+            <item index="6" class="java.lang.String" itemvalue="wire:target" />
+            <item index="7" class="java.lang.String" itemvalue="wire:model" />
+            <item index="8" class="java.lang.String" itemvalue="wire:click" />
+            <item index="9" class="java.lang.String" itemvalue="wire:loading.attr" />
+            <item index="10" class="java.lang.String" itemvalue="wire:blur" />
           </list>
         </value>
       </option>

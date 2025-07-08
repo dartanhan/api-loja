@@ -253,6 +253,11 @@ class ProdutoEditar extends Component
         }
     }
 
+    //voltar tela de lista de produtos
+    public function voltar()
+    {
+        return redirect()->route('produtos.produtos_livewire');
+    }
 
     public function render()
     {

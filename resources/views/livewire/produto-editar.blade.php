@@ -77,7 +77,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="floating-label-group border-lable-flt">
                                             <input type="text" placeholder="{{ __('DECRIÇÃO') }}"
                                                    wire:model="produto.descricao" id="descricao"
@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-1">
+                                    <div class="col-auto" style="max-width: 150px;">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                             <select wire:model="produto.status" id="status" class="form-select format-font form-control-sm"
                                                     data-toggle="tooltip" data-placement="top" title="Status do produto" required>
@@ -143,7 +143,7 @@
                                             <img src="{{ asset('storage/' . $imagem->path) }}"
                                                  alt="Imagem"
                                                  class="img-fluid mb-2 rounded"
-                                                 style="max-height: 150px; object-fit: cover;">
+                                                 style="max-height: 150px;min-height: 120px; object-fit: cover;">
 
                                             <div class="d-flex justify-content-center">
                                                 <button type="button"
@@ -177,8 +177,8 @@
                                 @foreach($variacoes as $index => $variacao)
                                     <div class="row mb-3 g-2 p-2 align-items-end">
                                         <div class="row card p-1 mb-2">
-                                            <div class="row card-body">
-                                                <div class="col-md-1 mb-3">
+                                            <div class="row card-body ">
+                                                <div class="col-md-2 mb-3">
                                                     <div class="floating-label-group border-lable-flt">
                                                         <input type="text" placeholder="{{ __('SUB CÓDIGO (SKU)') }}"
                                                                value="{{ $variacao['subcodigo'] }}"  class="form-control form-control-sm format-font" disabled >
@@ -232,7 +232,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-1">
+                                                <div class="col-auto" style="max-width: 150px;">
                                                     <div class="floating-label-group border-lable-flt">
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
@@ -242,7 +242,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-1">
+                                                <div class="col-auto" style="max-width: 150px;">
                                                     <div class="floating-label-group border-lable-flt">
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
@@ -261,7 +261,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-1">
+                                                <div class="col-auto" style="max-width: 150px;">
                                                     <div class="floating-label-group border-lable-flt">
                                                         <div class="input-group input-group-sm">
                                                             <input type="text" placeholder="{{ __('VALIDADE') }}"
@@ -271,7 +271,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-1">
+                                                <div class="col-auto" style="max-width: 130px;">
                                                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                                         <select wire:model="variacoes.{{ $index }}.status" class="form-select format-font form-control-sm" required>
                                                             <option value="">Selecione</option>
@@ -383,9 +383,17 @@
                     </button>
                     <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
 
-                    <a href="{{ route('produtos.produtos_livewire') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Voltar
-                    </a>
+                    <button wire:click="voltar"
+                            wire:loading.attr="disabled"
+                            class="btn btn-sm btn-outline-secondary">
+                                <span wire:loading wire:target="voltar"
+                                      class="spinner-border spinner-border-sm me-1"
+                                      role="status" aria-hidden="true">
+                                </span>
+                                <span wire:loading.remove wire:target="voltar">
+                            <i class="fas fa-arrow-left me-1"></i> Voltar
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
