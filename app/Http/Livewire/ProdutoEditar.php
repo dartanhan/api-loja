@@ -27,8 +27,9 @@ class ProdutoEditar extends Component
     public $produtoId;
     public $imagens = [];
     public array $pastasImagens = [];
+    public $valor_produto;
 
-    protected $listeners = ['setPastasImagens', 'salvar','deletarImagem'];
+    protected $listeners = ['setPastasImagens', 'salvar','deletarImagem','alterarStatusConfirmado'];
 
     public function mount(ProdutoVariation $produto)
     {
@@ -37,6 +38,7 @@ class ProdutoEditar extends Component
         $this->produtoId = $this->produto['id'];
         $this->codigoPai = $this->produto['codigo_produto'] ?? '0000';
         $this->imagens = $produto->images; // Ajuste conforme relacionamento
+        $this->valor_produto = $this->produto['valor_produto'];
 
         $this->variacoes = [
             [
@@ -135,6 +137,7 @@ class ProdutoEditar extends Component
         $produto->origem_id = $this->produto['origem_id'] ?? 0;
         $produto->categoria_id = $this->produto['categoria_id'] ?? 0;
         $produto->status = $this->produto['status'] ?? 0;
+        $produto->valor_produto = $this->produto['valor_produto'] ?? 0;
         $produto->save();
 
         foreach ($this->variacoes as $dados) {
@@ -256,7 +259,39 @@ class ProdutoEditar extends Component
     //voltar tela de lista de produtos
     public function voltar()
     {
-        return redirect()->route('produtos.produtos_livewire');
+        return redirect()->route('produtos.produtos_ativos');
+    }
+
+    //acionado via listener ao clicar no toogle
+    public function alterarStatusConfirmado($produtoId)
+    {
+        $produto = Produto::with('variacoes')->findOrFail($produtoId);
+
+        if ($produto->status) {
+            // Vai desativar
+            $this->dispatchBrowserEvent('confirmar-desativacao-produto', [
+                'produto_id' => $produto->id,
+            ]);
+        } else {
+            // Apenas ativa direto
+            $produto->status = 1;
+            $produto->save();
+            $this->dispatchBrowserEvent('status-alterado', ['status' => 'ativado']);
+        }
+    }
+
+    public function desativarProdutoComVariacoes($produtoId)
+    {
+        $produto = Produto::with('variacoes')->findOrFail($produtoId);
+        $produto->status = 0;
+        $produto->save();
+
+        foreach ($produto->variacoes as $v) {
+            $v->status = 0;
+            $v->save();
+        }
+
+        $this->dispatchBrowserEvent('status-alterado', ['status' => 'desativado']);
     }
 
     public function render()

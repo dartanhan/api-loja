@@ -79,9 +79,20 @@ class ProdutoController extends Controller
 
     }
 
-    public function produtos_livewire()
+    /**
+     * Livewire
+    */
+    public function produtos_ativos()
     {
-        return view('admin.produtos.index');
+        return view('admin.produtos.ativos');
+    }
+
+    /**
+     * Livewire
+     */
+    public function produtos_inativos()
+    {
+        return view('admin.produtos.inativos');
     }
     /**
      * Show the form for creating a new resource.

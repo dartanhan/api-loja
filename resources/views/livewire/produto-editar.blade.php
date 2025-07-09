@@ -26,7 +26,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('produtos.produtos_livewire') }}">Produtos</a>
+                            <a href="{{ route('produtos.produtos_ativos') }}">Produtos</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">Editar Produto</li>
                     </ol>
@@ -86,6 +86,17 @@
                                             <label for="label-descricao">{{ __('DESCRIÇÃO') }}</label>
                                         </div>
                                     </div>
+                                    {{-- Valor  --}}
+                                    <div class="col-auto" style="max-width: 150px;">
+                                        <div class="floating-label-group border-lable-flt">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">R$</span>
+                                                <input type="text" placeholder="{{ __('VALOR') }}" data-toggle="tooltip" data-placement="right" title="Valor do Produto"
+                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font valor-mask" >
+                                                <label for="label-valor-produto">{{ __('VALOR') }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
@@ -101,17 +112,27 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-auto" style="max-width: 150px;">
+                                    <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                            <select wire:model="produto.status" id="status" class="form-select format-font form-control-sm"
-                                                    data-toggle="tooltip" data-placement="top" title="Status do produto" required>
-                                                <option value="">Selecione</option>
-                                                <option value="1">Ativo</option>
-                                                <option value="0">Inativo</option>
-                                            </select>
-                                            <label for="status">STATUS</label>
+                                            <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
+                                                <label class="form-label m-0">STATUS</label>
+
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="form-check form-switch m-0">
+                                                        <input type="checkbox"
+                                                               class="form-check-input"
+                                                               id="switchStatus"
+                                                               wire:click="$emit('confirmarAlteracaoStatus', {{ $produto['id'] }})"
+                                                            {{ $produto['status'] ? 'checked' : '' }}>
+                                                    </div>
+                                                    <span class="small">
+                                                        {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                     </div>
@@ -454,6 +475,7 @@
 @push('scripts')
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
+    <script src="{{ asset('js/util.js') }}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
     <script>
         document.addEventListener('livewire:load', function () {

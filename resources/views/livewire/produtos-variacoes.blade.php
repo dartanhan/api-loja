@@ -1,18 +1,40 @@
 <div xmlns:wire="http://www.w3.org/1999/xhtml">
     <div class="container-fluid mt-4">
-        <h4>Gerenciar Produtos e Variações</h4>
-
         <!-- Campo de busca -->
-        <div class="mb-3">
-            <input type="text" class="form-control" placeholder="Buscar por produto ou variação..."
-                   wire:model.debounce.500ms="search">
+        <div class="card shadow border-0 mb-3">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-0">Gerenciar Produtos e Variações</h5>
+                <hr>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.home') }}">
+                                <i class="fas fa-home"></i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('produtos.produtos_ativos') }}">Produtos</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Lista de Produtos</li>
+                    </ol>
+                </nav>
+                <div class="floating-label-group border-lable-flt">
+                    <input class="form-control" placeholder="Buscar por produto ou variação..." type="text"
+                           wire:model.debounce.500ms="search">
+                    <label for="label-pesqusia">{{ __('Buscar por produto ou variação...') }}</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow border-0 mb-3">
             <div wire:loading.delay class="text-center mt-3">
                 <span class="spinner-border text-primary" role="status"></span>
                 <span>Carregando dados...</span>
             </div>
         </div>
 
-        <table class="table table-bordered table-striped table-hover">
+        <div class="card shadow border-0 mb-3 p-2">
+            <table class="table table-bordered table-striped table-hover">
             <thead class="table-light">
             <tr>
                 <th style="width: 50px;"></th>
@@ -57,7 +79,11 @@
                     <td>{{ $produto->id }}</td>
                     <td>{{ $produto->descricao }}</td>
                     <td>R$ {{ number_format($produto->valor_produto, 2, ',', '.') }}</td>
-                    <td>{{ $produto->status ? 'Ativo' : 'Inativo' }}</td>
+                    <td class="text-align ">
+                        <span class="badge {{ $produto->status ? 'bg-success' : 'bg-danger' }}">
+                            {{ $produto->status ? 'Ativo' : 'Inativo' }}
+                        </span>
+                    </td>
                 </tr>
 
                 @if($this->isExpanded($produto->id))
@@ -70,7 +96,7 @@
                                     <div class="row align-items-start g-1 px-3 py-2">
 
                                         {{-- Subcódigo --}}
-                                        <div class="col-md-1" style="max-width: 70px;">
+                                        <div class="col-md-1" style="max-width: 80px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Subcód.</label>
                                             @endif
@@ -78,7 +104,7 @@
                                         </div>
 
                                         {{-- Variação --}}
-                                        <div class="col-md-2">
+                                        <div class="col-md-2" style="max-width: 220px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Variação</label>
                                             @endif
@@ -89,7 +115,7 @@
                                         </div>
 
                                         {{-- Quantidade com botões --}}
-                                        <div class="col-md-2" style="max-width: 120px;">
+                                        <div class="col-md-2" style="max-width: 100px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Qtd.</label>
                                             @endif
@@ -121,7 +147,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-2" style="max-width: 120px;">
+                                        <div class="col-md-2" style="max-width: 100px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Estoque.</label>
                                             @endif
@@ -194,15 +220,20 @@
                                                     @endforeach
                                                 </select>
                                         </div>
-                                        <div class="col-md-1">
+                                        <div class="col-md-1 text-end">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Status</label>
                                             @endif
-                                                <select class="form-select form-select-sm "
-                                                        wire:change="atualizarCampo({{ $variacao->id}}, 'status', $event.target.value)">
-                                                    <option value="1" {{ $variacao->status == 1 ? 'selected' : '' }}>Ativo</option>
-                                                    <option value="0" {{ $variacao->status == 0 ? 'selected' : '' }}>Inativo</option>
-                                                </select>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           id="switchStatus{{ $variacao->id }}"
+                                                           wire:change="atualizarCampo({{ $variacao->id }}, 'status', $event.target.checked ? 1 : 0)"
+                                                            {{ $variacao->status ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="switchStatus{{ $variacao->id }}">
+                                                        {{ $variacao->status ? 'Ativo' : 'Inativo' }}
+                                                    </label>
+                                                </div>
                                         </div>
 
                                         {{-- Ações --}}
@@ -235,13 +266,16 @@
             @endforeach
             </tbody>
         </table>
+        </div>
 
         <div class="d-flex justify-content-center">
             {!! $produtos->links('vendor.pagination.bootstrap-4') !!}
         </div>
-
     </div>
+</div>
 
+@push('styles')
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
     <style>
         .variation-row {
             animation: fadeSlideDown 0.3s ease-in-out;
@@ -262,28 +296,10 @@
             user-select: none;
         }
     </style>
-</div>
+@endpush
+
 @push('scripts')
-    <script>
-        $('.quantidade').mask('000000', { reverse: false });
-
-        function aplicarMascaraMoeda() {
-            $('.moeda').mask('R$ 000.000.000,00', {
-                reverse: true,
-                placeholder: 'R$ 0,00'
-            });
-        }
-
-        document.addEventListener("livewire:load", function () {
-            // Aplica na primeira renderização
-            aplicarMascaraMoeda();
-
-            // Reaplica após DOM ser atualizado por Livewire
-            Livewire.hook('message.processed', () => {
-                aplicarMascaraMoeda();
-            });
-        });
-    </script>
+    <script src="{{ asset('js/util.js') }}"></script>
 @endpush
 
 

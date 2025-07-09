@@ -31,28 +31,34 @@
                 @endif
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                    @if( Auth::user()->is_admin) Produtos @else Menu @endif
+                    @if( Auth::user()->is_admin) Gerenciar Produtos @else Menu @endif
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav p-0">
                         @if( Auth::user()->is_admin)
-                            <a href="{{ route('produtos.produtos_livewire') }}" title="Gerenciar Produtos" class="nav-link p-0 mb-3 {{ request()->routeIs('produtos.produtos_livewire') ? 'active' : '' }}">
+                            <a href="{{ route('produtos.produtos_ativos') }}" title="Gerenciar Produtos"
+                                    class="nav-link p-0 mb-3 {{ request()->routeIs('produtos.produtos_ativos') ? 'active' : '' }}">
                                 <div class="sb-nav-link-icon"><i class="nav-icon fas fa-box"></i></div>
-                                Gerenciar Produtos
+                                Produtos Ativos
+                            </a>
+
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
+                                Produtos Inativos
                             </a>
 
                             <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
-                                Produtos Ativos
+                                Produtos Ativos (Antigo)
                             </a>
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
-                                Produtos Ativos(New)
-                            </a>
+{{--                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">--}}
+{{--                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>--}}
+{{--                                Produtos Ativos(New)--}}
+{{--                            </a>--}}
                             <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
-                                Produtos Inativos
+                                Produtos Inativos (Antigo)
                             </a>
                         @endif
                             <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtos.baixo_estoque' ? 'active' : '' }}" href="{{route('produtos.baixo_estoque')}}">
