@@ -292,16 +292,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-auto" style="max-width: 130px;">
-                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                                        <select wire:model="variacoes.{{ $index }}.status" class="form-select format-font form-control-sm" required>
-                                                            <option value="">Selecione</option>
-                                                            <option value="1" {{ $variacao['status'] == 1 ? 'selected' : '' }}>Ativo</option>
-                                                            <option value="0" {{ $variacao['status'] == 0 ? 'selected' : '' }}>Inativo</option>
-                                                        </select>
-                                                        <label for="status">STATUS</label>
-                                                    </div>
-                                                </div>
+
                                                 <div class="col-md-3">
                                                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                                         <select wire:model="variacoes.{{ $index }}.fornecedor_id" class="form-select format-font form-control-sm" required>
@@ -312,6 +303,18 @@
                                                             @endforeach
                                                         </select>
                                                         <label for="status">FORNECEDOR</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto" style="max-width: 150px;">
+                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
+
+                                                        <select  wire:change="alterarStatusVariacao({{ $variacao['id'] }}, $event.target.value)"
+                                                                class="form-select format-font form-control-sm" required>
+                                                            <option value="">Selecione</option>
+                                                            <option value="1" {{ $variacao['status'] == 1 ? 'selected' : '' }}>Ativo</option>
+                                                            <option value="0" {{ $variacao['status'] == 0 ? 'selected' : '' }}>Inativo</option>
+                                                        </select>
+                                                        <label for="status">STATUS</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-auto" style="max-width: 100px;">
@@ -544,35 +547,6 @@
                 }
             });
         }
-
-        //exibe a mesangem an tela
-        window.addEventListener('livewire:event', event => {
-            const { type, message, id } = event.detail;
-
-            switch (type) {
-                case 'alert':
-                    Swal.fire({
-                        toast: true,
-                        icon: event.detail.icon || 'success',
-                        title: message,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                    break;
-
-                case 'imagemRemovida':
-                    const el = document.getElementById(`imagem-${id}`);
-                    if (el) {
-                        $(el).fadeOut(300, () => el.remove());
-                    }
-                    break;
-
-                // Você pode adicionar mais tipos aqui no futuro
-                default:
-                    console.warn('Tipo de evento Livewire não tratado:', type);
-            }
-        });
 
         // Salva a aba ativa no sessionStorage ao trocar
         $('#myTab button[data-toggle="tab"]').on('shown.bs.tab', function (e) {

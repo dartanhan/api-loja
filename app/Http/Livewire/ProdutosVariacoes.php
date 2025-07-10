@@ -28,7 +28,7 @@ class ProdutosVariacoes extends Component
     public $categorias = [];
 
 
-    protected $listeners = ['atualizarCampoValor'];
+    protected $listeners = ['atualizarCampoValor','atualizarCampo'];
 
     public function mount()
     {
@@ -88,6 +88,7 @@ class ProdutosVariacoes extends Component
         $this->loadingVariaId = null;
     }
 
+
     public function atualizarCampo($variacaoId, $campo, $valor)
     {
         // Limpeza básica do valor
@@ -110,6 +111,13 @@ class ProdutosVariacoes extends Component
         $variacao->save();
 
         $this->refreshVariacao($variacao);
+
+        $this->dispatchBrowserEvent('status-generico',
+            [
+                'title' => 'Suecesso!',
+                'text' => 'Informações atualizadas com sucesso!',
+                'icon' => 'success'
+            ]);
     }
 
 

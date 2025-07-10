@@ -228,7 +228,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            id="switchStatus{{ $variacao->id }}"
-                                                           wire:change="atualizarCampo({{ $variacao->id }}, 'status', $event.target.checked ? 1 : 0)"
+                                                           onchange="confirmarDesativacaoVariacao({{ $variacao->id }}, 'status', this)"
                                                             {{ $variacao->status ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="switchStatus{{ $variacao->id }}">
                                                         {{ $variacao->status ? 'Ativo' : 'Inativo' }}
