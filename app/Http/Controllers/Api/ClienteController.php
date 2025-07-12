@@ -80,13 +80,12 @@ class ClienteController extends Controller
             /**
              * Cria o array com os dados
              */
-
-            if(!$this->verifyCPF($request['cpf']))
-                return Response::json(array('success' => false, "message" => "CPF Informado inválido [ ". $request['cpf'] ." ]"), 202, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $cpf = preg_replace('/\D/', '',$request['cpf']);
+            if(!empty($cpf) && !$this->verifyCPF($cpf))
+                return Response::json(array('success' => false, "message" => "CPF Informado inválido [ ". $cpf ." ]"), 202, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
             $dados["id"] = $request['id'];
             $dados["telefone"] = $request['telefone'];
-            $dados["cpf"] = $request['cpf'];
             $dados["nome"] = $request['nome'];
             $dados["email"] = $request['email'];
             $dados["cep"] = $request['cep'];
@@ -97,6 +96,10 @@ class ClienteController extends Controller
             $dados["localidade"] = $request['localidade'];
             $dados["uf"] = $request['uf'];
             $dados["taxa"] = $request['taxa'];
+
+            if (!empty($cpf)) {
+                $dados['cpf'] = $cpf;
+            }
 
             //Cria o cliente ou atualiza
              $matchThese = array('id' => $request['id']);
