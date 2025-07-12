@@ -34,8 +34,11 @@ class ProdutosVariacoes extends Component
 
     public function mount()
     {
-        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->get();
-        $this->categorias = Categoria::select('id', 'nome')->where('status',1)->get();
+        $this->fornecedores = collect(); // esvazia antes
+        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
+        $this->categorias = collect(); // esvazia antes
+        $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
+
     }
 
 

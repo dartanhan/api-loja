@@ -100,6 +100,19 @@
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
+                                            <select wire:model="produto.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
+                                                    class="form-select format-font form-control-sm" title="Categoria do Produto" required>
+                                                <option value="" class="select-custom">Selecione?</option>
+                                                @foreach($categorias->sortBy('nome') as $categoria)
+                                                    <option value="{{$categoria->id}}"> {{ ucfirst(strtolower($categoria->nome)) }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label for="label-qtd">CATEGORIAS</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                             <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
                                                 <label class="form-label m-0">STATUS</label>
 
