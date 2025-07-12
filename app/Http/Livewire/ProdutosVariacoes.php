@@ -6,6 +6,7 @@ use App\Http\Models\Categoria;
 use App\Http\Models\Fornecedor;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
+use App\Traits\ProdutoTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 class ProdutosVariacoes extends Component
 {
     use WithPagination;
+    use ProdutoTrait;
 
     public $expanded = [];
     public $search = '';
@@ -28,7 +30,7 @@ class ProdutosVariacoes extends Component
     public $categorias = [];
 
 
-    protected $listeners = ['atualizarCampoValor','atualizarCampo'];
+    protected $listeners = ['atualizarCampoValor','atualizarCampo','alterarStatusConfirmado'];
 
     public function mount()
     {
@@ -102,7 +104,8 @@ class ProdutosVariacoes extends Component
 
             // Ignora valores zerados ou negativos
             if ($valor > 0) {
-                $variacao->quantidade += $valor;
+                //$variacao->quantidade += $valor;
+                $variacao->quantidade = $valor;
             }
         } else {
             $variacao->$campo = $valor;
@@ -158,8 +161,7 @@ class ProdutosVariacoes extends Component
     public function render()
     {
 
-        $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))
-            ->filter(); // remove termos vazios
+        $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))->filter(); // remove termos vazios
 
         $produtos = Produto::where('status', 1)
             ->where(function ($query) use ($searchTerms) {

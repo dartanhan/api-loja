@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Http\Models\OrigemNfce;
 use App\Http\Models\ProdutoImagem;
 use App\Http\Models\TemporaryFile;
+use App\Traits\ProdutoTrait;
 use http\Client\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,8 @@ use App\Http\Models\Categoria;
 
 class ProdutoEditar extends Component
 {
+    use ProdutoTrait;
+
     public $produto;
     public $variacoes = [];
     public $fornecedores = [];
@@ -236,8 +239,10 @@ class ProdutoEditar extends Component
         if ($imagem && Storage::disk('public')->exists($imagem->path)) {
             // Apaga do storage
             Storage::disk('public')->delete($imagem->path);
+
             // Remove do banco
             $imagem->delete();
+
             //carregue o produto novamente com findOrFail (ou find) antes de acessar
             $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
 
@@ -262,52 +267,6 @@ class ProdutoEditar extends Component
         return redirect()->route('produtos.produtos_ativos');
     }
 
-    //acionado via listener ao clicar no toogle desativa ou ativa o PAI e suas variações
-    public function alterarStatusConfirmado($produtoId)
-    {
-        $produto = Produto::with('variacoes')->findOrFail($produtoId);
-
-        if ($produto->status) {
-            // Vai desativar
-            $produto->status = 0;
-            $produto->save();
-
-            foreach ($produto->variacoes as $v) {
-                $v->status = 0;
-                $v->save();
-            }
-
-            $this->dispatchBrowserEvent('status-alterado', ['status' => 'desativado']);
-        } else {
-            // Apenas ativa direto
-            $produto->status = 1;
-            $produto->save();
-            $this->dispatchBrowserEvent('status-alterado', ['status' => 'ativado']);
-        }
-    }
-
-    //desativa ou ativa a variação
-    public function alterarStatusVariacao($variacaoId, $novoStatus)
-    {
-        $index = collect($this->variacoes)->search(fn ($v) => $v['id'] == $variacaoId);
-
-        if ($index === false) return;
-
-        $this->variacoes[$index]['status'] = (int)$novoStatus;
-
-        if ($novoStatus == 0) {
-            // Verifica se há mais alguma variação ativa
-            $ativas = collect($this->variacoes)->filter(fn ($v) => $v['status'] == 1)->count();
-
-            if ($ativas == 0) {
-                // Última ativa foi desativada
-                $this->dispatchBrowserEvent('confirmar-desativacao-pai', [
-                    'produto_id' => $this->produto['id'],
-                    'variacao_id' => $variacaoId,
-                ]);
-            }
-        }
-    }
 
     public function render()
     {

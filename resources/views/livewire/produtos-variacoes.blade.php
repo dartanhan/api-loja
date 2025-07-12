@@ -66,14 +66,22 @@
             @foreach($produtos as $produto)
                 <tr wire:key="produto-{{ $produto->id }}">
                     <td>
+
                         <button wire:click="toggleExpand({{ $produto->id }})"
                                 wire:loading.attr="disabled"
-                                class="btn btn-sm btn-link p-0 m-0 align-middle">
+                                class="btn btn-sm p-0 m-0 align-middle">
+
+                            {{-- Ícone de expandir/recolher --}}
                             <span wire:loading.remove wire:target="toggleExpand({{ $produto->id }})">
-                                {{ $this->isExpanded($produto->id) ? '▼' : '▶' }}
+                                <img src="{{ asset($this->isExpanded($produto->id) ? 'img/minus.png' : 'img/plus.png') }}"
+                                      class="icon-expand" data-toggle="tooltip" data-placement="top" title="Expandir">
                             </span>
+
+                            {{-- Spinner de carregamento --}}
                             <span wire:loading wire:target="toggleExpand({{ $produto->id }})"
-                                  class="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></span>
+                                  class="spinner-border spinner-border-sm text-secondary"
+                                  role="status" aria-hidden="true">
+                            </span>
                         </button>
                     </td>
                     <td>{{ $produto->id }}</td>
@@ -104,7 +112,7 @@
                                         </div>
 
                                         {{-- Variação --}}
-                                        <div class="col-md-2" style="max-width: 220px;">
+                                        <div class="col-md-2">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Variação</label>
                                             @endif
@@ -120,21 +128,6 @@
                                                 <label class="form-label form-label-sm mb-1">Qtd.</label>
                                             @endif
                                             <div class="input-group input-group-sm">
-                                                <button wire:click="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                        class="btn btn-outline-success btn-sm">
-                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                          class="spinner-border spinner-border-sm">
-                                                    </span>
-                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'quantidade')">+</span>
-                                                </button>
-
-                                                <input type="text"
-                                                       class="form-control text-center form-control-sm p-0"
-                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
-                                                       value="{{ $variacao->quantidade }}">
-
                                                 <button wire:click="decrementar({{ $variacao->id }}, 'quantidade')"
                                                         wire:loading.attr="disabled"
                                                         wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
@@ -144,6 +137,21 @@
                                                     </span>
                                                     <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'quantidade')">−</span>
                                                 </button>
+
+                                                <input type="text"
+                                                       class="form-control text-center form-control-sm p-0"
+                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
+                                                       value="{{ $variacao->quantidade }}">
+
+                                                <button wire:click="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                        class="btn btn-outline-success btn-sm">
+                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                          class="spinner-border spinner-border-sm">
+                                                    </span>
+                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'quantidade')">+</span>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -152,6 +160,20 @@
                                                 <label class="form-label form-label-sm mb-1">Estoque.</label>
                                             @endif
                                             <div class="input-group input-group-sm">
+                                                <button wire:click="decrementar({{ $variacao->id }}, 'estoque')"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                        class="btn btn-outline-danger btn-sm">
+                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                          class="spinner-border spinner-border-sm"></span>
+                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'estoque')">−</span>
+                                                </button>
+
+                                                <input type="text"
+                                                       class="form-control text-center form-control-sm p-0"
+                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'estoque', $event.target.value)"
+                                                       value="{{ $variacao->estoque }}">
+
                                                 <button wire:click="incrementar({{ $variacao->id }}, 'estoque')"
                                                         wire:loading.attr="disabled"
                                                         wire:target="incrementar({{ $variacao->id }}, 'estoque')"
@@ -161,19 +183,6 @@
                                                     <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'estoque')">+</span>
                                                 </button>
 
-                                                <input type="text"
-                                                       class="form-control text-center form-control-sm p-0"
-                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'estoque', $event.target.value)"
-                                                       value="{{ $variacao->estoque }}">
-
-                                                <button wire:click="decrementar({{ $variacao->id }}, 'estoque')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="decrementar({{ $variacao->id }}, 'estoque')"
-                                                        class="btn btn-outline-danger btn-sm">
-                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'estoque')"
-                                                          class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'estoque')">−</span>
-                                                </button>
                                             </div>
                                         </div>
                                         {{-- Valor Unitário --}}
@@ -228,7 +237,7 @@
                                                     <input class="form-check-input"
                                                            type="checkbox"
                                                            id="switchStatus{{ $variacao->id }}"
-                                                           onchange="confirmarDesativacaoVariacao({{ $variacao->id }}, 'status', this)"
+                                                           wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao->id }}, {{ $produto->id }}, event.target)"
                                                             {{ $variacao->status ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="switchStatus{{ $variacao->id }}">
                                                         {{ $variacao->status ? 'Ativo' : 'Inativo' }}
@@ -295,6 +304,22 @@
         th {
             user-select: none;
         }
+        .icon-expand {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            padding: 2px;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .icon-expand:hover {
+            transform: scale(1.1);
+        }
+
     </style>
 @endpush
 

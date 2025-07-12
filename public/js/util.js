@@ -35,44 +35,70 @@
         });
     });
 
-    Livewire.on('confirmarAlteracaoStatus', produtoId => {
+
+    /***
+     * Altera o status do produto ou variação
+     */
+    Livewire.on('confirmarAlteracaoStatus', function(tipo, variacaoId, produtoId, inputElement) {
+        let data = {};
+        // Em JS, salvar o input para revertê-lo depois caso necessário
+        window.inputStatusTemp = inputElement;
+
+        if(tipo === "produto"){
+            data.title = 'Desativar Produto?';
+            data.text ='Isso também desativará todas as variações deste produto.';
+        }else{
+            data.title = 'Desativar Variação?';
+            data.text ='Deseja desativar realmente esta variação?';
+
+        }
+        data.tipo = tipo;
+        data.icon = 'warning';
+        data.variacaoId = variacaoId;
+        data.produtoId = produtoId;
+
+        confirmAlert(data,inputElement);
+    });
+
+    window.addEventListener('confirmarDesativacaoStatus', event => {
+        let data = {};
+        data.title = event.detail.title;
+        data.text = event.detail.text;
+        data.produtoId = event.detail.produtoId;
+        data.tipo = event.detail.tipo;
+
+        confirmAlert(data);
+    });
+
+    function confirmAlert(data){
+
         Swal.fire({
-            title: 'Desativar Produto?',
-            text: "Isso também desativará todas as variações deste produto.",
-            icon: 'warning',
+            title: data.title, //'Desativar Produto?',
+            text: data.text, //"Isso também desativará todas as variações deste produto.",
+            icon: 'warning', //'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, alterar',
             cancelButtonText: 'Cancelar'
         }).then(result => {
             if (result.isConfirmed) {
-                Livewire.emit('alterarStatusConfirmado', produtoId);
+                Livewire.emit('alterarStatusConfirmado', data);
+            }else {
+                // Reverter toggle visualmente se cancelado
+                //inputElement.checked = !inputElement.checked;
+                // Reverte o checkbox visualmente
+                if (window.inputStatusTemp) {
+                    window.inputStatusTemp.checked = !window.inputStatusTemp.checked;
+                }
             }
         });
-    });
-
-    window.addEventListener('confirmar-desativacao-pai', function (event) {
-        Swal.fire({
-            title: 'Desativar produto também?',
-            text: 'Essa é a última variação ativa. O produto pai será desativado também.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sim, desativar tudo',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.emit('alterarStatusConfirmado', event.detail.produto_id);
-            }
-        });
-    });
+    }
 
     window.addEventListener('status-alterado', event => {
         Swal.fire({
             toast: true,
             position: 'top-end',
             title: 'Sucesso!',
-            text: event.detail.status === 'desativado'
-                ? 'Produto e variações desativados com sucesso.'
-                : 'Produto ativado com sucesso.',
+            text: event.detail.text,
             icon: 'success',
             timer: 3000,
             showConfirmButton: false,
@@ -112,42 +138,42 @@
     });
 
 
+    //
+    // window.addEventListener('confirmarDesativacaoVariacao', function (event) {
+    //     Swal.fire({
+    //         title: 'Desativar produto também?',
+    //         text: 'Essa é a última variação ativa. O produto pai será desativado também.',
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Sim, desativar tudo',
+    //         cancelButtonText: 'Cancelar'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             Livewire.emit('atualizarCampo', event.detail.variacao_id,event.detail.campo, event.detail.valor);
+    //         }
+    //     });
+    // });
 
-    window.addEventListener('confirmarDesativacaoVariacao', function (event) {
-        Swal.fire({
-            title: 'Desativar produto também?',
-            text: 'Essa é a última variação ativa. O produto pai será desativado também.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sim, desativar tudo',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.emit('atualizarCampo', event.detail.variacao_id,event.detail.campo, event.detail.valor);
-            }
-        });
-    });
 
-
-
-    function confirmarDesativacaoVariacao(variacaoId, campo, inputElement) {
-        let statusNovo = inputElement.checked ? 1 : 0;
-
-        Swal.fire({
-            title: 'Tem certeza?',
-            text: statusNovo === 0
-                ? 'Essa variação será desativada.'
-                : 'Essa variação será ativada.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sim',
-            cancelButtonText: 'Cancelar',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.emit('atualizarCampo', variacaoId, campo, statusNovo);
-            } else {
-                // Reverter toggle visualmente se cancelado
-                inputElement.checked = !inputElement.checked;
-            }
-        });
-    }
+    //
+    // function confirmarDesativacaoVariacao(variacaoId, campo, inputElement) {
+    //     let statusNovo = inputElement.checked ? 1 : 0;
+    //
+    //     Swal.fire({
+    //         title: 'Tem certeza?',
+    //         text: statusNovo === 0
+    //             ? 'Essa variação será desativada.'
+    //             : 'Essa variação será ativada.',
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Sim',
+    //         cancelButtonText: 'Cancelar',
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             Livewire.emit('atualizarCampo', variacaoId, campo, statusNovo);
+    //         } else {
+    //             // Reverter toggle visualmente se cancelado
+    //             inputElement.checked = !inputElement.checked;
+    //         }
+    //     });
+    // }

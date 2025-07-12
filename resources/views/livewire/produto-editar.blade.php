@@ -100,20 +100,6 @@
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                            <select wire:model="produto.categoria_id" id="categoria_id" name="categoria_id"
-                                                    class="form-select format-font form-control-sm"
-                                                    data-toggle="tooltip" data-placement="top" title="Categoria do Produto" required>
-                                                <option value="" class="select-custom">Selecione?</option>
-                                                @foreach($categorias as $categoria)
-                                                    <option value="{{$categoria->id}}"> {{ ucfirst(strtolower($categoria->nome)) }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="label-qtd">CATEGORIA</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                             <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
                                                 <label class="form-label m-0">STATUS</label>
 
@@ -122,7 +108,7 @@
                                                         <input type="checkbox"
                                                                class="form-check-input"
                                                                id="switchStatus"
-                                                               wire:click="$emit('confirmarAlteracaoStatus', {{ $produto['id'] }})"
+                                                               wire:click="$emit('confirmarAlteracaoStatus','produto', '' ,{{ $produto['id'] }}, event.target)"
                                                             {{ $produto['status'] ? 'checked' : '' }}>
                                                     </div>
                                                     <span class="small">
@@ -295,7 +281,7 @@
 
                                                 <div class="col-md-3">
                                                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                                        <select wire:model="variacoes.{{ $index }}.fornecedor_id" class="form-select format-font form-control-sm" required>
+                                                        <select wire:model.defer="variacoes.{{ $index }}.fornecedor_id" class="form-select format-font form-control-sm" required>
                                                             <option value="">Selecione</option>
                                                             @foreach($fornecedores as $f)
                                                                 <option value="{{ $f['id'] }}" title="{{ $f['nome'] }}">
@@ -305,28 +291,38 @@
                                                         <label for="status">FORNECEDOR</label>
                                                     </div>
                                                 </div>
-                                                <div class="col-auto" style="max-width: 150px;">
-                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
 
-                                                        <select  wire:change="alterarStatusVariacao({{ $variacao['id'] }}, $event.target.value)"
-                                                                class="form-select format-font form-control-sm" required>
-                                                            <option value="">Selecione</option>
-                                                            <option value="1" {{ $variacao['status'] == 1 ? 'selected' : '' }}>Ativo</option>
-                                                            <option value="0" {{ $variacao['status'] == 0 ? 'selected' : '' }}>Inativo</option>
-                                                        </select>
-                                                        <label for="status">STATUS</label>
+                                                <div class="col-md-2">
+                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
+                                                        <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
+                                                            <label class="form-label m-0">STATUS</label>
+
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <div class="form-check form-switch m-0">
+                                                                    <input type="checkbox"
+                                                                           class="form-check-input"
+                                                                           id="switchStatus"
+                                                                           wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao['id'] }},{{$produto['id']}}, event.target)"
+                                                                        {{ $produto['status'] ? 'checked' : '' }}>
+                                                                </div>
+                                                                <span class="small">
+                                                        {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
+                                                    </span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-auto" style="max-width: 100px;">
-                                                    <button class="btn btn-sm btn-outline-danger" wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">
-                                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">
-                                                            <i class="fas fa-times"></i>
-                                                        </span>
-                                                        <span wire:loading wire:target="removerVariacao({{ $index }})">
-                                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...
-                                                        </span>
-                                                    </button>
-                                                </div>
+
+{{--                                                <div class="col-auto" style="max-width: 100px;">--}}
+{{--                                                    <button class="btn btn-sm btn-outline-danger" wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">--}}
+{{--                                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">--}}
+{{--                                                            <i class="fas fa-times"></i>--}}
+{{--                                                        </span>--}}
+{{--                                                        <span wire:loading wire:target="removerVariacao({{ $index }})">--}}
+{{--                                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...--}}
+{{--                                                        </span>--}}
+{{--                                                    </button>--}}
+{{--                                                </div>--}}
                                             </div>
                                         </div>
                                     </div>
