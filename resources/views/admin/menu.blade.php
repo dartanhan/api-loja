@@ -29,41 +29,52 @@
                         Monitoramento
                     </a>
                 @endif
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                    @if( Auth::user()->is_admin) Produtos @else Menu @endif
+                    @if( Auth::user()->is_admin) Gerenciar Produtos @else Menu @endif
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
+                <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav p-0">
                         @if( Auth::user()->is_admin)
-                            <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
+                            <a href="{{ route('produtos.produtos_ativos') }}" title="Gerenciar Produtos"
+                                    class="nav-link p-0 mb-3 {{ request()->routeIs('produtos.produtos_ativos') ? 'active' : '' }}">
+                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-box"></i></div>
                                 Produtos Ativos
                             </a>
-                            <a class="nav-link {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
-                                Produtos Ativos(New)
-                            </a>
-                            <a class="nav-link {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
+
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
                                 Produtos Inativos
                             </a>
+
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
+                                Produtos Ativos (Antigo)
+                            </a>
+{{--                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">--}}
+{{--                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>--}}
+{{--                                Produtos Ativos(New)--}}
+{{--                            </a>--}}
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
+                                <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
+                                Produtos Inativos (Antigo)
+                            </a>
                         @endif
-                            <a class="nav-link {{ Route::current()->getName() === 'produtos.baixo_estoque' ? 'active' : '' }}" href="{{route('produtos.baixo_estoque')}}">
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtos.baixo_estoque' ? 'active' : '' }}" href="{{route('produtos.baixo_estoque')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
                                 Baixo Estoque
                             </a>
 
-                            <a class="nav-link {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
                                 Produtos
                             </a>
-                            <a class="nav-link {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
                                     Lista de Compras
                             </a>
-                            <a class="nav-link {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
+                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
                                 Visão Trimestre
                             </a>
@@ -71,13 +82,13 @@
                 </div>
                 @if( Auth::user()->is_admin)
                 <div class="sb-sidenav-menu-heading">Interface</div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapseLayouts">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     Configurações
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
 
-                <div class="collapse" id="collapsePagesConfiguracoes" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapsePagesConfiguracoes" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ Route::current()->getName() === 'cashback.index' ? 'active' : '' }}" href="{{route('cashback.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-money-bill"></i></div>
@@ -120,12 +131,12 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
                                 Usuários
                         </a>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages2" aria-expanded="false" aria-controls="collapsePages2">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages2" aria-expanded="false" aria-controls="collapsePages2">
                         <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                             Dados da NFCe
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapsePages2" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion2">
+                        <div class="collapse" id="collapsePages2" aria-labelledby="headingTwo" data-parent="#sidenavAccordion2">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ Route::current()->getName() === 'origem.index' ? 'active' : '' }}" href="{{route('origem.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
@@ -135,12 +146,12 @@
                         </div>
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesRelatorios" aria-expanded="false" aria-controls="collapsePages">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesRelatorios" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                         Relatórios
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapsePagesRelatorios" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapsePagesRelatorios" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ Route::current()->getName() === 'categoria.index' ? 'active' : '' }}" href="{{route('categoria.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
@@ -169,14 +180,14 @@
 
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-sync-alt"></i>
                     </div>
                         Resposição
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapsePagesResposicao" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapsePagesResposicao" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
@@ -205,14 +216,14 @@
                         </a-->
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePagesAudits" aria-expanded="false" aria-controls="collapsePages">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesAudits" aria-expanded="false" aria-controls="collapsePages">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-check-square"></i>
                     </div>
                         Auditoria
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapsePagesAudits" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapsePagesAudits" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ Route::current()->getName() === 'audit.index' ? 'active' : '' }}" href="{{route('audit.index')}}">
                             <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>

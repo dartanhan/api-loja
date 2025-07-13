@@ -6,7 +6,7 @@
         const hostname = window.location.hostname;
         const pathname = (window.location.origin+""+window.location.pathname).split("/");
 
-        const url = (protocolo === "https:") ? protocolo +"//"+ hostname + "/admin" : protocolo +"//"+ hostname + "/"+pathname[3]+"/admin" ;
+        const url = (protocolo === "https:") ? protocolo +"//"+ hostname + "/admin" : protocolo +"//"+ hostname + "/"+pathname[3]+"" ;
 
         return url;
     }

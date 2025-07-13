@@ -101,6 +101,7 @@ class ClienteController extends Controller
                 $dados['cpf'] = $cpf;
             }
 
+
             //Cria o cliente ou atualiza
              $matchThese = array('id' => $request['id']);
             $cliente = $this->clienteModel::updateOrCreate($matchThese, $dados);

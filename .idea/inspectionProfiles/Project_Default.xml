@@ -21,9 +21,37 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="2">
+          <list size="14">
             <item index="0" class="java.lang.String" itemvalue="name" />
             <item index="1" class="java.lang.String" itemvalue="placeholder" />
+            <item index="2" class="java.lang.String" itemvalue="@selected($fornecedor[" />
+            <item index="3" class="java.lang.String" itemvalue="wire:model.defer" />
+            <item index="4" class="java.lang.String" itemvalue="wire:loading.remove" />
+            <item index="5" class="java.lang.String" itemvalue="wire:loading" />
+            <item index="6" class="java.lang.String" itemvalue="wire:target" />
+            <item index="7" class="java.lang.String" itemvalue="wire:model" />
+            <item index="8" class="java.lang.String" itemvalue="wire:click" />
+            <item index="9" class="java.lang.String" itemvalue="wire:loading.attr" />
+            <item index="10" class="java.lang.String" itemvalue="wire:blur" />
+            <item index="11" class="java.lang.String" itemvalue="wire:model.debounce.500ms" />
+            <item index="12" class="java.lang.String" itemvalue="wire:loading.delay" />
+            <item index="13" class="java.lang.String" itemvalue="wire:change" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="7">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="livewire:produtos-variacoes" />
           </list>
         </value>
       </option>

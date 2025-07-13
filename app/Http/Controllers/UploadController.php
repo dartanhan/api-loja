@@ -23,33 +23,39 @@ class UploadController extends Controller
         $this->temporaryFile = $temporaryFile;
     }
 
-    public function tmpUpload(){
-
+    public function tmpUpload()
+    {
         if ($this->request->hasFile('image')) {
-            $image = $this->request->file('image');
+            $files = $this->request->file('image');
 
-            $nome_unico = Str::uuid() . '.' . $image->getClientOriginalExtension();
+            foreach ((array)$files as $file) {
+                $nome_unico = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                $folder = uniqid("temporary", true);
 
-            $folder = uniqid("temporary", true);
+                $image = Image::make($file);
+                $image->resize(500, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
 
-            // Redimensionar imagem
-            $image = Image::make($image);
-            $image->resize(500, null, function ($constraint) {
-                $constraint->aspectRatio();
-            });
-            $temp_file = $image->encode('jpeg');
+                $temp_file = $image->encode('jpeg');
 
-            // Armazenar imagem redimensionada
-            Storage::put('tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+                //Storage::put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded, 'public')
+                Storage::disk('public')->put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded);
 
-            $this->temporaryFile->folder = $folder;
-            $this->temporaryFile->file =  $nome_unico;
-            $this->temporaryFile->save();
 
-            return $folder;
+                $this->temporaryFile->create([
+                    'folder' => $folder,
+                    'file'   => $nome_unico,
+                ]);
+
+                return response($folder);
+            }
         }
-        return '';
+
+        return response('Nenhum arquivo enviado', 400);
     }
+
+
 
     public function tmpDelete(){
         $temp_file = TemporaryFile::where('folder',$this->request->getContent())->first();
@@ -80,7 +86,8 @@ class UploadController extends Controller
             $temp_file = $image->encode('jpeg');
 
             // Armazenar imagem redimensionada
-            Storage::put($destinoFile.'/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+            //Storage::put($destinoFile.'/tmp/'.$folder.'/'.$nome_unico, $temp_file->encoded, 'public');
+            Storage::disk('public')->put("tmp/{$folder}/{$nome_unico}", $temp_file->encoded);
 
             $this->temporaryFile->folder = $folder;
             $this->temporaryFile->file =  $nome_unico;

@@ -1,4 +1,3 @@
-
 @extends('layouts.layout', ['page' => __('Produtos'), 'pageSlug' => 'product'])
 
 @section('menu')
@@ -128,7 +127,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">Incluir/Alterar/Remover - Fotos do Produto </h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -173,7 +172,7 @@
 
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="exampleModalLongTitle">Imagem do Produto </h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -184,7 +183,7 @@
                         <img id="modal-imagem" alt="Imagem Atual" class="img-thumbnail">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
                     </div>
                 </form>
@@ -201,7 +200,7 @@
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Atualização de Produtos em Lote</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                             <div class="form-row">
@@ -217,7 +216,7 @@
                     </div>
                     <div class="modal-footer">
                         <a href="{{URL::asset('/storage/atualizar_produto.xlsx')}}" class="btn btn-primary">Template</a>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary">Enviar</button>
                     </div>
                 </form>

@@ -20,6 +20,6 @@ storage/*.key
 api-loja.rar
 /bootstrap/.cache
 config/app.php
-/.idea
+*.idea
 bootstrap/cache/services.php
 bootstrap/cache/packages.php

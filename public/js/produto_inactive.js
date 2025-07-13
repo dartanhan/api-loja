@@ -72,7 +72,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../public/Portuguese-Brasil.json"
+                "url": "../../Portuguese-Brasil.json"
             },
             "order": [[0, "desc"]],
             //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
@@ -134,8 +134,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='../public/storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                                            "<img src='../../storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
+                                                            "<img src='../../storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +

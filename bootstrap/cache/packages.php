@@ -1,13 +1,13 @@
 <?php return array (
   'darkaonline/l5-swagger' => 
   array (
-    'aliases' => 
-    array (
-      'L5Swagger' => 'L5Swagger\\L5SwaggerFacade',
-    ),
     'providers' => 
     array (
       0 => 'L5Swagger\\L5SwaggerServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'L5Swagger' => 'L5Swagger\\L5SwaggerFacade',
     ),
   ),
   'facade/ignition' => 
@@ -65,6 +65,17 @@
     'providers' => 
     array (
       0 => 'Laravel\\Ui\\UiServiceProvider',
+    ),
+  ),
+  'livewire/livewire' => 
+  array (
+    'aliases' => 
+    array (
+      'Livewire' => 'Livewire\\Livewire',
+    ),
+    'providers' => 
+    array (
+      0 => 'Livewire\\LivewireServiceProvider',
     ),
   ),
   'nesbot/carbon' => 

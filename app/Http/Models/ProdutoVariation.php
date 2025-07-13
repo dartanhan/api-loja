@@ -11,6 +11,7 @@ use OwenIt\Auditing\Models\Audit;
 
 /**
  * @method static create($data)
+ * @method static findOrFail($variacaoId)
  */
 class ProdutoVariation extends Model implements Auditable
 {

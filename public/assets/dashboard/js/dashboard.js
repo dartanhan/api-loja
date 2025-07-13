@@ -130,7 +130,7 @@ $(function () {
             }
         ],
         language: {
-            "url": "../public/Portuguese-Brasil.json"
+            "url": "../../../Portuguese-Brasil.json"
         },
         "order": [[8, "desc"]]
 

@@ -42,9 +42,9 @@ $(function() {
                     render: function (data, type, row) {
                         if(row.produto_imagens.length > 0){
                             let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                            return '<img src="../public/storage/product/' + row.id + '/' + path + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
+                            return '<img src="../../storage/product/' + row.id + '/' + path + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
                         }else{
-                            return '<img src="../public/storage/produtos/not-image.png" class="image img-datatable"/>';
+                            return '<img src="../../storage/produtos/not-image.png" class="image img-datatable"/>';
                         }
                     }
                 },
@@ -61,13 +61,13 @@ $(function() {
                 {
                     "data": "defaultContent",
                     render: function (data, type, row) {
-                        let image = "../public/storage/produtos/not-image.png";
+                        let image = "../../storage/produtos/not-image.png";
                         let image_id = null;
                         let path = null;
                         //if(row.imagem !== null){
                         if(row.produto_imagens.length > 0){
                                 path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                                image = '../public/storage/product/'+row.id+'/'+ path;
+                                image = '../../storage/product/'+row.id+'/'+ path;
                                 image_id = row.produto_imagens[0].id;
                             }
 
@@ -75,8 +75,8 @@ $(function() {
                             "<span data-toggle=\"tooltip\" data-placement=\"right\"  title='Alterar Imagem do Produto'> "+
                             " <i class=\"bi-image\" " +
                             "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                            "   data-bs-toggle=\"modal\" " +
-                            "   data-bs-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
+                            "   data-toggle=\"modal\" " +
+                            "   data-target=\"#divModalImageProduct\" data-id='"+row.id+"' " +
                             "   data-image-preview='"+image+"'  data-path='"+path+"' data-flag-image='0'  " +
                             "   data-image-id='"+image_id+"'></i></span>"+
                             "<i class=\"bi-pencil-square btnUpdateProduct\" " +
@@ -102,7 +102,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../public/Portuguese-Brasil.json"
+                "url": "../../Portuguese-Brasil.json"
             },
             "order": [[0, "desc"]]
         });
@@ -160,8 +160,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                        "<img src='../public/storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>" :
-                                        "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>"
+                                        "<img src='../../storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>" :
+                                        "<img src='../../storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>"
 
                                     let image_filho = "../public/storage/produtos/not-image.png";
                                     if (arrayItem.path !== null) {
@@ -181,8 +181,8 @@ $(function() {
                                             "<td>" + "<span class='badge bg-success'>" + arrayItem.status + "</span>" + "</td>" +
                                             "<td><i class=\"bi-image\" " +
                                             "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                            "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
-                                            "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='" + arrayItem.id + "' " +
+                                            "   title='Imagem da Variação do Produto' data-toggle=\"modal\" " +
+                                            "   data-target=\"#divModalImageProduct\" data-variacao-id='" + arrayItem.id + "' " +
                                             "   data-subcodigo='" + arrayItem.subcodigo + "' data-image-id='" + arrayItem.id_image + "'" +
                                             "   data-image-preview='" + image_filho + "'  data-path='" + arrayItem.path + "' data-flag-image='1'>" +
                                             "</td>" +

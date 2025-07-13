@@ -80,6 +80,21 @@ class ProdutoController extends Controller
     }
 
     /**
+     * Livewire
+    */
+    public function produtos_ativos()
+    {
+        return view('admin.produtos.ativos');
+    }
+
+    /**
+     * Livewire
+     */
+    public function produtos_inativos()
+    {
+        return view('admin.produtos.inativos');
+    }
+    /**
      * Show the form for creating a new resource.
      *
      * @return JsonResponse
@@ -438,12 +453,12 @@ class ProdutoController extends Controller
     /**
      * Retorna os produtos inativos
      *
-     * @param int $id
+     * @param Produto $produto
      * @return void
      */
-    public function edit($id)
+    public function edit(Produto $produto)
     {
-
+      //
     }
 
     /**
