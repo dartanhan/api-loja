@@ -35,10 +35,9 @@
 
         <div class="card shadow border-0 mb-3 p-2">
             <table class="table table-bordered table-striped table-hover">
-            <thead class="table-light">
+            <thead class="table-light text-center">
             <tr>
-                <th style="width: 50px;"></th>
-
+                <th style="width: 50px;">#</th>
                 <th wire:click="sortBy('id')" style="cursor:pointer;">
                     Id
                     @if($sortField === 'id')
@@ -47,7 +46,8 @@
                         <i class="fas fa-sort text-muted"></i>
                     @endif
                 </th>
-
+                <th>Código</th>
+                <th class="w-10">Imagem</th>
                 <th wire:click="sortBy('descricao')" style="cursor:pointer;">
                     Produto
                     @if($sortField === 'descricao')
@@ -63,10 +63,10 @@
             </thead>
 
             <tbody>
-            @foreach($produtos as $produto)
-                <tr wire:key="produto-{{ $produto->id }}">
-                    <td>
 
+            @foreach($produtos as $produto)
+                <tr wire:key="produto-{{ $produto->id }}" >
+                    <td class="text-center align-middle">
                         <button wire:click="toggleExpand({{ $produto->id }})"
                                 wire:loading.attr="disabled"
                                 class="btn btn-sm p-0 m-0 align-middle">
@@ -84,10 +84,31 @@
                             </span>
                         </button>
                     </td>
-                    <td>{{ $produto->id }}</td>
-                    <td>{{ $produto->descricao }}</td>
-                    <td>R$ {{ number_format($produto->valor_produto, 2, ',', '.') }}</td>
-                    <td class="text-align ">
+                    <td class="text-center align-middle">{{ $produto->id }}</td>
+                    <td class="text-center align-middle">{{$produto->codigo_produto}}</td>
+                    <td class="text-center align-middle">
+                        @php
+                            /** @var TYPE_NAME $produto */
+                            $primeiraImagem = $produto->produtoImagens->first();
+                            $path = $primeiraImagem ? 'product/' . $produto->produtoImagens[0]->produto_id  . '/' . $primeiraImagem->path : null;
+
+                            $imagemPath = ($path && Storage::disk('public')->exists($path))
+                                ? $path
+                                : 'produtos/not-image.png';
+                        @endphp
+
+                        <img
+                            src="{{ asset('storage/' . $imagemPath) }}"
+                            class="img-thumbnail"
+                            style="cursor: pointer;"
+                            onclick="previewImagem('{{ asset('storage/' . $imagemPath) }}')"
+                            data-toggle="tooltip" data-placement="top" title="Click para ampliar Imagem"
+                        />
+
+                    </td>
+                    <td class="text-center align-middle">{{ $produto->descricao }}</td>
+                    <td class="text-center align-middle">R$ {{ number_format($produto->valor_produto, 2, ',', '.') }}</td>
+                    <td class="text-center align-middle" width="100px">
                         <span class="badge {{ $produto->status ? 'bg-success' : 'bg-danger' }}">
                             {{ $produto->status ? 'Ativo' : 'Inativo' }}
                         </span>
@@ -100,11 +121,31 @@
 
                         @if($variacao && is_object($variacao))
                             <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
+
                                 <td colspan="12">
                                     <div class="row align-items-start g-1 px-3 py-2">
+                                        <div class="col-md-3" style="max-width: 270px;">
+                                            @forelse ($variacao->images as $image)
+                                                <img
+                                                    src="{{ asset('storage/'.$image->path) }}"
+                                                    class="img-thumbnail m-1"
+                                                    style="cursor: pointer;"
+                                                    onclick="previewImagem('{{ asset('storage/'.$image->path) }}')"
+                                                    alt="Imagem Variação"
+                                                />
+                                            @empty
+                                                <img
+                                                    src="{{ asset('storage/produtos/not-image.png') }}"
+                                                    class="img-thumbnail"
+                                                    style="cursor: pointer;"
+                                                    onclick="previewImagem('{{ asset('storage/produtos/not-image.png') }}')"
+                                                    alt="Imagem não disponível"
+                                                />
+                                            @endforelse
 
+                                        </div>
                                         {{-- Subcódigo --}}
-                                        <div class="col-md-1" style="max-width: 80px;">
+                                        <div class="col-md-1 mt-4" style="max-width: 80px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Subcód.</label>
                                             @endif
@@ -112,7 +153,7 @@
                                         </div>
 
                                         {{-- Variação --}}
-                                        <div class="col-md-2">
+                                        <div class="col-md-2 mt-4">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Variação</label>
                                             @endif
@@ -123,7 +164,7 @@
                                         </div>
 
                                         {{-- Quantidade com botões --}}
-                                        <div class="col-md-2" style="max-width: 100px;">
+                                        <div class="col-md-2 mt-4" style="max-width: 100px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Qtd.</label>
                                             @endif
@@ -155,7 +196,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-2" style="max-width: 100px;">
+                                        <div class="col-md-2 mt-4" style="max-width: 100px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Estoque.</label>
                                             @endif
@@ -186,7 +227,7 @@
                                             </div>
                                         </div>
                                         {{-- Valor Unitário --}}
-                                        <div class="col-md-2" style="max-width: 120px;">
+                                        <div class="col-md-2 mt-4" style="max-width: 120px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Valor Varejo</label>
                                             @endif
@@ -200,7 +241,7 @@
                                         </div>
 
                                         {{-- Valor Produto --}}
-                                        <div class="col-md-2" style="max-width: 120px;">
+                                        <div class="col-md-2 mt-4" style="max-width: 120px;">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Valor Produto</label>
                                             @endif
@@ -214,7 +255,7 @@
                                         </div>
 
                                         {{-- Fornecedor --}}
-                                        <div class="col-md-2">
+                                        <div class="col-md-2 mt-4">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Fornecedor</label>
                                             @endif
@@ -229,7 +270,7 @@
                                                     @endforeach
                                                 </select>
                                         </div>
-                                        <div class="col-md-1 text-end">
+                                        <div class="col-md-1 mt-4 text-end">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1">Status</label>
                                             @endif
@@ -246,7 +287,7 @@
                                         </div>
 
                                         {{-- Ações --}}
-                                        <div class="col-md-1 text-end">
+                                        <div class="col-md-1 mt-4 text-end">
                                             @if ($loop->first)
                                                 <label class="form-label form-label-sm mb-1 d-block">Ações</label>
                                             @endif
@@ -276,6 +317,16 @@
             </tbody>
         </table>
         </div>
+        <!-- Modal Preview de Imagem -->
+        <div class="modal fade" id="previewImagemModal" tabindex="-1" aria-labelledby="previewImagemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <img id="imagemPreviewGrande" src="" class="img-fluid" alt="Preview Imagem">
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="d-flex justify-content-center">
             {!! $produtos->links('vendor.pagination.bootstrap-4') !!}
@@ -285,6 +336,7 @@
 
 @push('styles')
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
+
     <style>
         .variation-row {
             animation: fadeSlideDown 0.3s ease-in-out;
@@ -319,7 +371,16 @@
         .icon-expand:hover {
             transform: scale(1.1);
         }
-
+        .img-thumbnail{
+            border-radius: 5%;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+        }
+        .td-center {
+            text-align: center;        /* Centraliza horizontal */
+            vertical-align: middle;    /* Centraliza vertical */
+        }
     </style>
 @endpush
 

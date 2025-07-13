@@ -60,7 +60,7 @@ class ProdutosVariacoes extends Component
             $this->expanded[] = $produtoId;
 
             // Sempre recarrega as variações ao expandir
-            $this->variacoesCarregadas[$produtoId] = ProdutoVariation::where('products_id', $produtoId)
+            $this->variacoesCarregadas[$produtoId] = ProdutoVariation::with('images')->where('products_id', $produtoId)
                 ->where('status', 1)
                 ->get()
                 ->filter(); // Remove nulls, objetos vazios etc.
@@ -166,7 +166,7 @@ class ProdutosVariacoes extends Component
 
         $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))->filter(); // remove termos vazios
 
-        $produtos = Produto::where('status', 1)
+        $produtos = Produto::with('produtoImagens')->where('status', 1)
             ->where(function ($query) use ($searchTerms) {
                 foreach ($searchTerms as $term) {
                     $query->where(function ($sub) use ($term) {
