@@ -104,7 +104,6 @@
                             onclick="previewImagem('{{ asset('storage/' . $imagemPath) }}')"
                             data-toggle="tooltip" data-placement="top" title="Click para ampliar Imagem"
                         />
-
                     </td>
                     <td class="text-center align-middle">{{ $produto->descricao }}</td>
                     <td class="text-center align-middle">R$ {{ number_format($produto->valor_produto, 2, ',', '.') }}</td>

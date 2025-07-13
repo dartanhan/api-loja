@@ -41,7 +41,6 @@ class ProdutosVariacoes extends Component
 
     }
 
-
     public function updatingSearch()
     {
         $this->resetPage();
