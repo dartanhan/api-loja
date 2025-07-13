@@ -4,7 +4,7 @@ $(document).ready(function() {
     feather.replace();
 
     var metodo = '',titulo = '';
-    
+
     const urlApi = fncUrl();
 
     var table  = $('#tableClientes').DataTable({
@@ -47,7 +47,7 @@ $(document).ready(function() {
         //$(".modal-header").css( "background-color", "#17a2b8");
         //$(".modal-header").css( "color", "white" );
         //$(".modal-title").text("Cadastrar Categorias");
-        $('#modal-title').html('<p><img src="../img/iconfinder_interface-99_4634467.png"></img>&nbsp;<strong>NOVA </strong></p>');
+        $('#modal-title').html('<p><img src="'+Helpers.asset("img/iconfinder_interface-99_4634467.png")+'" alt=""/>&nbsp;<strong>NOVA </strong></p>');
 
         modal('#divModal');
 
@@ -110,7 +110,7 @@ $(document).ready(function() {
                         window.setTimeout(function () {
                             $('#modal-title').fadeIn('slow').removeClass("alert alert-success")
                                 .addClass("alert alert-secondary")
-                                .html('<p><img src="../img/iconfinder_interface-99_4634467.png"></img>' +
+                                .html('<p><img src="'+Helpers.asset("img/iconfinder_interface-99_4634467.png")+'" alt=""/>' +
                                     '&nbsp;<strong>'+titulo+'</strong></p>');
                         }, 3000);
                     });
@@ -135,7 +135,7 @@ $(document).ready(function() {
         $("#telefone").val(quantidade);
         $("#cep").val(status);
 
-        $('#modal-title').html('<p><img src="../img/iconfinder_interface-99_4634467.png"></img>&nbsp;<strong>EDITANDO</strong></p>');
+        $('#modal-title').html('<p><img src="'+Helpers.asset("img/iconfinder_interface-99_4634467.png")+'" alt=""/>&nbsp;<strong>EDITANDO</strong></p>');
         modal('#divModal');
     });
 

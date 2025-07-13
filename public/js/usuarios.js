@@ -35,7 +35,7 @@ $(document).ready(function() {
               {"defaultContent": "<div class='text-center'>" +
                       "<div class='btn-group'>" +
                       "<button class='btn btn-primary btn-sm btnEditar' " +
-                      "data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
+                      "data-toggle=\"modal\" data-target=\"#divModal\">" +
                       "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
                       "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
                       "</div>" +
@@ -44,7 +44,7 @@ $(document).ready(function() {
           ] ,
           "order": [[ 1, "asc" ]]
           ,	language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
 	});
 
@@ -60,7 +60,7 @@ $(document).ready(function() {
         $("#metodo").val('POST');
 		this.blur(); // Manually remove focus from clicked link.
         $("#modal-title").addClass("alert alert-success");
-		$('#modal-title').html('<p><img src="../public/img/iconfinder_user-alt_285645.png"/>&nbsp;<strong>NOVO USUÁRIO</strong></p>');
+		$('#modal-title').html('<p><img src="'+Helpers.asset("img/iconfinder_user-alt_285645.png")+'"/>&nbsp;<strong>NOVO USUÁRIO</strong></p>');
     });
 
     /**
@@ -80,7 +80,7 @@ $(document).ready(function() {
         $("#status").val(status);
 
         $("#modal-title").addClass("alert alert-secondary");
-        $('#modal-title').html('<p><img src="../public/img/iconfinder_user-alt_285645.png"/>&nbsp;<strong>EDITANDO USUÁRIO</strong></p>');
+        $('#modal-title').html('<p><img src="'+Helpers.asset("img/iconfinder_user-alt_285645.png")+'"/>&nbsp;<strong>EDITANDO USUÁRIO</strong></p>');
     });
 
 	/****

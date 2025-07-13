@@ -73,7 +73,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../public/Portuguese-Brasil.json",
+                "url": Helpers.asset("Portuguese-Brasil.json"),
             },
             initComplete: function(settings, json) {
                 $('#loadingMessage').hide();
@@ -136,13 +136,13 @@ $(function() {
                            if (response.success) {
                            // Iterar sobre cada objeto no array
                            response.data.forEach(function(obj) {
-                                let image = obj.imagem !== null ?
-                                                "<img src='../public/storage/" + obj.imagem + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='" + obj.variacao + "'/>" :
-                                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='" + obj.variacao + "'/>"
+                               let image = obj.imagem !== null ?
+                                   "<img src='" + Helpers.asset("storage/" + obj.imagem) + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='" + obj.variacao + "'/>" :
+                                   "<img src='" + Helpers.asset("storage/produtos/not-image.png") + "' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='" + obj.variacao + "'/>";
 
-                                    let image_filho = "../public/storage/produtos/not-image.png";
+                               let image_filho = Helpers.asset("storage/produtos/not-image.png");
                                     if(obj.imagem !== null){
-                                        image_filho = '../public/storage/'+obj.imagem;
+                                        image_filho = Helpers.asset('storage/'+obj.imagem);
                                     }
 
                                     //monta o header diferetne para casao não seja ADMIN

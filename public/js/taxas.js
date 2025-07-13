@@ -3,7 +3,7 @@ $(document).ready(function() {
     const urlApi = fncUrl();
 
     let metodo = '',titulo = '', id ='',url,json,fila,nome,taxa,token;
-    
+
     $('#valor_taxa').maskMoney();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -46,7 +46,7 @@ $(document).ready(function() {
             { "visible": false, "targets": 5 }
         ],
         language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[ 2, "asc" ]]
     });

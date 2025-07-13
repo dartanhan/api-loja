@@ -92,7 +92,7 @@ $(function() {
             }
         ],
         language: {
-            "url": "../public/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[0, "desc"]],
         drawCallback: function() {

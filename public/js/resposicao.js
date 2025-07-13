@@ -60,7 +60,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../public/Portuguese-Brasil.json"
+                "url": Helpers.asset("Portuguese-Brasil.json")
             },
             //page: 50, // Define o número de linhas exibidas por padrão
             "order": [[3, "desc"]],

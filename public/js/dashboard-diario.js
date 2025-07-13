@@ -141,7 +141,7 @@ $(function () {
                 }
             ],
         language: {
-            "url": "../public/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[8, "desc"]],
         "initComplete": function(settings, json) {

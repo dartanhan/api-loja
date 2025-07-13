@@ -20,9 +20,9 @@
                             Usuários
                         </div>
                         <div class="text-right" style="position: absolute;margin-top: -7px; text-align: right">
-                            <button id="btnNuevo" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#divModal">
+                            <button id="btnNuevo" type="button" class="btn btn-primary" data-toggle="modal" data-target="#divModal">
                                 <i class="fas fa-user-circle"></i>
-                                Nova Usuário
+                                Novo Usuário
                             </button>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                 <form id="form" name="form" class="needs-validation form-floating" novalidate method="post">
                     <div class="modal-header ">
                         <div class="alert col-md-11 alert-secondary" role="alert" id="modal-title"></div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
@@ -119,7 +119,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
                     </div>
                 </form>

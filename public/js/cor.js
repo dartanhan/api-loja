@@ -1,8 +1,8 @@
 /* globals Chart:false, feather:false */
 $(document).ready(function() {
-    
+
     let metodo = '', titulo = '',url,json,fila,id,nome,status,token;
-    
+
     const urlApi = fncUrl();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -43,7 +43,7 @@ $(document).ready(function() {
         ],
         "order": [[1, "asc"]]
         , language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
     });
 
@@ -58,7 +58,7 @@ $(document).ready(function() {
 		$('form[name="form"]')[0].reset();
 		$('#modal-title').html('<div class=\'btn-group\'>' +
                                     '<p>' +
-                                    ' <img src="../public/img/iconfinder_preferences-desktop-color_24251.png" />&nbsp;' +
+                                    ' <img src="'+Helpers.asset("img/iconfinder_preferences-desktop-color_24251.png")+'" alt=""/>&nbsp;' +
                                     ' <strong><h5>NOVA COR</h5></strong>' +
                                     '</p>'+
                                 '</div>');
@@ -78,7 +78,7 @@ $(document).ready(function() {
         $("#nome").val(nome);
         $("#status").val(status);
 
-        $('#modal-title').html('<p><img src="../public/img/iconfinder_preferences-desktop-color_24251.png"/>&nbsp;<strong>EDITANDO COR</strong></p>');
+        $('#modal-title').html('<p><img src="'+Helpers.asset("img/iconfinder_preferences-desktop-color_24251.png")+'" alt=""/>&nbsp;<strong>EDITANDO COR</strong></p>');
     });
 
     /**

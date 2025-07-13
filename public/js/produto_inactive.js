@@ -72,7 +72,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../../Portuguese-Brasil.json"
+                "url": Helpers.asset("Portuguese-Brasil.json")
             },
             "order": [[0, "desc"]],
             //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
@@ -134,8 +134,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                                            "<img src='../../storage/"+ arrayItem.path + "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
-                                                            "<img src='../../storage/produtos/not-image.png' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
+                                            "<img src='"+Helpers.asset("storage/"+ arrayItem.path)+ "' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>" :
+                                            "<img src='"+Helpers.asset("storage/produtos/not-image.png")+"' class=\"image\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'/>"
 
                                     tmpRow += "<tr>" +
                                         "<td>"+image+"</td>" +
@@ -284,12 +284,13 @@ $(function() {
                 if(response.data.length > 0){
                     $.each(response.data, function (idx, value) {
                         grid += "<div class=\"col\">";
-                        grid += "<img src='.,/public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"/>";
-                        grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
+                        grid += "<img src='"+Helpers.asset("/storage/" + value.path) + "' width='180px' height='180px' alt=\"\"/>";
+                        grid += "<i class=\"bi-trash btnRemoveImage\" data-id='"+value.id+"' " +
+                                    "style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
                         grid += "</div>";
                     });
                 }else{
-                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"/>";
+                    grid = "<img src='"+Helpers.asset("storage/produtos/not-image.png")+"' width='180px' height='180px' alt=\"\"/>";
                 }
                 $("#pictures").html(grid);
             },
