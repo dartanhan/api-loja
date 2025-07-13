@@ -42,9 +42,9 @@ $(function() {
                     render: function (data, type, row) {
                         if(row.produto_imagens.length > 0){
                             let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                            return '<img src="../../storage/product/' + row.id + '/' + path + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
+                            return '<img src="../storage/product/' + row.id + '/' + path + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
                         }else{
-                            return '<img src="../../storage/produtos/not-image.png" class="image img-datatable"/>';
+                            return '<img src="../storage/produtos/not-image.png" class="image img-datatable"/>';
                         }
                     }
                 },
@@ -61,13 +61,13 @@ $(function() {
                 {
                     "data": "defaultContent",
                     render: function (data, type, row) {
-                        let image = "../../storage/produtos/not-image.png";
+                        let image = "../storage/produtos/not-image.png";
                         let image_id = null;
                         let path = null;
                         //if(row.imagem !== null){
                         if(row.produto_imagens.length > 0){
                                 path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                                image = '../../storage/product/'+row.id+'/'+ path;
+                                image = '../storage/product/'+row.id+'/'+ path;
                                 image_id = row.produto_imagens[0].id;
                             }
 
@@ -102,7 +102,7 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../../Portuguese-Brasil.json"
+                "url": "../Portuguese-Brasil.json"
             },
             "order": [[0, "desc"]]
         });
@@ -160,12 +160,12 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                        "<img src='../../storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>" :
-                                        "<img src='../../storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>"
+                                        "<img src='../storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>" :
+                                        "<img src='../storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'></img>"
 
-                                    let image_filho = "../public/storage/produtos/not-image.png";
+                                    let image_filho = "../storage/produtos/not-image.png";
                                     if (arrayItem.path !== null) {
-                                        image_filho = '../public/storage/' + arrayItem.path;
+                                        image_filho = '../storage/' + arrayItem.path;
                                     }
                                     if (arrayItem.status !== 'INATIVO'){
                                         tmpRow += "<tr>" +
