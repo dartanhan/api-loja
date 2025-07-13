@@ -130,7 +130,7 @@ $(function () {
             }
         ],
         language: {
-            "url": "../../../Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[8, "desc"]]
 

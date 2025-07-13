@@ -138,42 +138,11 @@
     });
 
 
-    //
-    // window.addEventListener('confirmarDesativacaoVariacao', function (event) {
-    //     Swal.fire({
-    //         title: 'Desativar produto também?',
-    //         text: 'Essa é a última variação ativa. O produto pai será desativado também.',
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Sim, desativar tudo',
-    //         cancelButtonText: 'Cancelar'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             Livewire.emit('atualizarCampo', event.detail.variacao_id,event.detail.campo, event.detail.valor);
-    //         }
-    //     });
-    // });
+    function previewImagem(src) {
+        const imgElement = document.getElementById('imagemPreviewGrande');
+        imgElement.src = src;
 
+        const modal = new bootstrap.Modal(document.getElementById('previewImagemModal'));
+        modal.show();
+    }
 
-    //
-    // function confirmarDesativacaoVariacao(variacaoId, campo, inputElement) {
-    //     let statusNovo = inputElement.checked ? 1 : 0;
-    //
-    //     Swal.fire({
-    //         title: 'Tem certeza?',
-    //         text: statusNovo === 0
-    //             ? 'Essa variação será desativada.'
-    //             : 'Essa variação será ativada.',
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Sim',
-    //         cancelButtonText: 'Cancelar',
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             Livewire.emit('atualizarCampo', variacaoId, campo, statusNovo);
-    //         } else {
-    //             // Reverter toggle visualmente se cancelado
-    //             inputElement.checked = !inputElement.checked;
-    //         }
-    //     });
-    // }
