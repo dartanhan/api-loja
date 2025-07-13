@@ -7,6 +7,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="asset-url" content="{{ asset('') }}">
     <title>KN Cosméticos - Admin</title>
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap.css')}}">
     <link href="{{asset('css/dashboard/styles.css')}}" rel="stylesheet" />
@@ -87,12 +88,18 @@
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
+
     @livewireScripts
     @stack("scripts")
     <script>
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
+
+        window.Laravel = {
+            assetUrl: "{{ rtrim(asset(''), '/') }}/"
+        };
     </script>
+    <script src="{{ asset('js/helper/helpers.js') }}"></script>
 </body>
 </html>

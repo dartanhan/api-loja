@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
     feather.replace();
-    
+
     const urlApi = fncUrl();
 
     var metodo = '',titulo = '';
@@ -75,7 +75,7 @@ $(document).ready(function() {
             },
         ] ,
         language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[ 6, "desc" ]]
 

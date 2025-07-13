@@ -177,7 +177,18 @@
                         </button>
                     </div>
                     <div class="modal-body text-center">
-                        <input type="file"  id="image" name="image" title="Imagem" placeholder="Imagem" data-type="local">
+                        <input type="file"
+                               multiple
+                               id="image"
+                               name="image[]"
+                               title="Imagem"
+                               laceholder="Imagem"
+                               data-type="local"
+                               data-max-files="10"
+                               data-allow-reorder="true"
+                               data-max-file-size="3MB"
+                               data-allow-multiple="true"
+                               class="filepond">
 
                         <!-- Pré-visualização da imagem atual -->
                         <img id="modal-imagem" alt="Imagem Atual" class="img-thumbnail">

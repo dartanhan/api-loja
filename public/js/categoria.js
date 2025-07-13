@@ -32,7 +32,7 @@ $(document).ready(function() {
             {"data": "nome"},
             {"data": "defaultContent",
                 render: function (data, type, row) {
-                    return '<img src="../public/storage/categorias/'+row.id+'/'+ row.imagem + '" class="img-datatable">';
+                    return '<img src="'+Helpers.asset("storage/categorias/"+row.id+"/"+ row.imagem)+'" class="img-datatable">';
                 }
             },
             {"data": "defaultContent",
@@ -49,14 +49,14 @@ $(document).ready(function() {
             {"defaultContent": "<div class='text-center'>" +
                                     "<div class='btn-group'>" +
                                         "<button class='btn btn-primary btn-sm btnEditar' " +
-                                             "data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
+                                             "data-toggle=\"modal\" data-target=\"#divModal\">" +
                                                 "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
                                         "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
                                     "</div>" +
                                 "</div>"}
         ] ,
         language: {
-            "url": "../public/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
         "order": [[ 1, "asc" ]]
     });

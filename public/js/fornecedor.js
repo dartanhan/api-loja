@@ -37,7 +37,7 @@ $(document).ready(function() {
             {"defaultContent": "<div class='text-center'>" +
                     "<div class='btn-group'>" +
                     "<button class='btn btn-primary btn-sm btnEditar' " +
-                    "data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
+                    "data-toggle=\"modal\" data-target=\"#divModal\">" +
                     "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
                     "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
                     "</div>" +
@@ -52,7 +52,7 @@ $(document).ready(function() {
         ],
         "order": [[ 1, "asc" ]]
         ,	language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json"
+            "url": Helpers.asset("Portuguese-Brasil.json")
         },
     });
 
