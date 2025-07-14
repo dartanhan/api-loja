@@ -106,8 +106,8 @@ class ProdutosVariacoes extends Component
 
             // Ignora valores zerados ou negativos
             if ($valor > 0) {
-                //$variacao->quantidade += $valor;
-                $variacao->quantidade = $valor;
+                $variacao->quantidade += $valor;
+                //$variacao->quantidade = $valor;
             }
         } else {
             $variacao->$campo = $valor;
