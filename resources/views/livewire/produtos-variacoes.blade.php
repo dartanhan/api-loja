@@ -122,189 +122,169 @@
                             <tr class="bg-light variation-row" wire:key="variacao-{{ $variacao->id }}">
 
                                 <td colspan="12">
-                                    <div class="row align-items-start g-1 px-3 py-2">
+                                    <div class="row g-2 align-items-start px-3 py-2">
+                                        {{-- Coluna das Imagens --}}
                                         <div class="col-md-3" style="max-width: 270px;">
                                             @forelse ($variacao->images as $image)
                                                 <img
                                                     src="{{ asset('storage/'.$image->path) }}"
-                                                    class="img-thumbnail m-1"
+                                                    class="img-thumbnail"
                                                     style="cursor: pointer;"
+                                                    data-toggle="tooltip" data-placement="top"
                                                     onclick="previewImagem('{{ asset('storage/'.$image->path) }}')"
-                                                    alt="Imagem Variação"
+                                                    title="Click para ampliar"
                                                 />
                                             @empty
                                                 <img
                                                     src="{{ asset('storage/produtos/not-image.png') }}"
                                                     class="img-thumbnail"
-                                                    style="cursor: pointer;"
+                                                    style="cursor: pointer; max-width: 100%; height: auto;"
                                                     onclick="previewImagem('{{ asset('storage/produtos/not-image.png') }}')"
                                                     alt="Imagem não disponível"
                                                 />
                                             @endforelse
-
-                                        </div>
-                                        {{-- Subcódigo --}}
-                                        <div class="col-md-1 mt-4" style="max-width: 80px;">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Subcód.</label>
-                                            @endif
-                                            <input type="text" class="form-control form-control-sm" value="{{ $variacao->subcodigo }}" disabled />
                                         </div>
 
-                                        {{-- Variação --}}
-                                        <div class="col-md-2 mt-4">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Variação</label>
-                                            @endif
-                                            <input type="text"
-                                                   class="form-control form-control-sm"
-                                                   value="{{ $variacao->variacao }}"
-                                                   wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)">
-                                        </div>
-
-                                        {{-- Quantidade com botões --}}
-                                        <div class="col-md-2 mt-4" style="max-width: 100px;">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Qtd.</label>
-                                            @endif
-                                            <div class="input-group input-group-sm">
-                                                <button wire:click="decrementar({{ $variacao->id }}, 'quantidade')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
-                                                        class="btn btn-outline-danger btn-sm">
-                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
-                                                          class="spinner-border spinner-border-sm">
-                                                    </span>
-                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'quantidade')">−</span>
-                                                </button>
-
-                                                <input type="text"
-                                                       class="form-control text-center form-control-sm p-0"
-                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
-                                                       value="{{ $variacao->quantidade }}">
-
-                                                <button wire:click="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                        class="btn btn-outline-success btn-sm">
-                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
-                                                          class="spinner-border spinner-border-sm">
-                                                    </span>
-                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'quantidade')">+</span>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-2 mt-4" style="max-width: 100px;">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Estoque.</label>
-                                            @endif
-                                            <div class="input-group input-group-sm">
-                                                <button wire:click="decrementar({{ $variacao->id }}, 'estoque')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="decrementar({{ $variacao->id }}, 'estoque')"
-                                                        class="btn btn-outline-danger btn-sm">
-                                                    <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'estoque')"
-                                                          class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'estoque')">−</span>
-                                                </button>
-
-                                                <input type="text"
-                                                       class="form-control text-center form-control-sm p-0"
-                                                       wire:change="atualizarCampo({{ $variacao->id }}, 'estoque', $event.target.value)"
-                                                       value="{{ $variacao->estoque }}">
-
-                                                <button wire:click="incrementar({{ $variacao->id }}, 'estoque')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="incrementar({{ $variacao->id }}, 'estoque')"
-                                                        class="btn btn-outline-success btn-sm">
-                                                    <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'estoque')"
-                                                          class="spinner-border spinner-border-sm"></span>
-                                                    <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'estoque')">+</span>
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                        {{-- Valor Unitário --}}
-                                        <div class="col-md-2 mt-4" style="max-width: 120px;">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Valor Varejo</label>
-                                            @endif
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text">R$</span>
-                                                <input type="text"
-                                                       class="form-control moeda form-control-sm"
-                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)"
-                                                       value="{{ number_format($variacao->valor_varejo, 2, ',', '.') }}">
-                                            </div>
-                                        </div>
-
-                                        {{-- Valor Produto --}}
-                                        <div class="col-md-2 mt-4" style="max-width: 120px;">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Valor Produto</label>
-                                            @endif
-                                            <div class="input-group input-group-sm">
-                                                <span class="input-group-text">R$</span>
-                                                <input type="text"
-                                                       class="form-control moeda form-control-sm"
-                                                       wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_produto', $event.target.value)"
-                                                       value="{{ number_format($variacao->valor_produto, 2, ',', '.') }}">
-                                            </div>
-                                        </div>
-
-                                        {{-- Fornecedor --}}
-                                        <div class="col-md-2 mt-4">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Fornecedor</label>
-                                            @endif
-                                                <select class="form-select form-select-sm {{ $variacao->status == 0 ? 'bg-warning' : '' }}"
-                                                        wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor', $event.target.value)">
-                                                    <option value="">Selecione</option>
-                                                    @foreach($fornecedores as $fornecedor)
-                                                        <option value="{{ $fornecedor->id }}"
-                                                            {{ $fornecedor->id == $variacao->fornecedor ? 'selected' : '' }}>
-                                                            {{ strtoupper($fornecedor->nome) }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                        </div>
-                                        <div class="col-md-1 mt-4 text-end">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1">Status</label>
-                                            @endif
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input"
-                                                           type="checkbox"
-                                                           id="switchStatus{{ $variacao->id }}"
-                                                           wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao->id }}, {{ $produto->id }}, event.target)"
-                                                            {{ $variacao->status ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="switchStatus{{ $variacao->id }}">
-                                                        {{ $variacao->status ? 'Ativo' : 'Inativo' }}
-                                                    </label>
+                                        {{-- Coluna dos Campos --}}
+                                        <div class="col-md-9">
+                                            <div class="row g-2">
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Subcód.</label>
+                                                    <input type="text" class="form-control form-control-sm" value="{{ $variacao->subcodigo }}" disabled />
                                                 </div>
-                                        </div>
 
-                                        {{-- Ações --}}
-                                        <div class="col-md-1 mt-4 text-end">
-                                            @if ($loop->first)
-                                                <label class="form-label form-label-sm mb-1 d-block">Ações</label>
-                                            @endif
-                                            <div class="btn-group" role="group">
-                                                <button class="btn btn-outline-primary btn-sm"
-                                                        wire:click="editarVariacao({{ $variacao->id }})"
-                                                        wire:loading.attr="disabled"
-                                                        title="Editar">
-                                                        <span wire:loading.remove wire:target="editarVariacao({{ $variacao->id }})">
-                                                            <i class="fas fa-edit"></i>
+                                                <div class="col-md-4">
+                                                    <label class="form-label form-label-sm mb-1">Variação</label>
+                                                    <input type="text"
+                                                           class="form-control form-control-sm"
+                                                           value="{{ $variacao->variacao }}"
+                                                           wire:blur="atualizarCampo({{ $variacao->id }}, 'variacao', $event.target.value)">
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Quantidade</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <button wire:click="decrementar({{ $variacao->id }}, 'quantidade')"
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
+                                                                class="btn btn-outline-danger btn-sm">
+                                                        <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'quantidade')"
+                                                              class="spinner-border spinner-border-sm">
                                                         </span>
+                                                            <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'quantidade')">−</span>
+                                                        </button>
+
+                                                        <input type="text"
+                                                               class="form-control text-center form-control-sm p-0"
+                                                               wire:change="atualizarCampo({{ $variacao->id }}, 'quantidade', $event.target.value)"
+                                                               value="{{ $variacao->quantidade }}">
+
+                                                        <button wire:click="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                                class="btn btn-outline-success btn-sm">
+                                                        <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'quantidade')"
+                                                              class="spinner-border spinner-border-sm">
+                                                        </span>
+                                                            <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'quantidade')">+</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Estoque.</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <button wire:click="decrementar({{ $variacao->id }}, 'estoque')"
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                                class="btn btn-outline-danger btn-sm">
+                                                        <span wire:loading wire:target="decrementar({{ $variacao->id }}, 'estoque')"
+                                                              class="spinner-border spinner-border-sm"></span>
+                                                            <span wire:loading.remove wire:target="decrementar({{ $variacao->id }}, 'estoque')">−</span>
+                                                        </button>
+
+                                                        <input type="text"
+                                                               class="form-control text-center form-control-sm p-0"
+                                                               wire:change="atualizarCampo({{ $variacao->id }}, 'estoque', $event.target.value)"
+                                                               value="{{ $variacao->estoque }}">
+
+                                                        <button wire:click="incrementar({{ $variacao->id }}, 'estoque')"
+                                                                wire:loading.attr="disabled"
+                                                                wire:target="incrementar({{ $variacao->id }}, 'estoque')"
+                                                                class="btn btn-outline-success btn-sm">
+                                                        <span wire:loading wire:target="incrementar({{ $variacao->id }}, 'estoque')"
+                                                              class="spinner-border spinner-border-sm"></span>
+                                                            <span wire:loading.remove wire:target="incrementar({{ $variacao->id }}, 'estoque')">+</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {{-- Ações --}}
+                                                <div class="col-md-1 text-end">
+                                                    <label class="form-label form-label-sm mb-1 d-block">Ações</label>
+                                                    <div class="btn-group" role="group">
+                                                        <button class="btn btn-outline-primary btn-sm"
+                                                                wire:click="editarVariacao({{ $variacao->id }})"
+                                                                wire:loading.attr="disabled"
+                                                                data-toggle="tooltip" data-placement="top" title="Editar">
+                                                            <span wire:loading.remove wire:target="editarVariacao({{ $variacao->id }})">
+                                                                <i class="fas fa-edit"></i>
+                                                            </span>
                                                             <span wire:loading wire:target="editarVariacao({{ $variacao->id }})">
-                                                            <i class="fas fa-spinner fa-spin"></i>
-                                                        </span>
-                                                </button>
+                                                                <i class="fas fa-spinner fa-spin"></i>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row g-2 mt-2">
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Valor Varejo</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">R$</span>
+                                                        <input type="text"
+                                                               class="form-control moeda form-control-sm"
+                                                               wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_varejo', $event.target.value)"
+                                                               value="{{ number_format($variacao->valor_varejo, 2, ',', '.') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Valor Produto</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">R$</span>
+                                                        <input type="text"
+                                                               class="form-control moeda form-control-sm"
+                                                               wire:blur="atualizarCampo({{ $variacao->id }}, 'valor_produto', $event.target.value)"
+                                                               value="{{ number_format($variacao->valor_produto, 2, ',', '.') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-auto">
+                                                    <label class="form-label form-label-sm mb-1">Fornecedor</label>
+                                                    <select class="form-select form-select-sm {{ $variacao->status == 0 ? 'bg-warning' : '' }}"
+                                                            wire:change="atualizarCampo({{ $variacao->id }}, 'fornecedor', $event.target.value)">
+                                                        <option value="">Selecione</option>
+                                                        @foreach($fornecedores as $fornecedor)
+                                                            <option value="{{ $fornecedor->id }}"
+                                                                {{ $fornecedor->id == $variacao->fornecedor ? 'selected' : '' }}>
+                                                                {{ strtoupper($fornecedor->nome) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">Situação</label>
+                                                    <div class="form-check form-switch mt-1">
+                                                        <input class="form-check-input"
+                                                               type="checkbox"
+                                                               id="switchStatus{{ $variacao->id }}"
+                                                               wire:change="atualizarCampo({{ $variacao->id }}, 'status', $event.target.checked ? 1 : 0)"
+                                                            {{ $variacao->status ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="switchStatus{{ $variacao->id }}">
+                                                            {{ $variacao->status ? 'Ativo' : 'Inativo' }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
-
                                     </div>
                                 </td>
                             </tr>
@@ -372,8 +352,8 @@
         }
         .img-thumbnail{
             border-radius: 5%;
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 100px;
             cursor: pointer;
         }
         .td-center {
@@ -385,6 +365,23 @@
 
 @push('scripts')
     <script src="{{ asset('js/util.js') }}"></script>
+    <script>
+        document.addEventListener('livewire:load', function () {
+            inicializarTooltips();
+        });
+
+        Livewire.hook('message.processed', () => {
+            inicializarTooltips();
+        });
+
+        function inicializarTooltips() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+
+    </script>
 @endpush
 
 
