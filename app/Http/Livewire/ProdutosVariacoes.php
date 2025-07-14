@@ -104,11 +104,14 @@ class ProdutosVariacoes extends Component
         if ($campo === 'quantidade') {
             $valor = (float) $valor;
 
+            // Atualiza somando ou subtraindo o valor informado
+            $novoTotal = $variacao->quantidade + $valor;
+
             // Ignora valores zerados ou negativos
-            if ($valor > 0) {
-                $variacao->quantidade += $valor;
-                //$variacao->quantidade = $valor;
+            if ($novoTotal < 0) {
+                $novoTotal = 0;
             }
+            $variacao->quantidade = $novoTotal;
         } else {
             $variacao->$campo = $valor;
         }
