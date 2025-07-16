@@ -37,15 +37,20 @@
                 <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav p-0">
                         @if( Auth::user()->is_admin)
-                            <a href="{{ route('produtos.produtos_ativos') }}" title="Gerenciar Produtos"
+                            <a href="{{ route('produto.produto_create') }}" title="Adicionar Produtos"
+                               class="nav-link p-0 mb-3 {{ request()->routeIs('produto.produto_create') ? 'active' : '' }}">
+                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-add"></i></div>
+                                Adicionar Produtos
+                            </a>
+                            <a href="{{ route('produtos.produtos_ativos') }}" title="Produtos Ativos"
                                     class="nav-link p-0 mb-3 {{ request()->routeIs('produtos.produtos_ativos') ? 'active' : '' }}">
                                 <div class="sb-nav-link-icon"><i class="nav-icon fas fa-box"></i></div>
-                                Produtos Ativos
+                                Listar Ativos
                             </a>
 
                             <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
                                 <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
-                                Produtos Inativos
+                                Listar Inativos
                             </a>
 
                             <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">

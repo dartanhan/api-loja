@@ -1,22 +1,35 @@
     window.aplicarMascaraMoeda = function () {
-        $('.moeda').mask('R$ 000.000.000,00', {
-            reverse: true,
-            placeholder: 'R$ 0,00'
-        });
+        if ($('.moeda').length > 0) {
+            $('.moeda').mask('R$ 000.000.000,00', {
+                reverse: true,
+                placeholder: 'R$ 0,00'
+            });
+        }
     };
 
     window.aplicarMascaraQuantidade = function () {
-        $('.quantidade').mask('000000', { reverse: false });
+        if ($('.quantidade').length > 0) {
+            $('.quantidade').mask('000000', {reverse: false});
+        }
     };
 
-    // Aplica na primeira renderização e após Livewire atualizar o DOM
+    window.aplicarMascaraDataDDMMYYYY = function () {
+        if ($('.data-mask').length > 0) {
+            $('.data-mask').mask('##/##/####', {reverse: false});
+        }
+    };
+
+    //Aplica na primeira renderização e após Livewire atualizar o DOM
     document.addEventListener("livewire:load", function () {
         aplicarMascaraMoeda();
         aplicarMascaraQuantidade();
+        aplicarMascaraDataDDMMYYYY();
 
         Livewire.hook('message.processed', () => {
             aplicarMascaraMoeda();
             aplicarMascaraQuantidade();
+            aplicarMascaraDataDDMMYYYY();
+            $('[data-toggle="tooltip"]').tooltip();
         });
     });
 

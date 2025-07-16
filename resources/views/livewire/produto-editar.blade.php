@@ -92,7 +92,7 @@
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">R$</span>
                                                 <input type="text" placeholder="{{ __('VALOR') }}" data-toggle="tooltip" data-placement="right" title="Valor do Produto"
-                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font valor-mask" >
+                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font moeda" >
                                                 <label for="label-valor-produto">{{ __('VALOR') }}</label>
                                             </div>
                                         </div>
@@ -257,7 +257,8 @@
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
                                                             <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_varejo" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.valor_varejo"
+                                                                   class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-varejo-{{ $index }}">{{ __('VALOR VAREJO') }}</label>
                                                         </div>
                                                     </div>
@@ -267,7 +268,8 @@
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
                                                             <input type="text" placeholder="{{ __('VALOR PRODUTO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_produto" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.valor_produto"
+                                                                   class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-produto-{{ $index }}">{{ __('VALOR PRODUTO') }}</label>
                                                         </div>
                                                     </div>
@@ -276,7 +278,7 @@
                                                     <div class="floating-label-group border-lable-flt">
                                                         <div class="input-group input-group-sm">
                                                             <input type="text" placeholder="{{ __('DESC.EM %') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.percentage" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.percentage" class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-percentage-{{ $index }}">{{ __('DESC.EM %') }}</label>
                                                         </div>
                                                     </div>
@@ -485,35 +487,28 @@
 @endpush
 
 @push('scripts')
-    <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{ asset('js/util.js') }}"></script>
+    <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
     <script>
         document.addEventListener('livewire:load', function () {
-            $('.valor-mask').mask('#.##0,00', {reverse: true});
-            $('.data-mask').mask('##/##/####', {reverse: true});
-
             const activeTab = sessionStorage.getItem('activeTab');
 
             if (activeTab) {
                 $('#myTab a[href="' + activeTab + '"]').tab('show');
             }
+
+            Livewire.hook('message.processed', () => {
+                $('[data-toggle="tooltip"]').tooltip();
+
+                //reativa as abas
+                const activeTab = sessionStorage.getItem('activeTab');
+                if (activeTab) {
+                    $('#myTab a[href="' + activeTab + '"], #myTab button[data-target="' + activeTab + '"]').tab('show');
+                }
+                loadFilePond();
+            });
         });
-
-        Livewire.hook('message.processed', () => {
-            $('.valor-mask').mask('#.##0,00', {reverse: true});
-            $('.data-mask').mask('##/##/####', {reverse: true});
-            $('[data-toggle="tooltip"]').tooltip();
-
-            //reativa as abas
-            const activeTab = sessionStorage.getItem('activeTab');
-            if (activeTab) {
-                $('#myTab a[href="' + activeTab + '"], #myTab button[data-target="' + activeTab + '"]').tab('show');
-            }
-            loadFilePond();
-        });
-
         //Controla as tabs
         $('#myTab button').on('click', function (event) {
             event.preventDefault()

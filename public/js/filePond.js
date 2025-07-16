@@ -34,3 +34,4 @@ pond.setOptions({
     },labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>'
 });
 
+

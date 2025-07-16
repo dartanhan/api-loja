@@ -19,8 +19,6 @@
 
     <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
 
-
-
     @stack("styles")
 
     @livewireStyles
@@ -72,6 +70,7 @@
     </div>
 
     <script src="{{ asset('assets/jquery/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{ asset('assets/jquery/jquery.modal.min.js') }}"></script>
     <script src="{{ asset('assets/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/dashboard/js/scripts.js') }}"></script>
@@ -86,7 +85,7 @@
 
     <!-- Chosen + jQuery Mask -->
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="{{ asset('assets/jquery/jquery.mask.min.js') }}"></script>
 
 
     @livewireScripts
