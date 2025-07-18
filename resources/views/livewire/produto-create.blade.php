@@ -21,6 +21,15 @@
     </div>
 
     <div class="card shadow-sm mb-3 rounded">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="card-header">
             <h6>
                 <i class="fas fa-box"></i><b> Produto</b>
@@ -28,10 +37,10 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-auto" style="max-width: 250px;">
                     <div class="floating-label-group border-lable-flt">
                         <input type="text" placeholder="{{ __('CÓDIGO PRODUTO (SKU)') }}"
-                               wire:model="produto.codigo_produto" id="codigo_produto"
+                               wire:model.defer="produto.codigo_produto" id="codigo_produto"
                                class="form-control form-control-sm format-font"
                                data-toggle="tooltip" data-placement="top" title="Código do Produto (SKU)"
                                onkeyup="SomenteNumeros(this);" readonly >
@@ -41,8 +50,9 @@
                 <div class="col-md-3">
                     <div class="floating-label-group border-lable-flt">
                         <input type="text" placeholder="{{ __('NOME PRODUTO') }}"
-                               wire:model="produto.descricao" id="descricao"
-                               class="form-control form-control-sm format-font"
+                               wire:model.defer="produto.descricao" id="descricao"
+                               class="form-control form-control-sm format-font
+                                @error('produto.descricao') is-invalid @enderror"
                                data-toggle="tooltip" data-placement="top" title="Nome do Produto">
                         <label for="label-descricao">{{ __('NOME PRODUTO') }}</label>
                     </div>
@@ -53,18 +63,39 @@
                             <span class="input-group-text">R$</span>
                             <input type="text" placeholder="{{ __('VALOR') }}"
                                    data-toggle="tooltip" data-placement="top" title="Valor do Produto"
-                                   wire:model="produto.valor_produto"
-                                   class="form-control form-control-sm format-font moeda" >
+                                   wire:model.defer="produto.valor_produto" id="valor_prdouto"
+                                   class="form-control form-control-sm format-font moeda
+                                   @error('produto.valor_produto') is-invalid @enderror">
                             <label for="label-valor-produto">{{ __('VALOR') }}</label>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                        <select class="form-select format-font form-control-sm" required>
-                            <option value="">Selecione</option>
+                        <select wire:model.defer="produto.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
+                                class="form-select format-font form-control-sm @error('produto.categoria_id') is-invalid @enderror"
+                                data-toggle="tooltip" data-placement="top" title="Categoria do Produto" required>
+                            <option value="" class="select-custom">Selecione?</option>
+                            @foreach($categorias->sortBy('nome') as $categoria)
+                                <option value="{{$categoria->id}}"> {{ ucfirst(strtolower($categoria->nome)) }}</option>
+                            @endforeach
                         </select>
-                        <label for="status">CATEGORIA</label>
+                        <label for="label-qtd">CATEGORIAS</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
+                        <select wire:model.defer="produto.origem_id" key="{{ now() }}" id="origem_id" name="origem_id_id"
+                                class="form-select format-font form-control-sm @error('produto.origem_id') is-invalid @enderror"
+                                data-toggle="tooltip" data-placement="top" title="Origem do Produto" required>
+                            <option value="" class="select-custom">Selecione?</option>
+                            @foreach($origens->sortBy('codigo') as $origem)
+                                <option value="{{$origem->id}}">
+                                    {{$origem->codigo}} - {{ \Illuminate\Support\Str::limit($origem->descricao, 30, '...')  }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <label for="label-qtd">ORIGEM</label>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -76,11 +107,12 @@
                                     <input type="checkbox"
                                            class="form-check-input"
                                            id="switchStatus"
-{{--                                           wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao['id'] }},{{$produto['id']}}, event.target)"--}}
-                                        {{ $produto['status'] ? 'checked' : '' }}>
+                                           wire:model="produto.status"
+                                           wire:ignore.self
+                                           onchange="toggleStatusDescription(this)">
                                 </div>
-                                <span class="small">
-                                    {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
+                                <span class="small" id="statusLabel">
+                                     {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
                                 </span>
                             </div>
                         </div>
@@ -88,9 +120,17 @@
                 </div>
             </div>
 
-            <div class="mt-3">
-                <label>Imagens do Produto</label>
-                <input type="file" multiple class="filepond-pai" data-max-files="10" data-allow-reorder="true" data-max-file-size="3MB" data-allow-multiple="true" />
+            <div class="row"  wire:ignore>
+                <div class="card-body mb-3 p-2" id="filepond-wrapper"  wire:ignore>
+                    <input type="file"
+                           id="image"
+                           name="image[]"
+                           data-max-files="1"
+                           data-allow-reorder="true"
+                           data-max-file-size="3MB"
+                           data-allow-multiple="true"
+                           class="filepond" />
+                </div>
             </div>
         </div>
     </div>
@@ -168,7 +208,7 @@
                                     <label for="label-estoque">{{ __('ESTOQUE') }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-2">
+                            <div class="col-auto mb-2" style="max-width: 150px;">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
                                            wire:model.defer="variacoes.{{ $index }}.valor_varejo"
@@ -177,7 +217,7 @@
                                     <label for="label-valor_varejo">{{ __('VALOR VAREJO') }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-2">
+                            <div class="col-auto mb-2" style="max-width: 150px;">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('VALOR ATACADO') }}"
                                            wire:model.defer="variacoes.{{ $index }}.valor_atacado"
@@ -186,7 +226,7 @@
                                     <label for="label-valor_atacado">{{ __('VALOR ATACADO') }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-2">
+                            <div class="col-auto mb-2" style="max-width: 150px;">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('VALOR PAGO') }}"
                                            wire:model.defer="variacoes.{{ $index }}.valor_pago"
@@ -258,8 +298,9 @@
                                         </span>
                                 </button>
                             </div>
-                            <div class="row">
-                                <input type="file" multiple class="filepond-variacao" data-max-files="10" data-allow-reorder="true" data-max-file-size="3MB" data-allow-multiple="true" />
+                            <div class="row" id="filepond-wrapper-variacao-{{ $index }}">
+{{--                                <input type="file" multiple class="filepond-variacao"--}}
+{{--                                       data-max-files="10" data-allow-reorder="true" data-max-file-size="3MB" data-allow-multiple="true" />--}}
                             </div>
                         </div>
                     </div>
@@ -270,14 +311,15 @@
 
     <div class="card shadow-sm mt-3 rounded text-end">
         <div class="card-body">
-            <button class="btn btn-sm btn-outline-success" wire:click="salvar" wire:loading.attr="disabled">
-            <span wire:loading.remove wire:target="salvar">
-                <i class="fas fa-save me-1"></i> Salvar Produto
-            </span>
-                <span wire:loading wire:target="salvar">
-                <i class="fas fa-spinner fa-spin"></i>
-            </span>
+            <button class="btn btn-sm btn-outline-success" id="btn-salvar-produto" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="salvar">
+                    <i class="fas fa-save me-1"></i> Salvar
+                </span>
+            <span wire:loading wire:target="salvar">
+                    <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
+                </span>
             </button>
+            <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
         </div>
     </div>
 </div>
@@ -291,46 +333,22 @@
     <script src="{{ asset('js/util.js') }}"></script>
     <script>
         document.addEventListener('livewire:load', () => {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const baseUrl = window.location.origin + '/admin';
-
-            FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginImageResize, FilePondPluginFileEncode);
-
-            function initFilePond(selector) {
-                document.querySelectorAll(selector).forEach(inputElement => {
-                    if (inputElement._pond) {
-                        inputElement._pond.destroy();
-                    }
-
-                    FilePond.create(inputElement, {
-                        imageResizeTargetWidth: 500,
-                        imageResizeTargetHeight: 500,
-                        imageResizeMode: 'contain',
-                        labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
-                        server: {
-                            process: {
-                                method: 'POST',
-                                url: baseUrl + '/upload/tmp-upload',
-                                headers: {'X-CSRF-TOKEN': csrfToken},
-                                onload: res => res
-                            },
-                            revert: baseUrl + '/upload/tmp-delete'
-                        }
-                    });
-                });
-            }
-
-            function initAllFilePonds() {
-                initFilePond('.filepond-pai');
-                initFilePond('.filepond-variacao');
-            }
-
-            initAllFilePonds();
+            loadFilePondProduto();
+            inicializaFilePondVariacoes();
+            aplicarMascaraMoeda();
+            aplicarMascaraQuantidade();
+            aplicarMascaraDataDDMMYYYY();
+            initTooltips();
 
             Livewire.hook('message.processed', () => {
-                initAllFilePonds();
-                $('[data-toggle="tooltip"]').tooltip();
+                loadFilePondProduto();
+                inicializaFilePondVariacoes()
+                aplicarMascaraMoeda();
+                aplicarMascaraQuantidade();
+                aplicarMascaraDataDDMMYYYY();
+                initTooltips();
             });
         });
+
     </script>
 @endpush

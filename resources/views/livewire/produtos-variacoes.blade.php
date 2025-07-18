@@ -367,19 +367,21 @@
     <script src="{{ asset('js/util.js') }}"></script>
     <script>
         document.addEventListener('livewire:load', function () {
-            inicializarTooltips();
-        });
+            loadSetAbas();
+            aplicarMascaraMoeda?.();
+            aplicarMascaraQuantidade?.();
+            aplicarMascaraDataDDMMYYYY?.();
+            initTooltips?.();
 
-        Livewire.hook('message.processed', () => {
-            inicializarTooltips();
-        });
-
-        function inicializarTooltips() {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
-            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                new bootstrap.Tooltip(tooltipTriggerEl);
+            Livewire.hook('message.processed', () => {
+                loadSetAbas();
+                aplicarMascaraMoeda?.();
+                aplicarMascaraQuantidade?.();
+                aplicarMascaraDataDDMMYYYY?.();
+                initTooltips?.();
             });
-        }
+
+        });
 
     </script>
 @endpush

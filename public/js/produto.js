@@ -5,11 +5,11 @@ $(function() {
     let json,id,table,asyncData;
 
     const url = fncUrl();
-  
+
     /**
      * DATATABLES
      * */
-   
+
     table = $('#table').DataTable({
             ajax: {
                 method: 'get',
@@ -80,12 +80,12 @@ $(function() {
                 }
             ],
             language: {
-                "url": "../public/Portuguese-Brasil.json"
+                "url":  Helpers.asset('Portuguese-Brasil.json')
             },
             "order": [[0, "desc"]],
             //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
         });
-    
+
 
     /**
      * Add event listener for opening and closing details
@@ -136,8 +136,8 @@ $(function() {
                                 JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                                     // console.log(arrayItem.subcodigo);
                                     let image = arrayItem.path !== null ?
-                                            "<img src='../public/storage/"+ arrayItem.path + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>" :
-                                            "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='"+arrayItem.variacao+"'></img>"
+                                            "<img src='" + Helpers.asset('storage/' + arrayItem.path) + "' class=\"image img-datatable\" width='120px' height='80px' alt=\"\" title='" + arrayItem.variacao + "'/>" :
+                                            "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' class=\"image img-datatable\" width='80px' height='80px' alt=\"\" title='" + arrayItem.variacao + "'/>"
 
                                     let image_filho = "../public/storage/produtos/not-image.png";
                                     if(arrayItem.path !== null){
