@@ -25,10 +25,16 @@ class UploadController extends Controller
 
     public function tmpUpload()
     {
-        if ($this->request->hasFile('image')) {
-            $files = $this->request->file('image');
 
-            foreach ((array)$files as $file) {
+        //if ($this->request->hasFile('image')) {
+          //  $files = $this->request->file('image');
+        $files = collect($this->request->allFiles())->flatten(99);
+
+            if ($files->isEmpty()) {
+                return response('Nenhum arquivo enviado', 400);
+            }
+
+            foreach ($files as $file) {
                 $nome_unico = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $folder = uniqid("temporary", true);
 
@@ -46,25 +52,29 @@ class UploadController extends Controller
                 $this->temporaryFile->create([
                     'folder' => $folder,
                     'file'   => $nome_unico,
+                    'variacao_id' => $this->request->input('variacao_id') ?? null // se quiser registrar no temp também
                 ]);
 
                 return response($folder);
             }
-        }
-
-        return response('Nenhum arquivo enviado', 400);
     }
 
 
+    public function tmpDelete(Request $request){
 
-    public function tmpDelete(){
-        $temp_file = TemporaryFile::where('folder',$this->request->getContent())->first();
+        $folder = $request->input('folder');
 
-        if($temp_file){
-            Storage::deleteDirectory('tmp/'.$temp_file->folder);
-            $temp_file->delete();
-            return response('');
+        if ($folder) {
+            $temp_file = TemporaryFile::where('folder', $folder)->first();
+
+            if ($temp_file) {
+                //Storage::deleteDirectory('tmp/'.$temp_file->folder);
+                Storage::disk('public')->deleteDirectory('tmp/' . $temp_file->folder);
+                $temp_file->delete();
+                return response('');
+            }
         }
+        return response()->json(['error' => 'Arquivo não encontrado.'], 404);
     }
 
     public function tmpUploadVariacao(){

@@ -56,9 +56,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::resource('variacao','ProdutoVariacaoController');
 
-    Route::get('/produtos-ativos', [ProdutoController::class,'produtos_ativos'])->name('produtos.produtos_ativos');
-    Route::get('/produtos-inativos', [ProdutoController::class,'produtos_inativos'])->name('produtos.produtos_inativos');
-
+    Route::get('/produto-ativos', [ProdutoController::class,'produto_ativos'])->name('produtos.produtos_ativos');
+    Route::get('/produto-inativos', [ProdutoController::class,'produto_inativos'])->name('produtos.produtos_inativos');
+    Route::get('/produto-create', [ProdutoController::class , 'produto_create'])->name('produto.produto_create');
 
     Route::get('/produto/getProdutoInativos/{id}',[ProdutoInativoController::class,'getProdutoInativos'])->name('getProdutoInativos');
     Route::resource('produtoInativo','ProdutoInativoController');

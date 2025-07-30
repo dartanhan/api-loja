@@ -13,6 +13,7 @@ class OrigemNfce extends Model
     protected $fillable = ['id','codigo','descricao','created_at','update_at'];
 
     protected $appends = ['created_at','updated_at'];
+
     public function getCreatedAtAttribute()
     {
         return date('d/m/Y H:i:s', strtotime($this->attributes['created_at']));

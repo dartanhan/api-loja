@@ -92,7 +92,7 @@
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">R$</span>
                                                 <input type="text" placeholder="{{ __('VALOR') }}" data-toggle="tooltip" data-placement="right" title="Valor do Produto"
-                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font valor-mask" >
+                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font moeda" >
                                                 <label for="label-valor-produto">{{ __('VALOR') }}</label>
                                             </div>
                                         </div>
@@ -257,7 +257,8 @@
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
                                                             <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_varejo" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.valor_varejo"
+                                                                   class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-varejo-{{ $index }}">{{ __('VALOR VAREJO') }}</label>
                                                         </div>
                                                     </div>
@@ -267,7 +268,8 @@
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">R$</span>
                                                             <input type="text" placeholder="{{ __('VALOR PRODUTO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_produto" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.valor_produto"
+                                                                   class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-produto-{{ $index }}">{{ __('VALOR PRODUTO') }}</label>
                                                         </div>
                                                     </div>
@@ -276,7 +278,7 @@
                                                     <div class="floating-label-group border-lable-flt">
                                                         <div class="input-group input-group-sm">
                                                             <input type="text" placeholder="{{ __('DESC.EM %') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.percentage" class="form-control form-control-sm format-font valor-mask" >
+                                                                   wire:model.defer="variacoes.{{ $index }}.percentage" class="form-control form-control-sm format-font moeda" >
                                                             <label for="label-valor-percentage-{{ $index }}">{{ __('DESC.EM %') }}</label>
                                                         </div>
                                                     </div>
@@ -485,77 +487,30 @@
 @endpush
 
 @push('scripts')
-    <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
-    <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{ asset('js/util.js') }}"></script>
-    <script src="{{URL::asset('js/filePond.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
+{{--    <script src="{{ asset('js/filePond.js') }}"></script>--}}
     <script>
         document.addEventListener('livewire:load', function () {
-            $('.valor-mask').mask('#.##0,00', {reverse: true});
-            $('.data-mask').mask('##/##/####', {reverse: true});
+            loadFilePondProduto();
+            loadSetAbas();
 
-            const activeTab = sessionStorage.getItem('activeTab');
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                sessionStorage.setItem('activeTab', $(e.target).attr('href'));
+            });
 
-            if (activeTab) {
-                $('#myTab a[href="' + activeTab + '"]').tab('show');
-            }
+            Livewire.hook('message.processed', () => {
+                loadFilePondProduto();
+                loadSetAbas();
+            });
         });
 
-        Livewire.hook('message.processed', () => {
-            $('.valor-mask').mask('#.##0,00', {reverse: true});
-            $('.data-mask').mask('##/##/####', {reverse: true});
-            $('[data-toggle="tooltip"]').tooltip();
-
-            //reativa as abas
-            const activeTab = sessionStorage.getItem('activeTab');
-            if (activeTab) {
-                $('#myTab a[href="' + activeTab + '"], #myTab button[data-target="' + activeTab + '"]').tab('show');
-            }
-            loadFilePond();
-        });
 
         //Controla as tabs
         $('#myTab button').on('click', function (event) {
             event.preventDefault()
             $(this).tab('show')
-        })
-
-        //Ao clicar em salvar aciona o Livewire
-        document.getElementById('btn-salvar-produto').addEventListener('click', function () {
-            //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
-            // Chama o botão invisível com wire:click="salvar"
-            document.getElementById('btn-livewire-salvar').click();
-            if (typeof Livewire !== 'undefined') {
-                Livewire.emit('setPastasImagens', foldersEnviados);
-                Livewire.emit('salvar');
-                loadFilePond();
-            }
         });
-
-
-        //Função SweetAlert de confirmação deleção
-        function confirmarExclusaoImagem(id) {
-            Swal.fire({
-                title: 'Excluir imagem?',
-                text: "Essa ação não poderá ser desfeita!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#aaa',
-                confirmButtonText: 'Sim, excluir',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Muda ícone para spinner
-                    const icon = document.getElementById(`icon-trash-${id}`);
-                    icon.classList.remove('fa-trash-alt');
-                    icon.classList.add('fa-spinner', 'fa-spin');
-
-                    // Dispara o evento Livewire
-                    Livewire.emit('deletarImagem', id);
-                }
-            });
-        }
 
         // Salva a aba ativa no sessionStorage ao trocar
         $('#myTab button[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -564,45 +519,5 @@
             sessionStorage.setItem('activeTab', tabId);
         });
 
-        //para centralizar re-render o Filepond quando for rendreizado pleo livewire
-        function loadFilePond() {
-            const container = document.getElementById('filepond-wrapper');
-            if (!container) return;
-
-            // Remove conteúdo anterior
-            container.innerHTML = `
-                <input type="file"
-                       multiple
-                       id="image"
-                       name="image[]"
-                       data-max-files="10"
-                       data-allow-reorder="true"
-                       data-max-file-size="3MB"
-                       data-allow-multiple="true"
-                       class="filepond" />
-            `;
-
-            const inputElement = container.querySelector('input');
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            FilePond.create(inputElement, {
-                server: {
-                    process: {
-                        url: '/admin/upload/tmp-upload',
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrfToken },
-                        onload: (res) => {
-                            foldersEnviados.push(res);
-                            return res;
-                        }
-                    },
-                    revert: '/admin/upload/tmp-delete',
-                },
-                labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
-                allowMultiple: true
-            });
-        }
-
-
-    </script>
-@endpush
+        </script>
+    @endpush

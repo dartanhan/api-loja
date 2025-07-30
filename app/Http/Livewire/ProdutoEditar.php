@@ -114,13 +114,6 @@ class ProdutoEditar extends Component
         ];
     }
 
-    public function removerVariacao($index)
-    {
-        unset($this->variacoes[$index]);
-        $this->variacoes = array_values($this->variacoes); // reindexa o array
-    }
-
-
     public function salvar()
     {
         // Validação de duplicidade de subcódigos

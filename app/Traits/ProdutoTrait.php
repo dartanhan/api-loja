@@ -68,4 +68,17 @@ trait ProdutoTrait
 
         }
     }
+
+
+    public function removerVariacao($index)
+    {
+        unset($this->variacoes[$index]);
+        $this->variacoes = array_values($this->variacoes); // reindexa o array
+
+        // Recalcula os subcódigos conforme nova ordem
+        foreach ($this->variacoes as $i => &$variacao) {
+            $numeroSequencial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+            $variacao['subcodigo'] = $this->produto['codigo_produto'] . $numeroSequencial;
+        }
+    }
 }

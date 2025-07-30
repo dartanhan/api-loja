@@ -2,8 +2,12 @@
 
 namespace App\Exceptions;
 
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -30,10 +34,10 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Throwable  $exception
+     * @param Throwable $exception
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception|Throwable
      */
     public function report(Throwable $exception)
     {
@@ -43,11 +47,11 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  Request  $request
+     * @param Throwable $exception
+     * @return Response
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function render($request, Throwable $exception)
     {
@@ -55,6 +59,9 @@ class Handler extends ExceptionHandler
             // Personalize o redirecionamento conforme necessário
             //return redirect()->route('admin.login');
             return redirect()->route('admin.login')->with('message', 'Your session has expired. Please log in again.');
+
+        }else if ($exception instanceof NotFoundHttpException) {
+            return redirect()->route('admin.login');  // ou redirect('/login')
         }
 
         return parent::render($request, $exception);

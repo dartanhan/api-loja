@@ -53,11 +53,15 @@
                                 <!-- Divider Text -->
                                 <div class="form-group col-lg-8 mx-auto d-flex align-items-center my-4">
                                     @if($errors->all())
-                                        @foreach($errors->all() as $error)
-                                            <div class="alert alert-danger" role="alert">
-                                                {{ $error }}
-                                            </div>
-                                        @endforeach
+                                        <div class="alert alert-danger" role="alert">
+                                            <ul>
+                                                @foreach($errors->all() as $error)
+                                                    <li>
+                                                        <i class="fa fa-exclamation"></i> {{ $error }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     @endif
                                 </div>
                             </form>

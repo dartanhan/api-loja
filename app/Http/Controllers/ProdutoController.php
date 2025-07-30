@@ -82,7 +82,7 @@ class ProdutoController extends Controller
     /**
      * Livewire
     */
-    public function produtos_ativos()
+    public function produto_ativos()
     {
         return view('admin.produtos.ativos');
     }
@@ -90,10 +90,19 @@ class ProdutoController extends Controller
     /**
      * Livewire
      */
-    public function produtos_inativos()
+    public function produto_inativos()
     {
         return view('admin.produtos.inativos');
     }
+
+    /**
+     * Livewire
+     */
+    public function produto_create()
+    {
+        return view('admin.produtos.create');
+    }
+
     /**
      * Show the form for creating a new resource.
      *

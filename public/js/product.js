@@ -28,10 +28,11 @@ $(function() {
             {"data": "imagem",
                 render: function (data, type, row) {
                     if(row.produto_imagens.length > 0){
-                        let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
-                        return '<img src="../public/storage/product/' + row.id + '/' + path + '" class="image img-datatable"/>';
+                        let path = 'storage/product/' + row.id + '/' + row.produto_imagens[0].path;
+
+                        return '<img src="' + Helpers.asset(path) + '" class="image img-datatable"/>';
                     }else{
-                        return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"/>';
+                        return '<img src="' + Helpers.asset('storage/produtos/not-image.png') + '" class="img-datatable"/>';
                     }
                 }
             },
@@ -84,7 +85,7 @@ $(function() {
             }
         ],
         language: {
-            "url": "../public/Portuguese-Brasil.json"
+            "url": Helpers.asset('Portuguese-Brasil.json')
         },
         "order": [[0, "desc"]],
         //"order": [[ 0, 'desc' ], [ 2, 'asc' ]]
@@ -143,12 +144,12 @@ $(function() {
                         JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
                              console.log(arrayItem.subcodigo);
                             let image = arrayItem.path !== null ?
-                                "<img src='../public/storage/" + arrayItem.path + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>" :
-                                "<img src='../public/storage/produtos/not-image.png' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>"
+                                "<img src='" + Helpers.asset('storage/' + arrayItem.path) + "' ' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>" :
+                                "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>"
 
-                            let image_filho = "../public/storage/produtos/not-image.png";
+                            let image_filho = Helpers.asset("storage/produtos/not-image.png");
                             if(arrayItem.path !== null){
-                                image_filho = '../public/storage/'+arrayItem.path;
+                                image_filho = Helpers.asset('storage/' + arrayItem.path);
                             }
 
                             tmpRow += "<tr>" +
@@ -228,7 +229,8 @@ $(function() {
         if(i > 0){
             icon_remove =  "<div class=\"col-md-1\" style='padding:unset;left: -6px;width: 10px' >"+
                 "<a href=\"javascript:void(0)\" onclick=\"removeCampo('div_pai" + i + "')\" " +
-                "title=\"Remover linha\"><img src=\"../public/img/minus.png\" border=\"0\"/>" +
+                "title=\"Remover linha\">" +
+                "<img src=\"" + window.Helpers.asset('img/minus.png') + "\" border=\"0\"/>" +
                 "</a>"+
                 "</div>" ;
         }
