@@ -1,4 +1,4 @@
-<div class="container-fluid mt-4" xmlns:wire="http://www.w3.org/1999/xhtml">
+<div class="container-fluid mt-4 mb-4" xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
     {{-- Header do Produto --}}
     <div class="card shadow border-0 mb-3">
         <div class="card-body">
@@ -120,235 +120,285 @@
                 </div>
             </div>
 
-            <div class="row"  wire:ignore>
-                <div class="card-body mb-3 p-2" id="filepond-wrapper"  wire:ignore>
-                    <input type="file"
-                           id="image"
-                           name="image[]"
-                           data-max-files="1"
-                           data-allow-reorder="true"
-                           data-max-file-size="3MB"
-                           data-allow-multiple="true"
-                           class="filepond" />
+            <div class="row" >
+                <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
+{{--                    @livewire('produto-filepond', ['modelId' => $produto['id'] ?? null], key('produto-filepond'))--}}
+                    <input type="file" x-ref="filepondProduto" class="filepond-produto">
+
+                    {{-- Lista de arquivos já enviados --}}
+                    <ul class="list-group mt-2">
+                        @foreach($temporaryFiles as $f)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ $f->file }}
+                                <button class="btn btn-sm btn-outline-danger"
+                                        wire:click="deleteTemporaryFile('{{ $f->folder }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-5 mb-3  rounded">
+            <div class="card-header">
+                <h6>
+                    <i class="fas fa-cube"></i><b> Variações</b>
+                </h6>
+            </div>
+            <div class="card-body">
+{{--                <button wire:click="adicionarVariacao" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">--}}
+{{--                <span wire:loading.remove wire:target="adicionarVariacao">--}}
+{{--                    <i class="fas fa-plus-circle me-1"></i> Adicionar Variação--}}
+{{--                </span>--}}
+{{--                    <span wire:loading wire:target="adicionarVariacao">--}}
+{{--                    <i class="fas fa-spinner fa-spin me-1"></i> Adicionando...--}}
+{{--                </span>--}}
+{{--                </button>--}}
+
+                <livewire:produto-variacoes-form
+                    :variacoes="$variacoes"
+                    :fornecedores="$fornecedores"
+                    :produto-id="$produtoCodigo ?? null"></livewire:produto-variacoes-form>
+
+{{--            @foreach ($variacoes as $index => $variacao)--}}
+{{--                    <div class="card shadow-sm mb-2 mt-3 rounded">--}}
+{{--                        <div class="card-body">--}}
+{{--                            <div class="row">--}}
+{{--                                <div class="col-auto mb-2" style="max-width:120px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('SUB CÓDIGO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.subcodigo"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Sub Código" readonly>--}}
+{{--                                        <label for="label-subcodigo">{{ __('SUB CÓDIGO') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-md-2 mb-2">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('GTIN') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.gtin"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="GTIN">--}}
+{{--                                        <label for="label-gtin">{{ __('GTIN') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-md-3 mb-2">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('VARIACÃO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.variacao"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Nome da Variação">--}}
+{{--                                        <label for="label-variacao">{{ __('VARIACÃO') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-md-1 mb-2">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('QTD') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.quantidade"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Quantidade">--}}
+{{--                                        <label for="label-quantidade">{{ __('QTD') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-md-1 mb-2">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('QTD MIN') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.quantidade_minima"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Quantidade Minima">--}}
+{{--                                        <label for="label-quantidade_minima">{{ __('QTD MIN') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-md-1 mb-2">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('ESTOQUE') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.estoque"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Estoque">--}}
+{{--                                        <label for="label-estoque">{{ __('ESTOQUE') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width: 150px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('VALOR VAREJO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.valor_varejo"--}}
+{{--                                               class="form-control form-control-sm format-font moeda"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Valor Varejo">--}}
+{{--                                        <label for="label-valor_varejo">{{ __('VALOR VAREJO') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width: 150px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('VALOR ATACADO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.valor_atacado"--}}
+{{--                                               class="form-control form-control-sm format-font moeda"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Valor Atacado">--}}
+{{--                                        <label for="label-valor_atacado">{{ __('VALOR ATACADO') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width: 150px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('VALOR PAGO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.valor_pago"--}}
+{{--                                               class="form-control form-control-sm format-font moeda"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Valor Pago">--}}
+{{--                                        <label for="label-valor_pago">{{ __('VALOR PAGO') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width:120px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('DESCONTO') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.percentage"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Desconto em %">--}}
+{{--                                        <label for="label-percentage">{{ __('DESCONTO EM %') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width:150px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt">--}}
+{{--                                        <input type="text" placeholder="{{ __('VALIDADE') }}"--}}
+{{--                                               wire:model.defer="variacoes.{{ $index }}.validade"--}}
+{{--                                               class="form-control form-control-sm format-font"--}}
+{{--                                               data-toggle="tooltip" data-placement="top" title="Validade"--}}
+{{--                                               onkeyup="formatDate(this)" maxlength="10">--}}
+{{--                                        <label for="label-validade">{{ __('VALIDADE') }}</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto mb-2" style="max-width:250px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">--}}
+{{--                                        <select  wire:model.defer="variacoes.{{ $index }}.fornecedor_id"--}}
+{{--                                                 class="form-select format-font form-control-sm" required>--}}
+{{--                                            <option value="">Selecione</option>--}}
+{{--                                            @foreach($fornecedores as $f)--}}
+{{--                                                <option value="{{ $f['id'] }}" title="{{ $f['nome'] }}">--}}
+{{--                                                    {{ \Illuminate\Support\Str::limit(ucfirst(strtolower($f['nome'])), 30, '...') }} </option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+{{--                                        <label for="status">FORNECEDOR</label>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto" style="max-width: 150px;">--}}
+{{--                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">--}}
+{{--                                        <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">--}}
+{{--                                            <label class="form-label m-0">STATUS</label>--}}
+{{--                                            <div class="d-flex align-items-center gap-2">--}}
+{{--                                                <div class="form-check form-switch m-0">--}}
+{{--                                                    <input type="checkbox"--}}
+{{--                                                           class="form-check-input"--}}
+{{--                                                           id="switchStatus"--}}
+{{--                                                        --}}{{--                                               wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao['id'] }},{{$produto['id']}}, event.target)"--}}
+{{--                                                        {{ $produto['status'] ? 'checked' : '' }}>--}}
+{{--                                                </div>--}}
+{{--                                                <span class="small">--}}
+{{--                                                {{ $produto['status'] ? 'Ativo' : 'Inativo' }}--}}
+{{--                                            </span>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-auto" style="max-width: 150px;">--}}
+{{--                                    <button class="btn btn-sm btn-outline-danger"--}}
+{{--                                            data-toggle="tooltip" data-placement="top" title="Remover Variação"--}}
+{{--                                            wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">--}}
+{{--                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">--}}
+{{--                                            <i class="fas fa-times"></i>--}}
+{{--                                        </span>--}}
+{{--                                        <span wire:loading wire:target="removerVariacao({{ $index }})">--}}
+{{--                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...--}}
+{{--                                        </span>--}}
+{{--                                    </button>--}}
+{{--                                </div>--}}
+{{--                                <div class="row" id="filepond-wrapper-variacao-{{ $index }}">--}}
+{{--                                    --}}{{--  <input type="file" multiple class="filepond-variacao"--}}
+{{--                                    --}}{{--  data-max-files="10" data-allow-reorder="true" data-max-file-size="3MB" data-allow-multiple="true" />--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                @endforeach--}}
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-3 rounded text-end">
+            <div class="card-body">
+                <button class="btn btn-sm btn-outline-success" id="btn-salvar-produto" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="salvar">
+                    <i class="fas fa-save me-1"></i> Salvar
+                </span>
+                    <span wire:loading wire:target="salvar">
+                    <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
+                </span>
+                </button>
+                <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm mb-3 rounded">
-        <div class="card-header">
-            <h6>
-                <i class="fas fa-cube"></i><b> Variações</b>
-            </h6>
-        </div>
-        <div class="card-body">
-            <button wire:click="adicionarVariacao" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">
-                <span wire:loading.remove wire:target="adicionarVariacao">
-                    <i class="fas fa-plus-circle me-1"></i> Adicionar Variação
-                </span>
-                <span wire:loading wire:target="adicionarVariacao">
-                    <i class="fas fa-spinner fa-spin me-1"></i> Adicionando...
-                </span>
-            </button>
-            @foreach ($variacoes as $index => $variacao)
-                <div class="card shadow-sm mb-2 mt-3 rounded">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-auto mb-2" style="max-width:120px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('SUB CÓDIGO') }}"
-                                           wire:model="variacoes.{{ $index }}.subcodigo"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Sub Código" readonly>
-                                    <label for="label-subcodigo">{{ __('SUB CÓDIGO') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-2">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('GTIN') }}"
-                                           wire:model="variacoes.{{ $index }}.gtin"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="GTIN">
-                                    <label for="label-gtin">{{ __('GTIN') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-2">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('VARIACÃO') }}"
-                                           wire:model="variacoes.{{ $index }}.variacao"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Nome da Variação">
-                                    <label for="label-variacao">{{ __('VARIACÃO') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-1 mb-2">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('QTD') }}"
-                                           wire:model="variacoes.{{ $index }}.quantidade"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Quantidade">
-                                    <label for="label-quantidade">{{ __('QTD') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-1 mb-2">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('QTD MIN') }}"
-                                           wire:model="variacoes.{{ $index }}.quantidade_minima"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Quantidade Minima">
-                                    <label for="label-quantidade_minima">{{ __('QTD MIN') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-1 mb-2">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('ESTOQUE') }}"
-                                           wire:model="variacoes.{{ $index }}.estoque"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Estoque">
-                                    <label for="label-estoque">{{ __('ESTOQUE') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width: 150px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                           wire:model.defer="variacoes.{{ $index }}.valor_varejo"
-                                           class="form-control form-control-sm format-font moeda"
-                                           data-toggle="tooltip" data-placement="top" title="Valor Varejo">
-                                    <label for="label-valor_varejo">{{ __('VALOR VAREJO') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width: 150px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('VALOR ATACADO') }}"
-                                           wire:model.defer="variacoes.{{ $index }}.valor_atacado"
-                                           class="form-control form-control-sm format-font moeda"
-                                           data-toggle="tooltip" data-placement="top" title="Valor Atacado">
-                                    <label for="label-valor_atacado">{{ __('VALOR ATACADO') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width: 150px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('VALOR PAGO') }}"
-                                           wire:model.defer="variacoes.{{ $index }}.valor_pago"
-                                           class="form-control form-control-sm format-font moeda"
-                                           data-toggle="tooltip" data-placement="top" title="Valor Pago">
-                                    <label for="label-valor_pago">{{ __('VALOR PAGO') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width:120px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('DESCONTO') }}"
-                                           wire:model="variacoes.{{ $index }}.percentage"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Desconto em %">
-                                    <label for="label-percentage">{{ __('DESCONTO EM %') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width:150px;">
-                                <div class="floating-label-group border-lable-flt">
-                                    <input type="text" placeholder="{{ __('VALIDADE') }}"
-                                           wire:model.defer="variacoes.{{ $index }}.validade"
-                                           class="form-control form-control-sm format-font"
-                                           data-toggle="tooltip" data-placement="top" title="Validade"
-                                           onkeyup="formatDate(this)" maxlength="10">
-                                    <label for="label-validade">{{ __('VALIDADE') }}</label>
-                                </div>
-                            </div>
-                            <div class="col-auto mb-2" style="max-width:250px;">
-                                <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                    <select  wire:model.defer="variacoes.{{ $index }}.fornecedor_id"
-                                             class="form-select format-font form-control-sm" required>
-                                        <option value="">Selecione</option>
-                                        @foreach($fornecedores as $f)
-                                            <option value="{{ $f['id'] }}" title="{{ $f['nome'] }}">
-                                                {{ \Illuminate\Support\Str::limit(ucfirst(strtolower($f['nome'])), 30, '...') }} </option>
-                                        @endforeach
-                                    </select>
-                                    <label for="status">FORNECEDOR</label>
-                                </div>
-                            </div>
-                            <div class="col-auto" style="max-width: 150px;">
-                                <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                    <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
-                                        <label class="form-label m-0">STATUS</label>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="form-check form-switch m-0">
-                                                <input type="checkbox"
-                                                       class="form-check-input"
-                                                       id="switchStatus"
-        {{--                                               wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao['id'] }},{{$produto['id']}}, event.target)"--}}
-                                                    {{ $produto['status'] ? 'checked' : '' }}>
-                                            </div>
-                                            <span class="small">
-                                                {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-auto" style="max-width: 150px;">
-                                <button class="btn btn-sm btn-outline-danger"
-                                        data-toggle="tooltip" data-placement="top" title="Remover Variação"
-                                        wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">
-                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">
-                                            <i class="fas fa-times"></i>
-                                        </span>
-                                        <span wire:loading wire:target="removerVariacao({{ $index }})">
-                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...
-                                        </span>
-                                </button>
-                            </div>
-                            <div class="row" id="filepond-wrapper-variacao-{{ $index }}">
-{{--                                <input type="file" multiple class="filepond-variacao"--}}
-{{--                                       data-max-files="10" data-allow-reorder="true" data-max-file-size="3MB" data-allow-multiple="true" />--}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
 
-    <div class="card shadow-sm mt-3 rounded text-end">
-        <div class="card-body">
-            <button class="btn btn-sm btn-outline-success" id="btn-salvar-produto" wire:loading.attr="disabled">
-                <span wire:loading.remove wire:target="salvar">
-                    <i class="fas fa-save me-1"></i> Salvar
-                </span>
-            <span wire:loading wire:target="salvar">
-                    <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
-                </span>
-            </button>
-            <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
-        </div>
-    </div>
-</div>
+    @push('styles')
+        <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
+    @endpush
 
-
-@push('styles')
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
-@endpush
-
-@push('scripts')
-    <script src="{{ asset('js/util.js') }}"></script>
-    <script>
-        document.addEventListener('livewire:load', () => {
-            loadFilePondProduto();
-            inicializaFilePondVariacoes();
-            aplicarMascaraMoeda();
-            aplicarMascaraQuantidade();
-            aplicarMascaraDataDDMMYYYY();
-            initTooltips();
-
-            Livewire.hook('message.processed', () => {
+    @push('scripts')
+        <script src="{{ asset('js/util.js') }}"></script>
+        <script>
+            document.addEventListener('livewire:load', () => {
+                //inicializaFilePondVariacoes();
                 loadFilePondProduto();
-                inicializaFilePondVariacoes()
                 aplicarMascaraMoeda();
                 aplicarMascaraQuantidade();
                 aplicarMascaraDataDDMMYYYY();
                 initTooltips();
-            });
-        });
 
-    </script>
+                Livewire.hook('message.processed', () => {
+                   // inicializaFilePondVariacoes()
+                    loadFilePondProduto();
+                    aplicarMascaraMoeda();
+                    aplicarMascaraQuantidade();
+                    aplicarMascaraDataDDMMYYYY();
+                    initTooltips();
+                });
+            });
+
+            {{--document.addEventListener('livewire:load', () => {--}}
+            {{--    const inputElement = document.querySelector('.filepond-produto');--}}
+            {{--    const pond = FilePond.create(inputElement, {--}}
+            {{--        server: {--}}
+            {{--            process: {--}}
+            {{--                url: '/admin/upload/tmp-upload',--}}
+            {{--                method: 'POST',--}}
+            {{--                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },--}}
+            {{--                onload: (response) => {--}}
+            {{--                    // Atualiza lista de arquivos no Livewire--}}
+            {{--                    Livewire.emit('refreshTemporaryFiles');--}}
+            {{--                    foldersEnviados.push(response);--}}
+            {{--                    return response;--}}
+            {{--                }--}}
+            {{--            },--}}
+            {{--            revert: (folder, load, error) => {--}}
+            {{--                fetch('/admin/upload/tmp-delete', {--}}
+            {{--                    method: 'DELETE',--}}
+            {{--                    headers: {--}}
+            {{--                        'Content-Type': 'application/json',--}}
+            {{--                        'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
+            {{--                    },--}}
+            {{--                    body: JSON.stringify({ folder: folder })--}}
+            {{--                }).then(res => {--}}
+            {{--                    if(res.ok) {--}}
+            {{--                        Livewire.emit('refreshTemporaryFiles');--}}
+            {{--                        load();--}}
+            {{--                    } else {--}}
+            {{--                        error('Erro ao excluir');--}}
+            {{--                    }--}}
+            {{--                }).catch(() => error('Erro na comunicação'));--}}
+            {{--            }--}}
+            {{--        },--}}
+            {{--        allowMultiple: true,--}}
+            {{--        maxFiles: 10,--}}
+            {{--        labelIdle: 'Arraste ou clique para enviar imagens'--}}
+            {{--    });--}}
+            // });
+        </script>
 @endpush

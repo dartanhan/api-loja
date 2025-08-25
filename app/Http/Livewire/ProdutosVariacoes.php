@@ -158,9 +158,20 @@ class ProdutosVariacoes extends Component
      * @param $id
      * @return RedirectResponse
      */
-    public function editarVariacao($id)
+    public function editarVariacao(int $id)
     {
-        return Redirect::route('variacao.edit', ['variacao' => $id]);
+        //return Redirect::route('variacao.edit', ['variacao' => $id]);
+        return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => 'variacao']);
+    }
+
+    /**
+     *  editar produto pai
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function editarProduto(int $id)
+    {
+        return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => 'produto']);
     }
 
     public function render()

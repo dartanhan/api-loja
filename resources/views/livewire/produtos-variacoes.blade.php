@@ -59,6 +59,7 @@
 
                 <th>Preço</th>
                 <th>Status</th>
+                <th>Ações</th>
             </tr>
             </thead>
 
@@ -111,6 +112,20 @@
                         <span class="badge {{ $produto->status ? 'bg-success' : 'bg-danger' }}">
                             {{ $produto->status ? 'Ativo' : 'Inativo' }}
                         </span>
+                    </td>
+                    <td class="text-center align-middle">
+                        {{-- Ações --}}
+                        <button class="btn btn-outline-primary btn-sm"
+                                wire:click="editarProduto({{ $produto->id }})"
+                                wire:loading.attr="disabled"
+                                data-toggle="tooltip" data-placement="top" title="Editar">
+                                    <span wire:loading.remove wire:target="editarProduto({{ $produto->id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                            <span wire:loading wire:target="editarProduto({{ $produto->id }})">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                     </td>
                 </tr>
 

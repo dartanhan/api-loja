@@ -12,9 +12,9 @@
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap.css')}}">
     <link href="{{asset('css/dashboard/styles.css')}}" rel="stylesheet" />
 
-    <link href="{{asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+    <link href="{{ asset('assets/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/filepond/filepond.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/filepond/filepond-plugin-image-preview.css') }}" rel="stylesheet"/>
     <link href="{{asset('assets/fontawesome-free-6.7.2-web/css/all.min.css')}}" rel="stylesheet" />
 
     <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
@@ -95,6 +95,7 @@
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.mask.min.js') }}"></script>
 
+{{--    <script src="//unpkg.com/alpinejs" defer></script>--}}
 
     @livewireScripts
     @stack("scripts")

@@ -131,221 +131,88 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        @if($produto['produto_imagens'])
+                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $produto['produto_imagens'][0]['id'] }}"
+                                                 wire:key="imagem-{{ $produto['produto_imagens'][0]['id'] }}">
+                                                <div class="border rounded p-2 text-center position-relative">
+                                                    <img src="{{ asset('storage/product/' .$produto['id'].'/'. $produto['produto_imagens'][0]['path']) }}"
+                                                         alt="Imagem"
+                                                         class="img-fluid mb-2 rounded"
+                                                         style="max-height: 150px;min-height: 120px; object-fit: cover;">
 
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                onclick="confirmarExclusaoImagem({{ $produto['produto_imagens'][0]['id'] }})"
+                                                                data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                                id="btn-excluir-{{ $produto['produto_imagens'][0]['id'] }}">
+                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['produto_imagens'][0]['id'] }}"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                     </div>
 
-                    <div class="tab-pane fade" id="aba-imagens" role="tabpanel" aria-labelledby="tab-imagens">
-                        <div class="card mb-3 p-2">
-                            <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
-                                @csrf
-                                <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$variacoes[0]['id']}}">
-                                <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
+                    <div class="tab-pane fade p-2" id="aba-imagens" role="tabpanel" aria-labelledby="tab-imagens">
+                            @if($variacoes)
+                                <div class="card mb-3 p-2">
+                                    <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
+                                        @csrf
+                                        <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$variacoes[0]['id']}}">
+                                        <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
 
-                                    <div class="card-body mb-3 p-2" id="filepond-wrapper">
-                                        <input type="file"
-                                               multiple
-                                               id="image"
-                                               name="image[]"
-                                               data-max-files="10"
-                                               data-allow-reorder="true"
-                                               data-max-file-size="3MB"
-                                               data-allow-multiple="true"
-                                               class="filepond" />
-                                    </div>
-
-                            </form>
-                            <div class="row">
-                                @foreach($imagens as $imagem)
-                                    <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
-                                        <div class="border rounded p-2 text-center position-relative">
-                                            <img src="{{ asset('storage/' . $imagem->path) }}"
-                                                 alt="Imagem"
-                                                 class="img-fluid mb-2 rounded"
-                                                 style="max-height: 150px;min-height: 120px; object-fit: cover;">
-
-                                            <div class="d-flex justify-content-center">
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-danger"
-                                                        onclick="confirmarExclusaoImagem({{ $imagem->id }})"
-                                                        data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
-                                                        id="btn-excluir-{{ $imagem->id }}">
-                                                    <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
-                                                </button>
-                                            </div>
+                                        <div class="card-body mb-3 p-2" id="filepond-wrapper">
+                                            <input type="file"
+                                                   multiple
+                                                   id="image"
+                                                   name="image[]"
+                                                   data-max-files="10"
+                                                   data-allow-reorder="true"
+                                                   data-max-file-size="3MB"
+                                                   data-allow-multiple="true"
+                                                   class="filepond" />
                                         </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
-                        <div class="card-body mb-3">
-                            <div class="row g-2">
-{{--                                <div class="text-end mb-3">--}}
-{{--                                    <button class="btn btn-sm btn-outline-primary" wire:click="adicionarVariacao" wire:loading.attr="disabled">--}}
-{{--                                        <span wire:loading.remove wire:target="adicionarVariacao">--}}
-{{--                                            <i class="fas fa-plus me-1"></i> Nova Variação--}}
-{{--                                        </span>--}}
-{{--                                        <span wire:loading wire:target="adicionarVariacao">--}}
-{{--                                            <i class="fas fa-spinner fa-spin me-1"></i> Adicionando...--}}
-{{--                                        </span>--}}
-{{--                                    </button>--}}
-{{--                                </div>--}}
 
-                                @foreach($variacoes as $index => $variacao)
-                                    <div class="row mb-3 g-2 p-2 align-items-end">
-                                        <div class="row card p-1 mb-2">
-                                            <div class="row card-body ">
-                                                <div class="col-md-2 mb-3">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="text" placeholder="{{ __('SUB CÓDIGO (SKU)') }}"
-                                                               value="{{ $variacao['subcodigo'] }}"  class="form-control form-control-sm format-font" disabled >
-                                                        <label for="label-codigo-{{ $variacao['subcodigo'] }}">{{ __('SUB CÓDIGO(SKU)') }}</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="text" placeholder="{{ __('GTIN') }}"
-                                                               wire:model.defer="variacoes.{{ $index }}.gtin"  class="form-control form-control-sm format-font" >
-                                                        <label for="label-gtin-{{ $index }}">{{ __('GTIN') }}</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="text" placeholder="{{ __('VARIAÇÃO') }}"
-                                                               wire:model.defer="variacoes.{{ $index }}.variacao" class="form-control form-control-sm format-font" >
-                                                        <label for="label-variacao-{{ $index }}">{{ __('VARIAÇÃO') }}</label>
-                                                    </div>
-                                                </div>
-                                                {{-- QTD --}}
-                                                <div class="col-auto" style="max-width: 100px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="number"
-                                                               placeholder="{{ __('QTD') }}"
-                                                               wire:model.defer="variacoes.{{ $index }}.quantidade"
-                                                               class="form-control form-control-sm format-font variacao-qtd">
-                                                        <label>{{ __('QTD') }}</label>
-                                                    </div>
-                                                </div>
+                                    </form>
+                                    <div class="row">
+                                        @foreach($imagens as $imagem)
+                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
+                                                <div class="border rounded p-2 text-center position-relative">
+                                                    <img src="{{ asset('storage/' . $imagem->path) }}"
+                                                         alt="Imagem"
+                                                         class="img-fluid mb-2 rounded"
+                                                         style="max-height: 150px;min-height: 120px; object-fit: cover;">
 
-                                                {{-- ESTOQUE --}}
-                                                <div class="col-auto" style="max-width: 100px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="number"
-                                                               placeholder="{{ __('ESTOQUE') }}"
-                                                               wire:model.defer="variacoes.{{ $index }}.estoque"
-                                                               class="form-control form-control-sm format-font variacao-estoque">
-                                                        <label>{{ __('ESTOQUE') }}</label>
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                onclick="confirmarExclusaoImagem({{ $imagem->id }})"
+                                                                data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                                id="btn-excluir-{{ $imagem->id }}">
+                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
-
-                                                {{-- QTD MÍN --}}
-                                                <div class="col-auto" style="max-width: 100px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <input type="number"
-                                                               placeholder="{{ __('QTD MIN') }}"
-                                                               wire:model.defer="variacoes.{{ $index }}.quantidade_minima"
-                                                               class="form-control form-control-sm format-font variacao-qtd-min">
-                                                        <label>{{ __('QTD MIN') }}</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-auto" style="max-width: 150px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <div class="input-group input-group-sm">
-                                                            <span class="input-group-text">R$</span>
-                                                            <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_varejo"
-                                                                   class="form-control form-control-sm format-font moeda" >
-                                                            <label for="label-valor-varejo-{{ $index }}">{{ __('VALOR VAREJO') }}</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-auto" style="max-width: 150px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <div class="input-group input-group-sm">
-                                                            <span class="input-group-text">R$</span>
-                                                            <input type="text" placeholder="{{ __('VALOR PRODUTO') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.valor_produto"
-                                                                   class="form-control form-control-sm format-font moeda" >
-                                                            <label for="label-valor-produto-{{ $index }}">{{ __('VALOR PRODUTO') }}</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-auto" style="max-width: 100px">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" placeholder="{{ __('DESC.EM %') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.percentage" class="form-control form-control-sm format-font moeda" >
-                                                            <label for="label-valor-percentage-{{ $index }}">{{ __('DESC.EM %') }}</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-auto" style="max-width: 150px;">
-                                                    <div class="floating-label-group border-lable-flt">
-                                                        <div class="input-group input-group-sm">
-                                                            <input type="text" placeholder="{{ __('VALIDADE') }}"
-                                                                   wire:model.defer="variacoes.{{ $index }}.validade"
-                                                                   class="form-control form-control-sm format-font data-mask" maxlength="10">
-                                                            <label for="label-valor-validade-{{ $index }}">{{ __('VALIDADE') }}</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3">
-                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                                        <select wire:model.defer="variacoes.{{ $index }}.fornecedor_id" class="form-select format-font form-control-sm" required>
-                                                            <option value="">Selecione</option>
-                                                            @foreach($fornecedores as $f)
-                                                                <option value="{{ $f['id'] }}" title="{{ $f['nome'] }}">
-                                                                    {{ \Illuminate\Support\Str::limit(ucfirst(strtolower($f['nome'])), 30, '...') }} </option>
-                                                            @endforeach
-                                                        </select>
-                                                        <label for="status">FORNECEDOR</label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                                        <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
-                                                            <label class="form-label m-0">STATUS</label>
-
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <div class="form-check form-switch m-0">
-                                                                    <input type="checkbox"
-                                                                           class="form-check-input"
-                                                                           id="switchStatus"
-                                                                           wire:click="$emit('confirmarAlteracaoStatus','variacao', {{ $variacao['id'] }},{{$produto['id']}}, event.target)"
-                                                                        {{ $produto['status'] ? 'checked' : '' }}>
-                                                                </div>
-                                                                <span class="small">
-                                                        {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
-                                                    </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-{{--                                                <div class="col-auto" style="max-width: 100px;">--}}
-{{--                                                    <button class="btn btn-sm btn-outline-danger" wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">--}}
-{{--                                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">--}}
-{{--                                                            <i class="fas fa-times"></i>--}}
-{{--                                                        </span>--}}
-{{--                                                        <span wire:loading wire:target="removerVariacao({{ $index }})">--}}
-{{--                                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...--}}
-{{--                                                        </span>--}}
-{{--                                                    </button>--}}
-{{--                                                </div>--}}
                                             </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
+                                        @endforeach
+                                </div>
+                            @else
+                                <p>Sem imagens para essa variação</p>
+                            @endif
                     </div>
-                    <div class="tab-pane fade" id="aba-fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
+                    <div class="tab-pane fade p-2" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
+                            @if($variacoes)
+
+                            @else
+                                <p>Produto sem variação</p>
+                            @endif
+                    </div>
+                    <div class="tab-pane fade p-2" id="aba-fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
                         <div class="card-body mb-3">
                             <div class="row g-2">
                                 <div class="col-md-2">

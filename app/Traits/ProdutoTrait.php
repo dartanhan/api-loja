@@ -81,4 +81,11 @@ trait ProdutoTrait
             $variacao['subcodigo'] = $this->produto['codigo_produto'] . $numeroSequencial;
         }
     }
+
+    public function setPastasImagens($pastas)
+    {
+        //dump("folders", $pastas);
+        //die();
+        $this->pastasImagens = $pastas ?? [];
+    }
 }

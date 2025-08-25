@@ -71,7 +71,7 @@
     /***
      * Altera o status do produto ou variação
      */
-    Livewire.on('confirmarAlteracaoStatus', function(tipo, variacaoId, produtoId, inputElement) {
+    function confirmarAlteracaoStatus(tipo, variacaoId, produtoId, inputElement) {
         let data = {};
         // Em JS, salvar o input para revertê-lo depois caso necessário
         window.inputStatusTemp = inputElement;
@@ -90,7 +90,7 @@
         data.produtoId = produtoId;
 
         confirmAlert(data,inputElement);
-    });
+    };
 
     window.addEventListener('confirmarDesativacaoStatus', event => {
         let data = {};
@@ -268,11 +268,11 @@
             //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
             // Chama o botão invisível com wire:click="salvar"
             document.getElementById('btn-livewire-salvar').click();
-            if (typeof Livewire !== 'undefined') {
-                Livewire.emit('setPastasImagens', foldersEnviados);
+            //if (typeof Livewire !== 'undefined') {
+            console.log("salvar",  foldersEnviados);
                 Livewire.emit('salvar');
                 loadFilePondProduto();
-            }
+           // }
         });
     }
 
@@ -286,6 +286,9 @@
         }
     }
 
+    /**
+     * Altera a descrição do status
+     * */
     toggleStatusDescription = function(checkbox){
         const statusLabel = document.getElementById('statusLabel');
         statusLabel.textContent = checkbox.checked ? 'Ativo' : 'Inativo';
@@ -316,7 +319,7 @@
         if (!container) return;
 
         // Remove conteúdo anterior
-        container.innerHTML = containerUpadate();
+       // container.innerHTML = containerUpadate();
 
         const inputElement = container.querySelector('input');
 
@@ -335,7 +338,11 @@
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': csrfToken },
                     onload: (res) => {
+                        // Atualiza lista de arquivos no Livewire
+                        //Livewire.emit('refreshTemporaryFiles');
                         foldersEnviados.push(res);
+                        Livewire.emit('setPastasImagens', foldersEnviados);
+                        //console.log("res > ", res, 'foldersEnviados' , foldersEnviados);
                         return res;
                     }
                 },

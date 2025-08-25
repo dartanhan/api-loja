@@ -8,6 +8,6 @@
 
 @section('content')
     <div class="container-fluid mt-4">
-        @livewire('produto-editar', ['produto' => $produtoId])
+        @livewire('produto-editar', ['id' => $produtoId, 'tipo' => $tipo ])
     </div>
 @endsection

@@ -34,32 +34,53 @@ class ProdutoEditar extends Component
 
     protected $listeners = ['setPastasImagens', 'salvar','deletarImagem','alterarStatusConfirmado','voltar'];
 
-    public function mount(ProdutoVariation $produto)
+    public function mount($id, $tipo = 'produto')
     {
+        if ($tipo === 'variacao') {
+            $variacao = ProdutoVariation::with('produtoPai')->findOrFail($id);
 
-        $this->produto = $produto->produtoPai->toArray();// acessa o pai pela relação
-        $this->produtoId = $this->produto['id'];
-        $this->codigoPai = $this->produto['codigo_produto'] ?? '0000';
-        $this->imagens = $produto->images; // Ajuste conforme relacionamento
-        $this->valor_produto = $this->produto['valor_produto'];
+            dump($variacao);
+            die();
 
-        $this->variacoes = [
-            [
-                'id' => $produto->id,
-                'subcodigo' => $produto->subcodigo,
-                'variacao' => $produto->variacao,
-                'quantidade' => $produto->quantidade,
-                'valor_varejo' => number_format($produto->valor_varejo, 2, ',', '.'),
-                'valor_produto' => number_format($produto->valor_produto, 2, ',', '.'),
-                'gtin' => $produto->gtin,
-                'estoque' => $produto->estoque,
-                'quantidade_minima' => $produto->quantidade_minima,
-                'percentage' => number_format($produto->percentage, 2, ',', '.'),
-                'validade' => Carbon::parse($produto->validade)->format('d/m/Y'),
-                'fornecedor_id' => $produto->fornecedor ??  $this->produto->fornecedor_id ?? null,
-                'status' => $produto->status
-            ]
-        ];
+            $this->produto = $variacao->produtoPai->toArray();// acessa o pai pela relação
+            $this->produtoId = $this->produto['id'];
+            $this->codigoPai = $this->produto['codigo_produto'] ?? '0000';
+            $this->imagens = $variacao->images; // Ajuste conforme relacionamento
+            $this->valor_produto = $this->produto['valor_produto'];
+
+            $this->variacoes = [
+                [
+                    'id' => $variacao->id,
+                    'subcodigo' => $variacao->subcodigo,
+                    'variacao' => $variacao->variacao,
+                    'quantidade' => $variacao->quantidade,
+                    'valor_varejo' => number_format($variacao->valor_varejo, 2, ',', '.'),
+                    'valor_produto' => number_format($variacao->valor_produto, 2, ',', '.'),
+                    'gtin' => $variacao->gtin,
+                    'estoque' => $variacao->estoque,
+                    'quantidade_minima' => $variacao->quantidade_minima,
+                    'percentage' => number_format($variacao->percentage, 2, ',', '.'),
+                    'validade' => Carbon::parse($variacao->validade)->format('d/m/Y'),
+                    'fornecedor_id' => $variacao->fornecedor ??  $this->produto->fornecedor_id ?? null,
+                    'status' => $variacao->status
+                ]
+            ];
+
+        }else{
+            $produto = Produto::with('variances','produtoImagens')->findOrFail($id);
+
+            $this->produto = $produto->toArray();
+            $this->produtoId = $produto->id;
+
+            $this->variacoes = $produto->variances->map(fn($v) => [
+                'id' => $v->id,
+                'subcodigo' => $v->subcodigo,
+                'variacao' => $v->variacao,
+                'quantidade' => $v->quantidade,
+                // ...
+            ])->toArray();
+
+        }
 
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status', 1)->get()->toArray();
 
@@ -202,10 +223,6 @@ class ProdutoEditar extends Component
         ]);
     }
 
-    public function setPastasImagens($pastas)
-    {
-        $this->pastasImagens = $pastas ?? [];
-    }
 
     public function uploadImagem(Request $request)
     {
