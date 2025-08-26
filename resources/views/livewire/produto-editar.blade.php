@@ -1,4 +1,4 @@
-<div class="container-fluid mt-4" xmlns:wire="http://www.w3.org/1999/xhtml">
+<div class="container-fluid mt-4" xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -132,11 +132,11 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        @if($produto['produto_imagens'])
-                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $produto['produto_imagens'][0]['id'] }}"
-                                                 wire:key="imagem-{{ $produto['produto_imagens'][0]['id'] }}">
+                                        @if($produto['images'][0] ?? false)
+                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $produto['images'][0]['id'] }}"
+                                                 wire:key="imagem-{{ $produto['images'][0]['id'] }}">
                                                 <div class="border rounded p-2 text-center position-relative">
-                                                    <img src="{{ asset('storage/product/' .$produto['id'].'/'. $produto['produto_imagens'][0]['path']) }}"
+                                                    <img src="{{ asset('storage/product/' .$produto['id'].'/'. $produto['images'][0]['path']) }}"
                                                          alt="Imagem"
                                                          class="img-fluid mb-2 rounded"
                                                          style="max-height: 150px;min-height: 120px; object-fit: cover;">
@@ -144,15 +144,20 @@
                                                     <div class="d-flex justify-content-center">
                                                         <button type="button"
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                onclick="confirmarExclusaoImagem({{ $produto['produto_imagens'][0]['id'] }})"
+                                                                onclick="confirmarExclusaoImagem({{ $produto['images'][0]['id'] }})"
                                                                 data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
-                                                                id="btn-excluir-{{ $produto['produto_imagens'][0]['id'] }}">
-                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['produto_imagens'][0]['id'] }}"></i>
+                                                                id="btn-excluir-{{ $produto['images'][0]['id'] }}">
+                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['images'][0]['id'] }}"></i>
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
+                                        @else
+                                            <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
+                                                <input type="file" x-ref="filepondProduto" class="filepond-produto">
+                                            </div>
                                         @endif
+
                                     </div>
                                 </div>
                             </div>

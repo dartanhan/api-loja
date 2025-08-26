@@ -39,8 +39,8 @@ class ProdutoEditar extends Component
         if ($tipo === 'variacao') {
             $variacao = ProdutoVariation::with('produtoPai')->findOrFail($id);
 
-            dump($variacao);
-            die();
+//            dump($variacao);
+//            die();
 
             $this->produto = $variacao->produtoPai->toArray();// acessa o pai pela relação
             $this->produtoId = $this->produto['id'];
@@ -67,7 +67,7 @@ class ProdutoEditar extends Component
             ];
 
         }else{
-            $produto = Produto::with('variances','produtoImagens')->findOrFail($id);
+            $produto = Produto::with('variances','images')->findOrFail($id);
 
             $this->produto = $produto->toArray();
             $this->produtoId = $produto->id;

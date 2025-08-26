@@ -90,8 +90,8 @@
                     <td class="text-center align-middle">
                         @php
                             /** @var TYPE_NAME $produto */
-                            $primeiraImagem = $produto->produtoImagens->first();
-                            $path = $primeiraImagem ? 'product/' . $produto->produtoImagens[0]->produto_id  . '/' . $primeiraImagem->path : null;
+                            $primeiraImagem = $produto->images->first();
+                            $path = $primeiraImagem ? 'product/' . $produto->images[0]->produto_id  . '/' . $primeiraImagem->path : null;
 
                             $imagemPath = ($path && Storage::disk('public')->exists($path))
                                 ? $path

@@ -49,7 +49,7 @@ class Produto extends Model implements Auditable
         return $this->hasMany(ListaDeCompras::class, 'produto_new_id', 'id');
     }
 
-    public function produtoImagens()
+    public function images()
     {
         return $this->hasMany(ProdutoImagem::class, 'produto_id', 'id');
     }

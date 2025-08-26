@@ -113,7 +113,7 @@ class ProdutoController extends Controller
         try {
 
             //$ret =  $this->produto::with('products')
-            $query = $this->produto::with('produtoImagens')
+            $query = $this->produto::with('images')
                 ->leftJoin('loja_fornecedores', 'lpn.fornecedor_id', '=', 'loja_fornecedores.id')
                 ->leftJoin('loja_categorias', 'lpn.categoria_id', '=', 'loja_categorias.id')
                 ->select(

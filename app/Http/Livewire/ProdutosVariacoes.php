@@ -179,7 +179,7 @@ class ProdutosVariacoes extends Component
 
         $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))->filter(); // remove termos vazios
 
-        $produtos = Produto::with('produtoImagens')->where('status', 1)
+        $produtos = Produto::with('images')->where('status', 1)
             ->where(function ($query) use ($searchTerms) {
                 foreach ($searchTerms as $term) {
                     $query->where(function ($sub) use ($term) {
