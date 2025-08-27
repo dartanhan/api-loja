@@ -314,61 +314,61 @@
     /***
      * Para centralizar re-render o Filepond quando for rendreizado pelo livewire
      */
-    function loadFilePondProduto() {
-        const container = document.getElementById('filepond-wrapper');
-        if (!container) return;
-
-        // Remove conteúdo anterior
-       // container.innerHTML = containerUpadate();
-
-        const inputElement = container.querySelector('input');
-
-        // Create a FilePond instance
-        const pond = FilePond.create(inputElement,{
-         imageResizeTargetWidth: 500, // Largura alvo para redimensionamento (opcional)
-         imageResizeTargetHeight: 500, // Altura alvo para redimensionamento (opcional)
-         imageResizeMode: 'contain', // Modo de redimensionamento (opcional)
-         plugins: [FilePondPluginImageResize, FilePondPluginImagePreview,FilePondPluginFileEncode]
-        });
-
-        pond.setOptions({
-            server: {
-                process: {
-                    url: '/admin/upload/tmp-upload',
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken },
-                    onload: (res) => {
-                        // Atualiza lista de arquivos no Livewire
-                        //Livewire.emit('refreshTemporaryFiles');
-                        foldersEnviados.push(res);
-                        Livewire.emit('setPastasImagens', foldersEnviados);
-                        //console.log("res > ", res, 'foldersEnviados' , foldersEnviados);
-                        return res;
-                    }
-                },
-                revert: (folder, load, error) => {
-                    fetch('/admin/upload/tmp-delete', {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({ folder: folder })
-                    }).then(res => {
-                        if (res.ok) {
-                            load();
-                        } else {
-                            error('Erro ao excluir imagem temporária');
-                        }
-                    }).catch(err => {
-                        error('Falha na comunicação com o servidor');
-                    });
-                }
-            },
-            labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
-            allowMultiple: true
-        });
-    }
+    // function loadFilePondProduto() {
+    //     const container = document.getElementById('filepond-wrapper');
+    //     if (!container) return;
+    //
+    //     // Remove conteúdo anterior
+    //    // container.innerHTML = containerUpadate();
+    //
+    //     const inputElement = container.querySelector('input');
+    //
+    //     // Create a FilePond instance
+    //     const pond = FilePond.create(inputElement,{
+    //      imageResizeTargetWidth: 500, // Largura alvo para redimensionamento (opcional)
+    //      imageResizeTargetHeight: 500, // Altura alvo para redimensionamento (opcional)
+    //      imageResizeMode: 'contain', // Modo de redimensionamento (opcional)
+    //      plugins: [FilePondPluginImageResize, FilePondPluginImagePreview,FilePondPluginFileEncode]
+    //     });
+    //
+    //     pond.setOptions({
+    //         server: {
+    //             process: {
+    //                 url: '/admin/upload/tmp-upload',
+    //                 method: 'POST',
+    //                 headers: { 'X-CSRF-TOKEN': csrfToken },
+    //                 onload: (res) => {
+    //                     // Atualiza lista de arquivos no Livewire
+    //                     //Livewire.emit('refreshTemporaryFiles');
+    //                     foldersEnviados.push(res);
+    //                     Livewire.emit('setPastasImagens', foldersEnviados);
+    //                     //console.log("res > ", res, 'foldersEnviados' , foldersEnviados);
+    //                     return res;
+    //                 }
+    //             },
+    //             revert: (folder, load, error) => {
+    //                 fetch('/admin/upload/tmp-delete', {
+    //                     method: 'DELETE',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                         'X-CSRF-TOKEN': csrfToken
+    //                     },
+    //                     body: JSON.stringify({ folder: folder })
+    //                 }).then(res => {
+    //                     if (res.ok) {
+    //                         load();
+    //                     } else {
+    //                         error('Erro ao excluir imagem temporária');
+    //                     }
+    //                 }).catch(err => {
+    //                     error('Falha na comunicação com o servidor');
+    //                 });
+    //             }
+    //         },
+    //         labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
+    //         allowMultiple: true
+    //     });
+    // }
 
     function inicializaFilePondVariacoes() {
         document.querySelectorAll('[id^="filepond-wrapper-variacao-"]').forEach(wrapper => {

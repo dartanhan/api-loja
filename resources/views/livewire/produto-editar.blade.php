@@ -154,7 +154,11 @@
                                             </div>
                                         @else
                                             <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
-                                                <input type="file" x-ref="filepondProduto" class="filepond-produto">
+                                                <livewire:filepond-upload
+                                                    :multiple="false"
+                                                    :imagens-existentes="$produto->imagens ?? []"
+                                                    data-is-variacao="false"
+                                                />
                                             </div>
                                         @endif
 
@@ -186,6 +190,14 @@
                                     </form>
                                     <div class="row">
                                         @foreach($imagens as $imagem)
+                                            <livewire:filepond-upload
+                                                :multiple="false"
+                                                :imagens-existentes="$imagem['imagens'] ?? []"
+                                                wire:key="filepond-variacao-{{ $imagem->id }}"
+                                                data-is-variacao="true"
+                                                data-variacao-id="{{ $imagem->id }}"
+                                            />
+
                                             <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
                                                 <div class="border rounded p-2 text-center position-relative">
                                                     <img src="{{ asset('storage/' . $imagem->path) }}"
@@ -205,9 +217,12 @@
                                                 </div>
                                             </div>
                                         @endforeach
+                                    </div>
                                 </div>
                             @else
-                                <p>Sem imagens para essa variação</p>
+                                <div>
+                                    <p>Sem imagens para essa variação</p>
+                                </div>
                             @endif
                     </div>
                     <div class="tab-pane fade p-2" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
@@ -223,7 +238,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('NCM') }}"
-                                               wire:model="produto.ncm" id="ncm" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produto.ncm" id="ncm" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="NCM">
                                         <label for="label-ncm">{{ __('NCM') }}</label>
                                     </div>
@@ -232,7 +247,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('CEST') }}"
-                                               wire:model="produto.cest" id="cest" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produto.cest" id="cest" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="CEST">
                                         <label for="label-ncm">{{ __('CEST') }}</label>
                                     </div>
@@ -250,7 +265,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('CFOP Interestadual (Venda para outro estado)') }}"
-                                               wire:model="produto.cfop_inter" id="cfop_inter" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produto.cfop_inter" id="cfop_inter" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="CFOP Interestadual (Venda para outro estado)">
                                         <label for="label-cfop-inter">{{ __('CFOP Interestadual') }}</label>
                                     </div>
@@ -258,7 +273,7 @@
 
                                 <div class="col-md-3">
                                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                        <select wire:model="produto.origem_id" id="origem_id" name="origem_id"
+                                        <select wire:model.defer="produto.origem_id" id="origem_id" name="origem_id"
                                                 class="form-select format-font form-control-sm"
                                                 data-toggle="tooltip" data-placement="top" title="ICMS - Origem" required>
                                             <option value="" class="select-cstom">Selecione</option>
@@ -364,7 +379,7 @@
 {{--    <script src="{{ asset('js/filePond.js') }}"></script>--}}
     <script>
         document.addEventListener('livewire:load', function () {
-            loadFilePondProduto();
+           // loadFilePondProduto();
             loadSetAbas();
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -372,7 +387,7 @@
             });
 
             Livewire.hook('message.processed', () => {
-                loadFilePondProduto();
+               // loadFilePondProduto();
                 loadSetAbas();
             });
         });

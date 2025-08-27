@@ -29,10 +29,14 @@ class ProdutoEditar extends Component
     public $codigoPai; // nova propriedade
     public $produtoId;
     public $imagens = [];
-    public array $pastasImagens = [];
+    public array $pastasImagensProduto = [];   // imagens do produto pai
+    public array $pastasImagensVariacoes = []; // imagens exclusivas de cada variação
     public $valor_produto;
 
-    protected $listeners = ['setPastasImagens', 'salvar','deletarImagem','alterarStatusConfirmado','voltar'];
+    protected $listeners = [
+        'pastasAtualizadasProduto' => 'setPastasImagensProduto',
+        'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
+        'salvar','deletarImagem','alterarStatusConfirmado','voltar'];
 
     public function mount($id, $tipo = 'produto')
     {
@@ -157,63 +161,52 @@ class ProdutoEditar extends Component
         $produto->valor_produto = $this->produto['valor_produto'] ?? 0;
         $produto->save();
 
-        foreach ($this->variacoes as $dados) {
-            if (isset($dados['id']) && $dados['id']) {
-                $variacao = ProdutoVariation::find($dados['id']);
-            } else {
-                $variacao = new ProdutoVariation();
-                $variacao->products_id = $this->produtoId;
-            }
+        // Salva imagens do produto pai
+        $this->salvarImagens($this->pastasImagensProduto, 'produto', $produto->id);
 
-            if ($variacao) {
-                $variacao->subcodigo = $dados['subcodigo'] ?? '';
-                $variacao->variacao = $dados['variacao'] ?? '';
-                $variacao->quantidade = $dados['quantidade'] ?? 0;
-                $variacao->valor_varejo = $dados['valor_varejo'] ?? 0;
-                $variacao->valor_produto = $dados['valor_produto'] ?? 0;
-                $variacao->fornecedor = $dados['fornecedor_id'] ?? null;
-                $variacao->gtin = $dados['gtin'] ?? 0;
-                $variacao->estoque = $dados['estoque'] ?? 0;
-                $variacao->quantidade_minima = $dados['quantidade_minima'] ?? 0;
-                $variacao->percentage = $dados['percentage'] ?? 0;
-
-                if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dados['validade'])) {
-                    $variacao->validade = Carbon::createFromFormat('d/m/Y', $dados['validade'])->format('Y-m-d');
+        if (!empty($dados['variacoes'])) {
+            foreach ($this->variacoes as $dados) {
+                if (isset($dados['id']) && $dados['id']) {
+                    $variacao = ProdutoVariation::find($dados['id']);
                 } else {
-                    $variacao->validade = '0000-00-00';
+                    $variacao = new ProdutoVariation();
+                    $variacao->products_id = $this->produtoId;
                 }
-                $variacao->save();
+
+                if ($variacao) {
+                    $variacao->subcodigo = $dados['subcodigo'] ?? '';
+                    $variacao->variacao = $dados['variacao'] ?? '';
+                    $variacao->quantidade = $dados['quantidade'] ?? 0;
+                    $variacao->valor_varejo = $dados['valor_varejo'] ?? 0;
+                    $variacao->valor_produto = $dados['valor_produto'] ?? 0;
+                    $variacao->fornecedor = $dados['fornecedor_id'] ?? null;
+                    $variacao->gtin = $dados['gtin'] ?? 0;
+                    $variacao->estoque = $dados['estoque'] ?? 0;
+                    $variacao->quantidade_minima = $dados['quantidade_minima'] ?? 0;
+                    $variacao->percentage = $dados['percentage'] ?? 0;
+
+                    if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $dados['validade'])) {
+                        $variacao->validade = Carbon::createFromFormat('d/m/Y', $dados['validade'])->format('Y-m-d');
+                    } else {
+                        $variacao->validade = '0000-00-00';
+                    }
+                    $variacao->save();
+
+                    // Salva imagens da variação, se houver
+                    if (!empty($this->pastasImagensVariacoes[$this->variacoes[0]['id']])) {
+                        $this->salvarImagens($this->pastasImagensVariacoes[$this->variacoes[0]['id']], 'variacao', $this->variacoes[0]['id']);
+                    }
+                }
             }
+
         }
 
-        // Após salvar o produto e variações...
-        foreach ($this->pastasImagens as $folder) {
-            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
-
-            if ($temporaryFile && Storage::exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                $file = $temporaryFile->file;
-                $pathTemp = 'tmp/' . $folder . '/' . $file;
-                $produtoVariacaoId = $this->variacoes[0]['id']; // ou conforme o loop se tiver várias
-                $pathFinal = 'produtos/' . $produtoVariacaoId . '/' . $file;
-
-                // Move
-                Storage::makeDirectory('produtos/' . $produtoVariacaoId);
-                Storage::move($pathTemp, $pathFinal);
-
-                // Cria imagem associada ao produto ou variação (ajuste se for produto_id)
-                ProdutoImagem::create([
-                    'produto_variacao_id' => $this->variacoes[0]['id'], // ou ajuste para loop se forem várias
-                    'path' => $pathFinal,
-                    'produto_id' => null
-                ]);
-
-                // Limpa temporário
-                Storage::deleteDirectory('tmp/' . $folder);
-                $temporaryFile->delete();
-            }
-        }
         //carregue o produto novamente com findOrFail (ou find) antes de acessar
-        $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
+        //$this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
+        // Recarrega imagens da primeira variação (ou do produto)
+        $this->imagens = !empty($this->variacoes[0]['id'])
+            ? ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images
+            : $produto->images;
 
         //envia a mensagem no browser
         $this->dispatchBrowserEvent('livewire:event', [

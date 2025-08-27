@@ -4,8 +4,9 @@ namespace App\Traits;
 
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
-
-
+use Illuminate\Support\Facades\Storage;
+use App\Http\Models\TemporaryFile;
+use App\Http\Models\ProdutoImagem;
 
 trait ProdutoTrait
 {
@@ -82,10 +83,69 @@ trait ProdutoTrait
         }
     }
 
-    public function setPastasImagens($pastas)
+//    public function setPastasImagens($pastas)
+//    {
+//        //dump("folders", $pastas);
+//        //die();
+//        $this->pastasImagens = $pastas ?? [];
+//    }
+
+    public function setPastasImagensProduto($pastas)
     {
-        //dump("folders", $pastas);
-        //die();
-        $this->pastasImagens = $pastas ?? [];
+        $this->pastasImagensProduto = $pastas ?? [];
+    }
+
+    public function setPastasImagensVariacao($payload)
+    {
+        // payload = ['variacao_id' => 12, 'pastas' => [...]]
+        $this->pastasImagensVariacoes[$payload['variacao_id']] = $payload['pastas'] ?? [];
+    }
+
+
+    /**
+     * Processa as imagens enviadas via FilePond e associa ao produto ou variação.
+     *
+     * @param array $pastasImagens
+     * @param string $tipo 'produto' ou 'variacao'
+     * @param int $id id do produto pai ou da variação
+     */
+    public function salvarImagens(array $pastasImagens, string $tipo, int $id): void
+    {
+        foreach ($pastasImagens as $folder) {
+            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
+
+            if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
+                $file = $temporaryFile->file;
+                $pathTemp = 'tmp/' . $folder . '/' . $file;
+
+                // Definir destino e relacionamentos
+                if ($tipo === 'produto') {
+                    $pathFinal = 'product/' . $id . '/' . $file;
+                    $produtoId = $id;
+                    $variacaoId = null;
+                } else {
+                    $pathFinal = 'produtos/' . $id . '/' . $file;
+                    $produtoId = null;
+                    $variacaoId = $id;
+                }
+
+                // Cria diretório destino
+                Storage::disk('public')->makeDirectory(dirname($pathFinal));
+
+                // Move arquivo
+                Storage::disk('public')->move($pathTemp, $pathFinal);
+
+                // Salva no banco
+                ProdutoImagem::create([
+                    'produto_id' => $produtoId,
+                    'produto_variacao_id' => $variacaoId,
+                    'path' => $pathFinal,
+                ]);
+
+                // Remove temporário
+                Storage::disk('public')->deleteDirectory('tmp/' . $folder);
+                $temporaryFile->delete();
+            }
+        }
     }
 }
