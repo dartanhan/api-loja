@@ -7,6 +7,7 @@ use App\Http\Models\ProdutoVariation;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Models\TemporaryFile;
 use App\Http\Models\ProdutoImagem;
+use Livewire\Livewire;
 
 trait ProdutoTrait
 {
@@ -79,7 +80,7 @@ trait ProdutoTrait
         // Recalcula os subcódigos conforme nova ordem
         foreach ($this->variacoes as $i => &$variacao) {
             $numeroSequencial = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
-            $variacao['subcodigo'] = $this->produto['codigo_produto'] . $numeroSequencial;
+            $variacao['subcodigo'] = $this->codigoPai . $numeroSequencial;
         }
     }
 
@@ -97,8 +98,8 @@ trait ProdutoTrait
 
     public function setPastasImagensVariacao($payload)
     {
-        // payload = ['variacao_id' => 12, 'pastas' => [...]]
-        $this->pastasImagensVariacoes[$payload['variacao_id']] = $payload['pastas'] ?? [];
+        // $mapa vem do filho já como ['subcodigo' => ['pasta1','pasta2'], ...]
+        $this->pastasImagensVariacoes = $mapa ?? [];
     }
 
 
@@ -139,13 +140,82 @@ trait ProdutoTrait
                 ProdutoImagem::create([
                     'produto_id' => $produtoId,
                     'produto_variacao_id' => $variacaoId,
-                    'path' => $pathFinal,
+                    'path' => $tipo === 'produto' ? $file : $pathFinal,
                 ]);
 
                 // Remove temporário
                 Storage::disk('public')->deleteDirectory('tmp/' . $folder);
                 $temporaryFile->delete();
             }
+
         }
     }
+
+    /**
+     * @param $imagemId
+     * @param $isVariacao
+     * @param null $variacaoId
+     * acionado através do listener via js
+     */
+    public function deletarImagem($imagemId, $isVariacao, $variacaoId = null)
+    {
+
+        $imagem = ProdutoImagem::find($imagemId);
+
+        if ($isVariacao) {
+            if ($imagem && Storage::disk('public')->exists($imagem->path)) {
+                // Apaga do storage
+                Storage::disk('public')->delete($imagem->path);
+
+                // Pega o diretório da imagem
+                $diretorio = dirname($imagem->path);
+
+                // Remove do banco
+                $imagem->delete();
+
+                // Se o diretório ficou vazio, remove também
+                if (empty(Storage::disk('public')->files($diretorio))) {
+                    Storage::disk('public')->deleteDirectory($diretorio);
+                }
+            }
+
+            // Recarrega imagens da variação
+            if ($variacaoId) {
+                $this->imagens = ProdutoVariation::with('images')->findOrFail($variacaoId)->images;
+            }
+
+        } else {
+
+            //$imagemPath = "product/{$imagem->produto_id}/{$imagem->path}";
+            $diretorio = "product/{$imagem->produto_id}";
+
+            if (Storage::disk('public')->exists($diretorio)) {
+                Storage::disk('public')->deleteDirectory($diretorio);
+            }
+
+            // Remove do banco
+            $imagem->delete();
+
+            // Atualiza lista de imagens do produto/variação
+            $this->imagensExistentes = $this->produto->images->toArray(); // ou variação
+
+            // Notifica o FilepondUpload
+            $this->emitTo('filepond-upload', 'imagemAtualizada', $this->imagensExistentes);
+        }
+
+        // 🔹 Dispara eventos para atualizar UI
+        //envia a mensagem no browser
+        $this->dispatchBrowserEvent('livewire:event', [
+            'type' => 'alert',
+            'icon' => 'success',
+            'message' => 'Imagem deletada com sucesso!'
+        ]);
+        //atualiza a lista de imagens
+        $this->dispatchBrowserEvent('livewire:event', [
+            'type' => 'imagemRemovida',
+            'id' => $imagem->id
+        ]);
+
+    }
+
 }

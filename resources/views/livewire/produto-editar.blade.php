@@ -1,4 +1,5 @@
-<div class="container-fluid mt-4" xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
+<div class="container-fluid mt-4" xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire=""
+     xmlns:livewire="http://www.w3.org/1999/html">
     @if (session()->has('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -132,35 +133,15 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        @if($produto['images'][0] ?? false)
-                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $produto['images'][0]['id'] }}"
-                                                 wire:key="imagem-{{ $produto['images'][0]['id'] }}">
-                                                <div class="border rounded p-2 text-center position-relative">
-                                                    <img src="{{ asset('storage/product/' .$produto['id'].'/'. $produto['images'][0]['path']) }}"
-                                                         alt="Imagem"
-                                                         class="img-fluid mb-2 rounded"
-                                                         style="max-height: 150px;min-height: 120px; object-fit: cover;">
 
-                                                    <div class="d-flex justify-content-center">
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-outline-danger"
-                                                                onclick="confirmarExclusaoImagem({{ $produto['images'][0]['id'] }})"
-                                                                data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
-                                                                id="btn-excluir-{{ $produto['images'][0]['id'] }}">
-                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['images'][0]['id'] }}"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @else
                                             <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
                                                 <livewire:filepond-upload
                                                     :multiple="false"
-                                                    :imagens-existentes="$produto->imagens ?? []"
+                                                    :imagens-existentes="$imagensExistentes"
                                                     data-is-variacao="false"
                                                 />
                                             </div>
-                                        @endif
+
 
                                     </div>
                                 </div>
@@ -191,7 +172,7 @@
                                     <div class="row">
                                         @foreach($imagens as $imagem)
                                             <livewire:filepond-upload
-                                                :multiple="false"
+                                                :multiple="true"
                                                 :imagens-existentes="$imagem['imagens'] ?? []"
                                                 wire:key="filepond-variacao-{{ $imagem->id }}"
                                                 data-is-variacao="true"
@@ -208,7 +189,7 @@
                                                     <div class="d-flex justify-content-center">
                                                         <button type="button"
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                onclick="confirmarExclusaoImagem({{ $imagem->id }})"
+                                                                onclick="confirmarExclusaoImagem({{ $imagem->id }}, true, {{$variacoes[0]['id']}})"
                                                                 data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
                                                                 id="btn-excluir-{{ $imagem->id }}">
                                                             <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
@@ -226,11 +207,7 @@
                             @endif
                     </div>
                     <div class="tab-pane fade p-2" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
-                            @if($variacoes)
-
-                            @else
-                                <p>Produto sem variação</p>
-                            @endif
+                        <livewire:produto-variacoes-form :variacoes="$variacoes" :fornecedores="$fornecedores" :produto-id="$codigoPai ?? null"/>
                     </div>
                     <div class="tab-pane fade p-2" id="aba-fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
                         <div class="card-body mb-3">

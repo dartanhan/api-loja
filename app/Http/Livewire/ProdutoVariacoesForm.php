@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Http\Models\Produto;
 use App\Traits\ProdutoTrait;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ProdutoVariacoesForm extends Component
@@ -13,7 +14,7 @@ class ProdutoVariacoesForm extends Component
     public $variacoes = [];
     public $fornecedores = [];
     public $produtoId;
-    public $produtoCodigo;
+    public $codigoPai;
     public $produto = [
         'codigo_produto' => '',
         'descricao' => '',
@@ -21,35 +22,53 @@ class ProdutoVariacoesForm extends Component
         'status' => 1,
         'categoria_id' => ''
     ];
+    protected $listeners = ['updatedVariacoes' => 'updatedVariacoes'];
 
-    public function mount($variacoes = [], $fornecedores = [], $produtoId = null)
+    public function mount($variacoes = [], $fornecedores = [], ?int $produtoId = null)
     {
         $lastCodigo = Produto::max('codigo_produto') ?? 0;
         $this->produto['codigo_produto'] = $lastCodigo + 1;
 
         $this->variacoes = $variacoes;
         $this->fornecedores = $fornecedores;
-        $this->produtoId = $produtoId;
+        $this->codigoPai = $produtoId;
 
     }
-
-
 
     public function adicionarVariacao()
     {
         $seq = count($this->variacoes) + 1;
-        $subcodigo = $this->produtoId . str_pad($seq, 2, '0', STR_PAD_LEFT);
+        $subcodigo = $this->codigoPai . str_pad($seq, 2, '0', STR_PAD_LEFT);
+
+        // Gerar ID único (pode ser uuid ou contador incremental)
+        $idUnico = Str::uuid()->toString(); // se quiser usar UUID
+        // $idUnico = count($this->variacoes) + 1; // se quiser sequencial
 
         $this->variacoes[] = [
+            'id_temp'     => $idUnico, // garante que nunca vai conflitar
             'subcodigo' => $subcodigo,
             'variacao' => '',
             'quantidade' => 0,
-            'valor_varejo' => 0,
-            'status' => 1,
-            'imagens' => [],
+            'valor_varejo' => '',
+            'valor_produto' => '',
+            'fornecedor_id' => '',
+            'gtin' => '',
+            'estoque' => '',
+            'quantidade_minima' => '',
+            'percentage' => '',
+            'status' => true,
             'validade' => '',
-            'fornecedor_id' => ''
+            'imagens' => [],
         ];
+
+        // 🚀 Envia para o pai
+        $this->emitUp('atualizarVariacoes', $this->variacoes);
+    }
+
+    public function updatedVariacoes()
+    {
+        // toda vez que $variacoes mudar, envia para o pai
+        $this->emitUp('variacoesAtualizadas', $this->variacoes);
     }
 
     public function render()

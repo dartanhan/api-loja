@@ -12,13 +12,13 @@
             </div>
             <div class="card-body">
             @foreach($variacoes as $index => $variacao)
-                <div class="row mb-3 g-2 align-items-end">
+                <div class="row mb-3 g-2 align-items-end" wire:key="variacao-{{ $variacao['id_temp'] }}">
                     <div class="row card p-1 mb-2">
                         <div class="row card-body ">
                             <div class="col-md-2 mb-3">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('SUB CÓDIGO (SKU)') }}"
-                                           value="{{ $variacao['subcodigo'] }}"  class="form-control form-control-sm format-font" disabled >
+                                           wire:model.defer="variacoes.{{ $index }}.subcodigo"  class="form-control form-control-sm format-font" readonly >
                                     <label for="label-codigo-{{ $variacao['subcodigo'] }}">{{ __('SUB CÓDIGO(SKU)') }}</label>
                                 </div>
                             </div>

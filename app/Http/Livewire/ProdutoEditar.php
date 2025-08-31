@@ -32,11 +32,15 @@ class ProdutoEditar extends Component
     public array $pastasImagensProduto = [];   // imagens do produto pai
     public array $pastasImagensVariacoes = []; // imagens exclusivas de cada variação
     public $valor_produto;
+    public $imagensExistentes = [];
+    public $produtoCodigo;
 
     protected $listeners = [
         'pastasAtualizadasProduto' => 'setPastasImagensProduto',
         'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
-        'salvar','deletarImagem','alterarStatusConfirmado','voltar'];
+        'deletarImagem'=>'deletarImagem','atualizar'=>'atualizarProduto',
+        'imagemAtualizada' => 'carregarImagens',
+        'salvar','alterarStatusConfirmado','voltar'];
 
     public function mount($id, $tipo = 'produto')
     {
@@ -75,6 +79,7 @@ class ProdutoEditar extends Component
 
             $this->produto = $produto->toArray();
             $this->produtoId = $produto->id;
+            $this->codigoPai = $this->produto['codigo_produto'];
 
             $this->variacoes = $produto->variances->map(fn($v) => [
                 'id' => $v->id,
@@ -84,11 +89,14 @@ class ProdutoEditar extends Component
                 // ...
             ])->toArray();
 
+            $this->imagensExistentes = $this->produto['images'] ?? [];
+
         }
 
-        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status', 1)->get()->toArray();
+        //$this->fornecedores = Fornecedor::select('id', 'nome')->where('status', 1)->get()->toArray();
+        $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
 
-        $this->categorias = Categoria::select('id', 'nome')->where('status', 1)->get();
+        $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
 
         $this->origem_nfces = OrigemNfce::get();
     }
@@ -214,6 +222,9 @@ class ProdutoEditar extends Component
             'icon' => 'success',
             'message' => 'Produto e variações atualizados com sucesso!'
         ]);
+
+        // Emite para o componente FilepondUpload atualizar a lista
+        $this->emitTo('filepond-upload', 'imagemAtualizada', $this->imagensExistentes);
     }
 
 
@@ -234,45 +245,23 @@ class ProdutoEditar extends Component
     }
 
 
-    //acionado através d listener via js
-    public function deletarImagem($imagemId)
-    {
-        $imagem = ProdutoImagem::find($imagemId);
-
-        if ($imagem && Storage::disk('public')->exists($imagem->path)) {
-            // Apaga do storage
-            Storage::disk('public')->delete($imagem->path);
-
-            // Remove do banco
-            $imagem->delete();
-
-            //carregue o produto novamente com findOrFail (ou find) antes de acessar
-            $this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
-
-            //envia a mensagem no browser
-            $this->dispatchBrowserEvent('livewire:event', [
-                'type' => 'alert',
-                'icon' => 'success',
-                'message' => 'Imagem deletada com sucesso!'
-            ]);
-            //atualiza a lista de imagens
-            $this->dispatchBrowserEvent('livewire:event', [
-                'type' => 'imagemRemovida',
-                'id' => $imagem->id
-            ]);
-
-        }
-    }
-
     //voltar tela de lista de produtos
     public function voltar()
     {
         return redirect()->route('produtos.produtos_ativos');
     }
 
+    //ao deletar a imagem do API atualiza o componente para exibir o filepond
+    public function atualizarProduto()
+    {
+        $produto['images'][0] = []; // se estiver usando Model
+    }
+
+
 
     public function render()
     {
+        //$this->emitTo('filepond-upload', 'imagemAtualizada', $this->imagensExistentes);
         return view('livewire.produto-editar')->layout('layouts.layout');
     }
 }

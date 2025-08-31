@@ -161,6 +161,7 @@
                 if (el) {
                     $(el).fadeOut(300, () => el.remove());
                 }
+                Livewire.emitTo('filepond-upload', 'imagemDeletada', id);
                 break;
 
             // Você pode adicionar mais tipos aqui no futuro
@@ -237,8 +238,9 @@
     /**
      * Função SweetAlert de confirmação deleção
      * @param id
+     * @param isVariacao
      */
-    function confirmarExclusaoImagem(id) {
+    function confirmarExclusaoImagem(id, isVariacao ) {
         Swal.fire({
             title: 'Excluir imagem?',
             text: "Essa ação não poderá ser desfeita!",
@@ -256,10 +258,13 @@
                 icon.classList.add('fa-spinner', 'fa-spin');
 
                 // Dispara o evento Livewire
-                Livewire.emit('deletarImagem', id);
+                Livewire.emitTo('filepond-upload','deletarImagem', id, isVariacao);
+
             }
         });
     }
+
+
 
     //Ao clicar em salvar aciona o Livewire
     const btnSalvar = document.getElementById('btn-salvar-produto');
@@ -271,7 +276,7 @@
             //if (typeof Livewire !== 'undefined') {
             console.log("salvar",  foldersEnviados);
                 Livewire.emit('salvar');
-                loadFilePondProduto();
+                //loadFilePondProduto();
            // }
         });
     }

@@ -44,9 +44,13 @@ class ProdutoCreate extends Component
     public $imagemDestaque = null;
     public $fornecedores = [];
     public $origens =[];
-    public $pastasImagens = [];
-    protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles', 'setPastasImagens' => 'setPastasImagens'];
+    public array $pastasImagensProduto = [];
+    public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
     public $produtoCodigo;
+
+    protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles', 'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
+        'pastasAtualizadasVariacao' => 'setPastasImagensVariacao','variacoesAtualizadas' => 'setVariacoes'];
+
 
     public function mount()
     {
@@ -79,22 +83,11 @@ class ProdutoCreate extends Component
         }
     }
 
-//    public function adicionarVariacao()
-//    {
-//        $seq = count($this->variacoes) + 1;
-//        $subcodigo = $this->produto['codigo_produto'] . str_pad($seq, 2, '0', STR_PAD_LEFT);
-//
-//        $this->variacoes[] = [
-//            'subcodigo' => $subcodigo,
-//            'variacao' => '',
-//            'quantidade' => 0,
-//            'valor_varejo' => 0,
-//            'status' => 1,
-//            'imagens' => [],
-//            'validade' => '',
-//            'fornecedor_id' => ''
-//        ];
-//    }
+
+    public function setVariacoes($variacoes)
+    {
+        $this->variacoes = $variacoes;
+    }
 
     public function salvar()
     {
@@ -117,37 +110,16 @@ class ProdutoCreate extends Component
             'valor_produto' => $this->produto['valor_produto']
         ];
 
-       $produto = Produto::create($data);
+       //$produto = Produto::create($data);
 
-        //este valor vem do pond.setOptions() em util.js
-        foreach ($this->pastasImagens as $folder) {
-            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
-
-            if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                $file = $temporaryFile->file;
-                $pathTemp = 'tmp/' . $folder . '/' . $file;
-                $pathFinal = 'product/' . $produto->id . '/' . $file;
-
-                // Move arquivo
-                Storage::makeDirectory('product/' . $produto->id);
-                Storage::disk('public')->move($pathTemp, $pathFinal);
-
-                // Registra no banco como imagem do produto pai
-                ProdutoImagem::create([
-                    'produto_id' => $produto->id,
-                    'produto_variation_id' => null,  // ou omite se não for obrigatório
-                    'path' => $file
-                ]);
-
-                // Remove temporário
-                Storage::deleteDirectory('tmp/' . $folder);
-                $temporaryFile->delete();
-            }
-        }
+        // 1) Salva imagens do PRODUTO PAI
+       // $this->salvarImagens($this->pastasImagensProduto, 'produto', $produto->id);
 
         /**
          * salva as variações
         */
+        dump("dump2 ",$this->variacoes);
+die();
         if($this->variacoes) {
             foreach ($this->variacoes as $v) {
 
@@ -163,7 +135,7 @@ class ProdutoCreate extends Component
                     'quantidade_minima' => $v['quantidade_minima'] ?? 0,
                     'percentage' => $v['percentage'] ?? 0,
                     'status' => $v['status'] ?? 0,
-                    'produto_id' => $produto->id
+                    'products_id' => $produto->id
                 ];
 
                 // Trata validade
@@ -175,32 +147,36 @@ class ProdutoCreate extends Component
 
                 $variacao = ProdutoVariation::create($data);
 
+                $key = $variacao->subcodigo; // mesma chave usada no componente
+                if (!empty($this->pastasImagensVariacoes[$key])) {
+                    $this->salvarImagens($this->pastasImagensVariacoes[$key], 'variacao', $variacao->id);
+                }
 
                 // Se houver pastas temporárias associadas à variação
-                if (!empty($v['pastasImagens'])) {
-                    foreach ($v['pastasImagens'] as $folder) {
-                        $temporaryFile = TemporaryFile::where('folder', $folder)->first();
-
-                        if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                            $file = $temporaryFile->file;
-                            $pathTemp = 'tmp/' . $folder . '/' . $file;
-                            $pathFinal = 'produtos/' . $produto->id . '/variacoes/' . $variacao->id . '/' . $file;
-
-                            Storage::makeDirectory('produtos/' . $produto->id . '/variacoes/' . $variacao->id);
-                            Storage::move($pathTemp, $pathFinal);
-
-                            ProdutoImagem::create([
-                                'produto_id' => null,
-                                'produto_variation_id' => $variacao->id,
-                                'path' => $pathFinal
-                            ]);
-
-                            // Limpa os temporários
-                            Storage::deleteDirectory('tmp/' . $folder);
-                            $temporaryFile->delete();
-                        }
-                    }
-                }
+//                if (!empty($v['pastasImagens'])) {
+//                    foreach ($v['pastasImagens'] as $folder) {
+//                        $temporaryFile = TemporaryFile::where('folder', $folder)->first();
+//
+//                        if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
+//                            $file = $temporaryFile->file;
+//                            $pathTemp = 'tmp/' . $folder . '/' . $file;
+//                            $pathFinal = 'produtos/' . $produto->id . '/variacoes/' . $variacao->id . '/' . $file;
+//
+//                            Storage::makeDirectory('produtos/' . $produto->id . '/variacoes/' . $variacao->id);
+//                            Storage::move($pathTemp, $pathFinal);
+//
+//                            ProdutoImagem::create([
+//                                'produto_id' => null,
+//                                'produto_variation_id' => $variacao->id,
+//                                'path' => $pathFinal
+//                            ]);
+//
+//                            // Limpa os temporários
+//                            Storage::deleteDirectory('tmp/' . $folder);
+//                            $temporaryFile->delete();
+//                        }
+//                    }
+//                }
             }
             //envia a mensagem no browser
             $this->dispatchBrowserEvent('livewire:event', [
