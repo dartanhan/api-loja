@@ -48,8 +48,11 @@ class ProdutoCreate extends Component
     public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
     public $produtoCodigo;
 
-    protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles', 'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
-        'pastasAtualizadasVariacao' => 'setPastasImagensVariacao','variacoesAtualizadas' => 'setVariacoes'];
+    protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles',
+                            'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
+                            'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
+                            'atualizarVariacoes' => 'setVariacoes',
+                            'salvar'             => 'salvar',];
 
 
     public function mount()
@@ -84,7 +87,7 @@ class ProdutoCreate extends Component
     }
 
 
-    public function setVariacoes($variacoes)
+    public function setVariacoes(array $variacoes)
     {
         $this->variacoes = $variacoes;
     }

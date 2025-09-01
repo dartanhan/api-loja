@@ -1,30 +1,7 @@
-<div>
-    <div class="row" id="filepond-wrapper-{{ $this->id }}" wire:ignore xmlns:wire="http://www.w3.org/1999/xhtml">
-        @dump($imagensExistentes)
-        @if(count($imagensExistentes) > 0)
-            @foreach($imagensExistentes as $imagem)
-
-                <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem['id'] }}" wire:key="imagem-{{ $imagem['id'] }}">
-                    <div class="border rounded p-2 text-center position-relative">
-                        <img src="{{ asset('storage/product/'. $imagem['produto_id'] .'/'. $imagem['path']) }}"
-                             alt="Imagem"
-                             class="img-fluid mb-2 rounded"
-                             style="max-height: 150px; min-height: 120px; object-fit: cover;">
-
-                        <div class="d-flex justify-content-center">
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-danger"
-                                    onclick="confirmarExclusaoImagem({{ $imagem['id'] }}, {{ $context === 'variacao' ? 'true' : 'false' }})"
-                                    data-toggle="tooltip" title="Excluir imagem">
-                                <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem['id'] }}"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @else
-            <input type="file" class="filepond" {{ $multiple ? 'multiple' : '' }} />
-        @endif
+<div xmlns:wire="http://www.w3.org/1999/xhtml">
+    <div class="row" id="filepond-wrapper-{{ $this->id }}" wire:ignore>
+        {{-- Sempre renderiza o input do FilePond --}}
+        <input type="file" class="filepond" {{ $multiple ? 'multiple' : '' }} />
     </div>
 </div>
 
@@ -54,8 +31,6 @@
             const pond = FilePond.create(input, {
                 allowMultiple: allowMultiple,
                 labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
-                // se usar plugins de imagem, registre-os globalmente no layout antes
-                // plugins: [FilePondPluginImagePreview, FilePondPluginImageResize, FilePondPluginFileEncode],
             });
 
             pond.setOptions({
@@ -65,18 +40,16 @@
                         method: 'POST',
                         headers: { 'X-CSRF-TOKEN': csrfToken },
                         onload: (serverId) => {
-                            // serverId deve ser a "pasta" retornada pelo seu endpoint
                             try {
-                                // se sua API retorna JSON, ajuste aqui:
-                                // const { folder } = JSON.parse(serverId);
-                                // foldersEnviados.push(folder);
-
                                 foldersEnviados.push(serverId);
 
                                 if (context === 'produto') {
                                     lw.call('setPastasImagensProduto', foldersEnviados);
                                 } else {
-                                    lw.call('setPastasImagensVariacao', { variacao_key: variacaoKey, pastas: foldersEnviados });
+                                    lw.call('setPastasImagensVariacao', {
+                                        variacao_key: variacaoKey,
+                                        pastas: foldersEnviados
+                                    });
                                 }
                                 return serverId;
                             } catch (e) {
@@ -95,12 +68,15 @@
                             body: JSON.stringify({ folder: serverId })
                         }).then(res => {
                             if (!res.ok) throw new Error('Erro ao excluir imagem temporária');
-                            // remove do array local e sincroniza com Livewire
                             foldersEnviados = foldersEnviados.filter(f => f !== serverId);
+
                             if (context === 'produto') {
                                 lw.call('setPastasImagensProduto', foldersEnviados);
                             } else {
-                                lw.call('setPastasImagensVariacao', { variacao_key: variacaoKey, pastas: foldersEnviados });
+                                lw.call('setPastasImagensVariacao', {
+                                    variacao_key: variacaoKey,
+                                    pastas: foldersEnviados
+                                });
                             }
                             load();
                         }).catch(err => {
@@ -111,15 +87,13 @@
                 }
             });
 
-            // Se quiser pré-carregar imagens existentes (edição), descomente e alimente $imagensExistentes com urls:
+            // Pré-carregar imagens já salvas (edição)
             @if(!empty($imagensExistentes))
                 pond.files = [
                     @foreach($imagensExistentes as $img)
                 {
-                    source: "{{ is_string($img) ? $img : ($img['url'] ?? $img['path'] ?? '') }}",
-                    options: {
-                        type: 'local'
-                    }
+                    source: "{{ is_string($img) ? $img : ($img['url'] ?? asset('storage/product/'.($img['produto_id'] ?? '').'/'.($img['path'] ?? ''))) }}",
+                    options: { type: 'local' }
                 },
                 @endforeach
             ];

@@ -169,7 +169,11 @@
                     <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
                 </span>
                 </button>
-                <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
+                {{-- IMPORTANTE: o botão não chama salvar direto.
+                         Ele pede ao FILHO para sincronizar e SÓ ENTÃO manda salvar o pai. --}}
+                <button type="button" id="btn-livewire-salvar"
+                        wire:click="$emitTo('produto-variacoes-form', 'syncAndSave')"
+                        style="display: none;"></button>
             </div>
         </div>
     </div>

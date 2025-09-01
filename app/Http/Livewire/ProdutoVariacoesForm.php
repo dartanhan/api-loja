@@ -22,7 +22,8 @@ class ProdutoVariacoesForm extends Component
         'status' => 1,
         'categoria_id' => ''
     ];
-    protected $listeners = ['updatedVariacoes' => 'updatedVariacoes'];
+    // O filho "ouve" uma chamada para sincronizar e salvar
+    protected $listeners = ['updatedVariacoes' => 'updatedVariacoes','syncAndSave' => 'syncAndSave',];
 
     public function mount($variacoes = [], $fornecedores = [], ?int $produtoId = null)
     {
@@ -61,14 +62,16 @@ class ProdutoVariacoesForm extends Component
             'imagens' => [],
         ];
 
-        // 🚀 Envia para o pai
-        $this->emitUp('atualizarVariacoes', $this->variacoes);
     }
 
-    public function updatedVariacoes()
+    // Método chamado PELO PAI (via $emitTo) antes de salvar
+    public function syncAndSave()
     {
-        // toda vez que $variacoes mudar, envia para o pai
-        $this->emitUp('variacoesAtualizadas', $this->variacoes);
+        // 1) Envia o array completo de variações ao pai
+        $this->emitUp('atualizarVariacoes', $this->variacoes);
+
+        // 2) Agora manda o pai salvar (ele já recebeu as variações)
+        $this->emitUp('salvar');
     }
 
     public function render()

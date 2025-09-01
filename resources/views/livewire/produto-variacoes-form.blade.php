@@ -1,4 +1,4 @@
-<div xmlns:wire="http://www.w3.org/1999/xhtml">
+<div xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
         <div class="row g-2">
             <div class="mb-2">
                 <button wire:click="adicionarVariacao" wire:loading.attr="disabled" class="btn btn-sm btn-outline-primary">
@@ -166,6 +166,14 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                    <div id="filepond-wrapper" wire:ignore wire:key="variacoes.{{ $index }}">
+                        <!-- Upload de imagens da variação -->
+                        <livewire:filepond-upload
+                            context="variacao"
+                            :multiple="true"
+                            wire:model.defer="variacoes.{{ $index }}.imagens"
+                        />
                     </div>
                 </div>
             @endforeach
