@@ -84,22 +84,16 @@ trait ProdutoTrait
         }
     }
 
-//    public function setPastasImagens($pastas)
-//    {
-//        //dump("folders", $pastas);
-//        //die();
-//        $this->pastasImagens = $pastas ?? [];
-//    }
 
     public function setPastasImagensProduto($pastas)
     {
         $this->pastasImagensProduto = $pastas ?? [];
     }
 
-    public function setPastasImagensVariacao($payload)
+    public function setPastasImagensVariacao($pastasPorVariacao)
     {
         // $mapa vem do filho já como ['subcodigo' => ['pasta1','pasta2'], ...]
-        $this->pastasImagensVariacoes = $mapa ?? [];
+        $this->pastasImagensVariacoes = $pastasPorVariacao ?? [];
     }
 
 

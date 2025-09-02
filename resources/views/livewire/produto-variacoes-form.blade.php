@@ -167,13 +167,15 @@
                             </div>
                         </div>
                     </div>
-                    <div id="filepond-wrapper" wire:ignore wire:key="variacoes.{{ $index }}">
+                    <div id="filepond-wrapper" wire:key="variacoes.{{ $index }}">
                         <!-- Upload de imagens da variação -->
                         <livewire:filepond-upload
-                            context="variacao"
-                            :multiple="true"
-                            wire:model.defer="variacoes.{{ $index }}.imagens"
+                                context="variacao"
+                                :multiple="true"
+                                :variacao-key="$variacao['id_temp']"
+                                wire:key="filepond-variacao-{{ $variacao['id_temp'] }}"
                         />
+
                     </div>
                 </div>
             @endforeach

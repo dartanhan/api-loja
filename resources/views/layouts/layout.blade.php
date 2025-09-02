@@ -109,5 +109,103 @@
         };
     </script>
     <script src="{{ asset('js/helper/helpers.js') }}"></script>
+
+    <script>
+        document.addEventListener('livewire:load', () => {
+            // função que inicializa todos os inputs .filepond-input que ainda não tenham sido inicializados
+            function initAllFilePonds(root = document) {
+                if (typeof FilePond === 'undefined') {
+                    console.warn('FilePond não está carregado');
+                    return;
+                }
+
+                root.querySelectorAll('.filepond-input').forEach(input => {
+                    // evita inicializar duas vezes
+                    if (input.dataset.pondInitialized === '1') return;
+
+                    // obtém wrapper / meta
+                    const wrapper = input.closest('.filepond-wrapper');
+                    const variacaoKey = wrapper ? wrapper.dataset.variacaoKey || '' : '';
+                    const context = wrapper ? wrapper.dataset.context || 'produto' : 'produto';
+
+                    // pega CSRF (se precisar nas chamadas server)
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+
+                    // cria o pond (ajuste plugins / options conforme necessário)
+                    const pond = FilePond.create(input, {
+                        allowMultiple: input.hasAttribute('multiple'),
+                        labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
+                    });
+
+                    // store ref para uso futuro
+                    input._pond = pond;
+                    input.dataset.pondInitialized = '1';
+
+                    // server handlers — ajuste URL conforme sua rota
+                    pond.setOptions({
+                        server: {
+                            process: {
+                                url: '/admin/upload/tmp-upload',
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrfToken },
+                                onload: (serverId) => {
+                                    // serverId é o retorno do seu backend (folder ou id)
+                                    // notifica o Livewire do componente pai/filho (usa o closest wire:id para encontrar o componente)
+                                    const host = input.closest('[wire\\:id]');
+                                    if (host) {
+                                        const compId = host.getAttribute('wire:id');
+                                        const lw = compId ? Livewire.find(compId) : null;
+                                        if (lw) {
+                                            if (context === 'produto') {
+                                                lw.call('setPastasImagensProduto', [serverId]);
+                                            } else {
+                                                lw.call('setPastasImagensVariacao', { variacao_key: variacaoKey, pastas: [serverId] });
+                                            }
+                                        }
+                                    }
+                                    return serverId;
+                                }
+                            },
+                            revert: (serverId, load, error) => {
+                                // pedir exclusão temporária ao backend
+                                fetch('/admin/upload/tmp-delete', {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': csrfToken
+                                    },
+                                    body: JSON.stringify({ folder: serverId })
+                                }).then(res => {
+                                    if (!res.ok) throw new Error('Erro ao excluir imagem temporária');
+                                    load();
+                                }).catch(err => {
+                                    console.error(err);
+                                    error('Falha na comunicação com o servidor');
+                                });
+                            }
+                        }
+                    });
+
+                    // se quiser pré-carregar arquivos locais usando data vindo do backend, você pode setar pond.files aqui
+                    // ex: if (window._initialFiles && window._initialFiles[variacaoKey]) pond.files = window._initialFiles[variacaoKey];
+                });
+            }
+
+            // roda na primeira carga
+            initAllFilePonds(document);
+
+            // re-inicializa após qualquer patch do Livewire (quando novos inputs forem inseridos)
+            Livewire.hook('message.processed', (message, component) => {
+                initAllFilePonds(document);
+            });
+
+            // caso você queira disparar manualmente após adicionar variação (opcional)
+            window.addEventListener('variacao-adicionada', () => {
+                // small delay para garantir DOM atualizado
+                setTimeout(() => initAllFilePonds(document), 40);
+            });
+        });
+    </script>
+
 </body>
 </html>

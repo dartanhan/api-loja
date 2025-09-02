@@ -77,6 +77,12 @@ class FilepondUpload extends Component
         );
     }
 
+    public function carregarImagens($data)
+    {
+       // dd($data); // 👈 aqui você já vai ver o array
+        $this->imagensExistentes = $data ?? [];
+    }
+
     public function render()
     {
         return view('livewire.produto-filepond');
