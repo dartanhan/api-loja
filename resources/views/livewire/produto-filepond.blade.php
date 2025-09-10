@@ -1,13 +1,56 @@
-<div>
-    {{-- wrapper com id único e data para variacaoKey (se fornecida) --}}
-    <div id="filepond-wrapper-{{ $this->id }}"
-         class="filepond-wrapper"
-         data-variacao-key="{{ $variacaoKey ?? '' }}"
-         data-context="{{ $context ?? 'produto' }}">
-        {{-- input sempre presente (FilePond vai transformar) --}}
-        <input type="file" class="filepond-input" {{ $multiple ? 'multiple' : '' }} />
+<div
+    x-data
+    x-init="
+        const pond = FilePond.create($refs.input, {
+            allowMultiple: {{ $multiple ? 'true' : 'false' }},
+            server: {
+                process: (fieldName, file, metadata, load, error, progress, abort) => {
+                    @this.upload('images', file,
+                        (uploadedFilename) => {
+                            // Emite para o PAI o array atualizado de imagens
+                             @this.call('emitirParaOPai', uploadedFilename);
+                            load(uploadedFilename);
+                        },
+                        (erro) => { error(erro); },
+                        (event) => { progress(event.detail.progress); }
+                    );
+                },
+                revert: (uniqueFileId, load) => {
+                    @this.removeUpload('images', uniqueFileId, () => {
+                        @this.call('emitirParaOPai');
+                        load();
+                    });
+                }
+            }
+        });
+    "
+    xmlns:wire="http://www.w3.org/1999/xhtml"
+>
+    <div wire:ignore>
+        <input type="file" x-ref="input"  {{ $multiple ? 'multiple' : '' }}>
     </div>
+    <input type="hidden" wire:model="images">
 </div>
+
+
+
+
+{{--<div
+    id="filepond-wrapper-{{ $this->id }}"
+    class="filepond-wrapper"
+    data-variacao-key="{{ $variacaoKey ?? '' }}"
+    data-context="{{ $context ?? 'produto' }}"
+    wire:id="{{ $this->id }}"
+    wire:ignore
+    xmlns:wire="http://www.w3.org/1999/xhtml">
+    <input
+        type="file"
+        class="filepond-input"
+        {{ $multiple ? 'multiple' : '' }}
+    />
+</div>--}}
+
+
 
 {{-- NÃO coloque aqui o script de inicialização que só roda uma vez. --}}
 {{-- Usaremos um script global (abaixo) para inicializar todos os inputs e re-inicializar. --}}

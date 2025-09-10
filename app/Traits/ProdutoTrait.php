@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Models\TemporaryFile;
 use App\Http\Models\ProdutoImagem;
@@ -85,16 +86,16 @@ trait ProdutoTrait
     }
 
 
-    public function setPastasImagensProduto($pastas)
-    {
-        $this->pastasImagensProduto = $pastas ?? [];
-    }
-
-    public function setPastasImagensVariacao($pastasPorVariacao)
-    {
-        // $mapa vem do filho já como ['subcodigo' => ['pasta1','pasta2'], ...]
-        $this->pastasImagensVariacoes = $pastasPorVariacao ?? [];
-    }
+//    public function setPastasImagensProduto($pastas)
+//    {
+//        $this->pastasImagensProduto = $pastas ?? [];
+//    }
+//
+//    public function setPastasImagensVariacao($pastasPorVariacao)
+//    {
+//        // $mapa vem do filho já como ['subcodigo' => ['pasta1','pasta2'], ...]
+//        $this->pastasImagensVariacoes = $pastasPorVariacao ?? [];
+//    }
 
 
     /**
@@ -144,6 +145,65 @@ trait ProdutoTrait
 
         }
     }
+
+    /**
+     * @param array $pastasImagens
+     * @param string $destino
+     * @param int $id
+     * @param ProdutoImagem $imagem
+     */
+    public function salvarImagemV2(array $pastasImagens, string $destino, int $id)
+    {
+        foreach ($pastasImagens as $image) {
+            $pathTemp = 'livewire-tmp/' . $image;
+
+            if (!Storage::disk('public')->exists($pathTemp)) {
+                continue; // ignora se a imagem já foi movida/deletada
+            }
+
+            if ($destino === 'produto') {
+                // Produto PAI (só 1 imagem permitida)
+                $pathFinal = "product/{$id}/{$image}";
+                //$produtoId = $id;
+                //$variacaoId = null;
+
+                // Cria diretório destino
+                Storage::disk('public')->makeDirectory(dirname($pathFinal));
+
+                // Move arquivo
+                Storage::disk('public')->move($pathTemp, $pathFinal);
+
+                // Atualiza ou cria (só uma imagem por produto)
+                ProdutoImagem::updateOrCreate(
+                    ['produto_id' => $id, 'produto_variacao_id' => null],
+                    ['path' => $image]
+                );
+            } else {
+                // VARIAÇÃO (pode ter várias imagens)
+                $pathFinal = "produtos/{$id}/{$image}";
+                //$produtoId = null;
+                //$variacaoId = $id;
+
+                // Cria diretório destino
+                Storage::disk('public')->makeDirectory(dirname($pathFinal));
+
+                // Move arquivo
+                Storage::disk('public')->move($pathTemp, $pathFinal);
+
+                // Cria uma nova imagem (não sobrescreve)
+                ProdutoImagem::create([
+                    'produto_id' => null,
+                    'produto_variacao_id' => $id,
+                    'path' => $pathFinal
+                ]);
+            }
+
+            // Remove temporário
+            Storage::disk('public')->delete($pathTemp);
+        }
+    }
+
+
 
     /**
      * @param $imagemId
@@ -212,4 +272,13 @@ trait ProdutoTrait
 
     }
 
+
+    /**
+     * @param array $variacoes
+     * quando for salvar tanto no create quanto no edit, seta os dados das variações para o PAI
+     */
+    public function setVariacoes(array $variacoes)
+    {
+        $this->variacoes = $variacoes;
+    }
 }

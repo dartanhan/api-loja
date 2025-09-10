@@ -70,7 +70,7 @@
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt">
                                             <input type="text" placeholder="{{ __('CÓDIGO DO PRODUTO (SKU)') }}"
-                                                   wire:model="produto.codigo_produto" id="codigo_produto"
+                                                   wire:model.defer="produto.codigo_produto" id="codigo_produto"
                                                    class="form-control form-control-sm format-font"
 
                                                    onkeyup="SomenteNumeros(this);" readonly >
@@ -81,7 +81,7 @@
                                     <div class="col-md-4">
                                         <div class="floating-label-group border-lable-flt">
                                             <input type="text" placeholder="{{ __('DECRIÇÃO') }}"
-                                                   wire:model="produto.descricao" id="descricao"
+                                                   wire:model.defer="produto.descricao" id="descricao"
                                                    class="form-control form-control-sm format-font"
                                                    data-toggle="tooltip" data-placement="top" title="Descrição/Nome do produto" required autofocus>
                                             <label for="label-descricao">{{ __('DESCRIÇÃO') }}</label>
@@ -93,7 +93,7 @@
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">R$</span>
                                                 <input type="text" placeholder="{{ __('VALOR') }}" data-toggle="tooltip" data-placement="right" title="Valor do Produto"
-                                                       wire:model="produto.valor_produto" class="form-control form-control-sm format-font moeda" >
+                                                       wire:model.defer="produto.valor_produto" class="form-control form-control-sm format-font moeda" >
                                                 <label for="label-valor-produto">{{ __('VALOR') }}</label>
                                             </div>
                                         </div>
@@ -101,7 +101,7 @@
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                            <select wire:model="produto.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
+                                            <select wire:model.defer="produto.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
                                                     class="form-select format-font form-control-sm" title="Categoria do Produto" required>
                                                 <option value="" class="select-custom">Selecione?</option>
                                                 @foreach($categorias->sortBy('nome') as $categoria)
@@ -133,17 +133,58 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="card-body mb-3 p-2">
 
-                                            <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
-                                                <livewire:filepond-upload
-                                                    :multiple="false"
-                                                    :imagens-existentes="$imagensExistentes"
-                                                    data-is-variacao="false"
-                                                />
-                                            </div>
+                                            {{-- Se existir imagem do produto pai --}}
+                                            @if(isset($produto['images']) && count($produto['images']) > 0)
+                                                @php /** @var TYPE_NAME $produto */
+                                                   $img = $produto['images'][0];
+                                                @endphp
+                                                <div class="text-center">
+                                                    {{-- Miniatura da imagem --}}
+                                                    <img src="{{ asset('storage/product/'.$produto['id'].'/'.$img['path']) }}"
+                                                         alt="Imagem Produto"
+                                                         class="img-thumbnail mb-2"
+                                                         style="max-width: 150px; cursor: pointer;"
+                                                         data-bs-toggle="modal"
+                                                         data-bs-target="#previewImagemProduto">
 
+                                                    {{-- Botão de excluir --}}
+                                                    <div>
+                                                        <button class="btn btn-sm btn-danger"
+                                                                onclick="confirmarExclusao({{ $img['id'] }})">
+                                                            <i class="fas fa-trash-alt"></i> Excluir
+                                                        </button>
+                                                    </div>
+                                                </div>
 
+                                                {{-- Modal de preview --}}
+                                                <div class="modal fade" id="previewImagemProduto" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                        <div class="modal-content bg-transparent border-0 shadow-none">
+                                                            <div class="modal-body text-center p-0">
+                                                                <img src="{{ asset('storage/product/'.$produto['id'].'/'.$img['path']) }}"
+                                                                     class="img-fluid rounded shadow"
+                                                                     alt="Preview Imagem Produto">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                {{-- Filepond só aparece se não existir imagem --}}
+                                                <div id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
+                                                    <livewire:filepond-upload
+                                                        context="produto"
+                                                        :multiple="false"
+                                                        wire:key="pond-produto"
+                                                    />
+                                                </div>
+                                            @endif
+
+                                        </div>
                                     </div>
+
+
                                 </div>
                             </div>
                     </div>
@@ -157,27 +198,33 @@
                                         <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
 
                                         <div class="card-body mb-3 p-2" id="filepond-wrapper">
-                                            <input type="file"
-                                                   multiple
-                                                   id="image"
-                                                   name="image[]"
-                                                   data-max-files="10"
-                                                   data-allow-reorder="true"
-                                                   data-max-file-size="3MB"
-                                                   data-allow-multiple="true"
-                                                   class="filepond" />
+{{--                                            <input type="file"--}}
+{{--                                                   multiple--}}
+{{--                                                   id="image"--}}
+{{--                                                   name="image[]"--}}
+{{--                                                   data-max-files="10"--}}
+{{--                                                   data-allow-reorder="true"--}}
+{{--                                                   data-max-file-size="3MB"--}}
+{{--                                                   data-allow-multiple="true"--}}
+{{--                                                   class="filepond" />--}}
                                         </div>
 
                                     </form>
                                     <div class="row">
                                         @foreach($imagens as $imagem)
                                             <livewire:filepond-upload
+                                                context="variacao"
                                                 :multiple="true"
-                                                :imagens-existentes="$imagem['imagens'] ?? []"
                                                 wire:key="filepond-variacao-{{ $imagem->id }}"
-                                                data-is-variacao="true"
-                                                data-variacao-id="{{ $imagem->id }}"
                                             />
+
+{{--                                            <livewire:filepond-upload--}}
+{{--                                                :multiple="true"--}}
+{{--                                                :imagens-existentes="$imagem['imagens'] ?? []"--}}
+{{--                                                wire:key="filepond-variacao-{{ $imagem->id }}"--}}
+{{--                                                data-is-variacao="true"--}}
+{{--                                                data-variacao-id="{{ $imagem->id }}"--}}
+{{--                                            />--}}
 
                                             <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
                                                 <div class="border rounded p-2 text-center position-relative">
@@ -276,11 +323,14 @@
                         <span wire:loading.remove wire:target="salvar">
                             <i class="fas fa-save me-1"></i> Salvar
                         </span>
-                        <span wire:loading wire:target="salvar">
+                                <span wire:loading wire:target="salvar">
                             <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
                         </span>
                     </button>
-                    <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>
+                    <button type="button" id="btn-livewire-salvar"
+                            wire:click="$emitTo('produto-variacoes-form', 'syncAndSave')"
+                            style="display: none;"></button>
+{{--                    <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>--}}
 
                     <button wire:click="voltar"
                             wire:loading.attr="disabled"
@@ -358,6 +408,7 @@
         document.addEventListener('livewire:load', function () {
            // loadFilePondProduto();
             loadSetAbas();
+            aplicarMascaraMoeda();
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 sessionStorage.setItem('activeTab', $(e.target).attr('href'));
@@ -366,6 +417,7 @@
             Livewire.hook('message.processed', () => {
                // loadFilePondProduto();
                 loadSetAbas();
+                aplicarMascaraMoeda();
             });
         });
 
@@ -382,6 +434,24 @@
             //console.log('tabId', tabId);
             sessionStorage.setItem('activeTab', tabId);
         });
+
+
+        function confirmarExclusao(id) {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "A imagem será excluída permanentemente!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('removerImagem', { id: id });
+                }
+            })
+        }
 
         </script>
     @endpush

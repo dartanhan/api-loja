@@ -47,12 +47,14 @@ class ProdutoCreate extends Component
     public array $pastasImagensProduto = [];
     public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
     public $produtoCodigo;
+    public $images = []; // arquivos temporários
 
     protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles',
-                            'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
-                            'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
+                            'pastasAtualizadasProduto' => 'atualizarPastasProduto',
+                            'pastasAtualizadasVariacao' => 'atualizarPastasVariacao',
+                            'imagensAtualizadas' => 'setImagens',
                             'atualizarVariacoes' => 'setVariacoes',
-                            'salvar'             => 'salvar',];
+                            'salvar'             => 'salvar'];
 
 
     public function mount()
@@ -86,15 +88,35 @@ class ProdutoCreate extends Component
         }
     }
 
-
-    public function setVariacoes(array $variacoes)
+    public function atualizarPastasProduto($pastas)
     {
-        $this->variacoes = $variacoes;
+        logger()->info("Pai recebeu Produto", $pastas);
+        $this->pastasImagensProduto = $pastas;
+    }
+
+    public function atualizarPastasVariacao($payload)
+    {
+        $key = $payload['variacao_key'] ?? null;
+        $pastas = $payload['pastas'] ?? [];
+
+        if ($key) {
+            $this->pastasImagensVariacoes[$key] = $pastas;
+        }
+
+        logger()->info("Pai recebeu Variação $key", $pastas);
+    }
+
+
+
+    public function setImagens($arquivoTemporario)
+    {
+        $this->images[] = $arquivoTemporario; // adiciona cada arquivo temporário
     }
 
     public function salvar()
     {
-
+dump($this->images);
+dd();
         $this->produto['valor_produto'] = str_replace(',', '.', preg_replace('/[^\d,]/', '', $this->produto['valor_produto'] ?? '0'));
 
         $this->validate();
@@ -121,7 +143,7 @@ class ProdutoCreate extends Component
         /**
          * salva as variações
         */
-dump($this->variacoes,  $this->pastasImagensProduto, $this->pastasImagensVariacoes );
+dump($data, $this->variacoes,  $this->pastasImagensProduto, $this->pastasImagensVariacoes );
 die();
         if($this->variacoes) {
             foreach ($this->variacoes as $v) {

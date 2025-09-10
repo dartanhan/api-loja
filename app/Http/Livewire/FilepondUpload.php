@@ -4,14 +4,18 @@ namespace App\Http\Livewire;
 
 use App\Traits\ProdutoTrait;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class FilepondUpload extends Component
 {
     use ProdutoTrait;
+    use WithFileUploads;
+
     // Props configuráveis pelo pai
     public string $context = 'produto'; // 'produto' | 'variacao'
     public ?string $variacaoKey = null; // chave temporária da variação (ex.: subcodigo)
     public bool $multiple = true;
+    public $images = []; // arquivos temporários
 
     // Estado interno
     public array $pastasImagensProduto = [];   // imagens do produto pai
@@ -31,29 +35,35 @@ class FilepondUpload extends Component
 
     /**
      * @param string $context 'produto' ou 'variacao'
+     * @param string $multiple
      * @param string|null $variacaoKey chave temporária para mapear variação (ex.: subcodigo)
      * @param array $imagensExistentes urls/paths já salvos (na criação geralmente vazio)
      */
-    public function mount(string $context = 'produto', ?string $variacaoKey = null, array $imagensExistentes = [])
+    public function mount(string $context = 'produto',
+                          string $multiple, ?string $variacaoKey = null, array $imagensExistentes = [])
     {
         $this->context = $context;
         $this->variacaoKey = $variacaoKey;
         $this->imagensExistentes = $imagensExistentes ?? [];
+        $this->multiple = $multiple;
+
+      //  dump($this->multiple,  $this->context);
     }
 
 
-    public function setPastasImagensProduto($pastas): void
+    public function setPastasImagensProduto($pastas)
     {
         $this->pastasImagensProduto = $pastas ?? [];
 
         // avisa o PAI (ProdutoCreate) que a lista mudou
         $this->emitUp('pastasAtualizadasProduto', $this->pastasImagensProduto);
+        return $this->skipRender();
     }
 
     /**
      * payload: ['variacao_key' => string, 'pastas' => array]
      */
-    public function setPastasImagensVariacao(array $payload): void
+    public function setPastasImagensVariacao(array $payload)
     {
         $key = $payload['variacao_key'] ?? $this->variacaoKey;
         $pastas = $payload['pastas'] ?? [];
@@ -64,6 +74,7 @@ class FilepondUpload extends Component
 
         // avisa o PAI (ProdutoCreate) com o mapa completo de variações => pastas
         $this->emitUp('pastasAtualizadasVariacao', $this->pastasImagensVariacoes);
+        return $this->skipRender();
     }
 
     /** 🔹 Remove imagem deletada
@@ -81,6 +92,17 @@ class FilepondUpload extends Component
     {
        // dd($data); // 👈 aqui você já vai ver o array
         $this->imagensExistentes = $data ?? [];
+    }
+
+    public function emitirParaOPai($uploadedFile)
+    {
+        $payload = [
+            'file' => $uploadedFile,
+            'context' => $this->context,
+            'variacaoKey' => $this->variacaoKey,
+        ];
+        // Aqui passamos só o nome do arquivo temporário para o pai
+        $this->emitUp('imagensAtualizadas', $payload);
     }
 
     public function render()

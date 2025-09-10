@@ -28,7 +28,7 @@ class ProdutoEditar extends Component
     public $origem_nfces =[];
     public $codigoPai; // nova propriedade
     public $produtoId;
-    public $imagens = [];
+    public $images = [];
     public array $pastasImagensProduto = [];   // imagens do produto pai
     public array $pastasImagensVariacoes = []; // imagens exclusivas de cada variação
     public $valor_produto;
@@ -39,12 +39,16 @@ class ProdutoEditar extends Component
         'pastasAtualizadasProduto' => 'setPastasImagensProduto',
         'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
         'deletarImagem'=>'deletarImagem','atualizar'=>'atualizarProduto',
-        'imagemAtualizada' => 'carregarImagens',
-        'salvar','alterarStatusConfirmado','voltar'];
+        'imagensAtualizadas' => 'setImagens',
+        'atualizarVariacoes' => 'setVariacoes', //trait
+        'salvar','alterarStatusConfirmado','voltar',
+        'syncAndSave' => 'salvar','removerImagem' => 'removerImagem'];
 
-    public function mount($id, $tipo = 'produto')
+
+    public function mount($id, string $context = 'produto',
+                          bool $multiple = false, ?string $variacaoKey = null, array $imagensExistentes = [])
     {
-        if ($tipo === 'variacao') {
+        if ($context === 'variacao') {
             $variacao = ProdutoVariation::with('produtoPai')->findOrFail($id);
 
 //            dump($variacao);
@@ -53,7 +57,7 @@ class ProdutoEditar extends Component
             $this->produto = $variacao->produtoPai->toArray();// acessa o pai pela relação
             $this->produtoId = $this->produto['id'];
             $this->codigoPai = $this->produto['codigo_produto'] ?? '0000';
-            $this->imagens = $variacao->images; // Ajuste conforme relacionamento
+            $this->images = $variacao->images; // Ajuste conforme relacionamento
             $this->valor_produto = $this->produto['valor_produto'];
 
             $this->variacoes = [
@@ -76,10 +80,10 @@ class ProdutoEditar extends Component
 
         }else{
             $produto = Produto::with('variances','images')->findOrFail($id);
-
             $this->produto = $produto->toArray();
             $this->produtoId = $produto->id;
-            $this->codigoPai = $this->produto['codigo_produto'];
+            $this->codigoPai = $produto->codigo_produto;
+
 
             $this->variacoes = $produto->variances->map(fn($v) => [
                 'id' => $v->id,
@@ -99,6 +103,7 @@ class ProdutoEditar extends Component
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
 
         $this->origem_nfces = OrigemNfce::get();
+
     }
 
 
@@ -147,8 +152,31 @@ class ProdutoEditar extends Component
         ];
     }
 
+    /**
+     * @param $arquivoTemporario
+     */
+    public function setImagens($payload)
+    {
+        if ($payload['context'] === 'produto') {
+            $this->pastasImagensProduto = [$payload['file']]; // só 1 imagem
+        }
+
+        if ($payload['context'] === 'variacao') {
+            $key = $payload['variacaoKey'];
+            if (!isset($this->pastasImagensVariacoes[$key])) {
+                $this->pastasImagensVariacoes[$key] = [];
+            }
+            $this->pastasImagensVariacoes[$key][] = $payload['file'];
+        }
+    }
+
     public function salvar()
     {
+
+//        dump($this->pastasImagensVariacoes,
+//            $this->pastasImagensProduto, $this->variacoes,
+//            $this->produto);
+//        dd();
         // Validação de duplicidade de subcódigos
         $subcodigos = array_column($this->variacoes, 'subcodigo');
         $duplicados = array_diff_key($subcodigos, array_unique($subcodigos));
@@ -159,20 +187,24 @@ class ProdutoEditar extends Component
         }
 
         // Salva o produto pai
-        $produto = Produto::findOrFail($this->produtoId);
-        $produto->descricao = $this->produto['descricao'] ?? '';
-        $produto->ncm = $this->produto['ncm'] ?? 0;
-        $produto->cest = $this->produto['cest'] ?? 0;
-        $produto->origem_id = $this->produto['origem_id'] ?? 0;
-        $produto->categoria_id = $this->produto['categoria_id'] ?? 0;
-        $produto->status = $this->produto['status'] ?? 0;
-        $produto->valor_produto = $this->produto['valor_produto'] ?? 0;
-        $produto->save();
+        //$produto = Produto::with('images')->findOrFail($this->produtoId);
+        $data = ['descricao' => $this->produto['descricao'] ?? '',
+            'ncm' => $this->produto['ncm'] ?? 0,
+            'cest' => $this->produto['cest'] ?? 0,
+            'origem_id' => $this->produto['origem_id'] ?? 0,
+            'categoria_id' => $this->produto['categoria_id'] ?? 0,
+            'status' => $this->produto['status'] ?? 0,
+            'valor_produto' => $this->produto['valor_produto'] ?? 0];
+
+
+        Produto::where('id', $this->produtoId)->update($data);
 
         // Salva imagens do produto pai
-        $this->salvarImagens($this->pastasImagensProduto, 'produto', $produto->id);
+        if (!empty($this->pastasImagensProduto)) {
+            $this->salvarImagemV2($this->pastasImagensProduto, 'produto', $this->produtoId);
+        }
 
-        if (!empty($dados['variacoes'])) {
+        if (!empty($this->variacoes)) {
             foreach ($this->variacoes as $dados) {
                 if (isset($dados['id']) && $dados['id']) {
                     $variacao = ProdutoVariation::find($dados['id']);
@@ -201,20 +233,20 @@ class ProdutoEditar extends Component
                     $variacao->save();
 
                     // Salva imagens da variação, se houver
-                    if (!empty($this->pastasImagensVariacoes[$this->variacoes[0]['id']])) {
-                        $this->salvarImagens($this->pastasImagensVariacoes[$this->variacoes[0]['id']], 'variacao', $this->variacoes[0]['id']);
+                    if (!empty($this->pastasImagensVariacoes[$this->variacoes->id])) {
+                        $this->salvarImagemV2($this->pastasImagensVariacoes[$this->variacoes->id], 'variacao', $this->variacoes->id);
                     }
                 }
             }
-
         }
+
 
         //carregue o produto novamente com findOrFail (ou find) antes de acessar
         //$this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
         // Recarrega imagens da primeira variação (ou do produto)
         $this->imagens = !empty($this->variacoes[0]['id'])
             ? ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images
-            : $produto->images;
+            :  $this->produto = Produto::with('images')->find($this->produto['id'])->toArray();
 
         //envia a mensagem no browser
         $this->dispatchBrowserEvent('livewire:event', [
@@ -258,6 +290,22 @@ class ProdutoEditar extends Component
     }
 
 
+    public function removerImagem($id)
+    {
+        $imagem = ProdutoImagem::find($id);
+        if ($imagem) {
+            Storage::delete('public/product/'.$imagem->produto_id.'/'.$imagem->path);
+            $imagem->delete();
+        }
+
+        // Remove a imagem do array local
+        $this->produto['images'] = array_filter($this->produto['images'], fn($img) => $img['id'] !== $id);
+
+        // Mensagem de sucesso
+        $this->dispatchBrowserEvent('swal:sucesso', [
+            'message' => 'Imagem excluída com sucesso!'
+        ]);
+    }
 
     public function render()
     {
