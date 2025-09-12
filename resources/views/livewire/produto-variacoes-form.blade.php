@@ -12,7 +12,7 @@
             </div>
             <div class="card-body">
             @foreach($variacoes as $index => $variacao)
-                <div class="row mb-3 g-2 align-items-end" wire:key="variacao-{{ $variacao['id_temp'] }}">
+                <div class="row mb-3 g-2 align-items-end" wire:key="variacao-{{ $variacao['id'] }}">
                     <div class="row card p-1 mb-2">
                         <div class="row card-body ">
                             <div class="col-md-2 mb-3">
@@ -122,6 +122,10 @@
                                     </select>
                                     <label for="status">FORNECEDOR</label>
                                 </div>
+                                @error("variacoes.$index.fornecedor_id")
+                                <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+
                             </div>
 
                             <div class="col-md-2">
@@ -167,18 +171,59 @@
                             </div>
                         </div>
                     </div>
+
                     <div id="filepond-wrapper" wire:key="variacoes.{{ $index }}">
                         <!-- Upload de imagens da variação -->
                         <livewire:filepond-upload
                                 context="variacao"
                                 :multiple="true"
-                                :variacao-key="$variacao['id_temp']"
-                                wire:key="filepond-variacao-{{ $variacao['id_temp'] }}"
+                                :variacao-key="$variacao['id']"
+                                wire:key="filepond-variacao-{{ $variacao['id'] }}"
                         />
-
                     </div>
+                   {{-- @dump(count($variacao['images']))--}}
+                    @if(isset($variacao['images']) && count($variacao['images']) > 0)
+                        <div class="card mb-3 p-2">
+                            <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
+                                @csrf
+                                <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$variacao['id']}}">
+                                <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
+
+                                <div class="card-body mb-3 p-2" id="filepond-wrapper">
+                                    <div class="row">
+
+                                            @foreach($variacao['images'] as $index => $imagem)
+                                                <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem['id'] }}" wire:key="imagem-{{ $imagem['id'] }}">
+                                                    <div class="border rounded p-2 text-center position-relative">
+                                                        <img src="{{ asset('storage/' . $imagem['path']) }}"
+                                                             alt="Imagem"
+                                                             class="img-fluid mb-1 rounded"
+                                                             style="cursor: pointer;"
+                                                             onclick="previewImagem('{{ asset('storage/' . $imagem['path']) }}')"
+                                                             style="max-height: 150px;min-height: 120px; object-fit: cover;">
+
+                                                        <div class="d-flex justify-content-center">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger"
+                                                                    onclick="confirmarExclusaoImagem({{ $imagem['id'] }}, true, {{$produtoId}})"
+                                                                    data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                                    id="btn-excluir-{{ $imagem['id'] }}">
+                                                                <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem['id'] }}"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
+
                 </div>
             @endforeach
         </div>
     </div>
+
 </div>

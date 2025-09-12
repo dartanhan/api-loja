@@ -4,7 +4,8 @@ namespace App\Traits;
 
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
-use Illuminate\Database\Eloquent\Model;
+use NumberFormatter;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Models\TemporaryFile;
 use App\Http\Models\ProdutoImagem;
@@ -12,6 +13,34 @@ use Livewire\Livewire;
 
 trait ProdutoTrait
 {
+    /**
+     * Carrega os dados na tela de edição, as variações
+    */
+    private function carregdaDadosVariacao($produto){
+
+        if(!empty($produto['variacoes'])){
+            return $produto['variacoes']->map(fn($v) => [
+                'id' => $v->id,
+                'subcodigo' => $v->subcodigo,
+                'variacao' => $v->variacao,
+                'quantidade' => $v->quantidade,
+                'valor_varejo' => number_format($v->valor_varejo, 2, ',', '.'),
+                'valor_produto' => number_format($v->valor_produto, 2, ',', '.'),
+                'gtin' => $v->gtin,
+                'estoque' => $v->estoque,
+                'quantidade_minima' => $v->quantidade_minima,
+                'percentage' => number_format($v->percentage, 2, ',', '.'),
+                'validade' => Carbon::parse($v->validade)->format('d/m/Y'),
+                'fornecedor_id' => $v->fornecedor,
+                'status' => $v->status,
+                'images' => $v->images->map(fn($i) => [
+                    'id' => $i->id,
+                    'path' => $i->path
+                ])->toArray(),
+            ])->toArray();
+        }
+    }
+
     /**
      * acionado via listener ao clicar no toogle desativa ou ativa o PAI e suas variações
      * @param $data
@@ -86,17 +115,81 @@ trait ProdutoTrait
     }
 
 
-//    public function setPastasImagensProduto($pastas)
-//    {
-//        $this->pastasImagensProduto = $pastas ?? [];
-//    }
-//
-//    public function setPastasImagensVariacao($pastasPorVariacao)
-//    {
-//        // $mapa vem do filho já como ['subcodigo' => ['pasta1','pasta2'], ...]
-//        $this->pastasImagensVariacoes = $pastasPorVariacao ?? [];
-//    }
+    /**
+     * @param $imagemId
+     * @param $isVariacao
+     * @param $produtoId
+     */
+    public function deletarImagem($imagemId, $isVariacao, $produtoId)
+    {
 
+        $imagem = ProdutoImagem::find($imagemId);
+
+        if ($isVariacao) {
+            if ($imagem && Storage::disk('public')->exists($imagem->path)) {
+                // Apaga do storage
+                Storage::disk('public')->delete($imagem->path);
+
+                // Pega o diretório da imagem
+                $diretorio = dirname($imagem->path);
+
+                // Remove do banco
+                $imagem->delete();
+
+                // Se o diretório ficou vazio, remove também
+                if (empty(Storage::disk('public')->files($diretorio))) {
+                    Storage::disk('public')->deleteDirectory($diretorio);
+
+                    $produto = Produto::with('variacoes.images','images')->findOrFail($produtoId); //trás o PAI e sua relações
+                    //carrego os dados das variações do produto para blade
+                    $this->variacoes = $this->carregdaDadosVariacao($produto);
+                    //aciona o componente para atualizar as imagens
+                    $this->emitTo('produto-variacoes-form', 'imagemAtualizada', $this->variacoes);
+
+                }
+            }
+
+            // Recarrega imagens da variação
+//            if ($variacaoId) {
+//                $this->imagens = ProdutoVariation::with('images')->findOrFail($variacaoId)->images;
+//            }
+           // $this->produto = Produto::with('variacoes.images','images')->findOrFail($produtoId); //trás o PAI e sua relações
+            // Notifica o FilepondUpload
+
+
+        } else {
+
+            //$imagemPath = "product/{$imagem->produto_id}/{$imagem->path}";
+            $diretorio = "product/{$imagem->produto_id}";
+
+            if (Storage::disk('public')->exists($diretorio)) {
+                Storage::disk('public')->deleteDirectory($diretorio);
+            }
+
+            // Remove do banco
+            $imagem->delete();
+
+            // Atualiza lista de imagens do produto/variação
+            $this->imagensExistentes = $this->produto->images->toArray(); // ou variação
+
+            // Notifica o FilepondUpload
+            $this->emitTo('filepond-upload', 'imagemAtualizada', $this->imagensExistentes);
+        }
+
+        // 🔹 Dispara eventos para atualizar UI
+        //envia a mensagem no browser
+        $this->dispatchBrowserEvent('livewire:event', [
+            'type' => 'alert',
+            'icon' => 'success',
+            'message' => 'Imagem deletada com sucesso!'
+        ]);
+        //atualiza a lista de imagens
+        $this->dispatchBrowserEvent('livewire:event', [
+            'type' => 'imagemRemovida',
+            'id' => $imagem->id
+        ]);
+
+    }
 
     /**
      * Processa as imagens enviadas via FilePond e associa ao produto ou variação.
@@ -145,6 +238,8 @@ trait ProdutoTrait
 
         }
     }
+
+
 
     /**
      * @param array $pastasImagens
@@ -201,75 +296,6 @@ trait ProdutoTrait
             // Remove temporário
             Storage::disk('public')->delete($pathTemp);
         }
-    }
-
-
-
-    /**
-     * @param $imagemId
-     * @param $isVariacao
-     * @param null $variacaoId
-     * acionado através do listener via js
-     */
-    public function deletarImagem($imagemId, $isVariacao, $variacaoId = null)
-    {
-
-        $imagem = ProdutoImagem::find($imagemId);
-
-        if ($isVariacao) {
-            if ($imagem && Storage::disk('public')->exists($imagem->path)) {
-                // Apaga do storage
-                Storage::disk('public')->delete($imagem->path);
-
-                // Pega o diretório da imagem
-                $diretorio = dirname($imagem->path);
-
-                // Remove do banco
-                $imagem->delete();
-
-                // Se o diretório ficou vazio, remove também
-                if (empty(Storage::disk('public')->files($diretorio))) {
-                    Storage::disk('public')->deleteDirectory($diretorio);
-                }
-            }
-
-            // Recarrega imagens da variação
-            if ($variacaoId) {
-                $this->imagens = ProdutoVariation::with('images')->findOrFail($variacaoId)->images;
-            }
-
-        } else {
-
-            //$imagemPath = "product/{$imagem->produto_id}/{$imagem->path}";
-            $diretorio = "product/{$imagem->produto_id}";
-
-            if (Storage::disk('public')->exists($diretorio)) {
-                Storage::disk('public')->deleteDirectory($diretorio);
-            }
-
-            // Remove do banco
-            $imagem->delete();
-
-            // Atualiza lista de imagens do produto/variação
-            $this->imagensExistentes = $this->produto->images->toArray(); // ou variação
-
-            // Notifica o FilepondUpload
-            $this->emitTo('filepond-upload', 'imagemAtualizada', $this->imagensExistentes);
-        }
-
-        // 🔹 Dispara eventos para atualizar UI
-        //envia a mensagem no browser
-        $this->dispatchBrowserEvent('livewire:event', [
-            'type' => 'alert',
-            'icon' => 'success',
-            'message' => 'Imagem deletada com sucesso!'
-        ]);
-        //atualiza a lista de imagens
-        $this->dispatchBrowserEvent('livewire:event', [
-            'type' => 'imagemRemovida',
-            'id' => $imagem->id
-        ]);
-
     }
 
 

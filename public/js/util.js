@@ -239,8 +239,11 @@
      * Função SweetAlert de confirmação deleção
      * @param id
      * @param isVariacao
+     * @param produtoId
      */
-    function confirmarExclusaoImagem(id, isVariacao ) {
+    function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
+        console.log(id, isVariacao,produtoId );
+
         Swal.fire({
             title: 'Excluir imagem?',
             text: "Essa ação não poderá ser desfeita!",
@@ -258,7 +261,7 @@
                 icon.classList.add('fa-spinner', 'fa-spin');
 
                 // Dispara o evento Livewire
-                Livewire.emitTo('filepond-upload','deletarImagem', id, isVariacao);
+                Livewire.emitTo('filepond-upload','deletarImagem', id, isVariacao,produtoId);
 
             }
         });

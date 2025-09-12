@@ -3,6 +3,7 @@
     x-init="
         const pond = FilePond.create($refs.input, {
             allowMultiple: {{ $multiple ? 'true' : 'false' }},
+            labelIdle: '📁 Arraste ou <span class=\'filepond--label-action\'>clique</span> para enviar imagens',
             server: {
                 process: (fieldName, file, metadata, load, error, progress, abort) => {
                     @this.upload('images', file,

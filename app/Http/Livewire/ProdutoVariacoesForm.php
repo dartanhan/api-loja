@@ -15,24 +15,29 @@ class ProdutoVariacoesForm extends Component
     public $fornecedores = [];
     public $produtoId;
     public $codigoPai;
-    public $produto = [
-        'codigo_produto' => '',
-        'descricao' => '',
-        'valor_produto' => '',
-        'status' => 1,
-        'categoria_id' => ''
-    ];
-    // O filho "ouve" uma chamada para sincronizar e salvar
-    protected $listeners = ['updatedVariacoes' => 'updatedVariacoes','syncAndSave' => 'syncAndSave',];
+    public $produto;
 
-    public function mount($variacoes = [], $fornecedores = [], ?int $produtoId = null)
+    // O filho "ouve" uma chamada para sincronizar e salvar
+    protected $listeners = ['updatedVariacoes' => 'updatedVariacoes','syncAndSave' => 'syncAndSave',
+        'imagemAtualizada'=>'imagemAtualizada'];
+
+//    protected $rules = [
+//        'variacoes.*.descricao' => 'required|string|max:155',
+//        'variacoes.*.fornecedor_id' => 'required|exists:loja_fornecedores,id',
+//        'variacoes.*.categoria_id' => 'required|exists:loja_categorias,id',
+//        'variacoes.*.origem_id' => 'required|exists:loja_produto_origem_nfces,codigo',
+//    ];
+
+    public function mount($produto , $variacoes = [], $fornecedores = [], ?int $produtoId = null,$codigoPai)
     {
         $lastCodigo = Produto::max('codigo_produto') ?? 0;
         $this->produto['codigo_produto'] = $lastCodigo + 1;
 
         $this->variacoes = $variacoes;
         $this->fornecedores = $fornecedores;
-        $this->codigoPai = $produtoId;
+        $this->produtoId = $produtoId;
+        $this->produto = $produto;
+        $this->codigoPai = $codigoPai;
 
     }
 
@@ -46,7 +51,7 @@ class ProdutoVariacoesForm extends Component
         // $idUnico = count($this->variacoes) + 1; // se quiser sequencial
 
         $this->variacoes[] = [
-            'id_temp'     => $idUnico, // garante que nunca vai conflitar
+            'id'     => $idUnico, // garante que nunca vai conflitar
             'subcodigo' => $subcodigo,
             'variacao' => '',
             'quantidade' => 0,
@@ -59,7 +64,7 @@ class ProdutoVariacoesForm extends Component
             'percentage' => '',
             'status' => true,
             'validade' => '',
-            'imagens' => [],
+            'images' => [],
         ];
 
     }
@@ -67,11 +72,23 @@ class ProdutoVariacoesForm extends Component
     // Método chamado PELO PAI (via $emitTo) antes de salvar
     public function syncAndSave()
     {
+        $this->validate([
+            'variacoes.*.fornecedor_id' => 'required|exists:loja_fornecedores,id',
+            'variacoes.*.quantidade' => 'required|numeric|min:1',
+            // adicione outras regras conforme necessário
+        ]);
+
         // 1) Envia o array completo de variações ao pai
-        $this->emitUp('atualizarVariacoes', $this->variacoes);
+       // $this->emitUp('atualizarVariacoes', $this->variacoes);
 
         // 2) Agora manda o pai salvar (ele já recebeu as variações)
-        $this->emitUp('salvar');
+      //  $this->emitUp('salvar');
+    }
+
+    //deleteadno a ultima imagem, atualiza o componente na tela de edição
+    public function imagemAtualizada($data)
+    {
+        $this->variacoes = $data;
     }
 
     public function render()

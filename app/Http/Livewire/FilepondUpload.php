@@ -16,7 +16,7 @@ class FilepondUpload extends Component
     public ?string $variacaoKey = null; // chave temporária da variação (ex.: subcodigo)
     public bool $multiple = true;
     public $images = []; // arquivos temporários
-
+    public $produtoId;
     // Estado interno
     public array $pastasImagensProduto = [];   // imagens do produto pai
     public array $pastasImagensVariacoes = []; // imagens por key de variação
@@ -92,9 +92,10 @@ class FilepondUpload extends Component
     {
        // dd($data); // 👈 aqui você já vai ver o array
         $this->imagensExistentes = $data ?? [];
+        $this->produto = $data;
     }
 
-    public function emitirParaOPai($uploadedFile)
+    public function emitirParaOPai($uploadedFile = null)
     {
         $payload = [
             'file' => $uploadedFile,

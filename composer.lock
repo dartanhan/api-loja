@@ -3767,16 +3767,16 @@
         },
         {
             "name": "swagger-api/swagger-ui",
-            "version": "v5.27.1",
+            "version": "v5.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swagger-api/swagger-ui.git",
-                "reference": "43ed706e9519841e97401cfad83faca564b37eaf"
+                "reference": "26e6d3cce2a49195681116c97318b2a38c06e21c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/43ed706e9519841e97401cfad83faca564b37eaf",
-                "reference": "43ed706e9519841e97401cfad83faca564b37eaf",
+                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/26e6d3cce2a49195681116c97318b2a38c06e21c",
+                "reference": "26e6d3cce2a49195681116c97318b2a38c06e21c",
                 "shasum": ""
             },
             "type": "library",
@@ -3822,9 +3822,9 @@
             ],
             "support": {
                 "issues": "https://github.com/swagger-api/swagger-ui/issues",
-                "source": "https://github.com/swagger-api/swagger-ui/tree/v5.27.1"
+                "source": "https://github.com/swagger-api/swagger-ui/tree/v5.29.0"
             },
-            "time": "2025-08-01T07:33:59+00:00"
+            "time": "2025-09-09T14:04:45+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -7878,16 +7878,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.6.25",
+            "version": "9.6.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "049c011e01be805202d8eebedef49f769a8ec7b7"
+                "reference": "a0139ea157533454f611038326f3020b3051f129"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/049c011e01be805202d8eebedef49f769a8ec7b7",
-                "reference": "049c011e01be805202d8eebedef49f769a8ec7b7",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a0139ea157533454f611038326f3020b3051f129",
+                "reference": "a0139ea157533454f611038326f3020b3051f129",
                 "shasum": ""
             },
             "require": {
@@ -7961,7 +7961,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.25"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.26"
             },
             "funding": [
                 {
@@ -7985,7 +7985,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-20T14:38:31+00:00"
+            "time": "2025-09-11T06:17:45+00:00"
         },
         {
             "name": "sebastian/cli-parser",

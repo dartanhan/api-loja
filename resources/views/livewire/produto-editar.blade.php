@@ -46,11 +46,11 @@
                             <i class="fas fa-info-circle me-1"></i><strong>Inf. Gerais</strong>
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tab-imagens" data-toggle="tab" data-target="#aba-imagens" type="button" role="tab" aria-controls="imagens" aria-selected="false">
-                            <i class="fas fa-image me-1"></i> <strong>Imagens</strong>
-                        </button>
-                    </li>
+{{--                    <li class="nav-item" role="presentation">--}}
+{{--                        <button class="nav-link" id="tab-imagens" data-toggle="tab" data-target="#aba-imagens" type="button" role="tab" aria-controls="imagens" aria-selected="false">--}}
+{{--                            <i class="fas fa-image me-1"></i> <strong>Imagens</strong>--}}
+{{--                        </button>--}}
+{{--                    </li>--}}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="tab-variacoes" data-toggle="tab" data-target="#aba-variacoes" type="button" role="tab" aria-controls="variacoes" aria-selected="false">
                             <i class="fas fa-tags me-1"></i> <strong>Variação</strong>
@@ -70,7 +70,7 @@
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt">
                                             <input type="text" placeholder="{{ __('CÓDIGO DO PRODUTO (SKU)') }}"
-                                                   wire:model.defer="produto.codigo_produto" id="codigo_produto"
+                                                   wire:model.defer="produtos.codigo_produto" id="codigo_produto"
                                                    class="form-control form-control-sm format-font"
 
                                                    onkeyup="SomenteNumeros(this);" readonly >
@@ -81,7 +81,7 @@
                                     <div class="col-md-4">
                                         <div class="floating-label-group border-lable-flt">
                                             <input type="text" placeholder="{{ __('DECRIÇÃO') }}"
-                                                   wire:model.defer="produto.descricao" id="descricao"
+                                                   wire:model.defer="produtos.descricao" id="descricao"
                                                    class="form-control form-control-sm format-font"
                                                    data-toggle="tooltip" data-placement="top" title="Descrição/Nome do produto" required autofocus>
                                             <label for="label-descricao">{{ __('DESCRIÇÃO') }}</label>
@@ -93,7 +93,7 @@
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">R$</span>
                                                 <input type="text" placeholder="{{ __('VALOR') }}" data-toggle="tooltip" data-placement="right" title="Valor do Produto"
-                                                       wire:model.defer="produto.valor_produto" class="form-control form-control-sm format-font moeda" >
+                                                       wire:model.defer="produtos.valor_produto" class="form-control form-control-sm format-font moeda" >
                                                 <label for="label-valor-produto">{{ __('VALOR') }}</label>
                                             </div>
                                         </div>
@@ -101,7 +101,7 @@
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                            <select wire:model.defer="produto.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
+                                            <select wire:model.defer="produtos.categoria_id" key="{{ now() }}" id="categoria_id" name="categoria_id"
                                                     class="form-select format-font form-control-sm" title="Categoria do Produto" required>
                                                 <option value="" class="select-custom">Selecione?</option>
                                                 @foreach($categorias->sortBy('nome') as $categoria)
@@ -111,6 +111,7 @@
                                             <label for="label-qtd">CATEGORIAS</label>
                                         </div>
                                     </div>
+
 
                                     <div class="col-md-2">
                                         <div class="floating-label-group border-lable-flt col-xs-2 format-font">
@@ -122,11 +123,11 @@
                                                         <input type="checkbox"
                                                                class="form-check-input"
                                                                id="switchStatus"
-                                                               wire:click="$emit('confirmarAlteracaoStatus','produto', '' ,{{ $produto['id'] }}, event.target)"
-                                                            {{ $produto['status'] ? 'checked' : '' }}>
+                                                               wire:click="$emit('confirmarAlteracaoStatus','produto', '' ,{{ $produtos['id'] }}, event.target)"
+                                                            {{ $produtos['status'] ? 'checked' : '' }}>
                                                     </div>
                                                     <span class="small">
-                                                        {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
+                                                        {{ $produtos['status'] ? 'Ativo' : 'Inativo' }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -134,42 +135,40 @@
                                     </div>
                                     <div class="row">
                                         <div class="card-body mb-3 p-2">
-
                                             {{-- Se existir imagem do produto pai --}}
                                             @if(isset($produto['images']) && count($produto['images']) > 0)
-                                                @php /** @var TYPE_NAME $produto */
-                                                   $img = $produto['images'][0];
-                                                @endphp
                                                 <div class="text-center">
                                                     {{-- Miniatura da imagem --}}
-                                                    <img src="{{ asset('storage/product/'.$produto['id'].'/'.$img['path']) }}"
-                                                         alt="Imagem Produto"
+                                                    <img src="{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}"
+                                                         data-toggle="tooltip" data-placement="top"  title="Clique, para ampliar"
                                                          class="img-thumbnail mb-2"
                                                          style="max-width: 150px; cursor: pointer;"
-                                                         data-bs-toggle="modal"
-                                                         data-bs-target="#previewImagemProduto">
+                                                         onclick="previewImagem('{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}')">
 
                                                     {{-- Botão de excluir --}}
-                                                    <div>
-                                                        <button class="btn btn-sm btn-danger"
-                                                                onclick="confirmarExclusao({{ $img['id'] }})">
-                                                            <i class="fas fa-trash-alt"></i> Excluir
+                                                    <div class="d-flex justify-content-center">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                onclick="confirmarExclusao({{ $produto['images'][0]->id }})"
+                                                                data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                                id="btn-excluir-{{ $produto['images'][0]->id }}">
+                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['images'][0]->id}}"></i>
                                                         </button>
                                                     </div>
                                                 </div>
 
-                                                {{-- Modal de preview --}}
-                                                <div class="modal fade" id="previewImagemProduto" tabindex="-1" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                        <div class="modal-content bg-transparent border-0 shadow-none">
-                                                            <div class="modal-body text-center p-0">
-                                                                <img src="{{ asset('storage/product/'.$produto['id'].'/'.$img['path']) }}"
-                                                                     class="img-fluid rounded shadow"
-                                                                     alt="Preview Imagem Produto">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+{{--                                                --}}{{-- Modal de preview --}}
+{{--                                                <div class="modal fade" id="previewImagemProduto" tabindex="-1" aria-hidden="true">--}}
+{{--                                                    <div class="modal-dialog modal-dialog-centered modal-lg">--}}
+{{--                                                        <div class="modal-content bg-transparent border-0 shadow-none">--}}
+{{--                                                            <div class="modal-body text-center p-0">--}}
+{{--                                                                <img src="{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}"--}}
+{{--                                                                     class="img-fluid rounded shadow"--}}
+{{--                                                                     alt="Preview Imagem Produto">--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
                                             @else
                                                 {{-- Filepond só aparece se não existir imagem --}}
                                                 <div id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
@@ -183,68 +182,69 @@
 
                                         </div>
                                     </div>
-
-
                                 </div>
                             </div>
                     </div>
 
-                    <div class="tab-pane fade p-2" id="aba-imagens" role="tabpanel" aria-labelledby="tab-imagens">
-                            @if($variacoes)
+                   {{-- <div class="tab-pane fade p-2" id="aba-imagens" role="tabpanel" aria-labelledby="tab-imagens">
+
+                            @if(isset($produto['products']) && count($produto['products']) > 0)
                                 <div class="card mb-3 p-2">
                                     <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
                                         @csrf
-                                        <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$variacoes[0]['id']}}">
+                                        <input type="hidden" id="products_variation_id" name="products_variation_id" value="{{$produto['products'][0]['id']}}">
                                         <input type="hidden" name="tipoImage" id="tipoImage" value="variation">
 
                                         <div class="card-body mb-3 p-2" id="filepond-wrapper">
-{{--                                            <input type="file"--}}
-{{--                                                   multiple--}}
-{{--                                                   id="image"--}}
-{{--                                                   name="image[]"--}}
-{{--                                                   data-max-files="10"--}}
-{{--                                                   data-allow-reorder="true"--}}
-{{--                                                   data-max-file-size="3MB"--}}
-{{--                                                   data-allow-multiple="true"--}}
-{{--                                                   class="filepond" />--}}
+--}}{{--                                            <input type="file"--}}{{--
+--}}{{--                                                   multiple--}}{{--
+--}}{{--                                                   id="image"--}}{{--
+--}}{{--                                                   name="image[]"--}}{{--
+--}}{{--                                                   data-max-files="10"--}}{{--
+--}}{{--                                                   data-allow-reorder="true"--}}{{--
+--}}{{--                                                   data-max-file-size="3MB"--}}{{--
+--}}{{--                                                   data-allow-multiple="true"--}}{{--
+--}}{{--                                                   class="filepond" />--}}{{--
                                         </div>
 
                                     </form>
                                     <div class="row">
-                                        @foreach($imagens as $imagem)
-                                            <livewire:filepond-upload
-                                                context="variacao"
-                                                :multiple="true"
-                                                wire:key="filepond-variacao-{{ $imagem->id }}"
-                                            />
+                                        @if(isset($produto['images']) && count($produto['images']) > 0)
+                                            @foreach($produto['images'] as $index => $imagem)
+                                                <livewire:filepond-upload
+                                                    context="variacao"
+                                                    :multiple="true"
+                                                    wire:key="filepond-variacao-{{ $imagem->id }}"
+                                                />
 
-{{--                                            <livewire:filepond-upload--}}
-{{--                                                :multiple="true"--}}
-{{--                                                :imagens-existentes="$imagem['imagens'] ?? []"--}}
-{{--                                                wire:key="filepond-variacao-{{ $imagem->id }}"--}}
-{{--                                                data-is-variacao="true"--}}
-{{--                                                data-variacao-id="{{ $imagem->id }}"--}}
-{{--                                            />--}}
+    --}}{{--                                            <livewire:filepond-upload--}}{{--
+    --}}{{--                                                :multiple="true"--}}{{--
+    --}}{{--                                                :imagens-existentes="$imagem['imagens'] ?? []"--}}{{--
+    --}}{{--                                                wire:key="filepond-variacao-{{ $imagem->id }}"--}}{{--
+    --}}{{--                                                data-is-variacao="true"--}}{{--
+    --}}{{--                                                data-variacao-id="{{ $imagem->id }}"--}}{{--
+    --}}{{--                                            />--}}{{--
 
-                                            <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
-                                                <div class="border rounded p-2 text-center position-relative">
-                                                    <img src="{{ asset('storage/' . $imagem->path) }}"
-                                                         alt="Imagem"
-                                                         class="img-fluid mb-2 rounded"
-                                                         style="max-height: 150px;min-height: 120px; object-fit: cover;">
+                                                <div class="col-md-2 mb-3 imagem-item" id="imagem-{{ $imagem->id }}" wire:key="imagem-{{ $imagem->id }}">
+                                                    <div class="border rounded p-2 text-center position-relative">
+                                                        <img src="{{ asset('storage/' . $imagem->path) }}"
+                                                             alt="Imagem"
+                                                             class="img-fluid mb-2 rounded"
+                                                             style="max-height: 150px;min-height: 120px; object-fit: cover;">
 
-                                                    <div class="d-flex justify-content-center">
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-outline-danger"
-                                                                onclick="confirmarExclusaoImagem({{ $imagem->id }}, true, {{$variacoes[0]['id']}})"
-                                                                data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
-                                                                id="btn-excluir-{{ $imagem->id }}">
-                                                            <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
-                                                        </button>
+                                                        <div class="d-flex justify-content-center">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger"
+                                                                    onclick="confirmarExclusaoImagem({{ $imagem->id }}, true, {{$produto['products'][$index]['id']}})"
+                                                                    data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
+                                                                    id="btn-excluir-{{ $imagem->id }}">
+                                                                <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem->id }}"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        @endforeach
+                                            @endforeach
+                                        @endif
                                     </div>
                                 </div>
                             @else
@@ -252,17 +252,21 @@
                                     <p>Sem imagens para essa variação</p>
                                 </div>
                             @endif
-                    </div>
+                    </div>--}}
                     <div class="tab-pane fade p-2" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
-                        <livewire:produto-variacoes-form :variacoes="$variacoes" :fornecedores="$fornecedores" :produto-id="$codigoPai ?? null"/>
+                        <livewire:produto-variacoes-form :produto="$produto" :variacoes="$variacoes"
+                                                         :fornecedores="$fornecedores" :produtoId="$produtoId ?? null"
+                                                            :codigoPai="$codigoPai" />
                     </div>
+
+
                     <div class="tab-pane fade p-2" id="aba-fiscal" role="tabpanel" aria-labelledby="fiscal-tab">
                         <div class="card-body mb-3">
                             <div class="row g-2">
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('NCM') }}"
-                                               wire:model.defer="produto.ncm" id="ncm" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produtos.ncm" id="ncm" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="NCM">
                                         <label for="label-ncm">{{ __('NCM') }}</label>
                                     </div>
@@ -271,7 +275,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('CEST') }}"
-                                               wire:model.defer="produto.cest" id="cest" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produtos.cest" id="cest" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="CEST">
                                         <label for="label-ncm">{{ __('CEST') }}</label>
                                     </div>
@@ -280,7 +284,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('CFOP Interno (Venda para o mesmo estado)') }}"
-                                               wire:model="produto.cfop_interno" id="cfop_interno" class="form-control form-control-sm format-font"
+                                               wire:model="produtos.cfop_interno" id="cfop_interno" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="CFOP Interno (Venda para o mesmo estado)">
                                         <label for="label-cfpt-interno">{{ __('CFOP Interno') }}</label>
                                     </div>
@@ -289,7 +293,7 @@
                                 <div class="col-md-2">
                                     <div class="floating-label-group border-lable-flt">
                                         <input type="number" placeholder="{{ __('CFOP Interestadual (Venda para outro estado)') }}"
-                                               wire:model.defer="produto.cfop_inter" id="cfop_inter" class="form-control form-control-sm format-font"
+                                               wire:model.defer="produtos.cfop_inter" id="cfop_inter" class="form-control form-control-sm format-font"
                                                data-toggle="tooltip" data-placement="top" title="CFOP Interestadual (Venda para outro estado)">
                                         <label for="label-cfop-inter">{{ __('CFOP Interestadual') }}</label>
                                     </div>
@@ -297,7 +301,7 @@
 
                                 <div class="col-md-3">
                                     <div class="floating-label-group border-lable-flt col-xs-2 format-font">
-                                        <select wire:model.defer="produto.origem_id" id="origem_id" name="origem_id"
+                                        <select wire:model.defer="produtos.origem_id" id="origem_id" name="origem_id"
                                                 class="form-select format-font form-control-sm"
                                                 data-toggle="tooltip" data-placement="top" title="ICMS - Origem" required>
                                             <option value="" class="select-cstom">Selecione</option>
@@ -330,7 +334,6 @@
                     <button type="button" id="btn-livewire-salvar"
                             wire:click="$emitTo('produto-variacoes-form', 'syncAndSave')"
                             style="display: none;"></button>
-{{--                    <button type="button" id="btn-livewire-salvar" wire:click="salvar" style="display: none;"></button>--}}
 
                     <button wire:click="voltar"
                             wire:loading.attr="disabled"
@@ -346,10 +349,10 @@
                 </div>
             </div>
         </div>
+
+        {{-- modal de preview de imagem--}}
+        <livewire:produto-preview-image></livewire:produto-preview-image>
 </div>
-
-
-
 
 @push('styles')
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
@@ -409,6 +412,7 @@
            // loadFilePondProduto();
             loadSetAbas();
             aplicarMascaraMoeda();
+            aplicarMascaraDataDDMMYYYY();
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 sessionStorage.setItem('activeTab', $(e.target).attr('href'));
@@ -418,6 +422,7 @@
                // loadFilePondProduto();
                 loadSetAbas();
                 aplicarMascaraMoeda();
+                aplicarMascaraDataDDMMYYYY();
             });
         });
 

@@ -1,4 +1,4 @@
-<div xmlns:wire="http://www.w3.org/1999/xhtml">
+<div xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
     <div class="container-fluid mt-4">
         <!-- Campo de busca -->
         <div class="card shadow border-0 mb-3">
@@ -312,15 +312,7 @@
         </table>
         </div>
         <!-- Modal Preview de Imagem -->
-        <div class="modal fade" id="previewImagemModal" tabindex="-1" aria-labelledby="previewImagemModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                        <img id="imagemPreviewGrande" src="" class="img-fluid" alt="Preview Imagem">
-                    </div>
-                </div>
-            </div>
-        </div>
+        <livewire:produto-preview-image/>
 
         <div class="d-flex justify-content-center">
             {!! $produtos->links('vendor.pagination.bootstrap-4') !!}
