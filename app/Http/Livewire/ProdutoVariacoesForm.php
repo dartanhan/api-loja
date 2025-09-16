@@ -78,6 +78,7 @@ class ProdutoVariacoesForm extends Component
             // adicione outras regras conforme necessário
         ]);
 
+
         // 1) Envia o array completo de variações ao pai
         $this->emitUp('atualizarVariacoes', $this->variacoes);
 

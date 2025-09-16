@@ -16,6 +16,7 @@ class FilepondUpload extends Component
     public ?string $variacaoKey = null; // chave temporária da variação (ex.: subcodigo)
     public bool $multiple = true;
     public $images = []; // arquivos temporários
+    public $uploads = [];
     public $produtoId;
     // Estado interno
     public array $pastasImagensProduto = [];   // imagens do produto pai

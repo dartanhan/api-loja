@@ -20,7 +20,7 @@ class ProdutoCreate extends Component
 
     use WithFileUploads;
     use ProdutoTrait;
-    public $temporaryFiles = [];
+   // public $temporaryFiles = [];
 
     public $produto = [
         'codigo_produto' => '',
@@ -40,20 +40,22 @@ class ProdutoCreate extends Component
     ];
 
     public $variacoes = [];
-    public $produtoImages = [];
-    public $imagemDestaque = null;
+   // public $produtoImages = [];
+   // public $imagemDestaque = null;
     public $fornecedores = [];
     public $origens =[];
-    public array $pastasImagensProduto = [];
-    public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
+   // public array $pastasImagensProduto = [];
+   // public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
     public $codigoProduto;
-    public $images = []; // arquivos temporários
+    public array $uploads = []; // usado apenas pelo Livewire para armazenar temporários
+    public array $images  = []; // nosso array normalizado: sempre ['context','file','variacaoKey']
 
-    protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles',
-                            'pastasAtualizadasProduto' => 'atualizarPastasProduto',
-                            'pastasAtualizadasVariacao' => 'atualizarPastasVariacao',
-                            'imagensAtualizadas' => 'setImagens',
-                            'atualizarVariacoes' => 'setVariacoes',
+
+    protected $listeners = [//'refreshTemporaryFiles' => 'loadTemporaryFiles',
+                           // 'pastasAtualizadasProduto' => 'atualizarPastasProduto',
+                           // 'pastasAtualizadasVariacao' => 'atualizarPastasVariacao',
+                            'imagensAtualizadas' => 'setImagens', //trait
+                            'atualizarVariacoes' => 'setVariacoes', //trait
                             'salvar'             => 'salvar'];
 
 
@@ -70,15 +72,15 @@ class ProdutoCreate extends Component
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->origens = OrigemNfce::get();
 
-        $this->loadTemporaryFiles();
+        //$this->loadTemporaryFiles();
     }
 
-    public function loadTemporaryFiles()
+   /* public function loadTemporaryFiles()
     {
         $this->temporaryFiles = TemporaryFile::whereNull('folder')->get();
-    }
+    }*/
 
-    public function deleteTemporaryFile($folder)
+    /*public function deleteTemporaryFile($folder)
     {
         $temp = TemporaryFile::where('folder', $folder)->first();
         if($temp) {
@@ -86,15 +88,15 @@ class ProdutoCreate extends Component
             $temp->delete();
             $this->loadTemporaryFiles();
         }
-    }
+    }*/
 
-    public function atualizarPastasProduto($pastas)
+   /* public function atualizarPastasProduto($pastas)
     {
         logger()->info("Pai recebeu Produto", $pastas);
         $this->pastasImagensProduto = $pastas;
-    }
+    }*/
 
-    public function atualizarPastasVariacao($payload)
+  /*  public function atualizarPastasVariacao($payload)
     {
         $key = $payload['variacao_key'] ?? null;
         $pastas = $payload['pastas'] ?? [];
@@ -104,55 +106,48 @@ class ProdutoCreate extends Component
         }
 
         logger()->info("Pai recebeu Variação $key", $pastas);
-    }
+    }*/
 
-
-
-    public function setImagens($arquivoTemporario)
-    {
-        $this->images[] = $arquivoTemporario; // adiciona cada arquivo temporário
-    }
 
     public function salvar()
     {
-
-        $this->produto['valor_produto'] = LivewireHelper::formatCurrencyToBD($this->produto['valor_produto'], $this->NumberFormatter());
+        $this->produto['valor_produto'] = LivewireHelper::formatCurrencyToBD($this->produto['valor_produto'],
+            $this->NumberFormatter());
 
         $this->validate();
 
         /**
          * salva a produto
-         */
-        $data = [
+         🔹 Salva produto PAI
+         * */
+        $produto = Produto::create([
             'codigo_produto' => $this->produto['codigo_produto'],
-            'descricao' => $this->produto['descricao'] ?? '',
-            'ncm' => $this->produto['ncm'] ?? 0,
-            'cest' => $this->produto['cest'] ?? 0,
-            'origem_id' => (int)$this->produto['origem_id'] ?? 0,
-            'categoria_id' => (int)$this->produto['categoria_id'] ?? 0,
-            'status' => $this->produto['status'] ?? 0,
-            'valor_produto' => $this->produto['valor_produto']
-        ];
-
-        //cria o PAI
-      // $produto = Produto::create($data);
+            'descricao'      => $this->produto['descricao'] ?? '',
+            'ncm'            => $this->produto['ncm'] ?? 0,
+            'cest'           => $this->produto['cest'] ?? 0,
+            'origem_id'      => (int)$this->produto['origem_id'] ?? 0,
+            'categoria_id'   => (int)$this->produto['categoria_id'] ?? 0,
+            'status'         => $this->produto['status'] ?? 0,
+            'valor_produto'  => $this->produto['valor_produto'],
+        ]);
 
         /**
          * 🔹 1) Salva imagens do PRODUTO PAI
          */
-      //  $imagensProduto = collect($this->images)->where('context', 'produto');
-      //  foreach ($imagensProduto as $img) {
-      ///      $this->salvarImagemV2([$img['file']], 'produto', $produto->id);
-      //  }
 
-        dump($this->variacoes);
-        dd();
+        $imagensProduto = collect($this->images)->where('context', 'produto');
+        foreach ($imagensProduto as $img) {
+            $this->salvarImagemV2([$img['file']], 'produto', $produto->id);
+        }
+
         /**
          * 🔹 2) Salva variações
          */
         if ($this->variacoes) {
+            dump($this->produto,$this->images,$this->variacoes);
+            dd();
             foreach ($this->variacoes as $v) {
-                $data = [
+                $variacao = ProdutoVariation::create([
                     'products_id'       => $produto->id,
                     'subcodigo'         => $v['subcodigo'] ?? '',
                     'variacao'          => $v['variacao'] ?? '',
@@ -166,9 +161,7 @@ class ProdutoCreate extends Component
                     'percentage'        => $v['percentage'] ?? 0,
                     'status'            => $v['status'] ?? 0,
                     'validade'          => LivewireHelper::formatarData($v['validade'])
-                ];
-
-                $variacao = ProdutoVariation::create($data);
+                ]);
 
                 // 🔹 pega as imagens referentes a essa variação
                 $imagensVariacao = collect($this->images)->where('context', 'variacao')

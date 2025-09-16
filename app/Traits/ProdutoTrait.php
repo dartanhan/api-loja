@@ -15,10 +15,11 @@ trait ProdutoTrait
 {
     /**
      * Carrega os dados na tela de edição, as variações
-    */
-    private function carregdaDadosVariacao($produto){
+     */
+    private function carregdaDadosVariacao($produto)
+    {
 
-        if(!empty($produto['variacoes'])){
+        if (!empty($produto['variacoes'])) {
             return $produto['variacoes']->map(fn($v) => [
                 'id' => $v->id,
                 'subcodigo' => $v->subcodigo,
@@ -59,14 +60,14 @@ trait ProdutoTrait
                     $v->save();
                 }
 
-                $this->dispatchBrowserEvent('status-alterado',['text'=>'Produto e variações desativados com sucesso.']);
+                $this->dispatchBrowserEvent('status-alterado', ['text' => 'Produto e variações desativados com sucesso.']);
             } else {
                 // Apenas ativa direto
                 $produto->status = 1;
                 $produto->save();
                 $this->dispatchBrowserEvent('status-alterado', ['text' => 'Produto ativado com sucesso.']);
             }
-        }else{
+        } else {
 
             $variacoesAtivas = $produto->variacoes->where('status', 1)->count();
 
@@ -90,12 +91,12 @@ trait ProdutoTrait
                     $v->save();
                 }
 
-                $this->dispatchBrowserEvent('status-alterado',['text'=>'Produto e variações desativados.']);
+                $this->dispatchBrowserEvent('status-alterado', ['text' => 'Produto e variações desativados.']);
             } else {
                 $variacao = ProdutoVariation::findOrFail($data['variacaoId']);
                 $variacao->status = 0;
                 $variacao->save();
-                $this->dispatchBrowserEvent('status-alterado',['text'=>'Variação desativada com sucesso.']);
+                $this->dispatchBrowserEvent('status-alterado', ['text' => 'Variação desativada com sucesso.']);
             }
 
         }
@@ -140,7 +141,7 @@ trait ProdutoTrait
                 if (empty(Storage::disk('public')->files($diretorio))) {
                     Storage::disk('public')->deleteDirectory($diretorio);
 
-                    $produto = Produto::with('variacoes.images','images')->findOrFail($produtoId); //trás o PAI e sua relações
+                    $produto = Produto::with('variacoes.images', 'images')->findOrFail($produtoId); //trás o PAI e sua relações
                     //carrego os dados das variações do produto para blade
                     $this->variacoes = $this->carregdaDadosVariacao($produto);
                     //aciona o componente para atualizar as imagens
@@ -153,7 +154,7 @@ trait ProdutoTrait
 //            if ($variacaoId) {
 //                $this->imagens = ProdutoVariation::with('images')->findOrFail($variacaoId)->images;
 //            }
-           // $this->produto = Produto::with('variacoes.images','images')->findOrFail($produtoId); //trás o PAI e sua relações
+            // $this->produto = Produto::with('variacoes.images','images')->findOrFail($produtoId); //trás o PAI e sua relações
             // Notifica o FilepondUpload
 
 
@@ -198,47 +199,47 @@ trait ProdutoTrait
      * @param string $tipo 'produto' ou 'variacao'
      * @param int $id id do produto pai ou da variação
      */
-    public function salvarImagens(array $pastasImagens, string $tipo, int $id): void
-    {
-        foreach ($pastasImagens as $folder) {
-            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
+    /* public function salvarImagens(array $pastasImagens, string $tipo, int $id): void
+     {
+         foreach ($pastasImagens as $folder) {
+             $temporaryFile = TemporaryFile::where('folder', $folder)->first();
 
-            if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                $file = $temporaryFile->file;
-                $pathTemp = 'tmp/' . $folder . '/' . $file;
+             if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
+                 $file = $temporaryFile->file;
+                 $pathTemp = 'tmp/' . $folder . '/' . $file;
 
-                // Definir destino e relacionamentos
-                if ($tipo === 'produto') {
-                    $pathFinal = 'product/' . $id . '/' . $file;
-                    $produtoId = $id;
-                    $variacaoId = null;
-                } else {
-                    $pathFinal = 'produtos/' . $id . '/' . $file;
-                    $produtoId = null;
-                    $variacaoId = $id;
-                }
+                 // Definir destino e relacionamentos
+                 if ($tipo === 'produto') {
+                     $pathFinal = 'product/' . $id . '/' . $file;
+                     $produtoId = $id;
+                     $variacaoId = null;
+                 } else {
+                     $pathFinal = 'produtos/' . $id . '/' . $file;
+                     $produtoId = null;
+                     $variacaoId = $id;
+                 }
 
-                // Cria diretório destino
-                Storage::disk('public')->makeDirectory(dirname($pathFinal));
+                 // Cria diretório destino
+                 Storage::disk('public')->makeDirectory(dirname($pathFinal));
 
-                // Move arquivo
-                Storage::disk('public')->move($pathTemp, $pathFinal);
+                 // Move arquivo
+                 Storage::disk('public')->move($pathTemp, $pathFinal);
 
-                // Salva no banco
-                ProdutoImagem::create([
-                    'produto_id' => $produtoId,
-                    'produto_variacao_id' => $variacaoId,
-                    'path' => $tipo === 'produto' ? $file : $pathFinal,
-                ]);
+                 // Salva no banco
+                 ProdutoImagem::create([
+                     'produto_id' => $produtoId,
+                     'produto_variacao_id' => $variacaoId,
+                     'path' => $tipo === 'produto' ? $file : $pathFinal,
+                 ]);
 
-                // Remove temporário
-                Storage::disk('public')->deleteDirectory('tmp/' . $folder);
-                $temporaryFile->delete();
-            }
+                 // Remove temporário
+                 Storage::disk('public')->deleteDirectory('tmp/' . $folder);
+                 $temporaryFile->delete();
+             }
 
-        }
-    }
-
+         }
+     }
+ */
 
 
     /**
@@ -247,56 +248,47 @@ trait ProdutoTrait
      * @param int $id
      * @param ProdutoImagem $imagem
      */
-    public function salvarImagemV2(array $pastasImagens, string $destino, int $id)
+    public function salvarImagemV2(string $arquivo, string $destino, int $id): void
     {
-        foreach ($pastasImagens as $image) {
-            $pathTemp = 'livewire-tmp/' . $image;
+        $pathTemp = 'livewire-tmp/' . $arquivo;
 
-            if (!Storage::disk('public')->exists($pathTemp)) {
-                continue; // ignora se a imagem já foi movida/deletada
-            }
-
-            if ($destino === 'produto') {
-                // Produto PAI (só 1 imagem permitida)
-                $pathFinal = "product/{$id}/{$image}";
-                //$produtoId = $id;
-                //$variacaoId = null;
-
-                // Cria diretório destino
-                Storage::disk('public')->makeDirectory(dirname($pathFinal));
-
-                // Move arquivo
-                Storage::disk('public')->move($pathTemp, $pathFinal);
-
-                // Atualiza ou cria (só uma imagem por produto)
-                ProdutoImagem::updateOrCreate(
-                    ['produto_id' => $id, 'produto_variacao_id' => null],
-                    ['path' => $image]
-                );
-            } else {
-                // VARIAÇÃO (pode ter várias imagens)
-                $pathFinal = "produtos/{$id}/{$image}";
-                //$produtoId = null;
-                //$variacaoId = $id;
-
-                // Cria diretório destino
-                Storage::disk('public')->makeDirectory(dirname($pathFinal));
-
-                // Move arquivo
-                Storage::disk('public')->move($pathTemp, $pathFinal);
-
-                // Cria uma nova imagem (não sobrescreve)
-                ProdutoImagem::create([
-                    'produto_id' => null,
-                    'produto_variacao_id' => $id,
-                    'path' => $pathFinal
-                ]);
-            }
-
-            // Remove temporário
-            Storage::disk('public')->delete($pathTemp);
+        // Ignora se o arquivo temporário não existir
+        if (!Storage::disk('public')->exists($pathTemp)) {
+            return;
         }
+
+        if ($destino === 'produto') {
+            // Produto PAI (somente 1 imagem)
+            $pathFinal = "product/{$id}/{$arquivo}";
+
+            Storage::disk('public')->makeDirectory(dirname($pathFinal));
+            Storage::disk('public')->move($pathTemp, $pathFinal);
+
+            // Atualiza ou cria imagem do produto pai
+            ProdutoImagem::updateOrCreate(
+                ['produto_id' => $id, 'produto_variacao_id' => null],
+                ['path' => $arquivo]
+            );
+        } else {
+            // VARIAÇÃO (pode ter várias imagens)
+            $pathFinal = "produtos/{$id}/{$arquivo}";
+
+            Storage::disk('public')->makeDirectory(dirname($pathFinal));
+            Storage::disk('public')->move($pathTemp, $pathFinal);
+
+            // Cria uma nova imagem para a variação
+            ProdutoImagem::create([
+                'produto_id' => null,
+                'produto_variacao_id' => $id,
+                'path' => $pathFinal
+            ]);
+        }
+
+        // Remove arquivo temporário
+        Storage::disk('public')->delete($pathTemp);
     }
+
+
 
 
     /**
@@ -305,9 +297,17 @@ trait ProdutoTrait
      */
     public function setVariacoes(array $variacoes)
     {
-        $this->variacoes = $variacoes;
+        $this->variacoes = $variacoes; // agora pai tem as variações
     }
 
+    /**
+     * seta imagem temporaria para os componentes PAI
+     * @param $images
+     */
+    public function setImagens($images)
+    {
+        $this->images = $images; // agora pai tem as imagens
+    }
     /**
      * Retorna o NumberFormatter
     */
@@ -315,4 +315,49 @@ trait ProdutoTrait
     {
         return  new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
     }
+
+
+    /**
+     * Adiciona imagem no array unificado
+     * @param array $payload
+     */
+    public function addImagem(array $payload): void
+    {
+        // payload esperado: ['context' => 'produto'|'variacao', 'file' => string, 'variacaoKey' => int|null]
+
+        if ($payload['context'] === 'produto') {
+            // Produto só pode ter 1 imagem → substitui
+            $this->images = collect($this->images)
+                ->reject(fn($img) => $img['context'] === 'produto')
+                ->push([
+                    'context' => 'produto',
+                    'file'    => $payload['file'], // sempre string
+                ])
+                ->values()
+                ->toArray();
+        }
+
+        if ($payload['context'] === 'variacao') {
+            $this->images[] = [
+                'context'     => 'variacao',
+                'variacaoKey' => $payload['variacaoKey'],
+                'file'        => $payload['file'], // sempre string
+            ];
+        }
+        $this->emitUp('imagensAtualizadas', $this->images);
+    }
+
+
+    /**
+     * Remove imagem do array unificado
+     * @param string $file
+     */
+    public function removeImagem(string $file): void
+    {
+        $this->images = collect($this->images)
+            ->reject(fn($img) => $img['file'] === $file)
+            ->values()
+            ->toArray();
+    }
+
 }

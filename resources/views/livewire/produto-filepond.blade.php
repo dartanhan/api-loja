@@ -6,10 +6,13 @@
             labelIdle: '📁 Arraste ou <span class=\'filepond--label-action\'>clique</span> para enviar imagens',
             server: {
                 process: (fieldName, file, metadata, load, error, progress, abort) => {
-                    @this.upload('images', file,
+                    @this.upload('uploads', file,
                         (uploadedFilename) => {
-                            // Emite para o PAI o array atualizado de imagens
-                             @this.call('emitirParaOPai', uploadedFilename);
+                            @this.call('addImagem', {
+                                context: '{{ $context }}',
+                                file: uploadedFilename,
+                                variacaoKey: '{{ $variacaoKey ?? null }}'
+                            });
                             load(uploadedFilename);
                         },
                         (erro) => { error(erro); },
@@ -18,7 +21,7 @@
                 },
                 revert: (uniqueFileId, load) => {
                     @this.removeUpload('images', uniqueFileId, () => {
-                        @this.call('emitirParaOPai');
+                        @this.call('removeImagem', uniqueFileId);
                         load();
                     });
                 }
