@@ -79,10 +79,10 @@ class ProdutoVariacoesForm extends Component
         ]);
 
         // 1) Envia o array completo de variações ao pai
-       // $this->emitUp('atualizarVariacoes', $this->variacoes);
+        $this->emitUp('atualizarVariacoes', $this->variacoes);
 
         // 2) Agora manda o pai salvar (ele já recebeu as variações)
-      //  $this->emitUp('salvar');
+        $this->emitUp('salvar');
     }
 
     //deleteadno a ultima imagem, atualiza o componente na tela de edição

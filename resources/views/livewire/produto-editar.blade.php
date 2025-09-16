@@ -256,7 +256,7 @@
                     <div class="tab-pane fade p-2" id="aba-variacoes" role="tabpanel" aria-labelledby="tab-variacoes">
                         <livewire:produto-variacoes-form :produto="$produto" :variacoes="$variacoes"
                                                          :fornecedores="$fornecedores" :produtoId="$produtoId ?? null"
-                                                            :codigoPai="$codigoPai" />
+                                                            :codigoPai="$codigoProduto" />
                     </div>
 
 

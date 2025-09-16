@@ -130,7 +130,7 @@
                         />
 
                     {{-- Lista de arquivos já enviados --}}
-                    <ul class="list-group mt-2">
+                    {{--<ul class="list-group mt-2">
                         @foreach($temporaryFiles as $f)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ $f->file }}
@@ -140,7 +140,7 @@
                                 </button>
                             </li>
                         @endforeach
-                    </ul>
+                    </ul>--}}
                 </div>
             </div>
         </div>
@@ -153,8 +153,9 @@
             </div>
             <div class="card-body">
 
-                <livewire:produto-variacoes-form :variacoes="$variacoes" :fornecedores="$fornecedores"
-                                                 :produto-id="$produtoCodigo ?? null"/>
+                <livewire:produto-variacoes-form :produto="$produto" :variacoes="$variacoes"
+                                                 :fornecedores="$fornecedores" :produtoId="$produtoId ?? null"
+                                                 :codigoPai="$codigoProduto" />
 
             </div>
         </div>

@@ -307,4 +307,12 @@ trait ProdutoTrait
     {
         $this->variacoes = $variacoes;
     }
+
+    /**
+     * Retorna o NumberFormatter
+    */
+    public function NumberFormatter()
+    {
+        return  new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
+    }
 }

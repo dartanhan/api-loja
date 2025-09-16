@@ -26,7 +26,7 @@ class ProdutoEditar extends Component
     public $fornecedores = [];
     public $categorias = [];
     public $origem_nfces =[];
-    public $codigoPai; // nova propriedade
+    public $codigoProduto; // nova propriedade
     public $produtoId;
     public $images = [];
     public array $pastasImagensProduto = [];   // imagens do produto pai
@@ -56,7 +56,7 @@ class ProdutoEditar extends Component
     {
         $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e sua relações
         $this->produto = $produto;
-        $this->codigoPai = $produto->codigo_produto;
+        $this->codigoProduto = $produto->codigo_produto;
         $this->produtoId = $produto->id;
 
         $this->produtos = [
@@ -192,8 +192,8 @@ class ProdutoEditar extends Component
                         'subcodigo' => $dados['subcodigo'] ?? '',
                         'variacao' => $dados['variacao'] ?? '',
                         'quantidade' => $dados['quantidade'] ?? 0,
-                        'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $formatter) ?? 0,
-                        'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $formatter) ?? 0,
+                        'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                        'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
                         'fornecedor' => $dados['fornecedor_id'] ,
                         'gtin' => $dados['gtin'] ?? 0,
                         'estoque' => $dados['estoque'] ?? 0,

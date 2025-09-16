@@ -2,15 +2,15 @@
 
 namespace App\Http\Livewire;
 
+use App\Helpers\LivewireHelper;
 use App\Http\Models\Categoria;
 use App\Http\Models\Fornecedor;
 use App\Http\Models\OrigemNfce;
 use App\Http\Models\Produto;
-use App\Http\Models\ProdutoImagem;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TemporaryFile;
 use App\Traits\ProdutoTrait;
-use Illuminate\Support\Carbon;
+use NumberFormatter;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -46,7 +46,7 @@ class ProdutoCreate extends Component
     public $origens =[];
     public array $pastasImagensProduto = [];
     public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
-    public $produtoCodigo;
+    public $codigoProduto;
     public $images = []; // arquivos temporários
 
     protected $listeners = ['refreshTemporaryFiles' => 'loadTemporaryFiles',
@@ -62,7 +62,7 @@ class ProdutoCreate extends Component
         $this->produto['status'] = true;
         $lastCodigo = Produto::max('codigo_produto') ?? 0;
         $this->produto['codigo_produto'] = $lastCodigo + 1;
-        $this->produtoCodigo = $this->produto['codigo_produto'];
+        $this->codigoProduto = $this->produto['codigo_produto'];
 
         $this->fornecedores = collect(); // esvazia antes
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
@@ -115,9 +115,8 @@ class ProdutoCreate extends Component
 
     public function salvar()
     {
-dump($this->images);
-dd();
-        $this->produto['valor_produto'] = str_replace(',', '.', preg_replace('/[^\d,]/', '', $this->produto['valor_produto'] ?? '0'));
+
+        $this->produto['valor_produto'] = LivewireHelper::formatCurrencyToBD($this->produto['valor_produto'], $this->NumberFormatter());
 
         $this->validate();
 
@@ -135,61 +134,60 @@ dd();
             'valor_produto' => $this->produto['valor_produto']
         ];
 
+        //cria o PAI
       // $produto = Produto::create($data);
 
-        // 1) Salva imagens do PRODUTO PAI
-      //  $this->salvarImagens($this->pastasImagensProduto, 'produto', $produto->id);
-
         /**
-         * salva as variações
-        */
-dump($data, $this->variacoes,  $this->pastasImagensProduto, $this->pastasImagensVariacoes );
-die();
-        if($this->variacoes) {
+         * 🔹 1) Salva imagens do PRODUTO PAI
+         */
+      //  $imagensProduto = collect($this->images)->where('context', 'produto');
+      //  foreach ($imagensProduto as $img) {
+      ///      $this->salvarImagemV2([$img['file']], 'produto', $produto->id);
+      //  }
+
+        dump($this->variacoes);
+        dd();
+        /**
+         * 🔹 2) Salva variações
+         */
+        if ($this->variacoes) {
             foreach ($this->variacoes as $v) {
-
                 $data = [
-                    'subcodigo' => $v['subcodigo'] ?? '',
-                    'variacao' => $v['variacao'] ?? '',
-                    'quantidade' => $v['quantidade'] ?? 0,
-                    'valor_varejo' => $v['valor_varejo'] ?? 0,
-                    'valor_produto' => $v['valor_produto'] ?? 0,
-                    'fornecedor_id' => $v['fornecedor_id'] ?? null,
-                    'gtin' => $v['gtin'] ?? 0,
-                    'estoque' => $v['estoque'] ?? 0,
+                    'products_id'       => $produto->id,
+                    'subcodigo'         => $v['subcodigo'] ?? '',
+                    'variacao'          => $v['variacao'] ?? '',
+                    'quantidade'        => $v['quantidade'] ?? 0,
+                    'valor_varejo'      => LivewireHelper::formatCurrencyToBD($v['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                    'valor_produto'     => LivewireHelper::formatCurrencyToBD($v['valor_produto'], $this->NumberFormatter()) ?? 0,
+                    'fornecedor_id'     => $v['fornecedor_id'],
+                    'gtin'              => $v['gtin'] ?? 0,
+                    'estoque'           => $v['estoque'] ?? 0,
                     'quantidade_minima' => $v['quantidade_minima'] ?? 0,
-                    'percentage' => $v['percentage'] ?? 0,
-                    'status' => $v['status'] ?? 0,
-                    'products_id' => $produto->id
+                    'percentage'        => $v['percentage'] ?? 0,
+                    'status'            => $v['status'] ?? 0,
+                    'validade'          => LivewireHelper::formatarData($v['validade'])
                 ];
-
-                // Trata validade
-                if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $v['validade'] ?? '')) {
-                    $data['validade'] = Carbon::createFromFormat('d/m/Y', $v['validade'])->format('Y-m-d');
-                } else {
-                    $data['validade'] = '0000-00-00';
-                }
 
                 $variacao = ProdutoVariation::create($data);
 
-                // 🔑 usa o id_temp como chave (o mesmo que o FilePond recebeu)
-                $keyTemp = $v['id_temp'] ?? null;
-                if ($keyTemp && !empty($this->pastasImagensVariacoes[$keyTemp])) {
-                    $this->salvarImagens($this->pastasImagensVariacoes[$keyTemp], 'variacao', $variacao->id);
-                }
+                // 🔹 pega as imagens referentes a essa variação
+                $imagensVariacao = collect($this->images)->where('context', 'variacao')
+                    ->where('variacaoKey', $v['id']);
 
+                foreach ($imagensVariacao as $img) {
+                    $this->salvarImagemV2([$img['file']], 'variacao', $variacao->id);
+                }
             }
-            //envia a mensagem no browser
+
             $this->dispatchBrowserEvent('livewire:event', [
-                'type' => 'alert',
-                'icon' => 'success',
+                'type'    => 'alert',
+                'icon'    => 'success',
                 'message' => 'Produto e variações cadastrados com sucesso!'
             ]);
-        }else{
-            //envia a mensagem no browser
+        } else {
             $this->dispatchBrowserEvent('livewire:event', [
-                'type' => 'alert',
-                'icon' => 'success',
+                'type'    => 'alert',
+                'icon'    => 'success',
                 'message' => 'Produto cadastrado com sucesso!'
             ]);
         }
