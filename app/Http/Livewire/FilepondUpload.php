@@ -30,8 +30,8 @@ class FilepondUpload extends Component
         'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
         'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
         'imagemDeletada'            => 'removerImagem',
-        'imagemAtualizada' => 'carregarImagens',
-        'deletarImagem' => 'deletarImagem'
+        'imagensAtualizadas'        => 'setImagens',
+        'deletarImagem'             => 'deletarImagem'
     ];
 
     /**
@@ -52,7 +52,7 @@ class FilepondUpload extends Component
     }
 
 
-    public function setPastasImagensProduto($pastas)
+   /* public function setPastasImagensProduto($pastas)
     {
         $this->pastasImagensProduto = $pastas ?? [];
 
@@ -64,7 +64,7 @@ class FilepondUpload extends Component
     /**
      * payload: ['variacao_key' => string, 'pastas' => array]
      */
-    public function setPastasImagensVariacao(array $payload)
+    /*public function setPastasImagensVariacao(array $payload)
     {
         $key = $payload['variacao_key'] ?? $this->variacaoKey;
         $pastas = $payload['pastas'] ?? [];
@@ -76,26 +76,26 @@ class FilepondUpload extends Component
         // avisa o PAI (ProdutoCreate) com o mapa completo de variações => pastas
         $this->emitUp('pastasAtualizadasVariacao', $this->pastasImagensVariacoes);
         return $this->skipRender();
-    }
+    }*/
 
     /** 🔹 Remove imagem deletada
      * @param $data
      */
-    public function removerImagem($id): void
+  /*  public function removerImagem($id): void
     {
         $this->imagensExistentes = array_filter(
             $this->imagensExistentes,
             fn($img) => $img['id'] != $id
         );
-    }
+    }*/
 
-    public function carregarImagens($data)
+ /*   public function carregarImagens($data)
     {
        // dd($data); // 👈 aqui você já vai ver o array
-        $this->imagensExistentes = $data ?? [];
-        $this->produto = $data;
-    }
-
+        $this->images = $data ?? [];
+        //$this->produto = $data;
+    }*/
+/*
     public function emitirParaOPai($uploadedFile = null)
     {
         $payload = [
@@ -105,7 +105,9 @@ class FilepondUpload extends Component
         ];
         // Aqui passamos só o nome do arquivo temporário para o pai
         $this->emitUp('imagensAtualizadas', $payload);
-    }
+    }*/
+
+
 
     public function render()
     {

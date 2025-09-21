@@ -115,6 +115,14 @@ trait ProdutoTrait
         }
     }
 
+    /**
+     * Emite o compnente de varição apra sinronizar as variações com o PAI
+     * */
+    public function emitirSalvar()
+    {
+        $this->salvando = true;
+        $this->emitTo('produto-variacoes-form', 'syncAndSave');
+    }
 
     /**
      * @param $imagemId
@@ -243,10 +251,9 @@ trait ProdutoTrait
 
 
     /**
-     * @param array $pastasImagens
+     * @param string $arquivo
      * @param string $destino
      * @param int $id
-     * @param ProdutoImagem $imagem
      */
     public function salvarImagemV2(string $arquivo, string $destino, int $id): void
     {
@@ -277,7 +284,7 @@ trait ProdutoTrait
             Storage::disk('public')->move($pathTemp, $pathFinal);
 
             // Cria uma nova imagem para a variação
-            ProdutoImagem::create([
+            ProdutoImagem::updateOrCreate([
                 'produto_id' => null,
                 'produto_variacao_id' => $id,
                 'path' => $pathFinal
@@ -289,15 +296,15 @@ trait ProdutoTrait
     }
 
 
-
-
     /**
      * @param array $variacoes
      * quando for salvar tanto no create quanto no edit, seta os dados das variações para o PAI
      */
     public function setVariacoes(array $variacoes)
     {
-        $this->variacoes = $variacoes; // agora pai tem as variações
+        // 1) Atualiza o estado do pai
+        $this->variacoes = $variacoes;
+
     }
 
     /**
@@ -306,7 +313,22 @@ trait ProdutoTrait
      */
     public function setImagens($images)
     {
-        $this->images = $images; // agora pai tem as imagens
+        foreach ($images as $img) {
+            if ($img['context'] === 'produto') {
+                // só 1 imagem → substitui
+                $this->produtoImagem = $img['file'];
+            }
+
+            if ($img['context'] === 'variacao') {
+                $key = $img['variacaoKey'];
+
+                if (!isset($this->variacoesImagens[$key])) {
+                    $this->variacoesImagens[$key] = [];
+                }
+
+                $this->variacoesImagens[$key][] = $img['file'];
+            }
+        }
     }
     /**
      * Retorna o NumberFormatter
@@ -323,29 +345,42 @@ trait ProdutoTrait
      */
     public function addImagem(array $payload): void
     {
-        // payload esperado: ['context' => 'produto'|'variacao', 'file' => string, 'variacaoKey' => int|null]
+        // payload: ['context' => 'produto'|'variacao', 'file' => string, 'variacaoKey' => ...]
+        $file = (string) ($payload['file'] ?? '');
 
-        if ($payload['context'] === 'produto') {
-            // Produto só pode ter 1 imagem → substitui
-            $this->images = collect($this->images)
-                ->reject(fn($img) => $img['context'] === 'produto')
-                ->push([
-                    'context' => 'produto',
-                    'file'    => $payload['file'], // sempre string
-                ])
-                ->values()
-                ->toArray();
-        }
+        $this->emitUp('imagensAtualizadas', [[
+            'context'     => $payload['context'],
+            'file'        => $file,
+            'variacaoKey' => $payload['variacaoKey'] ?? null,
+        ]]);
 
-        if ($payload['context'] === 'variacao') {
-            $this->images[] = [
-                'context'     => 'variacao',
-                'variacaoKey' => $payload['variacaoKey'],
-                'file'        => $payload['file'], // sempre string
-            ];
-        }
-        $this->emitUp('imagensAtualizadas', $this->images);
+
+//        if ($payload['context'] === 'produto') {
+//            // só 1 imagem no produto -> remove antigas e adiciona nova
+//            $this->images = collect($this->images)
+//                ->reject(fn($i) => ($i['context'] ?? null) === 'produto')
+//                ->values()
+//                ->toArray();
+//
+//            $this->images[] = [
+//                'context' => 'produto',
+//                'file'    => $file,
+//            ];
+//        } else {
+//            $this->images[] = [
+//                'context'     => 'variacao',
+//                'variacaoKey' => $payload['variacaoKey'] ?? null,
+//                'file'        => $file,
+   //         ];
+   //     }
+
+        // DEBUG: grava no log (remova depois)
+        //\Log::debug('FilepondUpload::addImagem emitted imagensAtualizadas', ['images' => $this->images]);
+
+        // envia para o PAI imediato
+       // $this->emitUp('imagensAtualizadas', $this->images);
     }
+
 
 
     /**
@@ -358,6 +393,9 @@ trait ProdutoTrait
             ->reject(fn($img) => $img['file'] === $file)
             ->values()
             ->toArray();
+
+        $this->emitUp('imagensAtualizadas', $this->images);
+
     }
 
 }

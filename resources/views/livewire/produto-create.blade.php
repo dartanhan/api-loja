@@ -121,7 +121,7 @@
             </div>
 
             <div class="row" >
-                <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
+                <div class="card-body mb-3 p-2" id="filepond-wrapper" wire:key="filepond-produto">
 {{--                    @livewire('produto-filepond', ['modelId' => $produto['id'] ?? null], key('produto-filepond'))--}}
                         <livewire:filepond-upload
                             context="produto"
@@ -162,20 +162,21 @@
 
         <div class="card shadow-sm mt-3 rounded text-end">
             <div class="card-body">
-                <button class="btn btn-sm btn-outline-success" id="btn-salvar-produto" wire:loading.attr="disabled">
-                <span wire:loading.remove wire:target="salvar">
-                    <i class="fas fa-save me-1"></i> Salvar
-                </span>
-                    <span wire:loading wire:target="salvar">
-                    <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
-                </span>
+                <button class="btn btn-sm btn-outline-success"
+                        wire:click="emitirSalvar"
+                        wire:loading.attr="disabled"
+                        wire:target="emitirSalvar">
+
+                        <span wire:loading.remove wire:target="emitirSalvar">
+                            <i class="fas fa-save me-1"></i> Salvar
+                        </span>
+
+                                    <span wire:loading wire:target="emitirSalvar">
+                            <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
+                        </span>
                 </button>
-                {{-- IMPORTANTE: o botão não chama salvar direto.
-                         Ele pede ao FILHO para sincronizar e SÓ ENTÃO manda salvar o pai. --}}
-                <button type="button" id="btn-livewire-salvar"
-                        wire:click="$emitTo('produto-variacoes-form', 'syncAndSave')"
-                        style="display: none;"></button>
             </div>
+
         </div>
     </div>
 

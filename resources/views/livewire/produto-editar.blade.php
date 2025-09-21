@@ -323,17 +323,19 @@
         <div class="card shadow border-0 mb-3 mt-2">
             <div class="card-body">
                 <div class="mt-3 text-end">
-                    <button class="btn btn-sm btn-outline-success" id="btn-salvar-produto" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="salvar">
+                    <button class="btn btn-sm btn-outline-success"
+                            wire:click="emitirSalvar"
+                            wire:loading.attr="disabled"
+                            wire:target="emitirSalvar">
+
+                        <span wire:loading.remove wire:target="emitirSalvar">
                             <i class="fas fa-save me-1"></i> Salvar
                         </span>
-                                <span wire:loading wire:target="salvar">
+
+                        <span wire:loading wire:target="emitirSalvar">
                             <i class="fas fa-spinner fa-spin me-1"></i> Salvando...
                         </span>
                     </button>
-                    <button type="button" id="btn-livewire-salvar"
-                            wire:click="$emitTo('produto-variacoes-form', 'syncAndSave')"
-                            style="display: none;"></button>
 
                     <button wire:click="voltar"
                             wire:loading.attr="disabled"

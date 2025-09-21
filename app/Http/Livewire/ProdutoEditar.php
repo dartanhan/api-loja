@@ -29,8 +29,8 @@ class ProdutoEditar extends Component
     public $codigoProduto; // nova propriedade
     public $produtoId;
     public $images = [];
-    public array $pastasImagensProduto = [];   // imagens do produto pai
-    public array $pastasImagensVariacoes = []; // imagens exclusivas de cada variação
+    public $produtoImagem = null;
+    public array $variacoesImagens = [];
     public $valor_produto;
     public $imagensExistentes = [];
     public $produtoCodigo;
@@ -132,7 +132,7 @@ class ProdutoEditar extends Component
     /**
      * @param $arquivoTemporario
      */
-    public function setImagens($payload)
+/*    public function setImagens($payload)
     {
         if ($payload['context'] === 'produto') {
             $this->pastasImagensProduto = [$payload['file']]; // só 1 imagem
@@ -145,15 +145,13 @@ class ProdutoEditar extends Component
             }
             $this->pastasImagensVariacoes[$key][] = $payload['file'];
         }
-    }
+    }*/
 
     public function salvar()
     {
-     //   $this->validate();
-
         $formatter = new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
 
-        // Validação de duplicidade de subcódigos
+        // 1) Validação de duplicidade
         $subcodigos = array_column($this->variacoes, 'subcodigo');
         $duplicados = array_diff_key($subcodigos, array_unique($subcodigos));
 
@@ -162,79 +160,83 @@ class ProdutoEditar extends Component
             return;
         }
 
-        // Salva o produto pai
-        //$produto = Produto::with('images')->findOrFail($this->produtoId);
+        // 2) Atualiza produto pai
         $data = [
-                'descricao' => $this->produto['descricao'] ?? '',
-                'valor_produto' => $this->produto['valor_produto'] ?? 0,
-                'categoria_id' => $this->produto['categoria_id'] ?? 0,
-                'status' => $this->produto['status'] ?? 0,
-                'ncm' => $this->produto['ncm'] ?? 0,
-                'cest' => $this->produto['cest'] ?? 0,
-                'origem_id' => $this->produto['origem_id'] ?? 1
-                ];
+            'descricao' => $this->produto['descricao'] ?? '',
+            'valor_produto' => $this->produto['valor_produto'] ?? 0,
+            'categoria_id' => $this->produto['categoria_id'] ?? 0,
+            'status' => $this->produto['status'] ?? 0,
+            'ncm' => $this->produto['ncm'] ?? 0,
+            'cest' => $this->produto['cest'] ?? 0,
+            'origem_id' => $this->produto['origem_id'] ?? 1
+        ];
 
-
+        dump($this->produtoImagem,$this->variacoes,$this->variacoesImagens);
+        dd();
         Produto::where('id', $this->produtoId)->update($data);
 
-        // Salva imagens do produto pai
-        if (!empty($this->pastasImagensProduto)) {
+        // 3) Imagens do produto pai
+        if (isset($this->pastasImagensProduto)) {
+            // Remove imagens que não estão mais presentes
+            $idsMantidos = collect($this->pastasImagensProduto)->pluck('id')->filter()->toArray();
+            ProdutoImagem::where('produto_id', $this->produtoId)
+                ->whereNotIn('id', $idsMantidos)
+                ->delete();
+
+            // Salva / adiciona as novas
             $this->salvarImagemV2($this->pastasImagensProduto, 'produto', $this->produtoId);
         }
 
-        //dump($this->variacoes,$this->pastasImagensVariacoes);
-       // dd();
+        // 4) Variações
         if (!empty($this->variacoes)) {
             foreach ($this->variacoes as $dados) {
+                $data = [
+                    'products_id' => $this->produtoId,
+                    'subcodigo' => $dados['subcodigo'] ?? '',
+                    'variacao' => $dados['variacao'] ?? '',
+                    'quantidade' => $dados['quantidade'] ?? 0,
+                    'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                    'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
+                    'fornecedor' => $dados['fornecedor_id'],
+                    'gtin' => $dados['gtin'] ?? 0,
+                    'estoque' => $dados['estoque'] ?? 0,
+                    'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
+                    'percentage' => $dados['percentage'] ?? 0,
+                    'validade' => LivewireHelper::formatarData($dados['validade'])
+                ];
 
-                    $data = [
-                        'products_id' =>  $this->produtoId,
-                        'subcodigo' => $dados['subcodigo'] ?? '',
-                        'variacao' => $dados['variacao'] ?? '',
-                        'quantidade' => $dados['quantidade'] ?? 0,
-                        'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
-                        'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
-                        'fornecedor' => $dados['fornecedor_id'] ,
-                        'gtin' => $dados['gtin'] ?? 0,
-                        'estoque' => $dados['estoque'] ?? 0,
-                        'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
-                        'percentage' => $dados['percentage'] ?? 0,
-                        'validade' => LivewireHelper::formatarData($dados['validade'])
-                    ];
+                $variacao = ProdutoVariation::updateOrCreate(
+                    ['id' => $dados['id']],
+                    $data
+                );
 
-                   //dd($data ,  $variacao , $this->variacoes, $this->pastasImagensVariacoes[$dados['id']], $dados['id_temp']);
-                    $matchThese = array('id' => $dados['id']);
-                    $variacao = ProdutoVariation::updateOrCreate($matchThese, $data);
+                // --- Imagens da variação ---
+                if (isset($this->pastasImagensVariacoes[$dados['id']])) {
+                    $idsMantidos = collect($this->pastasImagensVariacoes[$dados['id']])->pluck('id')->filter()->toArray();
 
+                    ProdutoImagem::where('produto_variacao_id', $variacao->id)
+                        ->whereNotIn('id', $idsMantidos)
+                        ->delete();
 
-                    // Salva imagens da variação, se houver
-                    if (!empty($this->pastasImagensVariacoes[$dados['id']])) {
-                        $this->salvarImagemV2($this->pastasImagensVariacoes[$dados['id']], 'variacao', $variacao->id);
-                    }
+                    $this->salvarImagemV2($this->pastasImagensVariacoes[$dados['id']], 'variacao', $variacao->id);
                 }
+            }
         }
 
-
-        //carregue o produto novamente com findOrFail (ou find) antes de acessar
-        //$this->imagens = ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images;
-//        // Recarrega imagens da primeira variação (ou do produto)
-//        $this->imagens = !empty($this->variacoes[0]['id'])
-//            ? ProdutoVariation::with('images')->findOrFail($this->variacoes[0]['id'])->images
-//            :  $this->produto = Produto::with('images')->find($this->produto['id'])->toArray();
-
-        //envia a mensagem no browser
+        // 5) Feedback
         $this->dispatchBrowserEvent('livewire:event', [
             'type' => 'alert',
             'icon' => 'success',
             'message' => 'Produto e variações atualizados com sucesso!'
         ]);
 
-        $produto = Produto::with('variacoes.images','images')->findOrFail($this->produtoId); //trás o PAI e sua relações
-        //carrego os dados das variações do produto para blade
+        // 6) Recarregar estado atualizado
+        $produto = Produto::with('variacoes.images', 'images')->findOrFail($this->produtoId);
         $this->variacoes = $this->carregdaDadosVariacao($produto);
-        //aciona o componente para atualizar as imagens
+
         $this->emitTo('produto-variacoes-form', 'imagemAtualizada', $this->variacoes);
     }
+
 
 
     public function uploadImagem(Request $request)

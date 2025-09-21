@@ -367,6 +367,15 @@
             text-align: center;        /* Centraliza horizontal */
             vertical-align: middle;    /* Centraliza vertical */
         }
+        #imagemPreviewGrande {
+            max-width: 400px;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #ccc;
+        }
+
     </style>
 @endpush
 

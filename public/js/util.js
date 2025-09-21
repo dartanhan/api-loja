@@ -183,6 +183,17 @@
         $('[data-toggle="tooltip"]').tooltip();
     }
 
+    // function salvarProduto() {
+    //     console.log("salvarProduto");
+    //     // 1) Pede para o filho sincronizar
+    //     Livewire.emitTo('produto-variacoes-form', 'syncAndSave');
+    //
+    //     // 2) Aguarda um tick do Livewire e chama salvar no pai
+    //      setTimeout(() => {
+    //          Livewire.emitTo('produto-create', 'salvar');
+    //      }, 900); // 300ms geralmente já garante que o estado foi atualizado
+    // }
+
     //para centralizar re-render o Filepond quando for rendreizado pleo livewire
     // function loadFilePond(targetSelector, options = {}) {
     //     const container = document.querySelector(targetSelector);
@@ -270,19 +281,19 @@
 
 
     //Ao clicar em salvar aciona o Livewire
-    const btnSalvar = document.getElementById('btn-salvar-produto');
-    if (btnSalvar) {
-        document.getElementById('btn-salvar-produto').addEventListener('click', function () {
-            //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
-            // Chama o botão invisível com wire:click="salvar"
-            document.getElementById('btn-livewire-salvar').click();
-            //if (typeof Livewire !== 'undefined') {
-            console.log("salvar",  foldersEnviados);
-                Livewire.emit('salvar');
-                //loadFilePondProduto();
-           // }
-        });
-    }
+    // const btnSalvar = document.getElementById('btn-salvar-produto');
+    // if (btnSalvar) {
+    //     document.getElementById('btn-salvar-produto').addEventListener('click', function () {
+    //         //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
+    //         // Chama o botão invisível com wire:click="salvar"
+    //         document.getElementById('btn-livewire-salvar').click();
+    //         //if (typeof Livewire !== 'undefined') {
+    //         console.log("salvar",  foldersEnviados);
+    //             Livewire.emit('salvar');
+    //             //loadFilePondProduto();
+    //        // }
+    //     });
+    // }
 
     /**
      * Seta as abas para permanecer onde forma clciadas ao dar refesh

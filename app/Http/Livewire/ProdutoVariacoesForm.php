@@ -16,6 +16,8 @@ class ProdutoVariacoesForm extends Component
     public $produtoId;
     public $codigoPai;
     public $produto;
+    public bool $salvando = false;
+
 
     // O filho "ouve" uma chamada para sincronizar e salvar
     protected $listeners = ['updatedVariacoes' => 'updatedVariacoes','syncAndSave' => 'syncAndSave',
@@ -53,15 +55,15 @@ class ProdutoVariacoesForm extends Component
         $this->variacoes[] = [
             'id'     => $idUnico, // garante que nunca vai conflitar
             'subcodigo' => $subcodigo,
-            'variacao' => '',
-            'quantidade' => 0,
-            'valor_varejo' => '',
-            'valor_produto' => '',
-            'fornecedor_id' => '',
-            'gtin' => '',
-            'estoque' => '',
-            'quantidade_minima' => '',
-            'percentage' => '',
+            'variacao' => 'teste pai',
+            'quantidade' => 10,
+            'valor_varejo' => '4,99',
+            'valor_produto' => '1,99',
+            'fornecedor_id' => '1',
+            'gtin' => '12345',
+            'estoque' => '15',
+            'quantidade_minima' => '0',
+            'percentage' => '1',
             'status' => true,
             'validade' => '',
             'images' => [],
@@ -78,13 +80,13 @@ class ProdutoVariacoesForm extends Component
             // adicione outras regras conforme necessário
         ]);
 
-
         // 1) Envia o array completo de variações ao pai
-        $this->emitUp('atualizarVariacoes', $this->variacoes);
+         $this->emitUp('atualizarVariacoes', $this->variacoes);
 
         // 2) Agora manda o pai salvar (ele já recebeu as variações)
         $this->emitUp('salvar');
     }
+
 
     //deleteadno a ultima imagem, atualiza o componente na tela de edição
     public function imagemAtualizada($data)

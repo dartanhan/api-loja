@@ -24,10 +24,11 @@ class ProdutoCreate extends Component
 
     public $produto = [
         'codigo_produto' => '',
-        'descricao' => '',
-        'valor_produto' => '',
+        'descricao' => 'teste produto pai',
+        'valor_produto' => '29,99',
         'status' => 0,
-        'categoria_id' => ''
+        'categoria_id' => '1',
+        'origem_id' => '1'
     ];
 
     protected $rules = [
@@ -44,16 +45,14 @@ class ProdutoCreate extends Component
    // public $imagemDestaque = null;
     public $fornecedores = [];
     public $origens =[];
-   // public array $pastasImagensProduto = [];
-   // public array $pastasImagensVariacoes = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
+    public $produtoImagem = null;
+    public array $variacoesImagens = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
     public $codigoProduto;
     public array $uploads = []; // usado apenas pelo Livewire para armazenar temporários
     public array $images  = []; // nosso array normalizado: sempre ['context','file','variacaoKey']
 
 
-    protected $listeners = [//'refreshTemporaryFiles' => 'loadTemporaryFiles',
-                           // 'pastasAtualizadasProduto' => 'atualizarPastasProduto',
-                           // 'pastasAtualizadasVariacao' => 'atualizarPastasVariacao',
+    protected $listeners = [
                             'imagensAtualizadas' => 'setImagens', //trait
                             'atualizarVariacoes' => 'setVariacoes', //trait
                             'salvar'             => 'salvar'];
@@ -108,9 +107,12 @@ class ProdutoCreate extends Component
         logger()->info("Pai recebeu Variação $key", $pastas);
     }*/
 
-
+    /**
+     * Salva o produto e variações
+    */
     public function salvar()
     {
+
         $this->produto['valor_produto'] = LivewireHelper::formatCurrencyToBD($this->produto['valor_produto'],
             $this->NumberFormatter());
 
@@ -120,7 +122,7 @@ class ProdutoCreate extends Component
          * salva a produto
          🔹 Salva produto PAI
          * */
-        $produto = Produto::create([
+        $data = [
             'codigo_produto' => $this->produto['codigo_produto'],
             'descricao'      => $this->produto['descricao'] ?? '',
             'ncm'            => $this->produto['ncm'] ?? 0,
@@ -129,46 +131,63 @@ class ProdutoCreate extends Component
             'categoria_id'   => (int)$this->produto['categoria_id'] ?? 0,
             'status'         => $this->produto['status'] ?? 0,
             'valor_produto'  => $this->produto['valor_produto'],
-        ]);
+        ];
+
+        /**
+         * 🔹 0) Cria o PRODUTO PAI
+         */
+        $produto = Produto::create($data);
+
 
         /**
          * 🔹 1) Salva imagens do PRODUTO PAI
          */
-
-        $imagensProduto = collect($this->images)->where('context', 'produto');
-        foreach ($imagensProduto as $img) {
-            $this->salvarImagemV2([$img['file']], 'produto', $produto->id);
+      //
+        //$imagensProduto = collect($this->images)->where('context', 'produto');
+        if ($this->produtoImagem) {
+            $this->salvarImagemV2($this->produtoImagem, 'produto', $produto->id);
         }
 
         /**
          * 🔹 2) Salva variações
          */
+       // dump("2) Salva variações", $this->produto,$this->produtoImagem,$this->variacoes,$this->variacoesImagens);
+       // dd();
+        $mapVariacoes = []; // mapeia id temporário => id real
         if ($this->variacoes) {
-            dump($this->produto,$this->images,$this->variacoes);
-            dd();
+
             foreach ($this->variacoes as $v) {
-                $variacao = ProdutoVariation::create([
-                    'products_id'       => $produto->id,
-                    'subcodigo'         => $v['subcodigo'] ?? '',
-                    'variacao'          => $v['variacao'] ?? '',
-                    'quantidade'        => $v['quantidade'] ?? 0,
-                    'valor_varejo'      => LivewireHelper::formatCurrencyToBD($v['valor_varejo'], $this->NumberFormatter()) ?? 0,
-                    'valor_produto'     => LivewireHelper::formatCurrencyToBD($v['valor_produto'], $this->NumberFormatter()) ?? 0,
-                    'fornecedor_id'     => $v['fornecedor_id'],
-                    'gtin'              => $v['gtin'] ?? 0,
-                    'estoque'           => $v['estoque'] ?? 0,
+                $data = [
+                    'products_id' => $produto->id,
+                    'subcodigo' => $v['subcodigo'] ?? '',
+                    'variacao' => $v['variacao'] ?? '',
+                    'quantidade' => $v['quantidade'] ?? 0,
+                    'valor_varejo' => LivewireHelper::formatCurrencyToBD($v['valor_varejo'], $this->NumberFormatter()),
+                    'valor_produto' => LivewireHelper::formatCurrencyToBD($v['valor_produto'], $this->NumberFormatter()),
+                    'fornecedor_id' => $v['fornecedor_id'],
+                    'gtin' => $v['gtin'] ?? null,
+                    'estoque' => $v['estoque'] ?? 0,
                     'quantidade_minima' => $v['quantidade_minima'] ?? 0,
-                    'percentage'        => $v['percentage'] ?? 0,
-                    'status'            => $v['status'] ?? 0,
-                    'validade'          => LivewireHelper::formatarData($v['validade'])
-                ]);
+                    'percentage' => $v['percentage'] ?? 0,
+                    'status' => $v['status'] ?? 0,
+                    'validade' => LivewireHelper::formatarData($v['validade']),
+                ];
+                $variacao = ProdutoVariation::create($data);
 
-                // 🔹 pega as imagens referentes a essa variação
-                $imagensVariacao = collect($this->images)->where('context', 'variacao')
-                    ->where('variacaoKey', $v['id']);
+                // 🔹 guarda relação entre ID temporário (UUID) e ID real
+                $mapVariacoes[$v['id']] = $variacao->id;
+            }
 
-                foreach ($imagensVariacao as $img) {
-                    $this->salvarImagemV2([$img['file']], 'variacao', $variacao->id);
+            // Agora salva as imagens de cada variação usando o mapeamento
+            foreach ($this->variacoesImagens as $variacaoKey => $imagens) {
+                if (!isset($mapVariacoes[$variacaoKey])) {
+                    continue; // segurança: se não encontrou a variação, ignora
+                }
+
+                $variacaoId = $mapVariacoes[$variacaoKey];
+
+                foreach ($imagens as $img) {
+                    $this->salvarImagemV2($img, 'variacao', $variacaoId);
                 }
             }
 
