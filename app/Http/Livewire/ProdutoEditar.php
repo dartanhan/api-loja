@@ -54,7 +54,8 @@ class ProdutoEditar extends Component
 
     public function mount($id, string $context = 'produto', bool $multiple = false, ?string $variacaoKey = null, array $imagensExistentes = [])
     {
-        $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e sua relações
+        $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e sua
+
         $this->produto = $produto;
         $this->codigoProduto = $produto->codigo_produto;
         $this->produtoId = $produto->id;
@@ -66,8 +67,8 @@ class ProdutoEditar extends Component
             'valor_produto' => $produto->valor_produto,
             'categoria_id' => $produto->categoria_id,
             'status' => $produto->status,
-            'path' => !empty($produto['images']) ? $produto['images'][0]->path : null,
-            'image_id' => !empty($produto['images']) ? $produto['images'][0]->id : null,
+            'path' => data_get($produto, 'images.0.path'),//retorna null se não exitir o images ou estiver vazio
+            'image_id' => data_get($produto, 'images.0.id'),//retorna null se não exitir o images ou estiver vazio
             'origem_id' => $produto->origem_id,
             'cest' =>  $produto->cest,
             'ncm' =>  $produto->ncm
@@ -171,20 +172,14 @@ class ProdutoEditar extends Component
             'origem_id' => $this->produto['origem_id'] ?? 1
         ];
 
-        dump($this->produtoImagem,$this->variacoes,$this->variacoesImagens);
-        dd();
+       // dump($this->produtoImagem,$this->variacoes,$this->variacoesImagens);
+//        dd();
         Produto::where('id', $this->produtoId)->update($data);
 
         // 3) Imagens do produto pai
-        if (isset($this->pastasImagensProduto)) {
-            // Remove imagens que não estão mais presentes
-            $idsMantidos = collect($this->pastasImagensProduto)->pluck('id')->filter()->toArray();
-            ProdutoImagem::where('produto_id', $this->produtoId)
-                ->whereNotIn('id', $idsMantidos)
-                ->delete();
-
-            // Salva / adiciona as novas
-            $this->salvarImagemV2($this->pastasImagensProduto, 'produto', $this->produtoId);
+        if ($this->produtoImagem) {
+            // Salva
+            $this->salvarImagemV2($this->produtoImagem, 'produto', $this->produtoId);
         }
 
         // 4) Variações
@@ -205,23 +200,46 @@ class ProdutoEditar extends Component
                     'validade' => LivewireHelper::formatarData($dados['validade'])
                 ];
 
-                $variacao = ProdutoVariation::updateOrCreate(
-                    ['id' => $dados['id']],
-                    $data
-                );
-
+//                $variacao = ProdutoVariation::updateOrCreate(
+//                    ['id' => $dados['id']],
+//                    $data
+//                );
+                //dump($this->variacoesImagens, $dados['id']);
                 // --- Imagens da variação ---
-                if (isset($this->pastasImagensVariacoes[$dados['id']])) {
-                    $idsMantidos = collect($this->pastasImagensVariacoes[$dados['id']])->pluck('id')->filter()->toArray();
+                if (!empty($this->variacoes)) {
+                    foreach ($this->variacoes as $dados) {
+                        $data = [
+                            'products_id' => $this->produtoId,
+                            'subcodigo' => $dados['subcodigo'] ?? '',
+                            'variacao' => $dados['variacao'] ?? '',
+                            'quantidade' => $dados['quantidade'] ?? 0,
+                            'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                            'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
+                            'fornecedor' => $dados['fornecedor_id'],
+                            'gtin' => $dados['gtin'] ?? 0,
+                            'estoque' => $dados['estoque'] ?? 0,
+                            'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
+                            'percentage' => $dados['percentage'] ?? 0,
+                            'validade' => LivewireHelper::formatarData($dados['validade'])
+                        ];
 
-                    ProdutoImagem::where('produto_variacao_id', $variacao->id)
-                        ->whereNotIn('id', $idsMantidos)
-                        ->delete();
+                        $variacao = ProdutoVariation::updateOrCreate(
+                            ['id' => $dados['id']],
+                            $data
+                        );
+                        if (isset($this->variacoesImagens[$dados['id']])) {
+                            foreach ($this->variacoesImagens[$dados['id']] as $image) {
+                                // Aqui $image já é a string correta
+                                $this->salvarImagemV2($image, 'variacao', $variacao->id);
+                            }
+                        }
 
-                    $this->salvarImagemV2($this->pastasImagensVariacoes[$dados['id']], 'variacao', $variacao->id);
+                    }
                 }
             }
+
         }
+
 
         // 5) Feedback
         $this->dispatchBrowserEvent('livewire:event', [
@@ -272,13 +290,14 @@ class ProdutoEditar extends Component
     public function removerImagem($id)
     {
         $imagem = ProdutoImagem::find($id);
+
         if ($imagem) {
-            Storage::delete('public/product/'.$imagem->produto_id.'/'.$imagem->path);
-            $imagem->delete();
+            Storage::delete('public/product/'.$imagem[0]->produto_id.'/'.$imagem[0]->path);
+            ProdutoImagem::where('id', $imagem[0]->id)->delete();
         }
 
         // Remove a imagem do array local
-        $this->produto['images'] = array_filter($this->produto['images'], fn($img) => $img['id'] !== $id);
+       // $this->produto['images'] = array_filter($this->produto['images'], fn($img) => $img['id'] !== $id);
 
         // Mensagem de sucesso
         $this->dispatchBrowserEvent('swal:sucesso', [

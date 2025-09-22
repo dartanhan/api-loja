@@ -254,8 +254,9 @@ trait ProdutoTrait
      * @param string $arquivo
      * @param string $destino
      * @param int $id
+     * @param null $tblImageId
      */
-    public function salvarImagemV2(string $arquivo, string $destino, int $id): void
+    public function salvarImagemV2(string $arquivo, string $destino, int $id, $tblImageId = null): void
     {
         $pathTemp = 'livewire-tmp/' . $arquivo;
 
@@ -273,8 +274,7 @@ trait ProdutoTrait
 
             // Atualiza ou cria imagem do produto pai
             ProdutoImagem::updateOrCreate(
-                ['produto_id' => $id, 'produto_variacao_id' => null],
-                ['path' => $arquivo]
+                ['produto_id' => $id, 'produto_variacao_id' => null,'path' => $arquivo]
             );
         } else {
             // VARIAÇÃO (pode ter várias imagens)
@@ -284,11 +284,12 @@ trait ProdutoTrait
             Storage::disk('public')->move($pathTemp, $pathFinal);
 
             // Cria uma nova imagem para a variação
-            ProdutoImagem::updateOrCreate([
+            $data = [
                 'produto_id' => null,
                 'produto_variacao_id' => $id,
                 'path' => $pathFinal
-            ]);
+            ];
+            ProdutoImagem::updateOrCreate(['id' => $tblImageId],$data);
         }
 
         // Remove arquivo temporário

@@ -3,7 +3,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body text-center">
-                    <img id="imagemPreviewGrande" src="" alt="">
+                    <img id="imagemPreviewGrande" src="" alt="" width="450px">
                 </div>
             </div>
         </div>

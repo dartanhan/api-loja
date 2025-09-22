@@ -142,7 +142,7 @@
                                                     <img src="{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}"
                                                          data-toggle="tooltip" data-placement="top"  title="Clique, para ampliar"
                                                          class="img-thumbnail mb-2"
-                                                         style="max-width: 150px; cursor: pointer;"
+                                                         style="max-width: 250px; cursor: pointer;"
                                                          onclick="previewImagem('{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}')">
 
                                                     {{-- Botão de excluir --}}
@@ -455,7 +455,8 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Livewire.dispatch('removerImagem', { id: id });
+                    console.log('removerImagem',  id );
+                    Livewire.emitTo('produto-editar','removerImagem', { id: id });
                 }
             })
         }
