@@ -29,7 +29,7 @@ class FilepondUpload extends Component
     protected $listeners = [
         'pastasAtualizadasProduto'  => 'setPastasImagensProduto',
         'pastasAtualizadasVariacao' => 'setPastasImagensVariacao',
-        'imagemDeletada'            => 'removerImagem',
+        //'imagemDeletada'            => 'removerImagem',
         'imagensAtualizadas'        => 'setImagens',
         'deletarImagem'             => 'deletarImagem'
     ];

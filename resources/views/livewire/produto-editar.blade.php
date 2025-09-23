@@ -133,6 +133,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="row">
                                         <div class="card-body mb-3 p-2">
                                             {{-- Se existir imagem do produto pai --}}
@@ -149,7 +150,7 @@
                                                     <div class="d-flex justify-content-center">
                                                         <button type="button"
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                onclick="confirmarExclusao({{ $produto['images'][0]->id }})"
+                                                                onclick="confirmarExclusao({{ $produto['images'][0]->id }},'product',{{$produto->id}})"
                                                                 data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
                                                                 id="btn-excluir-{{ $produto['images'][0]->id }}">
                                                             <i class="fas fa-trash-alt" id="icon-trash-{{ $produto['images'][0]->id}}"></i>
@@ -443,7 +444,13 @@
         });
 
 
-        function confirmarExclusao(id) {
+        /**
+         * Apaga a imagem tanto da variação quando do produto
+         * imageId - id imagem
+         * destino - destino da imagem se produto(variação) ou product(pai)
+         * produtoId - id do produto PAI
+         * */
+        function confirmarExclusao(imageId, destino, produtoId) {
             Swal.fire({
                 title: 'Tem certeza?',
                 text: "A imagem será excluída permanentemente!",
@@ -455,8 +462,7 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    console.log('removerImagem',  id );
-                    Livewire.emitTo('produto-editar','removerImagem', { id: id });
+                    Livewire.emitTo('produto-editar','removerImagem', imageId, {destino: destino}, produtoId);
                 }
             })
         }

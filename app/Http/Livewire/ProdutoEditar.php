@@ -235,11 +235,15 @@ class ProdutoEditar extends Component
                         }
 
                     }
+                    $this->dispatchBrowserEvent('filepond:reset', [
+                        'context' => 'variacao',
+                        'variacaoKey' => $dados['id'], // ou o id da variação salva
+                    ]);
+
                 }
             }
 
         }
-
 
         // 5) Feedback
         $this->dispatchBrowserEvent('livewire:event', [
@@ -248,9 +252,10 @@ class ProdutoEditar extends Component
             'message' => 'Produto e variações atualizados com sucesso!'
         ]);
 
+
         // 6) Recarregar estado atualizado
-        $produto = Produto::with('variacoes.images', 'images')->findOrFail($this->produtoId);
-        $this->variacoes = $this->carregdaDadosVariacao($produto);
+        $this->produto = Produto::with('variacoes.images', 'images')->findOrFail($this->produtoId);
+        $this->variacoes = $this->carregdaDadosVariacao($this->produto);
 
         $this->emitTo('produto-variacoes-form', 'imagemAtualizada', $this->variacoes);
     }
@@ -273,7 +278,6 @@ class ProdutoEditar extends Component
         return response()->json(['error' => 'Nenhum arquivo enviado'], 400);
     }
 
-
     //voltar tela de lista de produtos
     public function voltar()
     {
@@ -286,23 +290,56 @@ class ProdutoEditar extends Component
         $produto['images'][0] = []; // se estiver usando Model
     }
 
-
-    public function removerImagem($id)
+    /**
+     * @param $imageId
+     * @param array $destino
+     * @param int $produtoId
+     */
+    public function removerImagem(int $imageId,array $destino, int $produtoId)
     {
-        $imagem = ProdutoImagem::find($id);
+        $imagem = ProdutoImagem::find($imageId);
+        $dest = null;
 
         if ($imagem) {
-            Storage::delete('public/product/'.$imagem[0]->produto_id.'/'.$imagem[0]->path);
-            ProdutoImagem::where('id', $imagem[0]->id)->delete();
+            //monta o destino da imagem
+            $dest = ($destino['destino'] == 'product') ?
+                $destino['destino'] . '/' . $imagem->produto_id . '/' . $imagem->path
+                :
+                $destino['destino'] . '/' . $imagem->produto_variacao_id . '/' . $imagem->path;
+
+            //deleta a imagem
+            Storage::disk('public')->delete($dest);
+
+            //deleta do banco
+            ProdutoImagem::where('id', $imagem->id)->delete();
+
+            //monta destino do diretrio para apagar caso seja vazio
+            $diretorio = ($destino['destino'] == 'product')
+                ?
+                $destino['destino'] . '/' . $imagem->produto_id
+                :
+                $destino['destino'] . '/' . $imagem->produto_variacao_id;
+
+            //se for vazio, apaga o diretorio
+            if (empty(Storage::disk('public')->files($diretorio))) {
+                Storage::disk('public')->deleteDirectory($diretorio);
+            }
+
+            // Mensagem de sucesso
+            $this->dispatchBrowserEvent('livewire:event', [
+                'type' => 'alert',
+                'icon' => 'success',
+                'message' => 'Imagem removida com sucesso!'
+            ]);
+
+
+            // 1) Recarregar estado atualizado para blade
+            $this->produto = Produto::with('variacoes.images', 'images')->findOrFail($produtoId);
+            $this->variacoes = $this->carregdaDadosVariacao($this->produto);
+
+            //atualiza o compnete de variações
+            $this->emitTo('produto-variacoes-form', 'imagemAtualizada', $this->variacoes);
         }
-
-        // Remove a imagem do array local
-       // $this->produto['images'] = array_filter($this->produto['images'], fn($img) => $img['id'] !== $id);
-
-        // Mensagem de sucesso
-        $this->dispatchBrowserEvent('swal:sucesso', [
-            'message' => 'Imagem excluída com sucesso!'
-        ]);
     }
 
     public function render()

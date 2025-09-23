@@ -181,7 +181,7 @@
                                 wire:key="filepond-variacao-{{ $variacao['id'] }}"
                         />
                     </div>
-                   {{-- @dump(count($variacao['images']))--}}
+                    @dump($variacao['images'])
                     @if(isset($variacao['images']) && count($variacao['images']) > 0)
                         <div class="card mb-3 p-2">
                             <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
@@ -205,7 +205,7 @@
                                                         <div class="d-flex justify-content-center">
                                                             <button type="button"
                                                                     class="btn btn-sm btn-outline-danger"
-                                                                    onclick="confirmarExclusaoImagem({{ $imagem['id'] }}, true, {{$produtoId}})"
+                                                                    onclick="confirmarExclusao({{ $imagem['id'] }}, 'produtos', {{$produtoId}})"
                                                                     data-toggle="tooltip" data-placement="right"  title="Excluir imagem"
                                                                     id="btn-excluir-{{ $imagem['id'] }}">
                                                                 <i class="fas fa-trash-alt" id="icon-trash-{{ $imagem['id'] }}"></i>

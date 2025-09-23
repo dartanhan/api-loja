@@ -252,7 +252,7 @@
      * @param isVariacao
      * @param produtoId
      */
-    function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
+    /*function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
         console.log(id, isVariacao,produtoId );
 
         Swal.fire({
@@ -276,7 +276,7 @@
 
             }
         });
-    }
+    }*/
 
 
 
@@ -466,6 +466,20 @@
             },
             ...options
         });
-
     }
+
+    /**
+     * Usado na tela de edição de variação , caso insira nova imagem na variação ,
+     * quando chcmar o salvar deve limpar o filepond
+     * */
+    document.addEventListener('filepond:reset', function (event) {
+        const { context, variacaoKey } = event.detail;
+console.log('filepond:reset', context, variacaoKey);
+        // Monta o seletor único para este FilePond
+        let pondElement = document.querySelector(`[wire\\:key="filepond-${context}-${variacaoKey}"] input[type=file]`);
+
+        if (pondElement && pondElement._pond) {
+            pondElement._pond.removeFiles();
+        }
+    });
 

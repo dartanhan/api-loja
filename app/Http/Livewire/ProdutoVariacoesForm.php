@@ -94,6 +94,7 @@ class ProdutoVariacoesForm extends Component
         $this->variacoes = $data;
     }
 
+
     public function render()
     {
         return view('livewire.produto-variacoes-form');
