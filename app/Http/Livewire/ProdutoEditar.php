@@ -54,6 +54,8 @@ class ProdutoEditar extends Component
 
     public function mount($id, string $context = 'produto', bool $multiple = false, ?string $variacaoKey = null, array $imagensExistentes = [])
     {
+        dump($id);
+        dd();
         $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e sua
 
         $this->produto = $produto;

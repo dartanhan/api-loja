@@ -28,6 +28,7 @@ class ProdutosVariacoes extends Component
     public $loadingVariaId = null;
     public $fornecedores = [];
     public $categorias = [];
+    public array $tipo = ['produto' => 'produto', 'variacao'=> 'variacao'];
 
 
     protected $listeners = ['atualizarCampoValor','atualizarCampo','alterarStatusConfirmado'];
@@ -153,26 +154,16 @@ class ProdutosVariacoes extends Component
         }
     }
 
-    /**
-     * Redireciona para  tela de editar a variação
-     * @param $id
-     * @return RedirectResponse
-     */
-    public function editarVariacao(int $id)
-    {
-        //return Redirect::route('variacao.edit', ['variacao' => $id]);
-        return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => 'variacao']);
-    }
 
     /**
-     *  editar produto pai
-     * @param $id
+     *  editar produto pai ou variação
+     * @param int $id
+     * @param string $tipo
      * @return RedirectResponse
      */
-    public function editarProduto(int $id)
+    public function editar(int $id, string $tipo)
     {
-
-        return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => 'produto']);
+      return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => $tipo]);
     }
 
     public function render()
