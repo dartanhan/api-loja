@@ -19,6 +19,7 @@
 
     <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
 
+
     @stack("styles")
 
     @livewireStyles
@@ -76,7 +77,8 @@
             </footer>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     <script src="{{ asset('assets/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{ asset('assets/jquery/jquery.modal.min.js') }}"></script>
@@ -84,6 +86,7 @@
     <script src="{{ asset('assets/dashboard/js/scripts.js') }}"></script>
     <script src="{{ asset('assets/sweetalert2/dist/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('js/url.js') }}"></script>
+
 
     <!-- Filepond plugins -->
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -94,6 +97,8 @@
     <!-- Chosen + jQuery Mask -->
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.mask.min.js') }}"></script>
+
+
 
     <script src="//unpkg.com/alpinejs" defer></script>
 

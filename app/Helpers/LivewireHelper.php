@@ -26,7 +26,7 @@ class LivewireHelper
 
     public static function formatarData($data)
     {
-        if ($data === "00/00/0000" || empty($data)) {
+        if ($data === "00/00/0000" || empty($data)){
             return "0000-00-00";
         }
 

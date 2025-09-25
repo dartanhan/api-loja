@@ -116,13 +116,13 @@
                     <td class="text-center align-middle">
                         {{-- Ações --}}
                         <button class="btn btn-outline-primary btn-sm"
-                                wire:click="editar({{ $produto->id }}, '{{$tipo['produto']}}')"
+                                wire:click="editar({{ $produto->id }}, 'produto')"
                                 wire:loading.attr="disabled"
                                 data-toggle="tooltip" data-placement="top" title="Editar">
-                                    <span wire:loading.remove wire:target="editar({{ $produto->id }}, '{{$tipo['produto']}}')">
+                                    <span wire:loading.remove wire:target="editar({{ $produto->id }}, 'produto')">
                                         <i class="fas fa-edit"></i>
                                     </span>
-                            <span wire:loading wire:target="editar({{ $produto->id }}, '{{$tipo['produto']}}')">
+                            <span wire:loading wire:target="editar({{ $produto->id }}, 'produto')">
                                 <i class="fas fa-spinner fa-spin"></i>
                             </span>
                         </button>
@@ -233,23 +233,24 @@
                                                     </div>
                                                 </div>
                                                 {{-- Ações --}}
-                                                <div class="col-md-1 text-end">
+                                                {{--<div class="col-md-1 text-end">
                                                     <label class="form-label form-label-sm mb-1 d-block">Ações</label>
                                                     <div class="btn-group" role="group">
                                                         <button class="btn btn-outline-primary btn-sm"
-                                                                wire:click="editar({{ $variacao->id }}, '{{$tipo['variacao']}}')"
+                                                                wire:click="editar({{ $produto->id }}, 'variacao')"
                                                                 wire:loading.attr="disabled"
                                                                 data-toggle="tooltip" data-placement="top" title="Editar">
-                                                            <span wire:loading.remove wire:target="editar({{ $variacao->id }}, '{{$tipo['variacao']}})'">
+                                                            <span wire:loading.remove wire:target="editar({{ $produto->id }}, 'variacao')">
                                                                 <i class="fas fa-edit"></i>
                                                             </span>
-                                                            <span wire:loading wire:target="editar({{ $variacao->id }}, '{{$tipo['variacao']}}')">
+                                                            <span wire:loading wire:target="editar({{ $produto->id }}, 'variacao')">
                                                                 <i class="fas fa-spinner fa-spin"></i>
                                                             </span>
                                                         </button>
                                                     </div>
-                                                </div>
+                                                </div>--}}
                                             </div>
+
                                             <div class="row g-2 mt-2">
                                                 <div class="col-md-2">
                                                     <label class="form-label form-label-sm mb-1">Valor Varejo</label>

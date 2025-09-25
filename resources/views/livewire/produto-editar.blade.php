@@ -158,18 +158,6 @@
                                                     </div>
                                                 </div>
 
-{{--                                                --}}{{-- Modal de preview --}}
-{{--                                                <div class="modal fade" id="previewImagemProduto" tabindex="-1" aria-hidden="true">--}}
-{{--                                                    <div class="modal-dialog modal-dialog-centered modal-lg">--}}
-{{--                                                        <div class="modal-content bg-transparent border-0 shadow-none">--}}
-{{--                                                            <div class="modal-body text-center p-0">--}}
-{{--                                                                <img src="{{ asset('storage/product/'.$produto['id'].'/'.$produto['images'][0]->path) }}"--}}
-{{--                                                                     class="img-fluid rounded shadow"--}}
-{{--                                                                     alt="Preview Imagem Produto">--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
                                             @else
                                                 {{-- Filepond só aparece se não existir imagem --}}
                                                 <div id="filepond-wrapper" wire:ignore wire:key="filepond-produto">
@@ -411,11 +399,13 @@
     <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
 {{--    <script src="{{ asset('js/filePond.js') }}"></script>--}}
     <script>
+
         document.addEventListener('livewire:load', function () {
            // loadFilePondProduto();
             loadSetAbas();
             aplicarMascaraMoeda();
             aplicarMascaraDataDDMMYYYY();
+
 
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 sessionStorage.setItem('activeTab', $(e.target).attr('href'));
@@ -426,6 +416,7 @@
                 loadSetAbas();
                 aplicarMascaraMoeda();
                 aplicarMascaraDataDDMMYYYY();
+
             });
         });
 

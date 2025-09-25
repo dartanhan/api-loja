@@ -15,21 +15,21 @@
                 <div class="row mb-3 g-2 align-items-end" wire:key="variacao-{{ $variacao['id'] }}">
                     <div class="row card p-1 mb-2">
                         <div class="row card-body ">
-                            <div class="col-md-2 mb-3">
+                            <div class="col-auto mb-3" style="max-width: 100px;min-width: 150px">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('SUB CÓDIGO (SKU)') }}"
                                            wire:model.defer="variacoes.{{ $index }}.subcodigo"  class="form-control form-control-sm format-font" readonly >
                                     <label for="label-codigo-{{ $variacao['subcodigo'] }}">{{ __('SUB CÓDIGO(SKU)') }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-auto mb-3" style="max-width: 100px;min-width: 150px">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('GTIN') }}"
                                            wire:model.defer="variacoes.{{ $index }}.gtin"  class="form-control form-control-sm format-font" >
                                     <label for="label-gtin-{{ $index }}">{{ __('GTIN') }}</label>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3 mb-3" style="min-width: 350px">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('VARIAÇÃO') }}"
                                            wire:model.defer="variacoes.{{ $index }}.variacao" class="form-control form-control-sm format-font" >
@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto" style="max-width: 150px;">
+                            <div class="col-auto mb-3" style="max-width: 150px;">
                                 <div class="floating-label-group border-lable-flt">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">R$</span>
@@ -91,7 +91,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto" style="max-width: 100px">
+                            <div class="col-auto mb-3" style="max-width: 100px">
                                 <div class="floating-label-group border-lable-flt">
                                     <div class="input-group input-group-sm">
                                         <input type="text" placeholder="{{ __('DESC.EM %') }}"
@@ -100,18 +100,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto" style="max-width: 150px;">
+                            <div class="col-auto mb-3" style="max-width: 150px;">
                                 <div class="floating-label-group border-lable-flt">
                                     <div class="input-group input-group-sm">
                                         <input type="text" placeholder="{{ __('VALIDADE') }}"
+                                               id="validade-{{ $index }}"
                                                wire:model.defer="variacoes.{{ $index }}.validade"
                                                class="form-control form-control-sm format-font data-mask" maxlength="10">
                                         <label for="label-valor-validade-{{ $index }}">{{ __('VALIDADE') }}</label>
+
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-3" style="max-width: 100px;min-width: 250px">
                                 <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                     <select wire:model.defer="variacoes.{{ $index }}.fornecedor_id" class="form-select format-font form-control-sm" required>
                                         <option value="">Selecione</option>
@@ -128,7 +130,7 @@
 
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="col-md-3 mb-3" style="max-width: 100px;min-width: 150px">
                                 <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                     <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
                                         <label class="form-label m-0">STATUS</label>
@@ -158,17 +160,18 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-auto" style="max-width: 100px;">
-                                <button class="btn btn-sm btn-outline-danger" wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">
-                                    <span wire:loading.remove wire:target="removerVariacao({{ $index }})">
-                                        <i class="fas fa-times"></i>
-                                    </span>
-                                    <span wire:loading wire:target="removerVariacao({{ $index }})">
-                                        <i class="fas fa-spinner fa-spin me-1"></i> Removendo...
-                                    </span>
-                                </button>
-                            </div>
+                            @if(!is_numeric($variacao['id']))
+                                <div class="col-auto" style="max-width: 100px;">
+                                    <button class="btn btn-sm btn-outline-danger" wire:click="removerVariacao({{ $index }})" wire:loading.attr="disabled">
+                                        <span wire:loading.remove wire:target="removerVariacao({{ $index }})">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                        <span wire:loading wire:target="removerVariacao({{ $index }})">
+                                            <i class="fas fa-spinner fa-spin me-1"></i> Removendo...
+                                        </span>
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -181,7 +184,7 @@
                                 wire:key="filepond-variacao-{{ $variacao['id'] }}"
                         />
                     </div>
-                    @dump($variacao['images'])
+{{--                    @dump($variacao['images'])--}}
                     @if(isset($variacao['images']) && count($variacao['images']) > 0)
                         <div class="card mb-3 p-2">
                             <form method="post" autocomplete="off" id="formImage" name="formImage" enctype="multipart/form-data" class="form-inline">
@@ -222,8 +225,32 @@
                     @endif
 
                 </div>
-            @endforeach
+
+                @endforeach
         </div>
     </div>
 
 </div>
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+@endpush
+
+@push('scripts')
+
+    <script>
+
+        function initCalendars() {
+            if (window.Helpers && typeof window.Helpers.calendar === "function") {
+                window.Helpers.calendar();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", initCalendars);
+        document.addEventListener("livewire:load", initCalendars);
+        Livewire.hook('message.processed', (message, component) => {
+            initCalendars();
+        });
+    </script>
+
+    </script>
+@endpush

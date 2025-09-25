@@ -54,9 +54,8 @@ class ProdutoEditar extends Component
 
     public function mount($id, string $context = 'produto', bool $multiple = false, ?string $variacaoKey = null, array $imagensExistentes = [])
     {
-        dump($id);
-        dd();
-        $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e sua
+
+        $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e as varições se tiver
 
         $this->produto = $produto;
         $this->codigoProduto = $produto->codigo_produto;
@@ -79,7 +78,6 @@ class ProdutoEditar extends Component
         //carrego os dados das variações do produto para blade
         $this->variacoes = $this->carregdaDadosVariacao($produto);
 
-        //$this->fornecedores = Fornecedor::select('id', 'nome')->where('status', 1)->get()->toArray();
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
 
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
@@ -88,7 +86,7 @@ class ProdutoEditar extends Component
 
     }
 
-    public function adicionarVariacao()
+   /* public function adicionarVariacao()
     {
          $codigoPai = $this->codigoPai ?? '0000';
 
@@ -130,7 +128,7 @@ class ProdutoEditar extends Component
             'fornecedor_id' => $produto->fornecedor ?? null, // ← aqui também
             'status' => null
         ];
-    }
+    }*/
 
     /**
      * @param $arquivoTemporario
@@ -174,8 +172,8 @@ class ProdutoEditar extends Component
             'origem_id' => $this->produto['origem_id'] ?? 1
         ];
 
-       // dump($this->produtoImagem,$this->variacoes,$this->variacoesImagens);
-//        dd();
+        //dump($this->variacoes);
+       // dd();
         Produto::where('id', $this->produtoId)->update($data);
 
         // 3) Imagens do produto pai
@@ -187,64 +185,38 @@ class ProdutoEditar extends Component
         // 4) Variações
         if (!empty($this->variacoes)) {
             foreach ($this->variacoes as $dados) {
-                $data = [
-                    'products_id' => $this->produtoId,
-                    'subcodigo' => $dados['subcodigo'] ?? '',
-                    'variacao' => $dados['variacao'] ?? '',
-                    'quantidade' => $dados['quantidade'] ?? 0,
-                    'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
-                    'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
-                    'fornecedor' => $dados['fornecedor_id'],
-                    'gtin' => $dados['gtin'] ?? 0,
-                    'estoque' => $dados['estoque'] ?? 0,
-                    'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
-                    'percentage' => $dados['percentage'] ?? 0,
-                    'validade' => LivewireHelper::formatarData($dados['validade'])
-                ];
 
-//                $variacao = ProdutoVariation::updateOrCreate(
-//                    ['id' => $dados['id']],
-//                    $data
-//                );
-                //dump($this->variacoesImagens, $dados['id']);
-                // --- Imagens da variação ---
-                if (!empty($this->variacoes)) {
-                    foreach ($this->variacoes as $dados) {
-                        $data = [
-                            'products_id' => $this->produtoId,
-                            'subcodigo' => $dados['subcodigo'] ?? '',
-                            'variacao' => $dados['variacao'] ?? '',
-                            'quantidade' => $dados['quantidade'] ?? 0,
-                            'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
-                            'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
-                            'fornecedor' => $dados['fornecedor_id'],
-                            'gtin' => $dados['gtin'] ?? 0,
-                            'estoque' => $dados['estoque'] ?? 0,
-                            'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
-                            'percentage' => $dados['percentage'] ?? 0,
-                            'validade' => LivewireHelper::formatarData($dados['validade'])
-                        ];
+                    $data = [
+                        'products_id' => $this->produtoId,
+                        'subcodigo' => $dados['subcodigo'] ?? '',
+                        'variacao' => $dados['variacao'] ?? '',
+                        'quantidade' => $dados['quantidade'] ?? 0,
+                        'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                        'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
+                        'fornecedor' => $dados['fornecedor_id'],
+                        'gtin' => $dados['gtin'] ?? 0,
+                        'estoque' => $dados['estoque'] ?? 0,
+                        'quantidade_minima' => $dados['quantidade_minima'] ?? 0,
+                        'percentage' => $dados['percentage'] ?? 0,
+                        'validade' => LivewireHelper::formatarData($dados['validade'])
+                    ];
 
-                        $variacao = ProdutoVariation::updateOrCreate(
-                            ['id' => $dados['id']],
-                            $data
-                        );
-                        if (isset($this->variacoesImagens[$dados['id']])) {
-                            foreach ($this->variacoesImagens[$dados['id']] as $image) {
-                                // Aqui $image já é a string correta
-                                $this->salvarImagemV2($image, 'variacao', $variacao->id);
-                            }
+                    $variacao = ProdutoVariation::updateOrCreate(
+                        ['id' => $dados['id']],
+                        $data
+                    );
+                    if (isset($this->variacoesImagens[$dados['id']])) {
+                        foreach ($this->variacoesImagens[$dados['id']] as $image) {
+                            // Aqui $image já é a string correta
+                            $this->salvarImagemV2($image, 'variacao', $variacao->id);
                         }
-
                     }
-                    $this->dispatchBrowserEvent('filepond:reset', [
-                        'context' => 'variacao',
-                        'variacaoKey' => $dados['id'], // ou o id da variação salva
-                    ]);
 
-                }
             }
-
+            $this->dispatchBrowserEvent('filepond:reset', [
+                'context' => 'variacao',
+                'variacaoKey' => $dados['id'], // ou o id da variação salva
+            ]);
         }
 
         // 5) Feedback
@@ -264,7 +236,7 @@ class ProdutoEditar extends Component
 
 
 
-    public function uploadImagem(Request $request)
+    /*public function uploadImagem(Request $request)
     {
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('produtos/' . $this->produto->id, 'public');
@@ -278,7 +250,7 @@ class ProdutoEditar extends Component
         }
 
         return response()->json(['error' => 'Nenhum arquivo enviado'], 400);
-    }
+    }*/
 
     //voltar tela de lista de produtos
     public function voltar()

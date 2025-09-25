@@ -31,7 +31,9 @@ trait ProdutoTrait
                 'estoque' => $v->estoque,
                 'quantidade_minima' => $v->quantidade_minima,
                 'percentage' => number_format($v->percentage, 2, ',', '.'),
-                'validade' => Carbon::parse($v->validade)->format('d/m/Y'),
+                'validade' => ($v->validade === '0000-00-00' || empty($v->validade))
+                    ? '00/00/0000'
+                    : Carbon::parse($v->validade)->format('d/m/Y'),
                 'fornecedor_id' => $v->fornecedor,
                 'status' => $v->status,
                 'images' => $v->images->map(fn($i) => [

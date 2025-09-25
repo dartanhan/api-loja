@@ -28,7 +28,6 @@ class ProdutosVariacoes extends Component
     public $loadingVariaId = null;
     public $fornecedores = [];
     public $categorias = [];
-    public array $tipo = ['produto' => 'produto', 'variacao'=> 'variacao'];
 
 
     protected $listeners = ['atualizarCampoValor','atualizarCampo','alterarStatusConfirmado'];
@@ -39,7 +38,6 @@ class ProdutosVariacoes extends Component
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->categorias = collect(); // esvazia antes
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
-
     }
 
     public function updatingSearch()
@@ -54,6 +52,7 @@ class ProdutosVariacoes extends Component
 
     public function toggleExpand($produtoId)
     {
+
         if ($this->isExpanded($produtoId)) {
             $this->expanded = array_filter($this->expanded, fn($id) => $id != $produtoId);
         } else {
@@ -65,6 +64,7 @@ class ProdutosVariacoes extends Component
                 ->get()
                 ->filter(); // Remove nulls, objetos vazios etc.
         }
+
     }
 
     public function incrementar($variacaoId, $campo = 'quantidade')
@@ -185,7 +185,6 @@ class ProdutosVariacoes extends Component
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
-
 
         return view('livewire.produtos-variacoes', [
             'produtos' => $produtos,
