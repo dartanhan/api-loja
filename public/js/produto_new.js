@@ -40,8 +40,8 @@ $(function() {
                 {"data": "codigo_produto", "defaultContent": ""},
                 {"data": "imagem",
                     render: function (data, type, row) {
-                        if (row.produto_imagens.length > 0) {
-                            let path = 'storage/product/' + row.id + '/' + row.produto_imagens[0].path;
+                        if (row.images.length > 0) {
+                            let path = 'storage/product/' + row.id + '/' + row.images[0].path;
                             return '<img src="' + Helpers.asset(path) + '" class="image img-datatable" title="Clique para Visualizar" data-toggle="tooltip" data-placement="right" />';
                         } else {
                             return '<img src="' + Helpers.asset('storage/produtos/not-image.png') + '" class="image img-datatable"/>';
@@ -66,10 +66,10 @@ $(function() {
                         let image_id = null;
                         let path = null;
                         //if(row.imagem !== null){
-                        if(row.produto_imagens.length > 0){
-                                path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+                        if(row.images.length > 0){
+                                path = row.images[0].path; // Pegar o caminho da primeira imagem
                                 image = Helpers.asset('storage/product/'+row.id+'/'+ path);
-                                image_id = row.produto_imagens[0].id;
+                                image_id = row.images[0].id;
                             }
 
                         return "<div class='text-center'>" +

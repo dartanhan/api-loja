@@ -8,6 +8,7 @@ use App\Http\Controllers\PdvController;
 use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProdutoInativoController;
+use App\Http\Controllers\ProdutoVariacaoController;
 use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\ReposicaoController;
 use App\Http\Controllers\SalesController;
@@ -55,6 +56,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('produto','ProdutoController');
 
     Route::resource('variacao','ProdutoVariacaoController');
+    Route::get('/produto/{id}/{tipo}/edit', [ProdutoVariacaoController::class, 'edit'])->name('produto.variacao.edit');
+
 
     Route::get('/produto-ativos', [ProdutoController::class,'produto_ativos'])->name('produtos.produtos_ativos');
     Route::get('/produto-inativos', [ProdutoController::class,'produto_inativos'])->name('produtos.produtos_inativos');

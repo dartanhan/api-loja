@@ -38,7 +38,6 @@ class ProdutosVariacoes extends Component
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->categorias = collect(); // esvazia antes
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
-
     }
 
     public function updatingSearch()
@@ -53,6 +52,7 @@ class ProdutosVariacoes extends Component
 
     public function toggleExpand($produtoId)
     {
+
         if ($this->isExpanded($produtoId)) {
             $this->expanded = array_filter($this->expanded, fn($id) => $id != $produtoId);
         } else {
@@ -64,6 +64,7 @@ class ProdutosVariacoes extends Component
                 ->get()
                 ->filter(); // Remove nulls, objetos vazios etc.
         }
+
     }
 
     public function incrementar($variacaoId, $campo = 'quantidade')
@@ -153,14 +154,16 @@ class ProdutosVariacoes extends Component
         }
     }
 
+
     /**
-     * Redireciona para  tela de editar a variação
-     * @param $id
+     *  editar produto pai ou variação
+     * @param int $id
+     * @param string $tipo
      * @return RedirectResponse
      */
-    public function editarVariacao($id)
+    public function editar(int $id, string $tipo)
     {
-        return Redirect::route('variacao.edit', ['variacao' => $id]);
+      return Redirect::route('produto.variacao.edit', ['id' => $id, 'tipo' => $tipo]);
     }
 
     public function render()
@@ -168,7 +171,7 @@ class ProdutosVariacoes extends Component
 
         $searchTerms = collect(explode(' ', strtoupper(trim($this->search))))->filter(); // remove termos vazios
 
-        $produtos = Produto::with('produtoImagens')->where('status', 1)
+        $produtos = Produto::with('images')->where('status', 1)
             ->where(function ($query) use ($searchTerms) {
                 foreach ($searchTerms as $term) {
                     $query->where(function ($sub) use ($term) {
@@ -182,7 +185,6 @@ class ProdutosVariacoes extends Component
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
-
 
         return view('livewire.produtos-variacoes', [
             'produtos' => $produtos,

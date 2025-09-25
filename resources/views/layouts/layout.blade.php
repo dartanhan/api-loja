@@ -12,12 +12,13 @@
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap.css')}}">
     <link href="{{asset('css/dashboard/styles.css')}}" rel="stylesheet" />
 
-    <link href="{{asset('assets/sweetalert2/dist/sweetalert2.min.css')}}" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+    <link href="{{ asset('assets/sweetalert2/dist/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/filepond/filepond.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/filepond/filepond-plugin-image-preview.css') }}" rel="stylesheet"/>
     <link href="{{asset('assets/fontawesome-free-6.7.2-web/css/all.min.css')}}" rel="stylesheet" />
 
     <link href="{{ asset('css/chosen.css') }}" rel="stylesheet" type="text/css">
+
 
     @stack("styles")
 
@@ -76,7 +77,8 @@
             </footer>
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     <script src="{{ asset('assets/jquery/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.validate.min.js')}}"></script>
     <script src="{{ asset('assets/jquery/jquery.modal.min.js') }}"></script>
@@ -84,6 +86,7 @@
     <script src="{{ asset('assets/dashboard/js/scripts.js') }}"></script>
     <script src="{{ asset('assets/sweetalert2/dist/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('js/url.js') }}"></script>
+
 
     <!-- Filepond plugins -->
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -95,6 +98,9 @@
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.mask.min.js') }}"></script>
 
+
+
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     @livewireScripts
     @stack("scripts")
@@ -108,5 +114,95 @@
         };
     </script>
     <script src="{{ asset('js/helper/helpers.js') }}"></script>
+
+    <script>
+        document.addEventListener('livewire:load', () => {
+            function initAllFilePonds(root = document) {
+                if (typeof FilePond === 'undefined') {
+                    console.warn('FilePond não está carregado');
+                    return;
+                }
+
+                root.querySelectorAll('.filepond-input').forEach(input => {
+                    if (input.dataset.pondInitialized === '1') return;
+
+                    const wrapper = input.closest('.filepond-wrapper');
+                    const variacaoKey = wrapper ? wrapper.dataset.variacaoKey || '' : '';
+                    const context = wrapper ? wrapper.dataset.context || 'produto' : 'produto';
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+
+                    const pond = FilePond.create(input, {
+                        allowMultiple: input.hasAttribute('multiple'),
+                        labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
+                    });
+
+                    input._pond = pond;
+                    input.dataset.pondInitialized = '1';
+
+                    pond.setOptions({
+                        server: {
+                            process: {
+                                url: '/admin/upload/tmp-upload',
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrfToken },
+                                onload: (serverId) => {
+                                    console.log("FilePond upload OK:", serverId, "context:", context, "variacao:", variacaoKey);
+
+                                    if (context === 'produto') {
+                                        Livewire.emit('pastasAtualizadasProduto', [serverId]);
+                                    } else {
+                                        Livewire.emit('pastasAtualizadasVariacao', {
+                                            variacao_key: variacaoKey,
+                                            pastas: [serverId]
+                                        });
+                                    }
+                                    return serverId;
+                                }
+                            },
+                            revert: (serverId, load, error) => {
+                                fetch('/admin/upload/tmp-delete', {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': csrfToken
+                                    },
+                                    body: JSON.stringify({ folder: serverId })
+                                }).then(res => {
+                                    if (!res.ok) throw new Error('Erro ao excluir imagem temporária');
+                                    load();
+
+                                    // também avisa o Livewire que removemos
+                                    if (context === 'produto') {
+                                        Livewire.emit('pastasAtualizadasProduto', []);
+                                    } else {
+                                        Livewire.emit('pastasAtualizadasVariacao', {
+                                            variacao_key: variacaoKey,
+                                            pastas: []
+                                        });
+                                    }
+                                }).catch(err => {
+                                    console.error(err);
+                                    error('Falha na comunicação com o servidor');
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+
+            initAllFilePonds(document);
+
+            Livewire.hook('message.processed', () => {
+                initAllFilePonds(document);
+            });
+
+            window.addEventListener('variacao-adicionada', () => {
+                setTimeout(() => initAllFilePonds(document), 40);
+            });
+        });
+
+    </script>
+
 </body>
 </html>

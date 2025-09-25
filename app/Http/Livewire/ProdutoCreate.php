@@ -2,15 +2,15 @@
 
 namespace App\Http\Livewire;
 
+use App\Helpers\LivewireHelper;
 use App\Http\Models\Categoria;
 use App\Http\Models\Fornecedor;
 use App\Http\Models\OrigemNfce;
 use App\Http\Models\Produto;
-use App\Http\Models\ProdutoImagem;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TemporaryFile;
 use App\Traits\ProdutoTrait;
-use Illuminate\Support\Carbon;
+use NumberFormatter;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -20,13 +20,15 @@ class ProdutoCreate extends Component
 
     use WithFileUploads;
     use ProdutoTrait;
+   // public $temporaryFiles = [];
 
     public $produto = [
         'codigo_produto' => '',
-        'descricao' => '',
-        'valor_produto' => '',
+        'descricao' => 'teste produto pai',
+        'valor_produto' => '29,99',
         'status' => 0,
-        'categoria_id' => ''
+        'categoria_id' => '1',
+        'origem_id' => '1'
     ];
 
     protected $rules = [
@@ -39,153 +41,169 @@ class ProdutoCreate extends Component
     ];
 
     public $variacoes = [];
-    public $produtoImages = [];
-    public $imagemDestaque = null;
+   // public $produtoImages = [];
+   // public $imagemDestaque = null;
     public $fornecedores = [];
     public $origens =[];
-    public array $pastasImagens = [];
+    public $produtoImagem = null;
+    public array $variacoesImagens = []; // ['SUBCODIGO_X' => [pastas...], 'SUBCODIGO_Y' => [...]];
+    public $codigoProduto;
+    public array $uploads = []; // usado apenas pelo Livewire para armazenar temporários
+    public array $images  = []; // nosso array normalizado: sempre ['context','file','variacaoKey']
+
+
+    protected $listeners = [
+                            'imagensAtualizadas' => 'setImagens', //trait
+                            'atualizarVariacoes' => 'setVariacoes', //trait
+                            'salvar'             => 'salvar'];
+
 
     public function mount()
     {
         $this->produto['status'] = true;
         $lastCodigo = Produto::max('codigo_produto') ?? 0;
         $this->produto['codigo_produto'] = $lastCodigo + 1;
+        $this->codigoProduto = $this->produto['codigo_produto'];
 
         $this->fornecedores = collect(); // esvazia antes
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->categorias = collect(); // esvazia antes
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->origens = OrigemNfce::get();
+
+        //$this->loadTemporaryFiles();
     }
 
-    public function adicionarVariacao()
+   /* public function loadTemporaryFiles()
     {
-        $seq = count($this->variacoes) + 1;
-        $subcodigo = $this->produto['codigo_produto'] . str_pad($seq, 2, '0', STR_PAD_LEFT);
+        $this->temporaryFiles = TemporaryFile::whereNull('folder')->get();
+    }*/
 
-        $this->variacoes[] = [
-            'subcodigo' => $subcodigo,
-            'variacao' => '',
-            'quantidade' => 0,
-            'valor_varejo' => 0,
-            'status' => 1,
-            'imagens' => [],
-            'validade' => '',
-            'fornecedor_id' => ''
-        ];
-    }
+    /*public function deleteTemporaryFile($folder)
+    {
+        $temp = TemporaryFile::where('folder', $folder)->first();
+        if($temp) {
+            Storage::disk('public')->deleteDirectory('tmp/'.$temp->folder);
+            $temp->delete();
+            $this->loadTemporaryFiles();
+        }
+    }*/
 
+   /* public function atualizarPastasProduto($pastas)
+    {
+        logger()->info("Pai recebeu Produto", $pastas);
+        $this->pastasImagensProduto = $pastas;
+    }*/
+
+  /*  public function atualizarPastasVariacao($payload)
+    {
+        $key = $payload['variacao_key'] ?? null;
+        $pastas = $payload['pastas'] ?? [];
+
+        if ($key) {
+            $this->pastasImagensVariacoes[$key] = $pastas;
+        }
+
+        logger()->info("Pai recebeu Variação $key", $pastas);
+    }*/
+
+    /**
+     * Salva o produto e variações
+    */
     public function salvar()
     {
 
-        $this->produto['valor_produto'] = str_replace(',', '.', preg_replace('/[^\d,]/', '', $this->produto['valor_produto'] ?? '0'));
+        $this->produto['valor_produto'] = LivewireHelper::formatCurrencyToBD($this->produto['valor_produto'],
+            $this->NumberFormatter());
 
         $this->validate();
 
         /**
          * salva a produto
-         */
+         🔹 Salva produto PAI
+         * */
         $data = [
             'codigo_produto' => $this->produto['codigo_produto'],
-            'descricao' => $this->produto['descricao'] ?? '',
-            'ncm' => $this->produto['ncm'] ?? 0,
-            'cest' => $this->produto['cest'] ?? 0,
-            'origem_id' => (int)$this->produto['origem_id'] ?? 0,
-            'categoria_id' => (int)$this->produto['categoria_id'] ?? 0,
-            'status' => $this->produto['status'] ?? 0,
-            'valor_produto' => $this->produto['valor_produto']
+            'descricao'      => $this->produto['descricao'] ?? '',
+            'ncm'            => $this->produto['ncm'] ?? 0,
+            'cest'           => $this->produto['cest'] ?? 0,
+            'origem_id'      => (int)$this->produto['origem_id'] ?? 0,
+            'categoria_id'   => (int)$this->produto['categoria_id'] ?? 0,
+            'status'         => $this->produto['status'] ?? 0,
+            'valor_produto'  => $this->produto['valor_produto'],
         ];
 
+        /**
+         * 🔹 0) Cria o PRODUTO PAI
+         */
         $produto = Produto::create($data);
 
 
-        foreach ($this->pastasImagens as $folder) {
-            $temporaryFile = TemporaryFile::where('folder', $folder)->first();
-
-            if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                $file = $temporaryFile->file;
-                $pathTemp = 'tmp/' . $folder . '/' . $file;
-                $pathFinal = 'product/' . $produto->id . '/' . $file;
-
-                // Move arquivo
-                Storage::makeDirectory('product/' . $produto->id);
-                Storage::disk('public')->move($pathTemp, $pathFinal);
-
-                // Registra no banco como imagem do produto pai
-                ProdutoImagem::create([
-                    'produto_id' => $produto->id,
-                    'produto_variation_id' => null,  // ou omite se não for obrigatório
-                    'path' => $pathFinal
-                ]);
-
-                // Remove temporário
-                Storage::deleteDirectory('tmp/' . $folder);
-                $temporaryFile->delete();
-            }
+        /**
+         * 🔹 1) Salva imagens do PRODUTO PAI
+         */
+      //
+        //$imagensProduto = collect($this->images)->where('context', 'produto');
+        if ($this->produtoImagem) {
+            $this->salvarImagemV2($this->produtoImagem, 'produto', $produto->id);
         }
 
         /**
-         * salva as variações
-        */
-        foreach ($this->variacoes as $v) {
+         * 🔹 2) Salva variações
+         */
+       // dump("2) Salva variações", $this->produto,$this->produtoImagem,$this->variacoes,$this->variacoesImagens);
+       // dd();
+        $mapVariacoes = []; // mapeia id temporário => id real
+        if ($this->variacoes) {
 
-            $data = [
-                'subcodigo' => $v['subcodigo'] ?? '',
-                'variacao' => $v['variacao'] ?? '',
-                'quantidade' => $v['quantidade'] ?? 0,
-                'valor_varejo' => $v['valor_varejo'] ?? 0,
-                'valor_produto' => $v['valor_produto'] ?? 0,
-                'fornecedor_id' => $v['fornecedor_id'] ?? null,
-                'gtin' => $v['gtin'] ?? 0,
-                'estoque' => $v['estoque'] ?? 0,
-                'quantidade_minima' => $v['quantidade_minima'] ?? 0,
-                'percentage' => $v['percentage'] ?? 0,
-                'status' => $v['status'] ?? 0,
-                'produto_id' => $produto->id
-            ];
+            foreach ($this->variacoes as $v) {
+                $data = [
+                    'products_id' => $produto->id,
+                    'subcodigo' => $v['subcodigo'] ?? '',
+                    'variacao' => $v['variacao'] ?? '',
+                    'quantidade' => $v['quantidade'] ?? 0,
+                    'valor_varejo' => LivewireHelper::formatCurrencyToBD($v['valor_varejo'], $this->NumberFormatter()),
+                    'valor_produto' => LivewireHelper::formatCurrencyToBD($v['valor_produto'], $this->NumberFormatter()),
+                    'fornecedor_id' => $v['fornecedor_id'],
+                    'gtin' => $v['gtin'] ?? null,
+                    'estoque' => $v['estoque'] ?? 0,
+                    'quantidade_minima' => $v['quantidade_minima'] ?? 0,
+                    'percentage' => $v['percentage'] ?? 0,
+                    'status' => $v['status'] ?? 0,
+                    'validade' => LivewireHelper::formatarData($v['validade']),
+                ];
+                $variacao = ProdutoVariation::create($data);
 
-            // Trata validade
-            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $v['validade'] ?? '')) {
-                $data['validade'] = Carbon::createFromFormat('d/m/Y', $v['validade'])->format('Y-m-d');
-            } else {
-                $data['validade'] = '0000-00-00';
+                // 🔹 guarda relação entre ID temporário (UUID) e ID real
+                $mapVariacoes[$v['id']] = $variacao->id;
             }
 
-            $variacao = ProdutoVariation::create($data);
+            // Agora salva as imagens de cada variação usando o mapeamento
+            foreach ($this->variacoesImagens as $variacaoKey => $imagens) {
+                if (!isset($mapVariacoes[$variacaoKey])) {
+                    continue; // segurança: se não encontrou a variação, ignora
+                }
 
+                $variacaoId = $mapVariacoes[$variacaoKey];
 
-            // Se houver pastas temporárias associadas à variação
-            if (!empty($v['pastasImagens'])) {
-                foreach ($v['pastasImagens'] as $folder) {
-                    $temporaryFile = TemporaryFile::where('folder', $folder)->first();
-
-                    if ($temporaryFile && Storage::disk('public')->exists('tmp/' . $folder . '/' . $temporaryFile->file)) {
-                        $file = $temporaryFile->file;
-                        $pathTemp = 'tmp/' . $folder . '/' . $file;
-                        $pathFinal = 'produtos/' . $produto->id . '/variacoes/' . $variacao->id . '/' . $file;
-
-                        Storage::makeDirectory('produtos/' . $produto->id . '/variacoes/' . $variacao->id);
-                        Storage::move($pathTemp, $pathFinal);
-
-                        ProdutoImagem::create([
-                            'produto_id' => null,
-                            'produto_variation_id' => $variacao->id,
-                            'path' => $pathFinal
-                        ]);
-
-                        // Limpa os temporários
-                        Storage::deleteDirectory('tmp/' . $folder);
-                        $temporaryFile->delete();
-                    }
+                foreach ($imagens as $img) {
+                    $this->salvarImagemV2($img, 'variacao', $variacaoId);
                 }
             }
+
+            $this->dispatchBrowserEvent('livewire:event', [
+                'type'    => 'alert',
+                'icon'    => 'success',
+                'message' => 'Produto e variações cadastrados com sucesso!'
+            ]);
+        } else {
+            $this->dispatchBrowserEvent('livewire:event', [
+                'type'    => 'alert',
+                'icon'    => 'success',
+                'message' => 'Produto cadastrado com sucesso!'
+            ]);
         }
-        //envia a mensagem no browser
-        $this->dispatchBrowserEvent('livewire:event', [
-            'type' => 'alert',
-            'icon' => 'success',
-            'message' => 'Produto e variações cadastrados com sucesso!'
-        ]);
+
         return redirect()->route('produtos.produtos_ativos');
     }
 

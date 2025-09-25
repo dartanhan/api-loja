@@ -1,4 +1,4 @@
-<div xmlns:wire="http://www.w3.org/1999/xhtml">
+<div xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="">
     <div class="container-fluid mt-4">
         <!-- Campo de busca -->
         <div class="card shadow border-0 mb-3">
@@ -59,6 +59,7 @@
 
                 <th>Preço</th>
                 <th>Status</th>
+                <th>Ações</th>
             </tr>
             </thead>
 
@@ -89,8 +90,8 @@
                     <td class="text-center align-middle">
                         @php
                             /** @var TYPE_NAME $produto */
-                            $primeiraImagem = $produto->produtoImagens->first();
-                            $path = $primeiraImagem ? 'product/' . $produto->produtoImagens[0]->produto_id  . '/' . $primeiraImagem->path : null;
+                            $primeiraImagem = $produto->images->first();
+                            $path = $primeiraImagem ? 'product/' . $produto->images[0]->produto_id  . '/' . $primeiraImagem->path : null;
 
                             $imagemPath = ($path && Storage::disk('public')->exists($path))
                                 ? $path
@@ -111,6 +112,20 @@
                         <span class="badge {{ $produto->status ? 'bg-success' : 'bg-danger' }}">
                             {{ $produto->status ? 'Ativo' : 'Inativo' }}
                         </span>
+                    </td>
+                    <td class="text-center align-middle">
+                        {{-- Ações --}}
+                        <button class="btn btn-outline-primary btn-sm"
+                                wire:click="editar({{ $produto->id }}, 'produto')"
+                                wire:loading.attr="disabled"
+                                data-toggle="tooltip" data-placement="top" title="Editar">
+                                    <span wire:loading.remove wire:target="editar({{ $produto->id }}, 'produto')">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                            <span wire:loading wire:target="editar({{ $produto->id }}, 'produto')">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                     </td>
                 </tr>
 
@@ -218,23 +233,24 @@
                                                     </div>
                                                 </div>
                                                 {{-- Ações --}}
-                                                <div class="col-md-1 text-end">
+                                                {{--<div class="col-md-1 text-end">
                                                     <label class="form-label form-label-sm mb-1 d-block">Ações</label>
                                                     <div class="btn-group" role="group">
                                                         <button class="btn btn-outline-primary btn-sm"
-                                                                wire:click="editarVariacao({{ $variacao->id }})"
+                                                                wire:click="editar({{ $produto->id }}, 'variacao')"
                                                                 wire:loading.attr="disabled"
                                                                 data-toggle="tooltip" data-placement="top" title="Editar">
-                                                            <span wire:loading.remove wire:target="editarVariacao({{ $variacao->id }})">
+                                                            <span wire:loading.remove wire:target="editar({{ $produto->id }}, 'variacao')">
                                                                 <i class="fas fa-edit"></i>
                                                             </span>
-                                                            <span wire:loading wire:target="editarVariacao({{ $variacao->id }})">
+                                                            <span wire:loading wire:target="editar({{ $produto->id }}, 'variacao')">
                                                                 <i class="fas fa-spinner fa-spin"></i>
                                                             </span>
                                                         </button>
                                                     </div>
-                                                </div>
+                                                </div>--}}
                                             </div>
+
                                             <div class="row g-2 mt-2">
                                                 <div class="col-md-2">
                                                     <label class="form-label form-label-sm mb-1">Valor Varejo</label>
@@ -297,15 +313,7 @@
         </table>
         </div>
         <!-- Modal Preview de Imagem -->
-        <div class="modal fade" id="previewImagemModal" tabindex="-1" aria-labelledby="previewImagemModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                        <img id="imagemPreviewGrande" src="" class="img-fluid" alt="Preview Imagem">
-                    </div>
-                </div>
-            </div>
-        </div>
+        <livewire:produto-preview-image/>
 
         <div class="d-flex justify-content-center">
             {!! $produtos->links('vendor.pagination.bootstrap-4') !!}
@@ -360,6 +368,15 @@
             text-align: center;        /* Centraliza horizontal */
             vertical-align: middle;    /* Centraliza vertical */
         }
+        #imagemPreviewGrande {
+            max-width: 400px;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #ccc;
+        }
+
     </style>
 @endpush
 

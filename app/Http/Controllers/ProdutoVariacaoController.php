@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use App\Http\Models\ProdutoVariation;
 
@@ -43,10 +46,16 @@ class ProdutoVariacaoController extends Controller
     }
 
 
-    public function edit(ProdutoVariation $variacao)
+    /**
+     * @param int $id
+     * @param string $tipo
+     * @return Application|Factory|View
+     */
+    public function edit(int $id, string $tipo)
     {
         return view('admin.produtos.editar', [
-            'produtoId' => $variacao->id
+            'produtoId' => $id,
+            'tipo' => $tipo
         ]);
     }
 

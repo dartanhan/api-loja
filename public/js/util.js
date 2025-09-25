@@ -71,7 +71,7 @@
     /***
      * Altera o status do produto ou variação
      */
-    Livewire.on('confirmarAlteracaoStatus', function(tipo, variacaoId, produtoId, inputElement) {
+    function confirmarAlteracaoStatus(tipo, variacaoId, produtoId, inputElement) {
         let data = {};
         // Em JS, salvar o input para revertê-lo depois caso necessário
         window.inputStatusTemp = inputElement;
@@ -90,7 +90,7 @@
         data.produtoId = produtoId;
 
         confirmAlert(data,inputElement);
-    });
+    };
 
     window.addEventListener('confirmarDesativacaoStatus', event => {
         let data = {};
@@ -161,6 +161,7 @@
                 if (el) {
                     $(el).fadeOut(300, () => el.remove());
                 }
+                Livewire.emitTo('filepond-upload', 'imagemDeletada', id);
                 break;
 
             // Você pode adicionar mais tipos aqui no futuro
@@ -181,6 +182,17 @@
     function initTooltips() {
         $('[data-toggle="tooltip"]').tooltip();
     }
+
+    // function salvarProduto() {
+    //     console.log("salvarProduto");
+    //     // 1) Pede para o filho sincronizar
+    //     Livewire.emitTo('produto-variacoes-form', 'syncAndSave');
+    //
+    //     // 2) Aguarda um tick do Livewire e chama salvar no pai
+    //      setTimeout(() => {
+    //          Livewire.emitTo('produto-create', 'salvar');
+    //      }, 900); // 300ms geralmente já garante que o estado foi atualizado
+    // }
 
     //para centralizar re-render o Filepond quando for rendreizado pleo livewire
     // function loadFilePond(targetSelector, options = {}) {
@@ -237,8 +249,12 @@
     /**
      * Função SweetAlert de confirmação deleção
      * @param id
+     * @param isVariacao
+     * @param produtoId
      */
-    function confirmarExclusaoImagem(id) {
+    /*function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
+        console.log(id, isVariacao,produtoId );
+
         Swal.fire({
             title: 'Excluir imagem?',
             text: "Essa ação não poderá ser desfeita!",
@@ -256,25 +272,28 @@
                 icon.classList.add('fa-spinner', 'fa-spin');
 
                 // Dispara o evento Livewire
-                Livewire.emit('deletarImagem', id);
+                Livewire.emitTo('filepond-upload','deletarImagem', id, isVariacao,produtoId);
+
             }
         });
-    }
+    }*/
+
+
 
     //Ao clicar em salvar aciona o Livewire
-    const btnSalvar = document.getElementById('btn-salvar-produto');
-    if (btnSalvar) {
-        document.getElementById('btn-salvar-produto').addEventListener('click', function () {
-            //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
-            // Chama o botão invisível com wire:click="salvar"
-            document.getElementById('btn-livewire-salvar').click();
-            if (typeof Livewire !== 'undefined') {
-                Livewire.emit('setPastasImagens', foldersEnviados);
-                Livewire.emit('salvar');
-                loadFilePondProduto();
-            }
-        });
-    }
+    // const btnSalvar = document.getElementById('btn-salvar-produto');
+    // if (btnSalvar) {
+    //     document.getElementById('btn-salvar-produto').addEventListener('click', function () {
+    //         //sessionStorage.removeItem('activeTab'); // <-- volta pra aba 1 após salvar
+    //         // Chama o botão invisível com wire:click="salvar"
+    //         document.getElementById('btn-livewire-salvar').click();
+    //         //if (typeof Livewire !== 'undefined') {
+    //         console.log("salvar",  foldersEnviados);
+    //             Livewire.emit('salvar');
+    //             //loadFilePondProduto();
+    //        // }
+    //     });
+    // }
 
     /**
      * Seta as abas para permanecer onde forma clciadas ao dar refesh
@@ -286,6 +305,9 @@
         }
     }
 
+    /**
+     * Altera a descrição do status
+     * */
     toggleStatusDescription = function(checkbox){
         const statusLabel = document.getElementById('statusLabel');
         statusLabel.textContent = checkbox.checked ? 'Ativo' : 'Inativo';
@@ -311,57 +333,61 @@
     /***
      * Para centralizar re-render o Filepond quando for rendreizado pelo livewire
      */
-    function loadFilePondProduto() {
-        const container = document.getElementById('filepond-wrapper');
-        if (!container) return;
-
-        // Remove conteúdo anterior
-        container.innerHTML = containerUpadate();
-
-        const inputElement = container.querySelector('input');
-
-        // Create a FilePond instance
-        const pond = FilePond.create(inputElement,{
-         imageResizeTargetWidth: 500, // Largura alvo para redimensionamento (opcional)
-         imageResizeTargetHeight: 500, // Altura alvo para redimensionamento (opcional)
-         imageResizeMode: 'contain', // Modo de redimensionamento (opcional)
-         plugins: [FilePondPluginImageResize, FilePondPluginImagePreview,FilePondPluginFileEncode]
-        });
-
-        pond.setOptions({
-            server: {
-                process: {
-                    url: '/admin/upload/tmp-upload',
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken },
-                    onload: (res) => {
-                        foldersEnviados.push(res);
-                        return res;
-                    }
-                },
-                revert: (folder, load, error) => {
-                    fetch('/admin/upload/tmp-delete', {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify({ folder: folder })
-                    }).then(res => {
-                        if (res.ok) {
-                            load();
-                        } else {
-                            error('Erro ao excluir imagem temporária');
-                        }
-                    }).catch(err => {
-                        error('Falha na comunicação com o servidor');
-                    });
-                }
-            },
-            labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
-            allowMultiple: true
-        });
-    }
+    // function loadFilePondProduto() {
+    //     const container = document.getElementById('filepond-wrapper');
+    //     if (!container) return;
+    //
+    //     // Remove conteúdo anterior
+    //    // container.innerHTML = containerUpadate();
+    //
+    //     const inputElement = container.querySelector('input');
+    //
+    //     // Create a FilePond instance
+    //     const pond = FilePond.create(inputElement,{
+    //      imageResizeTargetWidth: 500, // Largura alvo para redimensionamento (opcional)
+    //      imageResizeTargetHeight: 500, // Altura alvo para redimensionamento (opcional)
+    //      imageResizeMode: 'contain', // Modo de redimensionamento (opcional)
+    //      plugins: [FilePondPluginImageResize, FilePondPluginImagePreview,FilePondPluginFileEncode]
+    //     });
+    //
+    //     pond.setOptions({
+    //         server: {
+    //             process: {
+    //                 url: '/admin/upload/tmp-upload',
+    //                 method: 'POST',
+    //                 headers: { 'X-CSRF-TOKEN': csrfToken },
+    //                 onload: (res) => {
+    //                     // Atualiza lista de arquivos no Livewire
+    //                     //Livewire.emit('refreshTemporaryFiles');
+    //                     foldersEnviados.push(res);
+    //                     Livewire.emit('setPastasImagens', foldersEnviados);
+    //                     //console.log("res > ", res, 'foldersEnviados' , foldersEnviados);
+    //                     return res;
+    //                 }
+    //             },
+    //             revert: (folder, load, error) => {
+    //                 fetch('/admin/upload/tmp-delete', {
+    //                     method: 'DELETE',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                         'X-CSRF-TOKEN': csrfToken
+    //                     },
+    //                     body: JSON.stringify({ folder: folder })
+    //                 }).then(res => {
+    //                     if (res.ok) {
+    //                         load();
+    //                     } else {
+    //                         error('Erro ao excluir imagem temporária');
+    //                     }
+    //                 }).catch(err => {
+    //                     error('Falha na comunicação com o servidor');
+    //                 });
+    //             }
+    //         },
+    //         labelIdle: 'Arraste imagens ou <span class="filepond--label-action">clique para escolher</span>',
+    //         allowMultiple: true
+    //     });
+    // }
 
     function inicializaFilePondVariacoes() {
         document.querySelectorAll('[id^="filepond-wrapper-variacao-"]').forEach(wrapper => {
@@ -440,6 +466,20 @@
             },
             ...options
         });
-
     }
+
+    /**
+     * Usado na tela de edição de variação , caso insira nova imagem na variação ,
+     * quando chcmar o salvar deve limpar o filepond
+     * */
+    document.addEventListener('filepond:reset', function (event) {
+        const { context, variacaoKey } = event.detail;
+console.log('filepond:reset', context, variacaoKey);
+        // Monta o seletor único para este FilePond
+        let pondElement = document.querySelector(`[wire\\:key="filepond-${context}-${variacaoKey}"] input[type=file]`);
+
+        if (pondElement && pondElement._pond) {
+            pondElement._pond.removeFiles();
+        }
+    });
 

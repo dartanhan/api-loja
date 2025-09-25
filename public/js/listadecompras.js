@@ -29,8 +29,8 @@ $(function () {
             {
                 "data": "imagem",
                 render: function (data, type, row) {
-                    if(row.produto_imagens.length > 0){
-                        let path = row.produto_imagens[0].path; // Pegar o caminho da primeira imagem
+                    if(row.images.length > 0){
+                        let path = row.images[0].path; // Pegar o caminho da primeira imagem
                         return '<img src="../public/storage/product/'+row.id+'/'+ path+ '" class="image img-datatable"></img>';
                     }else{
                         return '<img src="../public/storage/produtos/not-image.png" class="img-datatable"></img>';

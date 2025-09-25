@@ -182,7 +182,7 @@
                                id="image"
                                name="image[]"
                                title="Imagem"
-                               laceholder="Imagem"
+                               placeholder="Imagem"
                                data-type="local"
                                data-max-files="10"
                                data-allow-reorder="true"
