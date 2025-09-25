@@ -12,9 +12,9 @@
             </div>
             <div class="card-body">
             @foreach($variacoes as $index => $variacao)
-                <div class="row mb-3 g-2 align-items-end" wire:key="variacao-{{ $variacao['id'] }}">
-                    <div class="row card p-1 mb-2">
-                        <div class="row card-body ">
+                <div class="row card mb-2 p-3" style="border: 1px solid #cecece" >
+                    <div class="card mb-2" style="background-color: #f8f9fa" wire:key="variacao-{{ $variacao['id'] }}">
+                        <div class="row card-body">
                             <div class="col-auto mb-3" style="max-width: 100px;min-width: 150px">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('SUB CÓDIGO (SKU)') }}"
