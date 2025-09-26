@@ -86,8 +86,8 @@
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary"
                                                 data-subcodigo="{{ $mov->variacao->subcodigo }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#historicoModal"
+                                                data-toggle="modal"
+                                                data-target="#historicoModal"
                                                 onclick="carregarHistorico('{{ $mov->variacao->subcodigo }}','{{$mov->variacao->produtoPai->descricao}} - {{$mov->variacao->variacao}}')">
                                             <i class="fas fa-history"></i>
                                         </button>
@@ -110,7 +110,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Histórico do Produto: <span id="subcodigoTitulo"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <div id="conteudoHistorico" class="table-responsive" >

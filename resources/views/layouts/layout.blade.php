@@ -116,7 +116,19 @@
     <script src="{{ asset('js/helper/helpers.js') }}"></script>
 
     <script>
-        document.addEventListener('livewire:load', () => {
+        function initCalendars() {
+            if (window.Helpers && typeof window.Helpers.calendar === "function") {
+                window.Helpers.calendar();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", initCalendars);
+        document.addEventListener("livewire:load", initCalendars);
+        Livewire.hook('message.processed', (message, component) => {
+            initCalendars();
+        });
+
+        /*document.addEventListener('livewire:load', () => {
             function initAllFilePonds(root = document) {
                 if (typeof FilePond === 'undefined') {
                     console.warn('FilePond não está carregado');
@@ -200,7 +212,8 @@
             window.addEventListener('variacao-adicionada', () => {
                 setTimeout(() => initAllFilePonds(document), 40);
             });
-        });
+        });*/
+
 
     </script>
 

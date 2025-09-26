@@ -125,12 +125,10 @@
                                     <label for="status">FORNECEDOR</label>
                                 </div>
                                 @error("variacoes.$index.fornecedor_id")
-                                <div class="text-danger small">{{ $message }}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
-
                             </div>
-
-                            <div class="col-md-3 mb-3" style="max-width: 100px;min-width: 150px">
+                            <div class="col-md-3 mb-3" style="max-width: 100px;min-width: 150px ">
                                 <div class="floating-label-group border-lable-flt col-xs-2 format-font">
                                     <div class="form-control d-flex align-items-center justify-content-between px-2" style="height: 38px;">
                                         <label class="form-label m-0">STATUS</label>
@@ -141,17 +139,7 @@
                                                        class="form-check-input"
                                                        id="switchStatus-{{ $index }}"
                                                        {{ $produto['status'] ? 'checked' : '' }}
-                                                       onchange="toggleStatusDescription(this)"
-{{--                                                       onchange="confirmarAlteracaoStatus('variacao', '{{ $variacao['id'] ?? '' }}', '{{ $produto['id'] ?? '' }}',this)"--}}
-                                                >
-
-{{--                                                <input type="checkbox"--}}
-{{--                                                       class="form-check-input"--}}
-{{--                                                       id="switchStatus"--}}
-{{--                                                       wire:click="$emit('confirmarAlteracaoStatus', 'variacao',--}}
-{{--                                                       '{{ $variacao['id'] ?? '' }}', '{{ $produto['id'] ?? '' }}', $event.target.checked)"--}}
-{{--                                                    {{ $produto['status'] ? 'checked' : '' }}>--}}
-
+                                                       onchange="toggleStatusDescription(this)">
                                             </div>
                                             <span class="small" id="statusLabel">
                                                  {{ $produto['status'] ? 'Ativo' : 'Inativo' }}
@@ -238,7 +226,6 @@
 @push('scripts')
 
     <script>
-
         function initCalendars() {
             if (window.Helpers && typeof window.Helpers.calendar === "function") {
                 window.Helpers.calendar();
@@ -250,7 +237,6 @@
         Livewire.hook('message.processed', (message, component) => {
             initCalendars();
         });
-    </script>
 
     </script>
 @endpush
