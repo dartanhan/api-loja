@@ -7,9 +7,8 @@ use App\Http\Models\ProdutoVariation;
 use NumberFormatter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Models\TemporaryFile;
 use App\Http\Models\ProdutoImagem;
-use Livewire\Livewire;
+
 
 trait ProdutoTrait
 {
