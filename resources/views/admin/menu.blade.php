@@ -7,7 +7,10 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                         Home
                     </a>
-
+                    <a class="nav-link {{ Route::current()->getName() === 'dre.index' ? 'active' : '' }}" href="{{route('dre.index')}}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-bar-chart"></i></div>
+                        Dre
+                    </a>
                     <a class="nav-link {{ Route::current()->getName() === 'admin.dashboard' ? 'active' : '' }}" href="{{route('admin.dashboard')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Dashboard
@@ -85,7 +88,29 @@
                             </a>
                     </nav>
                 </div>
+
                 @if( Auth::user()->is_admin)
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesReceitaDespesa" aria-expanded="false" aria-controls="collapsePages">
+                    <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
+                    @if( Auth::user()->is_admin) Gerenciar Receitas/Despesas @else Menu @endif
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapsePagesReceitaDespesa" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav p-0">
+                        @if( Auth::user()->is_admin)
+                            <a href="{{ route('despesa.index') }}" title="Adicionar Despesa"
+                               class="nav-link p-0 mb-3 {{ request()->routeIs('despesa.index') ? 'active' : '' }}">
+                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-minus-circle"></i></div>
+                                Adicionar Despesas
+                            </a>
+                           {{-- <a href="{{ route('despesa.index') }}" title="Adicionar Receita"
+                               class="nav-link p-0 mb-3 {{ request()->routeIs('despesa.index') ? 'active' : '' }}">
+                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-add"></i></div>
+                               Adicionar Receita
+                            </a>--}}
+                        @endif
+                    </nav>
+                </div>
                 <div class="sb-sidenav-menu-heading">Interface</div>
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>

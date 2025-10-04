@@ -1,4 +1,4 @@
-import {fncDataDatatable,getDataFormat,sweetAlert,getDataYear} from '../../../js/comum.js';
+import {fncDataDatatable,getDataFormat,sweetAlert,getDataYear,formatMoney} from '../../../js/comum.js';
 
 let dataIni = $('input[name=dataIni]');
 let dataFim = $('input[name=dataFim]');
@@ -147,7 +147,7 @@ $(function () {
 
                 return response.json()
             }).then(function (response) {
-                //  console.log(response);
+                  console.log('response',response);
                 typeChart = 'bar';
 
                 let myArr = JSON.stringify(response.chart);
@@ -163,23 +163,41 @@ $(function () {
                     bgColoR.push(dynamicColors());
                     borderColoR.push(dynamicBorderColors(r, g, b));
                 });
+                console.log('totalTaxas',response.totalTaxas);
 
-                $("#totalDinner").html("<div class=\"card-body text-center\">Total Dinheiro <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrders.orderTotalDiner+"</strong>" +
+                $("#totalDinner").html(
+                    "<div class=\"card-body text-center\">Total Dinheiro <br>" +
+                        " <strong class=\"fs-5\">" +response.totalOrders.orderTotalDiner+"</strong>" +
                     "</div>");
-                $("#totalCartao").html("<div class=\"card-body text-center\">Total Cartão <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrders.orderTotalCart+"</strong>" +
+
+                $("#totalCartao").html(
+                    "<div class=\"card-body text-center\">Total Cartão <br>" +
+                        " <strong class=\"fs-5\">" +response.totalOrders.orderTotalCart+"</strong>" +
                     "</div>");
-                $("#totalDesconto").html("<div class=\"card-body text-center\">Total Desconto <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderDiscount.totalDiscount+"</strong>" +
+
+                $("#totalDesconto").html(
+                    "<div class=\"card-body text-center\">Total Desconto <br>" +
+                        " <strong class=\"fs-5\">" +response.totalOrderDiscount.totalDiscount+"</strong>" +
                     "</div>");
-                $("#totalDia").html("<div class=\"card-body text-center\">Total Dia <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderDay.orderTotalDay+"</strong>" +
+
+                $("#totalDia").html(
+                    "<div class=\"card-body text-center\">Total Dia <br>" +
+                        " <strong class=\"fs-5\">" +response.totalOrderDay.orderTotalDay+"</strong>" +
                     "</div>");
-                $("#totalMes").html("<div class=\"card-body text-center\">Total Mês <br>" +
-                    " <strong class=\"fs-5\">" +response.totalOrderMonth.totalMes+"</strong></div>");
-                $("#totalSemana").html("<div class=\"card-body text-center\">Total Semana <br>" +
-                    " <strong class=\"fs-5\">" +response.totalsOrderWeek.totalWeek+"</strong>" +
+
+                $("#totalMes").html(
+                    "<div class=\"card-body text-center\">Total Mês <br>" +
+                        " <strong class=\"fs-5\">" +formatMoney(response.totalOrderMonth)+"</strong>" +
+                    "</div>");
+
+                $("#totalSemana").html(
+                    "<div class=\"card-body text-center\">Total Semana <br>" +
+                        " <strong class=\"fs-5\">" +response.totalsOrderWeek.totalWeek+"</strong>" +
+                    " </div>");
+
+                $("#totalTaxas").html(
+                    "<div class=\"card-body text-center\">Total Taxas <br>" +
+                        " <strong class=\"fs-5\">" +formatMoney(response.totalTaxas)+"</strong>" +
                     " </div>");
 
                 fncBarChart();

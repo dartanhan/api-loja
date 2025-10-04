@@ -249,10 +249,50 @@
     /**
      * Função SweetAlert de confirmação deleção
      * @param id
-     * @param isVariacao
-     * @param produtoId
      */
-    /*function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
+    function confirmarExclusao(id) {
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: 'Essa ação não pode ser desfeita.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, excluir',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(`icon-trash-${id}`).style.display = 'none';
+                document.getElementById(`spinner-trash-${id}`).style.display = 'inline-block';
+                document.getElementById(`btn-excluir-${id}`).disabled = true;
+
+
+                window.livewire.emit('excluirDespesa', id);
+            }
+        });
+    }
+
+    /**
+     * Função toast genérica de confirmação deleção, salve e update
+     * @param id
+     */
+    window.addEventListener('toast:success', event => {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: event.detail.message,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background:event.detail.background,
+            color:event.detail.color
+        });
+    });
+
+
+    /*
+    function confirmarExclusaoImagem(id, isVariacao,produtoId ) {
         console.log(id, isVariacao,produtoId );
 
         Swal.fire({

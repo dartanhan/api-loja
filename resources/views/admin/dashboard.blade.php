@@ -88,6 +88,18 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xl-2 col-md-6">
+                <div class="card bg-danger text-white mb-4">
+                    <div class="d-flex align-items-center" id="totalTaxas" name="load">
+                        <div class="card-body" name="card-body"></div>
+                        <div class="spinner-border spinner-border-sm ms-auto" role="status" aria-hidden="true"></div>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#">Detalhes</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row">

@@ -171,6 +171,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
 
     Route::get('/monitoramento-estoque', [MovimentacaoEstoqueController::class, 'index'])->name('monitoramento.index');
     Route::get('/monitoramento/historico', [MovimentacaoEstoqueController::class, 'historicoProduto'])->name('monitoramento.historico');
+
+    Route::resource('dre','DreController');
+    Route::resource('despesa','DespesaController');
 });
 
 
