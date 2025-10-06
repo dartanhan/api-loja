@@ -25,6 +25,8 @@ trait ProdutoTrait
                 'variacao' => $v->variacao,
                 'quantidade' => $v->quantidade,
                 'valor_varejo' => number_format($v->valor_varejo, 2, ',', '.'),
+                'valor_atacado' => number_format($v->valor_atacado, 2, ',', '.'),
+                'valor_atacado_10' => number_format($v->valor_atacado, 2, ',', '.'),
                 'valor_produto' => number_format($v->valor_produto, 2, ',', '.'),
                 'gtin' => $v->gtin,
                 'estoque' => $v->estoque,

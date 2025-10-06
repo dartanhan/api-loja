@@ -58,6 +58,7 @@ class ProdutoVariacoesForm extends Component
             'variacao' => '',
             'quantidade' => '',
             'valor_varejo' => '',
+            'valor_atacado' => '',
             'valor_produto' => '',
             'fornecedor_id' => '',
             'gtin' => '',
@@ -92,6 +93,15 @@ class ProdutoVariacoesForm extends Component
     public function imagemAtualizada($data)
     {
         $this->variacoes = $data;
+    }
+
+    public function updated($propertyName)
+    {
+        // Detecta se o campo alterado é valor_produto de uma variação específica
+        if (str_starts_with($propertyName, 'variacoes.') && str_ends_with($propertyName, '.valor_varejo')) {
+            $index = explode('.', $propertyName)[1];
+            $this->variacoes[$index]['valor_atacado'] = $this->variacoes[$index]['valor_varejo'];
+        }
     }
 
 

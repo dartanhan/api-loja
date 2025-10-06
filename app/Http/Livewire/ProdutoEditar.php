@@ -86,68 +86,9 @@ class ProdutoEditar extends Component
 
     }
 
-   /* public function adicionarVariacao()
-    {
-         $codigoPai = $this->codigoPai ?? '0000';
-
-        // 1. Busca o maior subcodigo no banco
-        $ultimoDoBanco = ProdutoVariation::select('subcodigo')->where('subcodigo', 'LIKE', $codigoPai . '%')
-            ->orderByDesc('subcodigo')->value('subcodigo');
-
-        $maiorSufixoBanco = 0;
-        if ($ultimoDoBanco && strlen($ultimoDoBanco) > strlen($codigoPai)) {
-            $sufixo = substr($ultimoDoBanco, strlen($codigoPai));
-            if (is_numeric($sufixo)) {
-                $maiorSufixoBanco = (int) $sufixo;
-            }
-        }
-
-        // 2. Busca o maior sufixo entre as variações em memória (tela)
-        $maiorSufixoTela = 0;
-        foreach ($this->variacoes as $v) {
-            if (isset($v['subcodigo']) && str_starts_with($v['subcodigo'], $codigoPai)) {
-                $sufixo = substr($v['subcodigo'], strlen($codigoPai));
-                if (is_numeric($sufixo)) {
-                    $maiorSufixoTela = max($maiorSufixoTela, (int) $sufixo);
-                }
-            }
-        }
-
-        // 3. Usa o maior dos dois
-        $novoSufixo = max($maiorSufixoBanco, $maiorSufixoTela) + 1;
-        $novoSubcodigo = $codigoPai . str_pad($novoSufixo, 2, '0', STR_PAD_LEFT);
-
-        $this->variacoes[] = [
-            'id' => null,
-            'subcodigo' => $novoSubcodigo,
-            'variacao' => '',
-            'quantidade' => 0,
-            'valor_varejo' => '',
-            'valor_produto' => '',
-            'gtin' => '',
-            'fornecedor_id' => $produto->fornecedor ?? null, // ← aqui também
-            'status' => null
-        ];
-    }*/
-
     /**
      * @param $arquivoTemporario
      */
-/*    public function setImagens($payload)
-    {
-        if ($payload['context'] === 'produto') {
-            $this->pastasImagensProduto = [$payload['file']]; // só 1 imagem
-        }
-
-        if ($payload['context'] === 'variacao') {
-            $key = $payload['variacaoKey'];
-            if (!isset($this->pastasImagensVariacoes[$key])) {
-                $this->pastasImagensVariacoes[$key] = [];
-            }
-            $this->pastasImagensVariacoes[$key][] = $payload['file'];
-        }
-    }*/
-
     public function salvar()
     {
         $formatter = new NumberFormatter('pt_BR', NumberFormatter::DECIMAL);
@@ -192,6 +133,8 @@ class ProdutoEditar extends Component
                         'variacao' => $dados['variacao'] ?? '',
                         'quantidade' => $dados['quantidade'] ?? 0,
                         'valor_varejo' => LivewireHelper::formatCurrencyToBD($dados['valor_varejo'], $this->NumberFormatter()) ?? 0,
+                        'valor_atacado' => LivewireHelper::formatCurrencyToBD($dados['valor_atacado'], $this->NumberFormatter()) ?? 0,
+                        'valor_atacado_10' => LivewireHelper::formatCurrencyToBD($dados['valor_atacado'], $this->NumberFormatter()) ?? 0,
                         'valor_produto' => LivewireHelper::formatCurrencyToBD($dados['valor_produto'], $this->NumberFormatter()) ?? 0,
                         'fornecedor' => $dados['fornecedor_id'],
                         'gtin' => $dados['gtin'] ?? 0,
@@ -235,22 +178,6 @@ class ProdutoEditar extends Component
     }
 
 
-
-    /*public function uploadImagem(Request $request)
-    {
-        if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('produtos/' . $this->produto->id, 'public');
-
-            // Salvar no banco se desejar
-            $this->produto->imagens()->create([
-                'caminho' => $path
-            ]);
-
-            return response()->json(['path' => $path], 200);
-        }
-
-        return response()->json(['error' => 'Nenhum arquivo enviado'], 400);
-    }*/
 
     //voltar tela de lista de produtos
     public function voltar()
