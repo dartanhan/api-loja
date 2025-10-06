@@ -74,9 +74,20 @@
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">R$</span>
                                         <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                               wire:model.defer="variacoes.{{ $index }}.valor_varejo"
+                                               wire:model="variacoes.{{ $index }}.valor_varejo"
                                                class="form-control form-control-sm format-font moeda" >
                                         <label for="label-valor-varejo-{{ $index }}">{{ __('VALOR VAREJO') }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto" style="max-width: 150px;">
+                                <div class="floating-label-group border-lable-flt">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="text" placeholder="{{ __('VALOR ATACADO') }}"
+                                               wire:model.defer="variacoes.{{ $index }}.valor_atacado"
+                                               class="form-control form-control-sm format-font moeda" >
+                                        <label for="label-valor-atacado-{{ $index }}">{{ __('VALOR ATACADO') }}</label>
                                     </div>
                                 </div>
                             </div>

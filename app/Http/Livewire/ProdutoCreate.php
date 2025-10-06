@@ -24,11 +24,11 @@ class ProdutoCreate extends Component
 
     public $produto = [
         'codigo_produto' => '',
-        'descricao' => 'teste produto pai',
-        'valor_produto' => '29,99',
+        'descricao' => '',
+        'valor_produto' => '',
         'status' => 0,
-        'categoria_id' => '1',
-        'origem_id' => '1'
+        'categoria_id' => '',
+        'origem_id' => ''
     ];
 
     protected $rules = [
@@ -163,6 +163,8 @@ class ProdutoCreate extends Component
                     'variacao' => $v['variacao'] ?? '',
                     'quantidade' => $v['quantidade'] ?? 0,
                     'valor_varejo' => LivewireHelper::formatCurrencyToBD($v['valor_varejo'], $this->NumberFormatter()),
+                    'valor_atacado' => LivewireHelper::formatCurrencyToBD($v['valor_atacado'], $this->NumberFormatter()),
+                    'valor_atacado_10' => LivewireHelper::formatCurrencyToBD($v['valor_atacado'], $this->NumberFormatter()),
                     'valor_produto' => LivewireHelper::formatCurrencyToBD($v['valor_produto'], $this->NumberFormatter()),
                     'fornecedor_id' => $v['fornecedor_id'],
                     'gtin' => $v['gtin'] ?? null,
@@ -172,6 +174,9 @@ class ProdutoCreate extends Component
                     'status' => $v['status'] ?? 0,
                     'validade' => LivewireHelper::formatarData($v['validade']),
                 ];
+
+                dump($data);
+                dd();
                 $variacao = ProdutoVariation::create($data);
 
                 // 🔹 guarda relação entre ID temporário (UUID) e ID real

@@ -1,4 +1,6 @@
 <?php return array (
+  'dashboard-dre' => 'App\\Http\\Livewire\\DashboardDre',
+  'despesas' => 'App\\Http\\Livewire\\Despesas',
   'filepond-upload' => 'App\\Http\\Livewire\\FilepondUpload',
   'produto-create' => 'App\\Http\\Livewire\\ProdutoCreate',
   'produto-editar' => 'App\\Http\\Livewire\\ProdutoEditar',

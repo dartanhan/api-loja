@@ -7,6 +7,7 @@ use App\Http\Models\Lojas;
 use App\Http\Models\TaxaCartao;
 use App\Http\Models\Vendas;
 use App\Http\Models\VendasCashBack;
+use App\Http\Models\VendasProdutos;
 use App\Http\Models\VendasProdutosDesconto;
 use App\Http\Models\VendasProdutosTipoPagamento;
 use App\Traits\RelatorioTrait;
@@ -27,7 +28,7 @@ class RelatorioController extends Controller
     use RelatorioTrait;
     protected $request, $vendas, $payments, $lojas, $salePayments,$formatter, $taxaCartao,$vendasCashBack,$vendasProdutosDesconto;
 
-    public function __construct(Request $request, Vendas $vendas,
+    public function __construct(Request $request, Vendas $vendas,VendasProdutos $vendasProdutos,
                                 Lojas $lojas, Payments $payments,
                                 VendasProdutosTipoPagamento $salePayments,
                                 TaxaCartao $taxaCartao, VendasCashBack $cashbackVendas,
@@ -41,6 +42,7 @@ class RelatorioController extends Controller
         $this->formatter = new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY);
         $this->vendasCashBack = $cashbackVendas;
         $this->vendasProdutosDesconto = $vendasProdutosDesconto;
+        $this->vendasProdutos = $vendasProdutos;
 
     }
     /**
@@ -280,7 +282,8 @@ class RelatorioController extends Controller
 
 
             //totais descontos por dia
-            $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
+            $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos',
+                'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
                 ->select(
                     (DB::raw("FORMAT(SUM(loja_vendas_produtos_descontos.valor_desconto),2) AS orderTotalDiscount"))
                 )
@@ -289,29 +292,78 @@ class RelatorioController extends Controller
                 ->groupBy('loja_vendas.loja_id')
                 ->get();
 
+
+          $receitasPorMes = DB::table('loja_vendas as lv')
+            ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
+            ->leftJoin(DB::raw('(
+                SELECT venda_id, AVG(taxa) AS taxa
+                FROM loja_vendas_produtos_tipo_pagamentos
+                GROUP BY venda_id
+            ) as tp'), 'tp.venda_id', '=', 'lv.id')
+            ->select([
+                DB::raw("ROUND(SUM((p.valor_produto * p.quantidade) - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa, 0) / 100)), 2) as totalMes")
+            ])
+            ->where('lv.loja_id', 2)
+            ->where('p.troca', 0)
+            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            ->value('totalMes');
+
+        $taxasAplicadas = $this->buscaTaxas($dateOne, $dateTwo);
+
+            /*DB::table('loja_vendas as lv')
+            ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
+            ->leftJoin(DB::raw('(
+                SELECT venda_id, AVG(taxa) AS taxa
+                FROM loja_vendas_produtos_tipo_pagamentos
+                GROUP BY venda_id
+            ) as tp'), 'tp.venda_id', '=', 'lv.id')
+            ->where('lv.loja_id', 2)
+            ->where('p.troca', '!=', 1)
+            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            ->select(DB::raw("ROUND(SUM((p.valor_produto * p.quantidade) * COALESCE(tp.taxa, 0) / 100), 2) as total_taxas"))
+            ->value('total_taxas');*/
+
+
+        /*$receitasPorMes = DB::table('loja_vendas as lv')
+            ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'lv.id')
+            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
+            ->select(
+                DB::raw("DATE_FORMAT(lvp.created_at, '%Y-%m') as mes"),
+                DB::raw("ROUND(SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)), 2) AS totalMes")
+            )
+            ->where('lv.loja_id', 2)
+            ->where('lvp.troca', 0)
+            ->whereBetween(DB::raw('DATE(lvp.created_at)'), [$dateOne, $dateTwo])
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();*/
+
             //total no mês por loja
             //$totalMes[$store->id] = $this->vendas::Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-            $totalMes = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
+           /* $totalMes = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
+                ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'loja_vendas.id')
                 ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
                 ->join('loja_taxa_cartoes', 'loja_taxa_cartoes.forma_id', '=', 'fp.id')
                 ->select(
                     //(DB::raw("SUM(loja_vendas.valor_total - (loja_vendas.valor_total * loja_taxa_cartoes.valor_taxa/100)) AS totalMes")),
-                    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalMes")),
+                    //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalMes")),
+                    (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS totalMes")),
                     (DB::raw('DATE_FORMAT(loja_vendas.created_at, "%m/%Y") as data')),
                     "loja_lojas.nome as loja"
                 )
-                //->where('loja_vendas.loja_id', $store->id)
+                ->where('lvp.troca', '!=' ,1)
                 ->where('loja_vendas.loja_id', $store_id)
                 ->whereYear('loja_vendas.created_at', '=', $dateOne->year)
                 ->whereMonth('loja_vendas.created_at', '=',$dateOne->month)
                 ->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m"),loja_id')))
                 ->orderBy('loja_vendas.created_at', 'asc')
-                ->get();
+                ->get();*/
 
             //totais por semana
             //$totalsDayWeek[$store->id] = $this->vendas::Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
             $totalsDayWeek = $this->vendas->Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
+                ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'loja_vendas.id')
                 ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
                 ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
                 ->join('loja_taxa_cartoes as ltc', 'ltc.forma_id', '=', 'fp.id')
@@ -320,13 +372,15 @@ class RelatorioController extends Controller
                     "ll.nome as loja",
                     "fp.nome as name",
                     "fp.id as id_payment",
-                    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotalWeek"))
+                    //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotalWeek"))
+                    (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS orderTotalWeek")),
 
                 )
                 //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataCarbon, $dataCarbonFim))
                 //->where('loja_vendas.loja_id', $store->id)
                 ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayWeek, $endDayWeek))
                 ->where('loja_vendas.loja_id', $store_id)
+                ->where('lvp.troca', '!=' ,1)
                 ->groupBy('ll.id')
                 ->get();
 
@@ -372,13 +426,13 @@ class RelatorioController extends Controller
         //total por mês
         //if(!empty($totalMes)) {
            // foreach ($totalMes as $keys => $item) {
-                $sum = 0;
+                //$sum = 0;
                // foreach ($item as $key => $tot) {
-                foreach ($totalMes as $key => $tot) {
-                    $sum = $tot->totalMes;
-                }
+               // foreach ($totalMes as $key => $tot) {
+               //     $sum = $tot->totalMes;
+               // }
                 //$totalOrderMonth[$keys] = array("totalMes" => $this->formatter->formatCurrency($sum, 'BRL'));
-                $totalOrderMonth = array("totalMes" => $this->formatter->formatCurrency($sum, 'BRL'));
+              //  $totalOrderMonth = array("totalMes" => $this->formatter->formatCurrency($sum, 'BRL'));
             //}
        // }
 
@@ -402,7 +456,8 @@ class RelatorioController extends Controller
                                     "totalOrderDiscount" => $totalOrderDiscount,
                                     "totalOrderDay" => $sumOrdersDay,
                                     "totalsOrderWeek" => $totalsOrdersWeek,
-                                    "totalOrderMonth" => $totalOrderMonth));
+                                    "totalOrderMonth" => $receitasPorMes,
+                                    "totalTaxas" => $taxasAplicadas));
 
     }
 
