@@ -20,7 +20,7 @@ trait RelatorioTrait
                 //(DB::raw("FORMAT(SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)),2) AS orderTotal")))
                 //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotal")))
                 (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS orderTotal")))
-            ->where('lvp.troca', '!=' ,1)
+            ->where('lvp.troca', 0)
             ->where('loja_vendas.loja_id', $store_id)
             ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
             ->groupBy('fp.id')

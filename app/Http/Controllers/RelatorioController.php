@@ -305,7 +305,9 @@ class RelatorioController extends Controller
             ])
             ->where('lv.loja_id', 2)
             ->where('p.troca', 0)
-            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            //->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            ->whereYear('lv.created_at', '=', $dateOne->year)
+            ->whereMonth('lv.created_at', '=',$dateOne->month)
             ->value('totalMes');
 
         $taxasAplicadas = $this->buscaTaxas($dateOne, $dateTwo);
