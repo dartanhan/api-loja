@@ -98,7 +98,9 @@
     <script src="{{ asset('js/chosen.jquery.js') }}"></script>
     <script src="{{ asset('assets/jquery/jquery.mask.min.js') }}"></script>
 
-
+    <!-- Moment.js + Daterangepicker -->
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script src="//unpkg.com/alpinejs" defer></script>
 

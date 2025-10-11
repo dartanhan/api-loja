@@ -17,19 +17,18 @@
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">DRE</li>
                     </ol>
-                </nav>
+                </nav>'
             </div>
         </div>
 
         <div class="card shadow border-0 mb-4 p-4">
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <label class="form-label">Início:</label>
-                    <input type="date" class="form-control" wire:model="inicio">
+                    <livewire:pesquisa/>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Fim:</label>
-                    <input type="date" class="form-control" wire:model="fim">
+                <div wire:loading class="text-center mt-2">
+                    <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                    <span class="ms-2">Atualizando dados...</span>
                 </div>
             </div>
 
@@ -165,5 +164,7 @@
             renderChart(receita, despesa, lucro);
         });
     </script>
+
 @endpush
+
 

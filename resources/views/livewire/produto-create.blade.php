@@ -183,6 +183,8 @@
 
     @push('styles')
         <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
     @endpush
 
     @push('scripts')

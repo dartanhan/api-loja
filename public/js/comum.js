@@ -11,6 +11,12 @@ window.botaoLoad = botaoLoad;
 window.removeCampo = removeCampo;
 window.getDataYear = getDataYear;
 
+window.utils = {
+    dateRangePicker,
+    getPeriodoFormatado
+    // etc.
+};
+
 
 const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
@@ -120,6 +126,24 @@ export function getDataYear(data){
         ? moment(data, 'DD/MM/YYYY').format('YYYY')
         : moment().format('YYYY');
 }
+
+/***
+ * recebe um data ranger DD/MM/YYYY - DD/MM/YYYY
+ * retorna data inicial e fim formato YYYY-MM-DD
+ * */
+export function getPeriodoFormatado(dateRange) {
+    if (!dateRange || !dateRange.includes(' - ')) {
+        const hoje = moment().format('YYYY-MM-DD');
+        return { inicio: hoje, fim: hoje };
+    }
+
+    const [inicioRaw, fimRaw] = dateRange.split(' - ');
+    const inicio = moment(inicioRaw, 'DD/MM/YYYY').format('YYYY-MM-DD');
+    const fim = moment(fimRaw, 'DD/MM/YYYY').format('YYYY-MM-DD');
+
+    return { inicio, fim };
+}
+
 
 /***
 Retorna por padrão um icone de hide de money
@@ -403,3 +427,35 @@ $(document).on("click","#addListaCompra" ,function(event){
     export function removeCampo(parm) {
         document.getElementById(parm).remove();
     }
+
+    export function dateRangePicker(){
+        $('#data_range').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Aplicar',
+                cancelLabel: 'Cancelar',
+                fromLabel: 'De',
+                toLabel: 'Até',
+                customRangeLabel: 'Personalizado',
+                daysOfWeek: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                firstDay: 0
+            }
+        });
+
+        $('#data_range').on('apply.daterangepicker', function (ev, picker) {
+            const valor = picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY');
+            $(this).val(valor);
+
+            // 🔥 Atualiza o Livewire manualmente
+            const componentId = $(this).closest('[wire\\:id]').attr('wire:id');
+            Livewire.find(componentId).set('data_range', valor);
+
+        });
+
+        $('#data_range').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+    };

@@ -243,8 +243,23 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex flex-wrap floating-card mt-3 p-2">
-            <div class="row date" id="data">
+        <div class="d-flex align-items-center flex-wrap gap-2 mt-3 p-2 floating-card">
+            {{-- Input de período --}}
+           <livewire:pesquisa  xmlns:wire="http://www.w3.org/1999/xhtml" xmlns:livewire="http://www.w3.org/1999/xhtml"></livewire:pesquisa>
+
+            {{-- Botões ao lado --}}
+            <button class="btn bgBtn btn-enviar btn-sm" type="button">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+
+            <button class="btn bgBtn btn-limpar btn-sm" type="button">
+                <i class="fas fa-eraser"></i> Limpar
+            </button>
+
+            <span id="loadChartBar"></span>
+
+
+            {{--<div class="row date" id="data">
                 <div class="col-auto input-group-sm">
                     <i class="fas fa-chart-area me-1"></i>
                     Filtro:
@@ -264,7 +279,7 @@
                     <button class="btn bgBtn btn-limpar" type="button">Limpar</button>
                     <span id="loadChartBar"></span>
                 </div>
-            </div>
+            </div>--}}
         </div>
         <div class="card floating-card mt-3">
             <div class="card-header">
@@ -468,12 +483,12 @@
 
     <!-- Biblioteca para gerar o arquivo Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 @endpush
 @push("styles")
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/bootstrap/css/bootstrap-datepicker.min.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/dataTableRender.css')}}">
     <link rel="stylesheet"  type="text/css" href="{{URL::asset('assets/datatables/DataTables-1.10.18/css/dataTables.bootstrap4.css')}}">
 {{--    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">--}}
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/custom-input-float.css')}}"/>
 
 @endpush
