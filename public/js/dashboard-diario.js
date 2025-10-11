@@ -1,11 +1,13 @@
-import {fncDataDatatable,getDataFormat,botaoLoad,getIconHideMoney} from './comum.js';
+import {fncDataDatatable,getDataFormat,botaoLoad,dateRangePicker,getPeriodoFormatado,formatMoney} from './comum.js';
 
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const url = fncUrl();
 let table;
 let startDate,endDate,id;
-let dataIni = $('input[name=dataIni]');
-let dataFim = $('input[name=dataFim]');
+//let dataIni = $('input[name=dataIni]');
+//let dataFim = $('input[name=dataFim]');
+let dtaPeriodo =  $('input[name=data_range]');
+let periodo;
 let todosVisiveis = false;
 
 $(function () {
@@ -25,8 +27,9 @@ $(function () {
             "data":function(data){
                 data.id = 2,
                 data._token = token,
-                data.dataIni = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
-                data.dataFim = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
+                data.periodo = dtaPeriodo.val()
+               // data.dataIni = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+               // data.dataFim = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
             },
 
             "dataType":"json",
@@ -53,7 +56,7 @@ $(function () {
                     .attr("data-valor", json.total_precentual_mc)
                     .each(function () {
                         if (!$(this).text().includes("*")) {
-                            $(this).text(rjson.total_precentual_mc);
+                            $(this).text(json.total_precentual_mc);
                         }
                     });
                 /*$("[data-key='taxes']").attr("data-valor", json.total_imposto);
@@ -339,13 +342,12 @@ $(function () {
 
         let id = $(this).data('content');
 
-        startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
-        endDate = getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
+        periodo = utils.getPeriodoFormatado(dtaPeriodo.val());
 
         const data = {
             id: id,
-            startDate: startDate,
-            endDate:endDate,
+            startDate: periodo.inicio,
+            endDate:periodo.fim,
             _token:token
         };
 
@@ -415,9 +417,9 @@ $(function () {
                         );
                     },initComplete: function(settings, json) {
                         $('span[name="periodo"]').text(
-                            getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                            getDataFormat(periodo.inicio,'YYYY-MM-DD','DD/MM/YYYY')
                              + " até " +
-                             getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY')
+                             getDataFormat(periodo.fim,'YYYY-MM-DD','DD/MM/YYYY')
                         );
                     },
             });//fim datatables
@@ -435,13 +437,12 @@ $(function () {
 
         let id = $(this).data('content');
 
-        startDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
-        endDate = getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
+        periodo = utils.getPeriodoFormatado(dtaPeriodo.val());
 
         const data = {
             id: id,
-            startDate: startDate,
-            endDate:endDate,
+            startDate: periodo.inicio,
+            endDate:periodo.fim,
             _token:token
         };
 
@@ -480,9 +481,9 @@ $(function () {
                 "order": [[0, "asc"]],
                 initComplete: function(settings, json) {
                     $('span[name="periodo"]').text(
-                        getDataFormat(startDate,'YYYY-MM-DD','DD/MM/YYYY')
+                        getDataFormat(periodo.inicio,'YYYY-MM-DD','DD/MM/YYYY')
                          + " até " +
-                         getDataFormat(endDate,'YYYY-MM-DD','DD/MM/YYYY') );
+                         getDataFormat(periodo.fim,'YYYY-MM-DD','DD/MM/YYYY') );
                 }
             });//fim datatables
 
@@ -505,7 +506,7 @@ $(function () {
         const response = await fetch(url + "/relatorio/editSales/"+venda_id);
         const data = await response.json();
         // console.log(data.data);
-         console.log(data.payments);
+        // console.log(data.payments);
 
         let html = data.data.reduce(function (string, obj) {
             payment_id = obj.id;
@@ -536,26 +537,13 @@ $(function () {
      * */
       let fncDataBarChart = async function(dateOne, dateTwo) {
         const endpoint = `${url}/relatorio/chartDay/`+dateOne+`/`+dateTwo+`/2`;
+
         await fetch(endpoint)
             .then(function (response) {
                 return response.json()
             }).then(function (response) {
-                //  console.log(response);
-              /*  typeChart = 'bar';
+            //      console.log(response);
 
-                let myArr = JSON.stringify(response.chart);
-                labels = [];
-                dados = [];
-                bgColoR = [];
-                borderColoR = [];
-
-                JSON.parse(myArr).forEach(function (ret) {
-                    // console.log(ret.data);
-                    labels.push(ret.data);
-                    dados.push(ret.total)
-                    bgColoR.push(dynamicColors());
-                    borderColoR.push(dynamicBorderColors(r, g, b));
-                });*/
                 $("[data-key='diner']")
                     .attr("data-valor", response.totalOrders.orderTotalDiner)
                     .each(function () {
@@ -596,18 +584,12 @@ $(function () {
                     });
 
                 $("[data-key='month']")
-                    .attr("data-valor", response.totalOrderMonth.totalMes)
+                    .attr("data-valor", formatMoney(response.totalOrderMonth))
                     .each(function () {
                         if (!$(this).text().includes("*")) {
-                            $(this).text(response.totalOrderMonth.totalMes);
+                            $(this).text(formatMoney(response.totalOrderMonth));
                         }
                     });
-
-                // $("[data-key='cart']").attr("data-valor", response.totalOrders.orderTotalCart);
-                // $("[data-key='discount']").attr("data-valor", response.totalOrderDiscount.totalDiscount);
-                // $("[data-key='day']").attr("data-valor", response.totalOrderDay.orderTotalDay);
-                // $("[data-key='week']").attr("data-valor", response.totalsOrderWeek.totalWeek);
-                // $("[data-key='month']").attr("data-valor", response.totalOrderMonth.totalMes);
 
                 //esconde o spinner
                 $(".spinner-border").hide();
@@ -696,45 +678,33 @@ $(function () {
          //console.log(dataIni);
 
          // Check if dataIni is filled
-         if (!dataIni) {
-             msg = "Por favor, preencha a Data Inicio."
-            isValid = false;
+         if (!$('input[name=data_range]').val()) {
+             sweetAlert({
+                 title: "Atenção",
+                 text: "Por favor, preencha o período de pesquisa!",
+                 icon: 'warning',
+                 showConfirmButton: true,
+                 //timer: 1500
+             });
+            return false;
         }
 
-        if (!dataFim && isValid === true) {
-            msg = "Por favor, preencha a Data Fim.";
-            isValid = false;
-        }
+        fncLoad("<div class=\"card-body\">Aguarde...</div>" +
+            "<div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
 
-        // If both fields are filled, submit the form
-        if (isValid) {
-            fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
+         periodo = utils.getPeriodoFormatado(dtaPeriodo.val());
 
-            startDate =  getDataFormat(dataIni.val(),'DD/MM/YYYY','YYYY-MM-DD');
-            endDate =  getDataFormat(dataFim.val(),'DD/MM/YYYY','YYYY-MM-DD');
 
-            fncDataBarChart(startDate,endDate); // atualiza os cards de totais
-            fncDataDatatable(table);
-
-        }else{
-            sweetAlert({
-                title: "Atenção",
-                text: msg,
-                icon: 'warning',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        }
+        fncDataBarChart(periodo.inicio, periodo.fim).then(); // atualiza os cards de totais
+        fncDataDatatable(table);
     });
 
     /***
      * Reseta as informações
      */
     $(".btn-limpar").on("click", function () {
-        //fncLoad("<div class=\"card-body\">Aguarde...</div><div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
 
-        dataIni.val("");
-        dataFim.val("");
+        dtaPeriodo.val('');
 
         fncDataBarChart(moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')).then();
         fncDataDatatable(table);

@@ -20,7 +20,7 @@ trait RelatorioTrait
                 //(DB::raw("FORMAT(SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)),2) AS orderTotal")))
                 //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotal")))
                 (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS orderTotal")))
-            ->where('lvp.troca', '!=' ,1)
+            ->where('lvp.troca', 0)
             ->where('loja_vendas.loja_id', $store_id)
             ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
             ->groupBy('fp.id')
@@ -28,6 +28,12 @@ trait RelatorioTrait
     }
 
 
+    /**
+     * Retorna a taxa que foram geradas no mês sobre as vendas
+     * @param $dataIinicio
+     * @param $dataFim
+     * @return total_taxas
+     */
     public function buscaTaxas($dataIinicio, $dataFim)
     {
        return DB::table('loja_vendas as lv')
@@ -39,7 +45,9 @@ trait RelatorioTrait
             ) as tp'), 'tp.venda_id', '=', 'lv.id')
             ->where('lv.loja_id', 2)
             ->where('p.troca', 0)
-            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dataIinicio, $dataFim])
+            //->whereBetween(DB::raw('DATE(p.created_at)'), [$dataIinicio, $dataFim])
+            ->whereYear('lv.created_at', '=', $dataIinicio)
+           ->whereMonth('lv.created_at', '=',$dataFim)
             ->select(DB::raw("ROUND(SUM((p.valor_produto * p.quantidade) * COALESCE(tp.taxa, 0) / 100), 2) as total_taxas"))
             ->value('total_taxas');
     }

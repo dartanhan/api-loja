@@ -305,7 +305,9 @@ class RelatorioController extends Controller
             ])
             ->where('lv.loja_id', 2)
             ->where('p.troca', 0)
-            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            //->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
+            ->whereYear('lv.created_at', '=', $dateOne->year)
+            ->whereMonth('lv.created_at', '=',$dateOne->month)
             ->value('totalMes');
 
         $taxasAplicadas = $this->buscaTaxas($dateOne, $dateTwo);
@@ -380,7 +382,7 @@ class RelatorioController extends Controller
                 //->where('loja_vendas.loja_id', $store->id)
                 ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayWeek, $endDayWeek))
                 ->where('loja_vendas.loja_id', $store_id)
-                ->where('lvp.troca', '!=' ,1)
+                ->where('lvp.troca', 0)
                 ->groupBy('ll.id')
                 ->get();
 
@@ -456,8 +458,8 @@ class RelatorioController extends Controller
                                     "totalOrderDiscount" => $totalOrderDiscount,
                                     "totalOrderDay" => $sumOrdersDay,
                                     "totalsOrderWeek" => $totalsOrdersWeek,
-                                    "totalOrderMonth" => $receitasPorMes,
-                                    "totalTaxas" => $taxasAplicadas));
+                                    "totalOrderMonth" => $receitasPorMes ?? "0",
+                                    "totalTaxas" => $taxasAplicadas ?? "0"));
 
     }
 

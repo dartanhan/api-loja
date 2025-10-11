@@ -122,35 +122,13 @@
     </div>
 @endsection
 @push("scripts")
-    <!-- Moment.js + Daterangepicker -->
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script  type="module">
+        import {dateRangePicker} from '{{ asset('js/comum.js') }}';
+
+        utils.dateRangePicker();
+    </script>
     <script>
-        $(function () {
-            $('#data_range').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    format: 'DD/MM/YYYY',
-                    applyLabel: 'Aplicar',
-                    cancelLabel: 'Cancelar',
-                    fromLabel: 'De',
-                    toLabel: 'Até',
-                    customRangeLabel: 'Personalizado',
-                    daysOfWeek: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-                    monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-                    firstDay: 0
-                }
-            });
-
-            $('#data_range').on('apply.daterangepicker', function (ev, picker) {
-                $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-            });
-
-            $('#data_range').on('cancel.daterangepicker', function (ev, picker) {
-                $(this).val('');
-            });
-        });
 
         // JavaScript para ativar o loading
         $(document).ready(function () {

@@ -71,10 +71,20 @@ class DashboardController extends Controller
             $imposto_total = 0;
             $total_mc = 0;
             $total_precentual_mc =0;
-            $startDate = CarbonImmutable::parse($this->request->input('dataIni'));
-            $endDate = CarbonImmutable::parse($this->request->input('dataFim'));
             $store_id = $this->request->id;
             $orderTotal =0;
+
+            $periodo = $this->request->input('periodo'); // Ex: "05/10/2025 - 09/10/2025"
+            if ($periodo && str_contains($periodo, ' - ')) {
+                [$inicio, $fim] = explode(' - ', $periodo);
+
+                $startDate = CarbonImmutable::createFromFormat('d/m/Y', trim($inicio));
+                $endDate = CarbonImmutable::createFromFormat('d/m/Y', trim($fim));
+            } else {
+                // fallback para hoje se o período estiver vazio ou malformado
+                $startDate = CarbonImmutable::today();
+                $endDate = CarbonImmutable::today();
+            }
 
             /**
              * Semana agrupado por dia

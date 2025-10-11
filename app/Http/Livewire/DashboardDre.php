@@ -28,27 +28,38 @@ class DashboardDre extends Component
     public $variacaoReceita;
     public $variacaoLucro;
 
+    protected $listeners = ['periodoAtualizado' => 'atualizarPeriodo'];
+
+
     public function mount()
     {
         $this->inicio = Carbon::now()->startOfMonth()->toDateString();
         $this->fim = Carbon::now()->endOfMonth()->toDateString();
+
         $this->calcularTaxas();
         $this->calcularDre();
         $this->calcularValorMesAnterior();
     }
 
-    public function updatedInicio()
+    public function atualizarPeriodo($periodo)
     {
-        $this->calcularTaxas();
-        $this->calcularDre();
-        $this->calcularValorMesAnterior();
-    }
+        if (!$periodo || !str_contains($periodo, ' - ')) {
+            return;
+        }
 
-    public function updatedFim()
-    {
-        $this->calcularTaxas();
-        $this->calcularDre();
-        $this->calcularValorMesAnterior();
+        try {
+            [$inicioRaw, $fimRaw] = explode(' - ', $periodo);
+
+            $this->inicio = Carbon::createFromFormat('d/m/Y', trim($inicioRaw))->toDateString();
+            $this->fim = Carbon::createFromFormat('d/m/Y', trim($fimRaw))->toDateString();
+
+            $this->calcularTaxas();
+            $this->calcularDre();
+            $this->calcularValorMesAnterior();
+
+        } catch (\Exception $e) {
+            // log ou erro silencioso
+        }
     }
 
     public function calcularDre()
