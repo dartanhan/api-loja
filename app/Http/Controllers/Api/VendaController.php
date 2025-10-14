@@ -126,9 +126,9 @@ class VendaController extends Controller
             return response()->json(['success' => false, 'message' => 'Produto Inativado para Venda!'], 201);
         }
 
-        if ($variations->quantidade == 0) {
-            return response()->json(['success' => false, 'message' => 'Produto sem Estoque para Venda!'], 201);
-        }
+        //if ($variations->quantidade == 0) {
+        //    return response()->json(['success' => false, 'message' => 'Produto sem Estoque para Venda!'], 201);
+       // }
 
         $product = $variations->produtoPai;
 
