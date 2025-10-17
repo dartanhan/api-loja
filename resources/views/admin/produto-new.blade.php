@@ -22,7 +22,7 @@
                             <div class="text-right" style="position: absolute;margin-top: 0; text-align: right">
                                 <button type="button" class="btn bgBtn gerarCodigo" id="GerarCodigo" name="GerarCodigo">
                                     <i class="fa fa-gear"></i> {{ __('Gerar Código') }}</button>
-                                <button type="button" class="btn bgBtn" id="btnLote" data-bs-toggle="modal" data-bs-target="#modalUpdateLote">
+                                <button type="button" class="btn bgBtn" id="btnLote" data-toggle="modal" data-target="#modalUpdateLote">
                                     <i class="fas fa-cogs"></i> {{ __('Atualização em Lote') }}</button>
                                 <button type="submit" class="btn bgBtn" id="btnSalvar" name='onSubmit'>
                                     <i class="fas fa-check"></i> {{ __('Salvar') }}</button>
@@ -128,7 +128,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="slideInModalLabel">Atualizando produto : xtz</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="form-group border-lable-flt format-font">
@@ -228,7 +228,7 @@
                                     </button>
                                 </div>
                                 <div class="col-md-6 d-flex justify-content-end">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                                 </div>
                             </div>
                         </div>

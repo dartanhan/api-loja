@@ -17,7 +17,7 @@
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">DRE</li>
                     </ol>
-                </nav>'
+                </nav>
             </div>
         </div>
 
