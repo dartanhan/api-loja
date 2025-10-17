@@ -435,7 +435,7 @@ class VendaController extends Controller
             $this->vendaService->processarPagamentos($dados["pagamentos"], $venda->id);
 
             // Desconto
-            $this->vendaService->registrarDesconto($dados["desconto"] ?? [], $venda->id);
+            $this->vendaService->registrarDesconto($dados, $venda->id);
 
             // Cashback
             $this->vendaService->registrarCashback($dados["clienteModel"], $venda);

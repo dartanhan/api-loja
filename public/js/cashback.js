@@ -36,7 +36,7 @@ $(document).ready(function() {
             {"defaultContent": "<div class='text-center'>" +
                     "<div class='btn-group'>" +
                     "<button class='btn btn-primary btn-sm btnEditar' " +
-                    "data-bs-toggle=\"modal\" data-bs-target=\"#divModal\">" +
+                    "data-toggle=\"modal\" data-target=\"#divModal\">" +
                     "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
                     "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
                     "</div>" +
@@ -87,7 +87,8 @@ $(document).ready(function() {
         $("#valor").val(valor);
        // $("#valor_final").val(valor_final);
 
-        $('#title-cashback').html('<i class="fas fa-money-bill me-1"></i> Editando CashBack ID: [<span style="color: red"> '+ id  +' </span>]');
+        $('#title-cashback').html('<i class="fas fa-money-bill me-1">' +
+            '</i> Editando CashBack ID: [<span style="color: red"> '+ id  +' </span>]');
 
     });
 

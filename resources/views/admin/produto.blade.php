@@ -22,7 +22,7 @@
                             <div class="text-right" style="position: absolute;margin-top: 0; text-align: right">
                                 <button type="button" class="btn bgBtn gerarCodigo" id="GerarCodigo" name="GerarCodigo">
                                     <i class="fa fa-gear"></i> {{ __('Gerar Código') }}</button>
-                                <button type="button" class="btn bgBtn" id="btnLote" data-bs-toggle="modal" data-bs-target="#modalUpdateLote">
+                                <button type="button" class="btn bgBtn" id="btnLote" data-toggle="modal" data-target="#modalUpdateLote">
                                     <i class="fas fa-cogs"></i> {{ __('Atualização em Lote') }}</button>
                                 <button type="submit" class="btn bgBtn" id="btnSalvar" name='onSubmit'>
                                     <i class="fas fa-check"></i> {{ __('Salvar') }}</button>

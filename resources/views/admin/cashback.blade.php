@@ -21,7 +21,7 @@
                             CashBack
                         </div>
                         <div class="text-right" style="position: absolute;margin-top: -7px; text-align: right">
-                            <button id="btnNuevo" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#divModal">
+                            <button id="btnNuevo" type="button" class="btn btn-primary" data-toggle="modal" data-target="#divModal">
                                 <i class="fas fa-percent"></i>
                                 Novo CashBack
                             </button>
@@ -52,7 +52,7 @@
             <div class="modal-content ">
                 <form id="form" name="form" class="needs-validation form-floating" novalidate method="post">
                     <div class="modal-header ">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
@@ -77,13 +77,15 @@
                                                 <label for="taxa">Taxa</label>
                                                 <input type="text" class="form-control center" id="taxa" name="taxa"
                                                        title="Taxa do CashBack" placeholder="Taxa do CashBack"
+                                                       data-toggle="tooltip" data-placement="top"
                                                        data-affixes-stay="true" data-posfix="%"
                                                        data-thousands="." data-decimal="," value="0,00%" required>
                                             </div>
                                             <div class="col-md-4 mb-2">
                                                 <label for="valo">Valor</label>
                                                 <input type="text" class="form-control center" id="valor" name="valor"
-                                                       title="Valor" placeholder="Valor"
+                                                       title="Valor de referência para disponibilizar o cashback na venda"
+                                                       placeholder="Valor" data-toggle="tooltip" data-placement="top"
                                                        data-affixes-stay="true" data-prefix="R$ "
                                                        data-thousands="." data-decimal="," value="R$ 0,00" required>
                                             </div>
@@ -101,7 +103,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
                     </div>
                 </form>

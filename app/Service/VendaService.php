@@ -3,6 +3,7 @@
 
 namespace App\Service;
 
+use App\Http\Models\Cashback;
 use Throwable;
 use App\Http\Models\ProdutoVariation;
 use App\Http\Models\TaxaCartao;
@@ -122,33 +123,44 @@ class VendaService
         }
     }
 
-    public function registrarDesconto(array $desconto, int $vendaId)
+    public function registrarDesconto($desconto, int $vendaId)
     {
-        VendasProdutosDesconto::create([
+        $data =[
             "venda_id" => $vendaId,
-            "valor_percentual" => $desconto["percentual"] ?? 0,
-            "valor_recebido"   => $desconto["valor_recebido"] ?? 0,
-            "valor_desconto"   => $desconto["valor_desconto"] ?? 0,
-        ]);
+            "valor_percentual" => $desconto['percentual'] ?? 0,
+            "valor_recebido"   => $desconto['valor_recebido'] ?? 0,
+            "valor_desconto"   => $desconto['valor_desconto'] ?? 0,
+        ];
+
+        VendasProdutosDesconto::create($data);
     }
 
     public function registrarCashback(array $cliente, $venda)
     {
+
         if (!empty($cliente["id"]) && $cliente["id"] != 0) {
             $cashbackUsado = $cliente["cashback"] ?? 0;
 
-            if ($cashbackUsado > 0) {
+            $cashBack = Cashback::where('status', 0)->first();
+
+            //valor epresenta o valor minimo acumulado para usar cashback
+            if ($cashbackUsado > $cashBack->valor) {
                 VendasCashBack::where('cliente_id', $cliente["id"])->update(['status' => 1]);
             }
 
-            $valorCashback = ($venda->valor_total * 0.08) / 100;
+            if ($cashBack) {
+                $valorCashback = $venda['valor_total'] * $cashBack->taxa;
+            } else {
+                // Tratar o caso em que não há taxa de cashback ativa
+                $valorCashback = 0;
+            }
+
+            $data = ["cliente_id" => $venda['cliente_id'],
+                    "venda_id" => $venda['id'],
+                    "valor" => $valorCashback];
 
             if ($valorCashback > 0) {
-                VendasCashBack::create([
-                    "cliente_id" => $venda->cliente_id,
-                    "venda_id" => $venda->id,
-                    "valor" => $valorCashback
-                ]);
+                VendasCashBack::create($data);
             }
         }
     }

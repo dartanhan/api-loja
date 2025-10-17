@@ -28,6 +28,9 @@
     <filter-actions connection-id="ffbcd63b-4524-4dee-b384-3b5de44a02c3" dataset="loja050225.loja_categorias" active-filter-id="" />
     <filter-actions connection-id="ffbcd63b-4524-4dee-b384-3b5de44a02c3" dataset="loja050225.loja_produtos_variacao" active-filter-id="" />
   </component>
+  <component name="DBNavigator.Project.ExecutionManager">
+    <retain-sticky-names value="false" />
+  </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />
