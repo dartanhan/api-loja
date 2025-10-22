@@ -52,7 +52,13 @@ class FormaPagamentoController extends Controller
      */
     public function show($id)
     {
-        //
+        return FormaPagamentos::where('status', 1)->get([
+            'id',
+            'nome',
+            'slug',
+            'status'
+        ]);
+
     }
 
     /**
