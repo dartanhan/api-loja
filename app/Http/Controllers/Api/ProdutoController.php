@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Throwable;
 
-class ProdutoController extends Controller
+class  ProdutoController extends Controller
 {
     /**
      * @var mixed
@@ -58,6 +58,7 @@ class ProdutoController extends Controller
 
             $product =  DB::table('loja_produtos_new')
                 ->join('loja_produtos_variacao', 'loja_produtos_new.id', '=','loja_produtos_variacao.products_id')
+                ->leftJoin('loja_produtos_imagens', 'loja_produtos_variacao.id', '=','loja_produtos_imagens.produto_variacao_id')
                 ->select("loja_produtos_variacao.subcodigo as codigo_produto",
                         DB::raw("Concat(loja_produtos_new.descricao, ' - ', loja_produtos_variacao.variacao) as descricao"),
                         "loja_produtos_new.status",
@@ -65,7 +66,8 @@ class ProdutoController extends Controller
                         "loja_produtos_variacao.id",
                         "loja_produtos_variacao.valor_varejo",
                         "loja_produtos_variacao.valor_atacado_10un",
-                        "loja_produtos_variacao.quantidade")
+                        "loja_produtos_variacao.quantidade",
+                        "loja_produtos_imagens.path as path_image")
                 ->where('loja_produtos_variacao.status',1)
                 ->get();
 
