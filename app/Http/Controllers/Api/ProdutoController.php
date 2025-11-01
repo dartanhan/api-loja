@@ -67,7 +67,8 @@ class  ProdutoController extends Controller
                         "loja_produtos_variacao.valor_varejo",
                         "loja_produtos_variacao.valor_atacado_10un",
                         "loja_produtos_variacao.quantidade",
-                        "loja_produtos_imagens.path as path_image")
+                        "loja_produtos_imagens.path as path_image",
+                        "loja_produtos_variacao.gtin",)
                 ->where('loja_produtos_variacao.status',1)
                 ->get();
 
