@@ -116,7 +116,11 @@ class VendaController extends Controller
         $codigo_produto = $this->request->header('product-code');
         $tipo_pgto = intval($this->request->header('tipo-id'));
 
-        $variations = $this->productVariation::with('produtoPai', 'images')->where('subcodigo', $codigo_produto)->first();
+        $variations = $this->productVariation::with('produtoPai', 'images')
+            ->where('subcodigo', $codigo_produto)
+            ->orWhere('gtin', $codigo_produto)
+            ->first();
+
 
         if (!$variations) {
             return response()->json(['success' => false, 'message' => 'Produto não encontrado!'], 201);
