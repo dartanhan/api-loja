@@ -133,6 +133,7 @@ $(function() {
                                 "<tr class='bg-secondary '>" +
                                     "<th>IMAGEM</th>" +
                                     "<th>SUB CÓDIGO</th>" +
+                                    "<th>GTIN</th>" +
                                     "<th>VARIAÇÃO</th>" +
                                     "<th>QTD</th>" +
                                     "<th>ESTOQUE</th>" +
@@ -172,6 +173,7 @@ $(function() {
                                         tmpRow += "<tr>" +
                                             "<td>" + image + "</td>" +
                                             "<td>" + arrayItem.subcodigo + "</td>" +
+                                            "<td>" + arrayItem.gtin + "</td>" +
                                             "<td>" + arrayItem.variacao + "</td>" +
                                             "<td>" + arrayItem.quantidade + "</td>" +
                                             "<td>" + arrayItem.estoque + "</td>" +

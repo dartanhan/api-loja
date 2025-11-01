@@ -112,6 +112,10 @@ class ProdutoController extends Controller
     {
         $this->searchTerm = $request->input('term');
 
+        if (strlen($this->searchTerm) < 2) {
+            return response()->json([]);
+        }
+
         return response()->json(ProdutoVariation::with('images')->where(function($query) {
             $query->where('variacao', 'like', '%' . $this->searchTerm . '%')
                 ->orWhere('subcodigo', 'like', '%' . $this->searchTerm . '%')
@@ -122,6 +126,5 @@ class ProdutoController extends Controller
             ->select('loja_produtos_variacao.*', 'lpn.descricao as produto_descricao',  'lpn.categoria_id', 'lpn.fornecedor_id')
             ->where('loja_produtos_variacao.status',true)
             ->orderBy('variacao', 'asc')->take(10)->get());
-
     }
 }
