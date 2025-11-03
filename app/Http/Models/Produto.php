@@ -59,4 +59,7 @@ class Produto extends Model implements Auditable
         return $this->hasMany(ProdutoVariation::class, 'products_id', 'id');
     }
 
+    public function categorias(){
+        return $this->hasMany(Categoria::class, 'id', 'categoria_id');
+    }
 }

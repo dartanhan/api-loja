@@ -21,7 +21,8 @@
                         Categorias
                     </div>
                     <div class="text-right" style="position: absolute;margin-top: -7px; text-align: right">
-                            <button id="btnNuevo" type="button" class="btn bgBtn" data-bs-toggle="modal" data-bs-target="#divModal">
+                            <button id="btnNuevo" type="button" class="btn bgBtn"
+                                    data-toggle="modal" data-target="#divModal">
                                 <i class="fas fa-newspaper me-1"></i>
                                     Nova Categoria
                             </button>
@@ -35,7 +36,9 @@
                         <tr>
                             <th>Id</th>
                             <th>Categoria</th>
+                            <th>Slug</th>
                             <th>Imagem</th>
+                            <th>Qtd</th>
                             <th>Status</th>
                             <th>Data Criação</th>
                             <th>Data Atualização</th>
@@ -54,7 +57,7 @@
                     <form id="form" name="form" class="needs-validation form-floating" novalidate method="post" enctype="multipart/form-data">
                         <div class="modal-header ">
                             <div class="alert col-md-11 alert-secondary" role="alert" id="modal-title"></div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                                 @csrf
@@ -63,8 +66,14 @@
                                 <input type="hidden" name="destinoFile" id="destinoFile" value="categorias">
                                 <div class="modal-body">
                                     <div class="row">
+                                        <div class="col-md-10 mb-3">
+                                            <input type="text" class="form-control" id="nome" name="nome"
+                                                   title="Nome da Categoria" placeholder="Nome da Categoria"
+                                            onchange="utils.getAplicarSlug('nome', 'slug'); ">
+                                        </div>
                                         <div class="col-md-8 mb-3">
-                                            <input type="text" class="form-control" id="nome" name="nome" title="Nome da Categoria" placeholder="Nome da Categoria">
+                                            <input type="text" class="form-control" id="slug" name="slug"
+                                                   title="Slug da Categoria" placeholder="Slug da Categoria" readonly>
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <select class="form-select" id="status" name="status" required>
@@ -79,7 +88,7 @@
                                 </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                             <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
                         </div>
                     </form>
@@ -92,6 +101,7 @@
     <script src="{{URL::asset('assets/jquery/jquery.dataTables.min.js')}}"></script>
     <script src="{{URL::asset('assets/bootstrap/js/dataTables.bootstrap4.min.js')}}"></script>
     <script src="{{URL::asset('assets/jquery/jquery.validate.min.js')}}"></script>
+    <script type="module" src="{{URL::asset('js/comum.js')}}"></script>
     <script src="{{URL::asset('js/categoria.js')}}"></script>
     <script src="{{URL::asset('js/filePond.js')}}"></script>
 @endpush

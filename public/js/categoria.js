@@ -30,11 +30,13 @@ $(document).ready(function() {
         "columns":[
             {"data": "id"},
             {"data": "nome"},
+            {"data": "slug"},
             {"data": "defaultContent",
                 render: function (data, type, row) {
                     return '<img src="'+Helpers.asset("storage/categorias/"+row.id+"/"+ row.imagem)+'" class="img-datatable">';
                 }
             },
+            {"data": "quantidade"},
             {"data": "defaultContent",
                 render: function (data, type, row) {
                     let status = "<span class=\"badge badge-pill badge-success\">"+row.status+"</span>";
@@ -84,12 +86,14 @@ $(document).ready(function() {
         fila = $(this).closest("tr");
         id = parseInt(fila.find('td:eq(0)').text()); //capturo o ID
         categoria = fila.find('td:eq(1)').text();
-        quantidade = fila.find('td:eq(2)').text();
-        status = fila.find('td:eq(3)').text() === 'ATIVO'? 1 : 0;
+        let slug = fila.find('td:eq(2)').text();
+        quantidade = fila.find('td:eq(4)').text()
+        status = fila.find('td:eq(5)').text() === 'ATIVO'? 1 : 0;
 
         $("#metodo").val('PUT');
         $("#id").val(id);
         $("#nome").val(categoria);
+        $("#slug").val(slug);
         //$("#image").val(image);
         $("#status").val(status);
 
