@@ -46,26 +46,24 @@ class CategoriaController extends Controller
     public function create()
     {
         try {
+            $categorias = $this->categoria::all();
 
-            foreach ($this->categoria::all() as $value){
-                $data['id'] =  $value->id;
-                $data['nome'] =  $value->nome;
-                $data['imagem'] =  $value->imagem;
-                $data['status'] =  $value->status == 1 ? "ATIVO" : "INATIVO";
-                $data['created_at'] =  date('d/m/Y H:i:s', strtotime($value->created_at));
-                $data['updated_at'] =  date('d/m/Y H:i:s', strtotime($value->updated_at));
+            $resultado = $categorias->map(function ($categoria) {
+                return [
+                    'id' => $categoria->id,
+                    'nome' => $categoria->nome,
+                    'slug' => $categoria->slug,
+                    'imagem' => $categoria->imagem,
+                    'quantidade' => $categoria->quantidade,
+                    'status' => $categoria->status == 1 ? 'ATIVO' : 'INATIVO',
+                    'created_at' => $categoria->created_at->format('d/m/Y H:i:s'),
+                    'updated_at' => $categoria->updated_at->format('d/m/Y H:i:s'),
+                ];
+            });
 
-                $exit[] = $data;
-            }
-
-            if(!empty($exit)) {
-                return Response()->json($exit);
-            }  else {
-                return Response()->json(array('data'=>''));
-            }
-
-        } catch (Throwable  $e) {
-            return Response::json(['error' => $e], 500);
+            return response()->json($resultado->isNotEmpty() ? $resultado : ['data' => '']);
+        } catch (Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -99,6 +97,7 @@ class CategoriaController extends Controller
 
             $cat = Categoria::create([
                 'nome' => $this->request->input('nome'),
+                'slug' => $this->request->input('slug'),
                 'status' =>  $this->request->input('status')
             ]);
 
@@ -197,6 +196,7 @@ class CategoriaController extends Controller
             }
 
             $this->categoria->nome = $this->request->input('nome');
+            $this->categoria->slug = $this->request->input('slug');
             $this->categoria->status = $this->request->input('status');
 
             $this->categoria->save();

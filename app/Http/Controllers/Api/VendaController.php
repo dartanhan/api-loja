@@ -116,11 +116,10 @@ class VendaController extends Controller
         $codigo_produto = $this->request->header('product-code');
         $tipo_pgto = intval($this->request->header('tipo-id'));
 
-        $variations = $this->productVariation::with('produtoPai', 'images')
+        $variations = $this->productVariation::with('produtoPai.categorias', 'images')
             ->where('subcodigo', $codigo_produto)
             ->orWhere('gtin', $codigo_produto)
             ->first();
-
 
         if (!$variations) {
             return response()->json(['success' => false, 'message' => 'Produto não encontrado!'], 201);
@@ -147,6 +146,7 @@ class VendaController extends Controller
             ? $storage . '/' . $variations->images[0]->path
             : $storage . '/produtos/not-image.png';
 
+
         return response()->json([
             'success' => true,
             'id' => $product->id, //id do pai
@@ -167,7 +167,8 @@ class VendaController extends Controller
             'loja_id' => 2,
             'troca' => false,
             'path' => $imagePath,
-            'path_image' => $imagePath
+            'path_image' => $imagePath,
+            'slug_cat' => $product->categorias[0]->slug ?? ''
         ], 200);
     }
 

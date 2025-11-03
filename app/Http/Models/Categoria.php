@@ -8,7 +8,7 @@ class Categoria extends Model
 {
     public $table = 'loja_categorias';
     protected $primaryKey = 'id';
-    protected $fillable = ['nome','imagem','status'];
+    protected $fillable = ['nome','imagem','quantidade','status','slug','updated_at'];
 
     function produtos() {
         return  $this->hasMany('App\Http\Models\Categoria');
