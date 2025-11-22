@@ -163,7 +163,13 @@ $(function() {
                                     let imagesHtml = "";
                                     if (arrayItem.images && arrayItem.images.length > 0) {
                                         arrayItem.images.forEach(function(img) {
-                                            imagesHtml += "<img src='" + Helpers.asset('storage/' + img.path) + "' class='image img-datatable me-1' alt='' title='" + arrayItem.variacao + "' style='max-width:150px;'/>";
+                                            imagesHtml += "<div style='display:inline-block; margin:10px; text-align:center;' data-img-id='" + img.id + "'>"
+                                                + "<img src='" + Helpers.asset('storage/' + img.path) + "' "
+                                                + "class='image img-datatable me-1' alt='' title='" + arrayItem.variacao + "' style='max-width:150px; display:block; margin-bottom:5px;'/>"
+                                                + "<button type=\"button\" class='btn btn-sm btn-danger' onclick=\"utils.deleteImage('" + img.id + "')\">"
+                                                + "<i class='bi-trash'></i> Excluir"
+                                                + "</button>"
+                                                + "</div>";
                                         });
                                     } else {
                                         imagesHtml = "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' class='image img-datatable' alt='' title='" + arrayItem.variacao + "'/>";
