@@ -11,8 +11,8 @@ class Pesquisa extends Component
 
     public function mount()
     {
-        $inicio = Carbon::now()->startOfMonth()->format('d/m/Y');
-        $fim = Carbon::now()->endOfMonth()->format('d/m/Y');
+        $inicio = Carbon::now()->format('d/m/Y');
+        $fim = Carbon::now()->format('d/m/Y');
 
         $this->data_range = "$inicio - $fim";
 

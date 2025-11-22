@@ -19,25 +19,24 @@ $(function () {
      * #########################################################################
      * */
 
-    table =  $('#datatablesDiario').DataTable({
+    table = $('#datatablesDiario').DataTable({
         dom: 'Bfrtip', // Ativa os botões de exportação
-        "ajax":{
-            "method": 'post',
-            "url": url + "/dashboardDiario/vendasDia",
-            "data":function(data){
-                data.id = 2,
-                data._token = token,
-                data.periodo = dtaPeriodo.val()
-               // data.dataIni = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
-               // data.dataFim = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+        processing: true, // ativa o indicador de processamento
+        ajax: {
+            method: 'post',
+            url: url + "/dashboardDiario/vendasDia",
+            data: function(data){
+                data.id = 2;
+                data._token = token;
+                data.periodo = dtaPeriodo.val();
+                // data.dataIni = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
+                // data.dataFim = getDataFormat($('input[name=data_range]').val(),'DD/MM/YYYY','YYYY-MM-DD');
             },
-
-            "dataType":"json",
+            dataType: "json",
             responsive: true,
             dataSrc: function(json) {
-
                 $("[data-key='taxes']")
-                    .attr("data-valor",json.total_imposto)
+                    .attr("data-valor", json.total_imposto)
                     .each(function () {
                         if (!$(this).text().includes("*")) {
                             $(this).text(json.total_imposto);
@@ -59,9 +58,6 @@ $(function () {
                             $(this).text(json.total_precentual_mc);
                         }
                     });
-                /*$("[data-key='taxes']").attr("data-valor", json.total_imposto);
-                $("[data-key='tmc']").attr("data-valor", json.total_mc);
-                $("[data-key='tpmc']").attr("data-valor", json.total_precentual_mc);*/
 
                 return json.data;
             }
@@ -144,7 +140,8 @@ $(function () {
                 }
             ],
         language: {
-            "url": Helpers.asset("Portuguese-Brasil.json")
+            url: Helpers.asset("Portuguese-Brasil.json"),
+            processing: "⏳ Aguarde, carregando registros..."
         },
         "order": [[8, "desc"]],
         "initComplete": function(settings, json) {
@@ -694,6 +691,7 @@ $(function () {
 
          periodo = utils.getPeriodoFormatado(dtaPeriodo.val());
 
+        console.log("periodo", periodo);
 
         fncDataBarChart(periodo.inicio, periodo.fim).then(); // atualiza os cards de totais
         fncDataDatatable(table);
