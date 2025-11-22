@@ -114,8 +114,8 @@ $(function() {
             let tmpRow  ="<table class='table table-striped table-condensed'>" +
                 "<thead class=\"text-center\">" +
                 "<tr class='bg-secondary '>" +
-                "<th>IMAGEM</th>" +
                 "<th>SUB CÓDIGO</th>" +
+                "<th>GTIN</th>" +
                 "<th>VARIAÇÃO</th>" +
                 "<th>QTD</th>" +
                 "<th>ESTOQUE</th>" +
@@ -124,7 +124,7 @@ $(function() {
                // "<th>PRODUTO</th>" +
                // "<th>DESCONTO EM %</th>" +
                 "<th>STATUS</th>" +
-                //"<th>AÇÃO</th>" +
+                "<th>AÇÃO</th>" +
                 "</tr>" +
                 "</thead>";
 
@@ -139,47 +139,54 @@ $(function() {
                 success: function (response) {
                     //  console.log(response.data.products);
                     if (response.success) {
-                        let arrayProducts = JSON.stringify(response.data.products);
+                        let arrayProducts = JSON.stringify(response.data.variacoes);
 
-                        JSON.parse(arrayProducts).forEach(async function (arrayItem, index, fullArray) {
-                             console.log(arrayItem.subcodigo);
-                            let image = arrayItem.path !== null ?
-                                "<img src='" + Helpers.asset('storage/' + arrayItem.path) + "' ' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>" :
-                                "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' class=\"image img-datatable\" alt=\"\" title='" + arrayItem.variacao + "'/>"
+                        JSON.parse(arrayProducts).forEach(function (arrayItem) {
+                            // monta todas as imagens da variação
+                            let imagesHtml = "";
+                            if (arrayItem.images && arrayItem.images.length > 0) {
+                                arrayItem.images.forEach(function(img) {
+                                    imagesHtml += "<div style='display:inline-block; margin:10px; text-align:center;' data-img-id='" + img.id + "'>"
+                                        + "<img src='" + Helpers.asset('storage/' + img.path) + "' "
+                                        + "class='image img-datatable me-1' alt='' title='" + arrayItem.variacao + "' style='max-width:150px; display:block; margin-bottom:5px;'/>"
+                                        + "<button type=\"button\" class='btn btn-sm btn-danger' onclick=\"utils.deleteImage('" + img.id + "')\">"
+                                        + "<i class='bi-trash'></i> Excluir"
+                                        + "</button>"
+                                        + "</div>";
 
-                            let image_filho = Helpers.asset("storage/produtos/not-image.png");
-                            if(arrayItem.path !== null){
-                                image_filho = Helpers.asset('storage/' + arrayItem.path);
+
+                                });
+                            } else {
+                                imagesHtml = "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' "
+                                    + "class='image img-datatable' alt='' title='" + arrayItem.variacao + "'/>";
                             }
 
-                            tmpRow += "<tr>" +
-                                "<td>"+image+"</td>" +
-                                "<td>" + arrayItem.subcodigo + "</td>" +
-                                "<td>" + arrayItem.variacao + "</td>" +
-                                "<td>" + arrayItem.quantidade + "</td>" +
-                                "<td>" + arrayItem.estoque + "</td>" +
-                                "<td>" + formatMoney(arrayItem.valor_varejo) + "</td>" +
-                                "<td>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
-                               // "<td>" + formatMoney(arrayItem.valor_produto) + "</td>" +
-                               // "<td>" + formatMoney(arrayItem.percentage) + "</td>" +
-                                "<td>" + "<span class='badge bg-success'>"+arrayItem.status+"</span>" + "</td>" +
-                                // "<td>" +
-                                // "   <i class=\"bi-image\" " +
-                                // "   style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                // "   title='Imagem da Variação do Produto' data-bs-toggle=\"modal\" " +
-                                // "   data-bs-target=\"#divModalImageProduct\" data-variacao-id='"+arrayItem.id+"' " +
-                                // "   data-subcodigo='"+arrayItem.subcodigo+"' data-image-id='"+arrayItem.id_image+"'" +
-                                // "   data-image-preview='"+image_filho+"'  data-path='"+arrayItem.path+"' data-flag-image='1'>" +
-                                // "   </i>"+
-                                // "   <i class=\"bi-pencil-square openModalBtn\"  " +
-                                // "       style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
-                                // "       title=\"Atualizar Produto\" data-id='"+arrayItem.id+"'>" +
-                                // "   </i>" +
-                                // "</td>"+
-                                "</tr>"
+                            if (arrayItem.status == 1) {
+                                tmpRow += "<tr>"
+                                    + "<td rowspan='2'>" + arrayItem.subcodigo + "</td>"
+                                    + "<td rowspan='2'>" + arrayItem.gtin + "</td>"
+                                    + "<td rowspan='2'>" + arrayItem.variacao + "</td>"
+                                    + "<td rowspan='2'>" + arrayItem.quantidade + "</td>"
+                                    + "<td rowspan='2'>" + arrayItem.estoque + "</td>"
+                                    + "<td rowspan='2'>" + formatMoney(arrayItem.valor_varejo) + "</td>"
+                                    + "<td rowspan='2'>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>"
+                                    + "<td rowspan='2'><span class='badge bg-success'>" + (arrayItem.status == 1 ? "ATIVO" : "INATIVO") + "</span></td>"
+                                    + "<td rowspan='2'>"
+                                    + "<i class=\"bi-image\" style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" "
+                                    + "   title='Imagem da Variação do Produto' data-toggle=\"modal\" "
+                                    + "   data-target=\"#divModalImageProduct\" data-variacao-id='" + arrayItem.id + "' "
+                                    + "   data-subcodigo='" + arrayItem.subcodigo + "' data-flag-image='1'>"
+                                    + "</i>"
+                                    + "</td>"
+                                    + "</tr>"
+                                    + "<tr>";
+
+                                // linha extra só para imagens
+                                tmpRow += "<tr><td colspan='11'>" + imagesHtml + "</td></tr>";
+                            }
                         });
 
-                        tmpRow  +=      "</table>";
+                        tmpRow += "</table>";
                         row.child(tmpRow).show();
                     }
                 },
@@ -352,6 +359,9 @@ $(function() {
     $(document).on('click','.openModalBtn', function () {
         $('#slideInModal').modal('show');
     });
+
+
+
 });
 /**
  *  Formatting function for row details - modify as you need
@@ -383,3 +393,6 @@ function format ( d ) {
         '</tr>'+
         '</table>';
 }
+
+
+

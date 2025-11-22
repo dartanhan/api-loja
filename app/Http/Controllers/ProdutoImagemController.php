@@ -187,12 +187,14 @@ class ProdutoImagemController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param $id
      * @return JsonResponse
      */
-    public function destroy()
+    public function destroy($id = null)
     {
         try {
-            $id = $this->request->input("id");
+            // tenta pegar o id da rota, se não vier usa o input
+            $id = $id ?? $this->request->input('id');
 
             $image = $this->produtoImagem::find($id);
            // dd($image);
