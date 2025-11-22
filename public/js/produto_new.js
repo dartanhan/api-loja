@@ -169,7 +169,7 @@ $(function() {
                                         imagesHtml = "<img src='" + Helpers.asset('storage/produtos/not-image.png') + "' class='image img-datatable' alt='' title='" + arrayItem.variacao + "'/>";
                                     }
 
-                                    if (arrayItem.status !== 'INATIVO') {
+                                    if (arrayItem.status == 1) {
                                         tmpRow += "<tr>" +
                                             "<td rowspan='2'>" + arrayItem.subcodigo + "</td>" +
                                             "<td rowspan='2'>" + arrayItem.gtin + "</td>" +
@@ -180,7 +180,7 @@ $(function() {
                                             "<td rowspan='2'>" + formatMoney(arrayItem.valor_atacado_10un) + "</td>" +
                                             "<td rowspan='2'>" + formatMoney(arrayItem.valor_produto) + "</td>" +
                                             "<td rowspan='2'>" + arrayItem.percentage + "% </td>" +
-                                            "<td rowspan='2'><span class='badge bg-success'>" + arrayItem.status + "</span></td>" +
+                                            "<td rowspan='2'><span class='badge bg-success'>" + (arrayItem.status == 1 ? "ATIVO" : "INATIVO")  + "</span></td>" +
                                             "<td rowspan='2'>" +
                                             "<i class=\"bi-image\" style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" " +
                                             "   title='Imagem da Variação do Produto' data-toggle=\"modal\" " +

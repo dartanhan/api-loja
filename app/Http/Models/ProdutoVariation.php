@@ -71,9 +71,4 @@ class ProdutoVariation extends Model implements Auditable
         $this->attributes['valor_produto'] = str_replace(',', '.', $value);
     }
 
-    public function getStatusAttribute($value)
-    {
-        return $value == 1 ? 'ATIVO' : 'INATIVO';
-    }
-
 }
