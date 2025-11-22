@@ -22,10 +22,10 @@
                                     <label for="label-codigo-{{ $variacao['subcodigo'] }}">{{ __('SUB CÓDIGO(SKU)') }}</label>
                                 </div>
                             </div>
-                            <div class="col-auto mb-3" style="max-width: 100px;min-width: 150px">
+                            <div class="col-auto mb-3" style="max-width: 180px;min-width: 160px">
                                 <div class="floating-label-group border-lable-flt">
                                     <input type="text" placeholder="{{ __('GTIN') }}"
-                                           wire:model.defer="variacoes.{{ $index }}.gtin"  class="form-control form-control-sm format-font" >
+                                           wire:model.lazy="variacoes.{{ $index }}.gtin"  class="form-control form-control-sm format-font" >
                                     <label for="label-gtin-{{ $index }}">{{ __('GTIN') }}</label>
                                 </div>
                             </div>
@@ -74,7 +74,7 @@
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">R$</span>
                                         <input type="text" placeholder="{{ __('VALOR VAREJO') }}"
-                                               wire:model="variacoes.{{ $index }}.valor_varejo"
+                                               wire:model.lazy="variacoes.{{ $index }}.valor_varejo"
                                                class="form-control form-control-sm format-font moeda" >
                                         <label for="label-valor-varejo-{{ $index }}">{{ __('VALOR VAREJO') }}</label>
                                     </div>
@@ -85,7 +85,7 @@
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">R$</span>
                                         <input type="text" placeholder="{{ __('VALOR ATACADO') }}"
-                                               wire:model.defer="variacoes.{{ $index }}.valor_atacado"
+                                               wire:model.lazy="variacoes.{{ $index }}.valor_atacado"
                                                class="form-control form-control-sm format-font moeda" >
                                         <label for="label-valor-atacado-{{ $index }}">{{ __('VALOR ATACADO') }}</label>
                                     </div>
@@ -96,7 +96,7 @@
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">R$</span>
                                         <input type="text" placeholder="{{ __('VALOR PRODUTO') }}"
-                                               wire:model.defer="variacoes.{{ $index }}.valor_produto"
+                                               wire:model.lazy="variacoes.{{ $index }}.valor_produto"
                                                class="form-control form-control-sm format-font moeda" >
                                         <label for="label-valor-produto-{{ $index }}">{{ __('VALOR PRODUTO') }}</label>
                                     </div>

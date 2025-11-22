@@ -95,15 +95,42 @@ class ProdutoVariacoesForm extends Component
         $this->variacoes = $data;
     }
 
-    public function updated($propertyName)
+    public function updatedVariacoes($value, $key)
     {
-        // Detecta se o campo alterado é valor_produto de uma variação específica
-        if (str_starts_with($propertyName, 'variacoes.') && str_ends_with($propertyName, '.valor_varejo')) {
-            $index = explode('.', $propertyName)[1];
-            $this->variacoes[$index]['valor_atacado'] = $this->variacoes[$index]['valor_varejo'];
-        }
-    }
+        // $key vem como "0.valor_varejo" ou "0.valor_atacado"
+        [$index, $campo] = explode('.', $key);
 
+        // Normaliza valor (ex: troca vírgula por ponto)
+        $value = str_replace(',', '.', preg_replace('/[^\d,]/', '', $value));
+
+        // Aplica a regra única
+        if ($campo === 'valor_varejo') {
+            // Se alterou o varejo, atacado recebe o mesmo valor
+            $this->variacoes[$index]['valor_atacado'] = $value;
+        }
+
+        if ($campo === 'valor_atacado') {
+            // Se alterou o atacado, só atualiza atacado
+            $this->variacoes[$index]['valor_atacado'] = $value;
+        }
+
+        // Atualiza no banco
+        $variacao = $this->produto->variacoes[$index];
+        $variacao->update([
+            $campo => $value,
+            'valor_atacado' => $this->variacoes[$index]['valor_atacado'],
+        ]);
+        // Atualiza o array com vírgula para exibir
+        $this->variacoes[$index][$campo] = number_format((float) $value, 2, ',', '');
+
+
+        $this->dispatchBrowserEvent('toast:success', [
+            'message'    => 'Informações atualizadas com sucesso!',
+            'background' => '#28a745',
+            'color'      => '#fff',
+            'reload'     => false, // ou false, conforme desejar // só quando precisar
+        ]);
+    }
 
     public function render()
     {
