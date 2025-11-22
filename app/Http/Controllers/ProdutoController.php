@@ -128,7 +128,7 @@ class ProdutoController extends Controller
                 )->from('loja_produtos_new as lpn')
                 ->where('lpn.status', 1) //somente ativos
                 ->groupBy('lpn.id')
-                ->orderBy('lpn.id', 'DESC')->limit(2);
+                ->orderBy('lpn.id', 'DESC');
 
             if (!empty($query)) {
                 return DataTables::of($query)->make(true);
