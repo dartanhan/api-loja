@@ -285,8 +285,14 @@
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
-            background:event.detail.background,
-            color:event.detail.color
+            background: event.detail.background,
+            color: event.detail.color
+        }).then(() => {
+            // Se reload for true, recarrega a página
+            // reload só se vier true, senão fica false por padrão
+            if (event.detail.reload === true) {
+                window.location.reload();
+            }
         });
     });
 

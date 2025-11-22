@@ -56,5 +56,24 @@ class ProdutoVariation extends Model implements Auditable
             ->whereMonth('created_at', Carbon::now()->month); // Filtrar vendas do mês
     }
 
+    public function setValorVarejoAttribute($value)
+    {
+        $this->attributes['valor_varejo'] = str_replace(',', '.', $value);
+    }
+
+    public function setValorAtacadoAttribute($value)
+    {
+        $this->attributes['valor_atacado'] = str_replace(',', '.', $value);
+    }
+
+    public function setValorProdutoAttribute($value)
+    {
+        $this->attributes['valor_produto'] = str_replace(',', '.', $value);
+    }
+
+    public function getStatusAttribute($value)
+    {
+        return $value == 1 ? 'ATIVO' : 'INATIVO';
+    }
 
 }
