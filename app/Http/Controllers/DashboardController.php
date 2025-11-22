@@ -78,8 +78,8 @@ class DashboardController extends Controller
             if ($periodo && str_contains($periodo, ' - ')) {
                 [$inicio, $fim] = explode(' - ', $periodo);
 
-                $startDate = CarbonImmutable::createFromFormat('d/m/Y', trim($inicio));
-                $endDate = CarbonImmutable::createFromFormat('d/m/Y', trim($fim));
+                $startDate = CarbonImmutable::createFromFormat('d/m/Y', trim($inicio))->format("Y-m-d");
+                $endDate = CarbonImmutable::createFromFormat('d/m/Y', trim($fim))->format("Y-m-d");
             } else {
                 // fallback para hoje se o período estiver vazio ou malformado
                 $startDate = CarbonImmutable::today();
