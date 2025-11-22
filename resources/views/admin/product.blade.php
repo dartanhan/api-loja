@@ -67,7 +67,7 @@
 
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title" id="exampleModalLongTitle">Imagem do Produto </h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -75,11 +75,11 @@
                         <input type="file"  id="image" name="image" title="Imagem" placeholder="Imagem" >
 
                          <!-- Pré-visualização da imagem atual -->
-                        <img id="modal-imagem" alt="Imagem Atual" class="img-thumbnail">
+                        {{--<img id="modal-imagem" alt="Imagem Atual" class="img-thumbnail">--}}
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Salvar</button>
                     </div>
                 </form>

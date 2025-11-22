@@ -14,7 +14,8 @@ window.getDataYear = getDataYear;
 window.utils = {
     dateRangePicker,
     getPeriodoFormatado,
-    getAplicarSlug
+    getAplicarSlug,
+    deleteImage
     // etc.
 };
 
@@ -485,3 +486,50 @@ $(document).on("click","#addListaCompra" ,function(event){
             .trim()
             .replace(/\s+/g, "-");
     }
+
+    export function deleteImage(imgId) {
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Deseja realmente deletar esta imagem?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sim, deletar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/image/' + imgId, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    title:'Deletado!',
+                                    text: 'A imagem foi removida com sucesso.',
+                                    icon:'success',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                                document.querySelector("[data-img-id='" + imgId + "']").remove();
+                            } else {
+                                Swal.fire(
+                                    'Erro!',
+                                    'Não foi possível deletar a imagem.',
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire(
+                                'Erro!',
+                                'Falha de conexão: ' + err,
+                                'error'
+                            );
+                        });
+                }
+            });
+        }
