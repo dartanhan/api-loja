@@ -15,7 +15,9 @@ window.utils = {
     dateRangePicker,
     getPeriodoFormatado,
     getAplicarSlug,
-    deleteImage
+    deleteImage,
+    isStatusActive,
+    isStatusInactive
     // etc.
 };
 
@@ -533,3 +535,14 @@ $(document).on("click","#addListaCompra" ,function(event){
                 }
             });
         }
+
+
+    export function isStatusActive(status) {
+        return String(status).toUpperCase() === 'ATIVO' || Number(status) === 1;
+    }
+
+    export function isStatusInactive(status) {
+        return String(status).toUpperCase() === 'INATIVO' || Number(status) === 0;
+    }
+
+

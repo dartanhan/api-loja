@@ -385,7 +385,7 @@ $(function() {
                 required: true
             },
             gtin0: {
-                required: true
+                required: false
             },
             percentage: {
                 required: true
@@ -496,7 +496,7 @@ $(function() {
         await fetch(url + "/produto/getProducts/"+id).then( function (response) {
             return response.json()
         }).then( function (response) {
-            //console.log(JSON.stringify(response.data));
+           // console.log(JSON.stringify(response.data));
 
             $('#produto_id').val(response.data.id);
             $('#codigo_produto').val(response.data.codigo_produto);
@@ -514,155 +514,15 @@ $(function() {
 
             $('#btnSalvar').html("<i class=\"fas fa-refresh\"></i> Atualizar");
             let arrayProducts = JSON.stringify(response.data.variacoes);
-            //console.log(arrayProducts);
 
-            //$("#tblVariacao").html("");
             $("#tbl").html("");
             JSON.parse(arrayProducts).forEach(function (arrayItem, index, fullArray) {
-                //console.log(index);
+                const selected = utils.isStatusActive(arrayItem.status) ? '' : 'selected';
 
-                //$("#tblVariacao").append(camposVariacao(arrayProducts));
-                let selected = arrayItem.status === 'ATIVO' ? '' : 'selected';
-
-                //$("#tblVariacao").append(camposformVariacao(index,arrayItem,selected));
                 $("#tbl").append(fnc_variacao(index,'',index,arrayItem,selected));
-
             });
         });
     });
-
-    /***
-     *
-     * */
-/*
-    $(document).on("click",".btnProductImage" ,function(event){
-        event.preventDefault();
-        id = $(this).data('id') != null ? $(this).data('id') : 0; //capturo o ID
-        $("#product_id").val(id);
-    });*/
-        /**
-     * Exibe as imagens das variações dos produtos
-     * **/
-    /*$(document).on("click",".btnImageProduct" ,function(event){
-        event.preventDefault();
-
-        //console.log($(this).data('variacao-id'));
-        id = $(this).data('variacao-id') != null ? $(this).data('variacao-id') : 0; //capturo o ID
-       // $("#products_variation_id").val($(this).data('subcodigo'));
-        $("#products_variation_id").val(id);
-
-        $.ajax({
-            url: url + "/produto/pictures/"+id,
-            type:'get',
-            cache: false,
-            dataType:'json',
-            beforeSend: function () {
-                $("#modal-title").removeClass( "alert alert-danger" );
-                $('#modal-title').html('<h4>Aguarde... <div class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></div></h4>');
-                $("#modal-title").addClass( "alert alert-info" );
-            },
-            success: function(response) {
-               // console.log(response);
-                grid = "";
-                if(response.data.length > 0){
-                    $.each(response.data, function (idx, value) {
-                        grid += "<div class=\"col\">";
-                        grid += "<img src='../public/storage/" + value.path + "' width='180px' height='180px' alt=\"\"></img>";
-                        grid += "<i class=\"bi-trash btnRemoveImage\"  data-id='"+value.id+"' style=\"font-size: 2rem; color: #db9dbe;cursor: pointer;\" title='Remover Imagem'></i>";
-                        grid += "</div>";
-                    });
-                }else{
-                    grid = "<img src='../public/storage/produtos/not-image.png' width='180px' height='180px' alt=\"\"></img>";
-                }
-                $("#pictures").html(grid);
-            },
-            error:function(response){
-                json = $.parseJSON(response.responseText);
-                $("#modal-title").addClass( "alert alert-danger" );
-                $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>'+json.message+'</strong></p>');
-                Swal.fire(
-                    'error!',
-                    json.message,
-                    'error'
-                )
-
-            },complete: function(response){
-
-            }
-        });
-    });/
-
-    /**
-     * Deleta a imagem do produto
-     * */
-   // $('i[name="btnRemoveImage"]').on('click',function(event) {
-   /* $(document).on("click",".btnRemoveImage" , function(event){
-        event.preventDefault();
-
-        Swal.fire({
-            title: 'Tem certeza?',
-            text: "Está seguro de remover esta imagem ?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sim, deletar!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-
-            id = $(this).data('id');
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-                $.ajax({
-                    url: url + '/image/destroy',
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        _method: 'DELETE'
-                    },
-                    cache: false,
-                    dataType: 'json',
-                    success: function (response) {
-                        //console.log(response.message);
-                        //table.ajax.reload();
-                        //$("#alert-success").html(response.message).fadeIn('slow').fadeOut(3000);
-                        Swal.fire({
-                            title: "Sucesso!",
-                            text: response.message,
-                            icon: 'success',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        //table.ajax.reload(null, false);
-                        table.destroy();
-                        getdata();
-                    },
-                    error: function (response) {
-                        json = $.parseJSON(response.responseText);
-                        Swal.fire(
-                            'error!',
-                            json.message,
-                            'error'
-                        )
-                    },
-                    complete:function(response){
-                        json = $.parseJSON(response.responseText);
-                        if(json.success) {
-                            window.setTimeout(function () {
-                                $('#divModalImage').modal('hide');
-                            }, 1500);
-                        }
-                    }
-                });
-            }
-        });
-    });*/
-
-    /*** Fim */
 
     /**
      * Upload em Lote
@@ -764,7 +624,7 @@ $(function() {
         let validade = arrayItem != null ? getFormattedDate(arrayItem.validade) : '00/00/0000';
         let fornecedor_id = arrayItem != null ? arrayItem.fornecedor : 0;
         let percentage = arrayItem != null ? formatMoney(arrayItem.percentage,'') : typeof $("#percetage0").val() !== "undefined" ? $("#percetage0").val() : '0,00';
-        let gtin = arrayItem && arrayItem.gtin !== null ? arrayItem.gtin : 0;
+        let gtin = arrayItem && arrayItem.gtin !== null ? arrayItem.gtin : '';
 
         /**
          * Adiciona o icone de remover do segundo em diante
@@ -779,7 +639,8 @@ $(function() {
         }
 
         if(arrayItem !== null ){
-            display = arrayItem.status === 'INATIVO' ? 'padding:0px;display:none' : 'padding: 3px;';
+            //display = arrayItem.status === 'INATIVO' ? 'padding:0px;display:none' : 'padding: 3px;';
+            display = utils.isStatusInactive(arrayItem.status) ? 'padding:0px;display:none': 'padding: 3px;';
         }
 
         $("#tbl").append("<div class=\"row mt-1\" style=\" "+display+"\" id=\"div_pai"+i+"\">" +
@@ -795,9 +656,9 @@ $(function() {
                                 "</div>"+
                                 "<div class=\"col-md-2\" style='left: -2px;width: 200px'>" +
                                     "<span class=\"border-lable-flt\">"+
-                                        "<input type=\"number\" name=\"gtin[]\"  maxlength='15' id=\"gtin"+i+"\" " +
+                                        "<input type=\"text\" name=\"gtin[]\"  maxlength='15' id=\"gtin"+i+"\" " +
                                         "class=\"form-control format-font\" placeholder=\"GTIN\" maxlength='15' " +
-                                        "value=\'" + gtin + "\' required/>" +
+                                        "value=\'" + gtin + "\' />" +
                                         "<label for=\"label-gtin\">GTIN</label>"+
                                     "</span>"+
                                 "</div>"+
@@ -909,18 +770,18 @@ $(function() {
        const inputs_variacao = document.querySelectorAll('input[name="variacao[]"]');
        const inputs_qtd = document.querySelectorAll('input[name="quantidade[]"]');
        const selects = document.querySelectorAll('select[name="fornecedor[]"]');
-        const inputs_gtin = document.querySelectorAll('input[name="gtin[]"]');
+       // const inputs_gtin = document.querySelectorAll('input[name="gtin[]"]');
        let error = false;
 
-        inputs_gtin.forEach(input => {
-            if (input.value.trim() === '') {
-                //errors.push(`Campo ${input.name} deve ser preencido!`);
-                error = true;
-                input.classList.add('invalid-input');
-            } else {
-                input.classList.remove('invalid-input');
-            }
-        });
+        // inputs_gtin.forEach(input => {
+        //     if (input.value.trim() === '') {
+        //         //errors.push(`Campo ${input.name} deve ser preencido!`);
+        //         error = true;
+        //         input.classList.add('invalid-input');
+        //     } else {
+        //         input.classList.remove('invalid-input');
+        //     }
+        // });
 
         inputs_variacao.forEach(input => {
             if (input.value.trim() === '') {
@@ -1015,11 +876,11 @@ $(function() {
                 try {
                     json = xhr.responseJSON ?? JSON.parse(xhr.responseText);
                 } catch (e) {
-                    console.error("Erro ao processar JSON de erro:", e);
+                   // console.error("Erro ao processar JSON de erro:", e);
                     return;
                 }
 
-                console.error("Erro na requisição:", json);
+             //   console.error("Erro na requisição:", json);
 
                 $('#modal-title').html('<p><i class="fas fa-exclamation-circle"></i>&nbsp;<strong>' + (json.message || 'Erro desconhecido') + '</strong></p>');
 
