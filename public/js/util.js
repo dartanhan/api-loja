@@ -53,6 +53,10 @@
     // });
 
     window.addEventListener('status-generico', event => {
+
+        const shouldGoBack = event.detail.goBack ?? true;
+        // se não vier nada, assume true (voltar normalmente)
+
         Swal.fire({
             toast: true,
             position: 'top-end',
@@ -62,8 +66,9 @@
             timer: 3000,
             showConfirmButton: false,
         }).then(() => {
-            // Após o SweetAlert fechar, emite evento Livewire
-            Livewire.emit('voltar');
+            if (shouldGoBack) {
+                Livewire.emit('voltar');
+            }
         });
     });
 

@@ -15,6 +15,7 @@ use App\Http\Models\Usuario;
 use App\Traits\MovimentacaoTrait;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -375,7 +376,9 @@ class ProdutoController extends Controller
                         "validade" => $validade,
                         "fornecedor" => (int)$this->request->input("fornecedor")[$i],
                         "estoque" => (int)$this->request->input("estoque")[$i],
-                        "gtin" => $this->request->input("gtin")[$i],
+                        "gtin" => trim($this->request->input("gtin")[$i]) !== ""
+                            ? $this->request->input("gtin")[$i]
+                            : null,
                         "variacao_id" => (int)$this->request->input("variacao_id")[$i],
                     ];
 
@@ -395,7 +398,16 @@ class ProdutoController extends Controller
                     ]);
                 }
 
-            } catch (Throwable $e) {
+        } catch (QueryException $e) {
+
+            $gtinErro = $data['gtin'] ?? '(não informado)';
+
+            // Verifica se é erro de UNIQUE
+            if ($e->errorInfo[1] == 1062) {
+                throw new \Exception("O código GTIN {$gtinErro} já está sendo usado em outra variação." ,500, $e);
+            }
+
+        } catch (Throwable $e) {
             throw new \Exception("Erro em salvarVariacoes: " . $e->getMessage(), 500, $e);
         }
     }

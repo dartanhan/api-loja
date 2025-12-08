@@ -7,6 +7,7 @@ use App\Http\Models\Fornecedor;
 use App\Http\Models\Produto;
 use App\Http\Models\ProdutoVariation;
 use App\Traits\ProdutoTrait;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
@@ -93,41 +94,63 @@ class ProdutosVariacoes extends Component
         $this->loadingVariaId = null;
     }
 
-
     public function atualizarCampo($variacaoId, $campo, $valor)
     {
-        // Limpeza básica do valor
-        $valor = str_replace(['R$', '.', ' '], '', $valor);
-        $valor = str_replace(',', '.', $valor);
+        try {
 
-        $variacao = ProdutoVariation::findOrFail($variacaoId);
+            // Limpeza básica do valor
+            $valor = str_replace(['R$', '.', ' '], '', $valor);
+            $valor = str_replace(',', '.', $valor);
 
-        if ($campo === 'quantidade') {
-            $valor = (float) $valor;
+            $variacao = ProdutoVariation::findOrFail($variacaoId);
 
-            // Atualiza somando ou subtraindo o valor informado
-            $novoTotal = $variacao->quantidade + $valor;
+            if ($campo === 'quantidade') {
+                $valor = (float) $valor;
 
-            // Ignora valores zerados ou negativos
-            if ($novoTotal < 0) {
-                $novoTotal = 0;
+                $novoTotal = $variacao->quantidade + $valor;
+
+                if ($novoTotal < 0) {
+                    $novoTotal = 0;
+                }
+
+                $variacao->quantidade = $novoTotal;
+
+            } else {
+                $variacao->$campo = $valor;
             }
-            $variacao->quantidade = $novoTotal;
-        } else {
-            $variacao->$campo = $valor;
-        }
 
-        $variacao->save();
+            $variacao->save();
 
-        $this->refreshVariacao($variacao);
+            $this->refreshVariacao($variacao);
 
-        $this->dispatchBrowserEvent('status-generico',
-            [
-                'title' => 'Suecesso!',
+            $this->dispatchBrowserEvent('status-generico', [
+                'title' => 'Sucesso!',
                 'text' => 'Informações atualizadas com sucesso!',
                 'icon' => 'success'
             ]);
+
+        } catch (QueryException $e) {
+
+            if ($e->getCode() == "23000") {  // código de violação UNIQUE
+                $this->dispatchBrowserEvent('status-generico', [
+                    'title' => 'Oops!',
+                    'text' => 'Este código GTIN já está sendo usado por outra variação.',
+                    'icon' => 'error',
+                    'goBack' => false,
+                ]);
+            } else {
+                // outros erros SQL
+                $this->dispatchBrowserEvent('status-generico', [
+                    'title' => 'Erro!',
+                    'text' => 'Não foi possível salvar a alteração.',
+                    'icon' => 'error',
+                    'goBack' => false,
+                ]);
+            }
+        }
+        return; // ← impede continuar
     }
+
 
 
     public function sortBy($field)

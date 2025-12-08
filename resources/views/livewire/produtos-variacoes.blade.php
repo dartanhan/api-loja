@@ -168,6 +168,13 @@
                                                     <input type="text" class="form-control form-control-sm" value="{{ $variacao->subcodigo }}" disabled />
                                                 </div>
 
+                                                <div class="col-md-2">
+                                                    <label class="form-label form-label-sm mb-1">GTIN</label>
+                                                    <input type="text" class="form-control form-control-sm"
+                                                           value="{{ $variacao->gtin }}"
+                                                           wire:blur="atualizarCampo({{ $variacao->id }}, 'gtin', $event.target.value)"/>
+                                                </div>
+
                                                 <div class="col-md-4">
                                                     <label class="form-label form-label-sm mb-1">Variação</label>
                                                     <input type="text"
