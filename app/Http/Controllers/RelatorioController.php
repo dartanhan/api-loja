@@ -314,8 +314,9 @@ class RelatorioController extends Controller
         "), 'tp.venda_id', '=', 'lv.id')
             ->where('lv.loja_id', $store_id)
             ->where('p.troca', 0)
-            ->whereYear('lv.created_at', '=', $dateOne->year)
-            ->whereMonth('lv.created_at', '=', $dateOne->month)
+            //->whereYear('lv.created_at', '=', $dateOne->year)
+            //->whereMonth('lv.created_at', '=', $dateOne->month)
+            ->whereBetween('lv.created_at', [$dateOne, $dateTwo])  // Corrigido: agora usa o intervalo entre as datas
             ->select(DB::raw("
             ROUND(SUM((p.valor_produto * p.quantidade)
             - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa,0) / 100)), 2) as totalMes
