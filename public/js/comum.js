@@ -75,35 +75,51 @@ export function formatMoneyPress(parm) {
 /**
  * Ajusta para exibição nos inputs e etc.. valor moeda!
  * */
-export function formatMoney(valor, cifrao = "R$ ")
-{
+export function formatMoney(valor, cifrao = "R$ ") {
     try {
-
-        // Verifica se o valor passado é uma string
-        if (typeof valor !== 'string') {
-            throw new Error('O valor deve ser uma string. ' + valor);
+        if (valor === null || valor === undefined) {
+            return cifrao + "0,00";
         }
 
-        const v = ((valor.replace(/\D/g, '') / 100).toFixed(2) + '').split('.');
+        // Se for número, converte para string
+        if (typeof valor === "number") {
+            valor = valor.toString();
+        }
+
+        // Agora sim: se não for string, erro
+        if (typeof valor !== 'string') {
+            throw new Error('O valor deve ser string ou número. Valor recebido: ' + valor);
+        }
+
+        // Remove tudo que não for número
+        valor = valor.replace(/\D/g, '');
+
+        if (valor.length === 0) {
+            return cifrao + "0,00";
+        }
+
+        const v = ((parseInt(valor, 10) / 100).toFixed(2) + '').split('.');
 
         const m = v[0].split('').reverse().join('').match(/.{1,3}/g);
 
         if (!m) {
-            throw new Error('Não foi possível formatar o valor.' + m);
+            throw new Error('Não foi possível formatar o valor.');
         }
 
-        for (let i = 0; i < m.length; i++)
+        for (let i = 0; i < m.length; i++) {
             m[i] = m[i].split('').reverse().join('') + '.';
+        }
 
         const r = m.reverse().join('');
 
         return cifrao + r.substring(0, r.lastIndexOf('.')) + ',' + v[1];
+
     } catch (error) {
         console.error('Erro na função formatMoney:', error.message);
-        // Você pode decidir o que fazer aqui em caso de erro, como retornar um valor padrão ou lançar novamente o erro
-        throw error; // Lança novamente o erro para que quem chama a função possa lidar com ele
+        return cifrao + "0,00";
     }
 }
+
 
  /***
      * Formata data de yyyy/mm/dd para dd/mm/yyyy

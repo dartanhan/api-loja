@@ -227,241 +227,142 @@ class RelatorioController extends Controller
      * @param $store_id
      * @return JsonResponse
      */
-    public function chartDay($dateOne,$dateTwo,$store_id)
+    public function chartDay($dateOne, $dateTwo, $store_id)
     {
+        $dateOne = CarbonImmutable::parse($dateOne);
+        $dateTwo = CarbonImmutable::parse($dateTwo);
 
-        //todas as lojas
-        //$stores = $this->lojas::where("status" , true)->get();
+        $iniDayWeek  = $dateOne->startOfWeek()->toDateString();
+        $endDayWeek  = $dateOne->endOfWeek()->toDateString();
 
-        //Tipos de pagamentos
-        //$paymentType = [2,3,4,5,6,7];
-        $payments = $this->payments::all();
-        $paymentType = [];
-        foreach ($payments as $pay) {
-            if(!in_array($pay->id, [1])) //diferentes desse(s) ids de pagamentos [1 = dinheiro]
-                $paymentType[] = $pay->id;
+        $iniDayMonth = $dateOne->startOfMonth()->toDateString();
+        $endDayMonth = $dateTwo->endOfMonth()->toDateString();
+
+        /* ----------------------------------------------------------
+         * Tipos de pagamento exceto dinheiro (id = 1)
+         * --------------------------------------------------------*/
+        $paymentType = $this->payments::where('id', '!=', 1)->pluck('id')->toArray();
+
+        /* ----------------------------------------------------------
+         * CHART: Total por dia do mês
+         * --------------------------------------------------------*/
+        $chart = $this->vendas
+            ->join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
+            ->leftJoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            ->select([
+                DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa / 100)) AS total"),
+                DB::raw('DATE_FORMAT(loja_vendas.created_at, "%d/%m/%Y") as data'),
+                "loja_lojas.nome as loja"
+            ])
+            ->where('loja_vendas.loja_id', $store_id)
+            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$iniDayMonth, $endDayMonth])
+            ->groupBy(DB::raw('DATE(loja_vendas.created_at)'))
+            ->orderBy('loja_vendas.created_at')
+            ->get();
+
+        /* ----------------------------------------------------------
+         * Totais do dia por tipo de pagamento
+         * --------------------------------------------------------*/
+        $totalsDay = $this->totaisPorDia($store_id, $dateOne, $dateTwo);
+
+        $sumDinner = 0;
+        $sumCart   = 0;
+
+        foreach ($totalsDay as $tot) {
+            if ($tot->id_payment == 1) {
+                $sumDinner = (float) $tot->orderTotal;
+            }
+            if (in_array($tot->id_payment, $paymentType)) {
+                $sumCart += (float) $tot->orderTotal;
+            }
         }
 
-       $dateOne = CarbonImmutable::parse($dateOne);
-       $dateTwo = CarbonImmutable::parse($dateTwo);
+        $totalOrders = [
+            "orderTotalDiner" => $this->formatter->formatCurrency($sumDinner, 'BRL'),
+            "orderTotalCart"  => $this->formatter->formatCurrency($sumCart, 'BRL')
+        ];
 
-        $iniDayWeek = $dateOne->startOfWeek()->format('Y-m-d');
-        $endDayWeek = $dateOne->endOfWeek()->format('Y-m-d');
-        //dd( [$iniDayWeek,  $endDayWeek]);
+        $sumOrdersDay = [
+            "orderTotalDay" => $this->formatter->formatCurrency(($sumDinner + $sumCart), 'BRL')
+        ];
 
-        $iniDayMonth = $dateOne->startOfMonth();
-        $endDayMonth = $dateTwo->endOfMonth();
+        /* ----------------------------------------------------------
+         * Descontos por dia
+         * --------------------------------------------------------*/
+        $discount = $this->vendas
+            ->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
+            ->select(DB::raw("SUM(loja_vendas_produtos_descontos.valor_desconto) as total"))
+            ->where('loja_vendas.loja_id', $store_id)
+            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$dateOne, $dateTwo])
+            ->value('total');
 
-        //$iniDayMonth = Carbon::now()->startOfMonth();
-        //$endDayMonth = Carbon::now()->endOfMonth();
+        $discount = (float) $discount;
 
-        //foreach ($stores as $key => $store) {
+        $totalOrderDiscount = [
+            "totalDiscount" => $this->formatter->formatCurrency($discount, 'BRL')
+        ];
 
-            //semana agrupado por dia
-            $chart = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-                ->leftjoin('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-                ->select(
-                    //(DB::raw("SUM(loja_vendas.valor_total) AS total")),
-                    (DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS total")),
-                    (DB::raw('DATE_FORMAT(loja_vendas.created_at, "%d/%m/%Y") as data')),
-                    "loja_lojas.nome as loja"
-                )
-                //->where('loja_vendas.loja_id', $store->id)
-                //->whereDate('loja_vendas.created_at', Carbon::today())
-                //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayWeek, $endDayWeek))
-				//->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayMonth, $endDayMonth))
-                ->where('loja_vendas.loja_id', $store_id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayMonth, $endDayMonth))
-                ->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m-%d"),loja_id')))
-                ->orderBy('loja_vendas.created_at', 'asc')
-                ->get();
-
-
-            //totais por dia
-            $totalsDay = $this->totaisPorDia($store_id,$dateOne, $dateTwo);
-
-
-            //totais descontos por dia
-            $totalsDayDiscount = $this->vendas->join('loja_vendas_produtos_descontos',
-                'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-                ->select(
-                    (DB::raw("FORMAT(SUM(loja_vendas_produtos_descontos.valor_desconto),2) AS orderTotalDiscount"))
-                )
-                ->where('loja_vendas.loja_id', $store_id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dateOne, $dateTwo))
-                ->groupBy('loja_vendas.loja_id')
-                ->get();
-
-
-          $receitasPorMes = DB::table('loja_vendas as lv')
+        /* ----------------------------------------------------------
+         * Total do mês
+         * --------------------------------------------------------*/
+        $receitasPorMes = DB::table('loja_vendas as lv')
             ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
-            ->leftJoin(DB::raw('(
-                SELECT venda_id, AVG(taxa) AS taxa
-                FROM loja_vendas_produtos_tipo_pagamentos
-                GROUP BY venda_id
-            ) as tp'), 'tp.venda_id', '=', 'lv.id')
-            ->select([
-                DB::raw("ROUND(SUM((p.valor_produto * p.quantidade) - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa, 0) / 100)), 2) as totalMes")
-            ])
-            ->where('lv.loja_id', 2)
+            ->leftJoin(DB::raw("
+            (SELECT venda_id, AVG(taxa) AS taxa
+             FROM loja_vendas_produtos_tipo_pagamentos
+             GROUP BY venda_id) as tp
+        "), 'tp.venda_id', '=', 'lv.id')
+            ->where('lv.loja_id', $store_id)
             ->where('p.troca', 0)
-            //->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
             ->whereYear('lv.created_at', '=', $dateOne->year)
-            ->whereMonth('lv.created_at', '=',$dateOne->month)
+            ->whereMonth('lv.created_at', '=', $dateOne->month)
+            ->select(DB::raw("
+            ROUND(SUM((p.valor_produto * p.quantidade)
+            - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa,0) / 100)), 2) as totalMes
+        "))
             ->value('totalMes');
 
+        $totalOrderMonth = $receitasPorMes ?? 0;
+
+        /* ----------------------------------------------------------
+         * Total da semana
+         * --------------------------------------------------------*/
+        $weekTotal = $this->vendas
+            ->join('loja_vendas_produtos as lvp', 'lvp.venda_id', '=', 'loja_vendas.id')
+            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
+            ->select(DB::raw("
+            SUM((lvp.valor_produto * lvp.quantidade)
+            - ((lvp.valor_produto * lvp.quantidade) * tp.taxa / 100)) AS total
+        "))
+            ->where('loja_vendas.loja_id', $store_id)
+            ->where('lvp.troca', 0)
+            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$iniDayWeek, $endDayWeek])
+            ->value('total');
+
+        $totalsOrdersWeek = [
+            "totalWeek" => $this->formatter->formatCurrency(($weekTotal ?? 0), 'BRL')
+        ];
+
+        /* ----------------------------------------------------------
+         * Taxas aplicadas (sua função já existente)
+         * --------------------------------------------------------*/
         $taxasAplicadas = $this->buscaTaxas($dateOne, $dateTwo);
 
-            /*DB::table('loja_vendas as lv')
-            ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
-            ->leftJoin(DB::raw('(
-                SELECT venda_id, AVG(taxa) AS taxa
-                FROM loja_vendas_produtos_tipo_pagamentos
-                GROUP BY venda_id
-            ) as tp'), 'tp.venda_id', '=', 'lv.id')
-            ->where('lv.loja_id', 2)
-            ->where('p.troca', '!=', 1)
-            ->whereBetween(DB::raw('DATE(p.created_at)'), [$dateOne, $dateTwo])
-            ->select(DB::raw("ROUND(SUM((p.valor_produto * p.quantidade) * COALESCE(tp.taxa, 0) / 100), 2) as total_taxas"))
-            ->value('total_taxas');*/
-
-
-        /*$receitasPorMes = DB::table('loja_vendas as lv')
-            ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'lv.id')
-            ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'lv.id')
-            ->select(
-                DB::raw("DATE_FORMAT(lvp.created_at, '%Y-%m') as mes"),
-                DB::raw("ROUND(SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)), 2) AS totalMes")
-            )
-            ->where('lv.loja_id', 2)
-            ->where('lvp.troca', 0)
-            ->whereBetween(DB::raw('DATE(lvp.created_at)'), [$dateOne, $dateTwo])
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();*/
-
-            //total no mês por loja
-            //$totalMes[$store->id] = $this->vendas::Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-           /* $totalMes = $this->vendas->Join('loja_lojas', 'loja_lojas.id', '=', 'loja_vendas.loja_id')
-                ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'loja_vendas.id')
-                ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-                ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-                ->join('loja_taxa_cartoes', 'loja_taxa_cartoes.forma_id', '=', 'fp.id')
-                ->select(
-                    //(DB::raw("SUM(loja_vendas.valor_total - (loja_vendas.valor_total * loja_taxa_cartoes.valor_taxa/100)) AS totalMes")),
-                    //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS totalMes")),
-                    (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS totalMes")),
-                    (DB::raw('DATE_FORMAT(loja_vendas.created_at, "%m/%Y") as data')),
-                    "loja_lojas.nome as loja"
-                )
-                ->where('lvp.troca', '!=' ,1)
-                ->where('loja_vendas.loja_id', $store_id)
-                ->whereYear('loja_vendas.created_at', '=', $dateOne->year)
-                ->whereMonth('loja_vendas.created_at', '=',$dateOne->month)
-                ->groupBy((DB::raw('DATE_FORMAT(loja_vendas.created_at, "%Y-%m"),loja_id')))
-                ->orderBy('loja_vendas.created_at', 'asc')
-                ->get();*/
-
-            //totais por semana
-            //$totalsDayWeek[$store->id] = $this->vendas::Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
-            $totalsDayWeek = $this->vendas->Join('loja_lojas as ll', 'll.id', '=', 'loja_vendas.loja_id')
-                ->join('loja_vendas_produtos as lvp', 'lvp.venda_id' , '=', 'loja_vendas.id')
-                ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-                ->join('loja_forma_pagamentos as fp', 'tp.forma_pagamento_id', '=', 'fp.id')
-                ->join('loja_taxa_cartoes as ltc', 'ltc.forma_id', '=', 'fp.id')
-                ->select(
-                    //(DB::raw("SUM(loja_vendas.valor_total - (loja_vendas.valor_total * ltc.valor_taxa/100)) AS orderTotalWeek")),
-                    "ll.nome as loja",
-                    "fp.nome as name",
-                    "fp.id as id_payment",
-                    //(DB::raw("SUM(tp.valor_pgto - (tp.valor_pgto * tp.taxa/100)) AS orderTotalWeek"))
-                    (DB::raw("SUM((lvp.valor_produto * lvp.quantidade) - ((lvp.valor_produto * lvp.quantidade) * tp.taxa/100)) AS orderTotalWeek")),
-
-                )
-                //->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($dataCarbon, $dataCarbonFim))
-                //->where('loja_vendas.loja_id', $store->id)
-                ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), array($iniDayWeek, $endDayWeek))
-                ->where('loja_vendas.loja_id', $store_id)
-                ->where('lvp.troca', 0)
-                ->groupBy('ll.id')
-                ->get();
-
-        //}
-     //  $totalsDayWeek['data'] = array($iniDayWeek, $endDayWeek);
-        //dd($totalsDayWeek);
-       // if(!empty($totalsDay)){
-            //foreach ($totalsDay as $keys => $total) {
-                $sumDinner = 0;
-                $sumCart = 0;
-                    //foreach ($total as $key => $tot){
-                    foreach ($totalsDay as $key => $tot){
-                        if ($tot->id_payment == 1) {
-                            $sumDinner = $tot->orderTotal;
-                        }
-
-                        if (in_array($tot->id_payment, $paymentType)) {
-                            $sumCart += $tot->orderTotal;
-                        }
-                    }
-                //$totalOrders[$keys] = array(
-                $totalOrders = array(
-                                        "orderTotalDiner" => $this->formatter->formatCurrency($sumDinner, 'BRL'),
-                                        "orderTotalCart" => $this->formatter->formatCurrency($sumCart, 'BRL'));
-
-                //$sumOrdersDay[$keys] = array(
-                $sumOrdersDay = array(
-                    "orderTotalDay" => $this->formatter->formatCurrency($sumDinner + $sumCart, 'BRL'));
-           // }
-       // }
-       // if(!empty($totalsDayDiscount)){
-            //foreach ($totalsDayDiscount as $keys => $item) {
-                $sumDisc = 0;
-                //foreach ($item as $key => $tot){
-                foreach ($totalsDayDiscount as $key => $tot){
-                    $sumDisc = $tot->orderTotalDiscount;
-                }
-                //$totalOrderDiscount[$keys] = array("totalDiscount" => $this->formatter->formatCurrency($sumDisc, 'BRL'));
-                $totalOrderDiscount = array("totalDiscount" => $this->formatter->formatCurrency($sumDisc, 'BRL'));
-          // }
-        //}
-
-        //total por mês
-        //if(!empty($totalMes)) {
-           // foreach ($totalMes as $keys => $item) {
-                //$sum = 0;
-               // foreach ($item as $key => $tot) {
-               // foreach ($totalMes as $key => $tot) {
-               //     $sum = $tot->totalMes;
-               // }
-                //$totalOrderMonth[$keys] = array("totalMes" => $this->formatter->formatCurrency($sum, 'BRL'));
-              //  $totalOrderMonth = array("totalMes" => $this->formatter->formatCurrency($sum, 'BRL'));
-            //}
-       // }
-
-        //total semana
-       // if(!empty($totalsDayWeek)) {
-            //foreach ($totalsDayWeek as $keys => $item) {
-                $sumWeek = 0;
-                //foreach ($item as $key => $tot) {
-                foreach ($totalsDayWeek as $key => $tot) {
-                    $sumWeek = $tot->orderTotalWeek;
-                }
-
-                //$totalsOrdersWeek[$keys] = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
-                $totalsOrdersWeek = array("totalWeek" => $this->formatter->formatCurrency($sumWeek, 'BRL'));
-           // }
-       // }
-
-        return Response::json(array("chart"=> $chart,
-                                    "totals" => $totalsDay,
-                                    "totalOrders" => $totalOrders ,
-                                    "totalOrderDiscount" => $totalOrderDiscount,
-                                    "totalOrderDay" => $sumOrdersDay,
-                                    "totalsOrderWeek" => $totalsOrdersWeek,
-                                    "totalOrderMonth" => $receitasPorMes ?? "0",
-                                    "totalTaxas" => $taxasAplicadas ?? "0"));
-
+        /* ----------------------------------------------------------
+         * RESPOSTA FINAL
+         * --------------------------------------------------------*/
+        return Response::json([
+            "chart"             => $chart,
+            "totals"            => $totalsDay,
+            "totalOrders"       => $totalOrders,
+            "totalOrderDiscount"=> $totalOrderDiscount,
+            "totalOrderDay"     => $sumOrdersDay,
+            "totalsOrderWeek"   => $totalsOrdersWeek,
+            "totalOrderMonth"   => $totalOrderMonth,
+            "totalTaxas"        => $taxasAplicadas ?? 0,
+        ]);
     }
+
 
     public function chartLineGroupYear($year){
 
