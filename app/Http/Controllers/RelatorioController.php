@@ -221,6 +221,20 @@ class RelatorioController extends Controller
         //
     }
 
+    private function resolveDates($dateOne, $dateTwo)
+    {
+        return [
+            $dateOne
+                ? CarbonImmutable::parse($dateOne)->startOfDay()
+                : CarbonImmutable::now()->startOfDay(),
+
+            $dateTwo
+                ? CarbonImmutable::parse($dateTwo)->endOfDay()
+                : CarbonImmutable::now()->endOfDay(),
+        ];
+    }
+
+
     /**
      * @param $dateOne
      * @param $dateTwo
@@ -229,8 +243,8 @@ class RelatorioController extends Controller
      */
     public function chartDay($dateOne, $dateTwo, $store_id)
     {
-        $dateOne = CarbonImmutable::parse($dateOne);
-        $dateTwo = CarbonImmutable::parse($dateTwo);
+        //se não vier data, você define início e fim do dia atual
+        [$dateOne, $dateTwo] = $this->resolveDates($dateOne, $dateTwo);
 
         $iniDayWeek  = $dateOne->startOfWeek()->toDateString();
         $endDayWeek  = $dateOne->endOfWeek()->toDateString();
