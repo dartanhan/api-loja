@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LivewireHelper;
 use App\Http\Models\Payments;
 use App\Http\Models\Lojas;
 use App\Http\Models\TaxaCartao;
@@ -221,19 +222,6 @@ class RelatorioController extends Controller
         //
     }
 
-    private function resolveDates($dateOne, $dateTwo)
-    {
-        return [
-            $dateOne
-                ? CarbonImmutable::parse($dateOne)->startOfDay()
-                : CarbonImmutable::now()->startOfDay(),
-
-            $dateTwo
-                ? CarbonImmutable::parse($dateTwo)->endOfDay()
-                : CarbonImmutable::now()->endOfDay(),
-        ];
-    }
-
 
     /**
      * @param $dateOne
@@ -243,19 +231,41 @@ class RelatorioController extends Controller
      */
     public function chartDay($dateOne, $dateTwo, $store_id)
     {
-        //se não vier data, você define início e fim do dia atual
-        [$dateOne, $dateTwo] = $this->resolveDates($dateOne, $dateTwo);
+        /* ----------------------------------------------------------
+         * NORMALIZAÇÃO DE DATAS (ponto-chave)
+         * --------------------------------------------------------*/
+        $dateOne = LivewireHelper::parseDateOrNull($dateOne);
+        $dateTwo = LivewireHelper::parseDateOrNull($dateTwo);
 
-        $iniDayWeek  = $dateOne->startOfWeek()->toDateString();
-        $endDayWeek  = $dateOne->endOfWeek()->toDateString();
+        if ($dateOne && $dateTwo) {
+            // Datas enviadas
+            $dateOne = CarbonImmutable::parse($dateOne);
+            $dateTwo = CarbonImmutable::parse($dateTwo);
+        } else {
+            // Datas vazias → mês atual
+            $dateOne = CarbonImmutable::now()->startOfMonth();
+            $dateTwo = CarbonImmutable::now()->endOfMonth();
+        }
 
-        $iniDayMonth = $dateOne->startOfMonth()->toDateString();
-        $endDayMonth = $dateTwo->endOfMonth()->toDateString();
+        // Dia atual (sempre baseado em dateOne)
+        $iniDay = $dateOne->startOfDay();
+        $endDay = $dateOne->endOfDay();
+
+        // Semana
+        $iniDayWeek  = $dateOne->startOfWeek();
+        $endDayWeek  = $dateOne->endOfWeek();
+
+        // Mês
+        $iniDayMonth = $dateOne->startOfMonth();
+        $endDayMonth = $dateOne->endOfMonth();
 
         /* ----------------------------------------------------------
          * Tipos de pagamento exceto dinheiro (id = 1)
          * --------------------------------------------------------*/
-        $paymentType = $this->payments::where('id', '!=', 1)->pluck('id')->toArray();
+        $paymentType = $this->payments
+            ::where('id', '!=', 1)
+            ->pluck('id')
+            ->toArray();
 
         /* ----------------------------------------------------------
          * CHART: Total por dia do mês
@@ -269,7 +279,7 @@ class RelatorioController extends Controller
                 "loja_lojas.nome as loja"
             ])
             ->where('loja_vendas.loja_id', $store_id)
-            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$iniDayMonth, $endDayMonth])
+            ->whereBetween('loja_vendas.created_at', [$iniDayMonth, $endDayMonth])
             ->groupBy(DB::raw('DATE(loja_vendas.created_at)'))
             ->orderBy('loja_vendas.created_at')
             ->get();
@@ -277,7 +287,11 @@ class RelatorioController extends Controller
         /* ----------------------------------------------------------
          * Totais do dia por tipo de pagamento
          * --------------------------------------------------------*/
-        $totalsDay = $this->totaisPorDia($store_id, $dateOne, $dateTwo);
+        $totalsDay = $this->totaisPorDia(
+            $store_id,
+            $iniDay,
+            $endDay
+        );
 
         $sumDinner = 0;
         $sumCart   = 0;
@@ -286,6 +300,7 @@ class RelatorioController extends Controller
             if ($tot->id_payment == 1) {
                 $sumDinner = (float) $tot->orderTotal;
             }
+
             if (in_array($tot->id_payment, $paymentType)) {
                 $sumCart += (float) $tot->orderTotal;
             }
@@ -293,90 +308,88 @@ class RelatorioController extends Controller
 
         $totalOrders = [
             "orderTotalDiner" => $this->formatter->formatCurrency($sumDinner, 'BRL'),
-            "orderTotalCart"  => $this->formatter->formatCurrency($sumCart, 'BRL')
+            "orderTotalCart"  => $this->formatter->formatCurrency($sumCart, 'BRL'),
         ];
 
         $sumOrdersDay = [
-            "orderTotalDay" => $this->formatter->formatCurrency(($sumDinner + $sumCart), 'BRL')
+            "orderTotalDay" => $this->formatter->formatCurrency($sumDinner + $sumCart, 'BRL'),
         ];
 
         /* ----------------------------------------------------------
-         * Descontos por dia
+         * Descontos do período
          * --------------------------------------------------------*/
         $discount = $this->vendas
             ->join('loja_vendas_produtos_descontos', 'loja_vendas_produtos_descontos.venda_id', '=', 'loja_vendas.id')
-            ->select(DB::raw("SUM(loja_vendas_produtos_descontos.valor_desconto) as total"))
             ->where('loja_vendas.loja_id', $store_id)
-            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$dateOne, $dateTwo])
-            ->value('total');
-
-        $discount = (float) $discount;
+            ->whereBetween('loja_vendas.created_at', [$dateOne, $dateTwo])
+            ->sum('loja_vendas_produtos_descontos.valor_desconto');
 
         $totalOrderDiscount = [
-            "totalDiscount" => $this->formatter->formatCurrency($discount, 'BRL')
+            "totalDiscount" => $this->formatter->formatCurrency($discount, 'BRL'),
         ];
 
         /* ----------------------------------------------------------
-         * Total do mês
+         * TOTAL DO MÊS (ou intervalo informado)
          * --------------------------------------------------------*/
-        $receitasPorMes = DB::table('loja_vendas as lv')
-            ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
-            ->leftJoin(DB::raw("
+        $totalOrderMonth = DB::table('loja_vendas as lv')
+                ->join('loja_vendas_produtos as p', 'p.venda_id', '=', 'lv.id')
+                ->leftJoin(DB::raw("
             (SELECT venda_id, AVG(taxa) AS taxa
              FROM loja_vendas_produtos_tipo_pagamentos
              GROUP BY venda_id) as tp
         "), 'tp.venda_id', '=', 'lv.id')
-            ->where('lv.loja_id', $store_id)
-            ->where('p.troca', 0)
-            //->whereYear('lv.created_at', '=', $dateOne->year)
-            //->whereMonth('lv.created_at', '=', $dateOne->month)
-            ->whereBetween('lv.created_at', [$dateOne, $dateTwo])  // Corrigido: agora usa o intervalo entre as datas
-            ->select(DB::raw("
-            ROUND(SUM((p.valor_produto * p.quantidade)
-            - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa,0) / 100)), 2) as totalMes
+                ->where('lv.loja_id', $store_id)
+                ->where('p.troca', 0)
+                ->whereBetween('lv.created_at', [$dateOne, $dateTwo])
+                ->select(DB::raw("
+            ROUND(SUM(
+                (p.valor_produto * p.quantidade)
+                - ((p.valor_produto * p.quantidade) * COALESCE(tp.taxa,0) / 100)
+            ), 2) as totalMes
         "))
-            ->value('totalMes');
-
-        $totalOrderMonth = $receitasPorMes ?? 0;
+                ->value('totalMes') ?? 0;
 
         /* ----------------------------------------------------------
-         * Total da semana
+         * TOTAL DA SEMANA
          * --------------------------------------------------------*/
         $weekTotal = $this->vendas
             ->join('loja_vendas_produtos as lvp', 'lvp.venda_id', '=', 'loja_vendas.id')
             ->join('loja_vendas_produtos_tipo_pagamentos as tp', 'tp.venda_id', '=', 'loja_vendas.id')
-            ->select(DB::raw("
-            SUM((lvp.valor_produto * lvp.quantidade)
-            - ((lvp.valor_produto * lvp.quantidade) * tp.taxa / 100)) AS total
-        "))
             ->where('loja_vendas.loja_id', $store_id)
             ->where('lvp.troca', 0)
-            ->whereBetween(DB::raw('DATE(loja_vendas.created_at)'), [$iniDayWeek, $endDayWeek])
+            ->whereBetween('loja_vendas.created_at', [$iniDayWeek, $endDayWeek])
+            ->select(DB::raw("
+            SUM(
+                (lvp.valor_produto * lvp.quantidade)
+                - ((lvp.valor_produto * lvp.quantidade) * tp.taxa / 100)
+            ) AS total
+        "))
             ->value('total');
 
         $totalsOrdersWeek = [
-            "totalWeek" => $this->formatter->formatCurrency(($weekTotal ?? 0), 'BRL')
+            "totalWeek" => $this->formatter->formatCurrency($weekTotal ?? 0, 'BRL'),
         ];
 
         /* ----------------------------------------------------------
-         * Taxas aplicadas (sua função já existente)
+         * Taxas aplicadas
          * --------------------------------------------------------*/
         $taxasAplicadas = $this->buscaTaxas($dateOne, $dateTwo);
 
         /* ----------------------------------------------------------
-         * RESPOSTA FINAL
+         * RESPOSTA
          * --------------------------------------------------------*/
         return Response::json([
-            "chart"             => $chart,
-            "totals"            => $totalsDay,
-            "totalOrders"       => $totalOrders,
-            "totalOrderDiscount"=> $totalOrderDiscount,
-            "totalOrderDay"     => $sumOrdersDay,
-            "totalsOrderWeek"   => $totalsOrdersWeek,
-            "totalOrderMonth"   => $totalOrderMonth,
-            "totalTaxas"        => $taxasAplicadas ?? 0,
+            "chart"              => $chart,
+            "totals"             => $totalsDay,
+            "totalOrders"        => $totalOrders,
+            "totalOrderDiscount" => $totalOrderDiscount,
+            "totalOrderDay"      => $sumOrdersDay,
+            "totalsOrderWeek"    => $totalsOrdersWeek,
+            "totalOrderMonth"    => $this->formatter->formatCurrency($totalOrderMonth, 'BRL'),
+            "totalTaxas"         => $taxasAplicadas ?? 0,
         ]);
     }
+
 
 
     public function chartLineGroupYear($year){

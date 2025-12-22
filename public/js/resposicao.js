@@ -32,10 +32,11 @@ $(function() {
                 },
             },
             columns: [
-                {"data": "imagem",name: 'imagem'},
+                { data: "imagem",name: 'imagem'},
                 { data: 'codigo_produto', name: 'codigo_produto'},
                 { data: 'descricao', name: 'descricao'},
                 { data: 'valor_produto', name: 'valor_produto'},
+                { data: 'valor_venda', name: 'valor_venda'},
                 { data: 'quantidade', name: 'quantidade'},
                 { data: 'valor_total', name: 'valor_total'},
                 {

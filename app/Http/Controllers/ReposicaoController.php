@@ -189,6 +189,7 @@ class ReposicaoController extends Controller
                 'lv.descricao',
                 'lv.codigo_produto',
                 DB::raw('CONCAT("R$ ", FORMAT(v.valor_produto, 2, "pt_BR")) AS valor_produto'),
+                DB::raw('CONCAT("R$ ", FORMAT(lv.valor_produto, 2, "pt_BR")) AS valor_venda'),
                 DB::raw('CONCAT("R$ ", FORMAT(SUM(v.valor_produto * lv.quantidade), 2, "pt_BR")) AS valor_total'),
                 DB::raw("DATE_FORMAT(lv.created_at, '%d/%m/%Y') AS venda_data"),
                 DB::raw('SUM(lv.quantidade) AS quantidade'),

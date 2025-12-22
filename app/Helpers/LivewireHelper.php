@@ -4,6 +4,7 @@
 namespace App\Helpers;
 
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use Exception;
 
@@ -35,6 +36,15 @@ class LivewireHelper
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    public static function  parseDateOrNull($date)
+    {
+        if (empty($date) || $date === 'null') {
+            return null;
+        }
+
+        return CarbonImmutable::parse($date);
     }
 
 }
