@@ -152,17 +152,24 @@ export function getDataYear(data){
  * retorna data inicial e fim formato YYYY-MM-DD
  * */
 export function getPeriodoFormatado(dateRange) {
+    // Nenhuma data selecionada → envia vazio
     if (!dateRange || !dateRange.includes(' - ')) {
-        const hoje = moment().format('YYYY-MM-DD');
-        return { inicio: hoje, fim: hoje };
+        return { inicio: null, fim: null };
     }
 
     const [inicioRaw, fimRaw] = dateRange.split(' - ');
+
+    // Segurança extra
+    if (!inicioRaw || !fimRaw) {
+        return { inicio: null, fim: null };
+    }
+
     const inicio = moment(inicioRaw, 'DD/MM/YYYY').format('YYYY-MM-DD');
-    const fim = moment(fimRaw, 'DD/MM/YYYY').format('YYYY-MM-DD');
+    const fim    = moment(fimRaw, 'DD/MM/YYYY').format('YYYY-MM-DD');
 
     return { inicio, fim };
 }
+
 
 
 /***

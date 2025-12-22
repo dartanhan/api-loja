@@ -121,6 +121,7 @@
                                                 <th data-sortable="false">Codigo</th>
                                                 <th data-sortable="false">Descrição</th>
                                                 <th data-sortable="false">Valor Produto</th>
+                                                <th data-sortable="false">Valor Venda</th>
                                                 <th data-sortable="false">Quantidade</th>
                                                 <th data-sortable="false">Valor Total</th>
                                                 <th data-sortable="false">Ações</th>

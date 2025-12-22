@@ -669,23 +669,6 @@ $(function () {
      $( ".btn-enviar" ).on("click", function() {
          $(".spinner-border").show();//exibe o spinner
 
-         let isValid = true;
-         let msg = '';
-
-         //console.log(dataIni);
-
-         // Check if dataIni is filled
-         if (!$('input[name=data_range]').val()) {
-             sweetAlert({
-                 title: "Atenção",
-                 text: "Por favor, preencha o período de pesquisa!",
-                 icon: 'warning',
-                 showConfirmButton: true,
-                 //timer: 1500
-             });
-            return false;
-        }
-
         fncLoad("<div class=\"card-body\">Aguarde...</div>" +
             "<div class=\"spinner-border spinner-border-sm ms-auto\" role=\"status\" aria-hidden=\"true\"></div>");
 
