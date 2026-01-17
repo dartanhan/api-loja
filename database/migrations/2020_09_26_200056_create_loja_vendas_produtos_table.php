@@ -23,6 +23,7 @@ class CreateLojaVendasProdutosTable extends Migration
             $table->string('descricao');
             $table->decimal('valor_produto');
             $table->integer('quantidade');
+            $table->decimal('percentual_desconto');
             $table->boolean('troca')->default(false);
 
             $table->unsignedBigInteger('fornecedor_id');
@@ -49,6 +50,6 @@ class CreateLojaVendasProdutosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vendasProdutos');
+        Schema::dropIfExists('loja_vendas_produtos');
     }
 }
