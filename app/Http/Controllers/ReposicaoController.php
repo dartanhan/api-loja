@@ -148,13 +148,15 @@ class ReposicaoController extends Controller
      */
     public function filter(){
 
-       // $startDate = Carbon::createFromFormat('d/m/Y', $this->request->input('startDate'))->startOfDay();
-       // $endDate = Carbon::createFromFormat('d/m/Y', $this->request->input('endDate'))->endOfDay();
-       $startDate = $this->request->input('startDate');
-       $endDate = $this->request->input('endDate');
+        // $startDate = Carbon::createFromFormat('d/m/Y', $this->request->input('startDate'))->startOfDay();
+        // $endDate = Carbon::createFromFormat('d/m/Y', $this->request->input('endDate'))->endOfDay();
+        $startDate = $this->request->input('startDate');
+        $endDate = $this->request->input('endDate');
 
-       //dd([$startDate ,$endDate]);
+        //dd([$startDate ,$endDate]);
         $vendas = $this->listSales($startDate,$endDate);
+
+       // return Response()->json($vendas);
 
         return DataTables::of($vendas)
             ->addColumn('imagem', function ($venda) {
@@ -169,37 +171,36 @@ class ReposicaoController extends Controller
 
     }
 
+
+
     public function listSales($startDate,$endDate){
 
-        //if ($startDate && $endDate) {
-            $startDate = Carbon::parse($startDate)->startOfDay();
-            $endDate = Carbon::parse($endDate)->endOfDay();
-       /* } else {
-            // Se as datas não forem fornecidas, define um período padrão
-           // $startDate = Carbon::now()->subMonth()->startOfDay(); // Um mês atrás
-            $startDate = Carbon::now()->subDays()->startOfDay();
-            $endDate = Carbon::now()->endOfDay(); // Hoje
-        }*/
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate   = Carbon::parse($endDate)->endOfDay();
+
        // dd([$startDate ,$endDate]);
         return DB::table('loja_vendas_produtos as lv')
-            ->leftJoin('loja_produtos_variacao as v', 'lv.codigo_produto', '=', 'v.subcodigo')
+            //->leftJoin('loja_produtos_variacao as v', 'lv.codigo_produto', '=', 'v.subcodigo')
+            ->leftJoin('loja_produtos_variacao as v', 'lv.produto_id', '=', 'v.products_id')
             ->leftJoin('loja_produtos_imagens as i', 'v.id', '=', 'i.produto_variacao_id')
+            //->leftJoin('loja_produtos_new as new', 'v.products_id', '=', 'new.id')
 
             ->select(
+                'lv.produto_id',
                 'lv.descricao',
                 'lv.codigo_produto',
                 DB::raw('CONCAT("R$ ", FORMAT(v.valor_produto, 2, "pt_BR")) AS valor_produto'),
                 DB::raw('CONCAT("R$ ", FORMAT(lv.valor_produto, 2, "pt_BR")) AS valor_venda'),
-                DB::raw('CONCAT("R$ ", FORMAT(SUM(v.valor_produto * lv.quantidade), 2, "pt_BR")) AS valor_total'),
+                DB::raw('CONCAT("R$ ", FORMAT(SUM(lv.valor_produto * lv.quantidade), 2, "pt_BR")) AS valor_total'),
                 DB::raw("DATE_FORMAT(lv.created_at, '%d/%m/%Y') AS venda_data"),
                 DB::raw('SUM(lv.quantidade) AS quantidade'),
                 'i.path AS imagem'
 
             )
             ->whereBetween('lv.created_at', [$startDate, $endDate])
-            ->groupBy('lv.codigo_produto', 'lv.descricao', 'i.path')
-            ->orderBy('quantidade', 'DESC')
-            ->orderBy('lv.descricao')
+            ->groupBy('lv.variacao_id')
+            ->orderByDesc('lv.descricao')
             ->get();
     }
+
 }
