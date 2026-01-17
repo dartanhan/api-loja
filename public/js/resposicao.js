@@ -64,7 +64,7 @@ $(function() {
                 "url": Helpers.asset("Portuguese-Brasil.json")
             },
             //page: 50, // Define o número de linhas exibidas por padrão
-            "order": [[3, "desc"]],
+            "order": [[6, "desc"]],
             initComplete: function(settings, json) {
                 //console.log(json);
             }
