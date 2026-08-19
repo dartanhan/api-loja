@@ -17,10 +17,9 @@ class CreateProdutoProdutoquantidadePivotTable extends Migration
     {
         Schema::create('loja_produtos_quantidade', function (Blueprint $table) {
             $table->bigInteger('produto_id')->unsigned()->index();
-            $table->foreign('produto_id')->references('id')->on('loja_produtos')->onDelete('cascade');
+            $table->foreign('produto_id')->references('id')->on('loja_produtos_new')->onDelete('cascade');
 
             $table->bigInteger('cor_id')->unsigned()->index();
-            $table->foreign('cor_id')->references('id')->on('loja_cores')->onDelete('cascade');
 
             $table->bigInteger('loja_id')->unsigned()->index();
             $table->foreign('loja_id')->references('id')->on('loja_lojas')->onDelete('cascade');
@@ -43,6 +42,6 @@ class CreateProdutoProdutoquantidadePivotTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('produto_produtoquantidade');
+        Schema::dropIfExists('loja_produtos_quantidade');
     }
 }

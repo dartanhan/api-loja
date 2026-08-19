@@ -17,7 +17,7 @@ class CreateLojaProdutosControlesTable extends Migration
             $table->id()->unsigned()->index()->autoIncrement();
 
             $table->bigInteger('products_variation_id')->unsigned();
-            $table->foreign('products_variation_id')->references('id')->on('loja_produtos_variacao');
+            //$table->foreign('products_variation_id')->references('id')->on('loja_produtos_variacao');
 
             $table->decimal('valor_custo', 9,2)->default('0.00');
             $table->integer('quantidade')->default(0);

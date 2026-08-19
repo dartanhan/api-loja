@@ -17,7 +17,7 @@ class CreateLojaVendasProdutosTrocasTable extends Migration
             $table->id();
             $table->unsignedBigInteger('troca_id');
             // Foreign Keys
-            $table->foreign('troca_id')->references('id')->on('loja_vendas_trocas');
+            //$table->foreign('troca_id')->references('id')->on('loja_vendas_trocas');
 
             $table->unsignedBigInteger('produto_id');
             // Foreign Keys

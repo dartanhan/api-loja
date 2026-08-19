@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-
-
 class AuthController extends Controller
 {
     public function dashboard() {
@@ -19,65 +17,68 @@ class AuthController extends Controller
         if(Auth::check() === true){
             $user_data = Usuario::where("user_id",auth()->user()->id)->first();
 
-            $store_id = $user_data->loja_id;
-            $isAdmin = $user_data->admin;
+            $store_id = $user_data->loja_id ?? null;
+            $isAdmin = $user_data->admin ?? null;
 
             if($isAdmin){
                 return view('admin.dashboard',compact("user_data"));
             }else{
-               // return view('admin.pdv',compact("isAdmin"));
                 return redirect()->route('admin.pdv');
             }
-
-
         }
 
         return redirect()->route('admin.login');
-
     }
 
     function showLoginForm() {
-        //return view('admin.formLogin');
         return view('admin.login');
     }
 
     public function login(Request $request)
     {
         // Validação básica dos campos
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'login' => 'required',
             'password' => 'required',
-            'g-recaptcha-response' => 'required',
-        ]);
+        ];
+
+        // Só exige o recaptcha se as chaves reais estiverem configuradas
+        $secret = env('DATA_SECRET_KEY');
+        if (!empty($secret) && $secret !== 'SUA_CHAVE_SECRETA_AQUI') {
+            $rules['g-recaptcha-response'] = 'required';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // ReCaptcha v3 via Guzzle
-        $secret = env('DATA_SECRET_KEY');
-        $recaptcha = $request->input('g-recaptcha-response');
-        $client = new Client();
-
         try {
-            $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
-                'form_params' => [
-                    'secret' => $secret,
-                    'response' => $recaptcha,
-                    'remoteip' => $request->ip()
-                ],
-                'verify' => true
-            ]);
+            // Se houver secret configurado e não for o placeholder, valida no Google
+            if (!empty($secret) && $secret !== 'SUA_CHAVE_SECRETA_AQUI') {
+                $recaptcha = $request->input('g-recaptcha-response');
+                $client = new Client();
 
-            $body = json_decode((string)$response->getBody(), true);
-
-            if (!isset($body['success']) || $body['success'] !== true || $body['score'] < 0.5) {
-                return redirect()->back()->withInput()->withErrors([
-                    'recaptcha' => 'Você é considerado um bot ou spammer! Score: ' . ($body['score'] ?? 'sem score')
+                $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'form_params' => [
+                        'secret' => $secret,
+                        'response' => $recaptcha,
+                        'remoteip' => $request->ip()
+                    ],
+                    'verify' => true
                 ]);
+
+                $body = json_decode((string)$response->getBody(), true);
+                $score = $body['score'] ?? 1.0; // fallback se não for reCAPTCHA v3 com score
+
+                if (!isset($body['success']) || $body['success'] !== true || $score < 0.5) {
+                    return redirect()->back()->withInput()->withErrors([
+                        'recaptcha' => 'Você é considerado um bot ou spammer! Score: ' . $score
+                    ]);
+                }
             }
 
-            // Coloque todo acesso ao banco dentro desse try
             $loginField = $request->input('login');
             $password = $request->input('password');
 
@@ -102,12 +103,10 @@ class AuthController extends Controller
             Log::error('Erro inesperado ao logar: ' . $e->getMessage());
 
             return redirect()->back()->withInput()->withErrors([
-                'login' => 'Erro inesperado. Tente novamente mais tarde.'
+                'login' => 'Erro inesperado: ' . $e->getMessage()
             ]);
         }
     }
-
-
 
     function logout() {
         Auth::logout();

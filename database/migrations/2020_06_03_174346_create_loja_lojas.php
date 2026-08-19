@@ -20,8 +20,7 @@ class CreateLojaLojas extends Migration
             $table->string('razao');
             $table->string('cnpj',18);
             $table->string('endereco');
-            $table->string('local');
-            $table->string('local',12);
+            $table->string('local', 255)->nullable();
             $table->timestamps();
         });
     }
