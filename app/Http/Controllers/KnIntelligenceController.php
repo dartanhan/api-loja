@@ -104,13 +104,36 @@ class KnIntelligenceController extends Controller
         $estoque = $this->inventoryService->getEstoqueRisco();
         $margem = $this->marginService->getAnaliseMargem();
 
+        $detalhesEstoque = "";
+        if (!empty($estoque['produtos'])) {
+            $detalhesEstoque = " - Itens específicos com estoque baixo:\n";
+            foreach($estoque['produtos'] as $item) {
+                $desc = is_array($item) ? $item['descricao'] : $item->descricao;
+                $qtd = is_array($item) ? $item['quantidade'] : $item->quantidade;
+                $min = is_array($item) ? $item['quantidade_minima'] : $item->quantidade_minima;
+                $detalhesEstoque .= "   * {$desc} (Qtd: {$qtd} / Mín: {$min})\n";
+            }
+        }
+
+        $detalhesMargem = "";
+        if (!empty($margem['descontos_altos'])) {
+            $detalhesMargem = " - Itens específicos com maiores descontos (potencial baixa margem):\n";
+            foreach($margem['descontos_altos'] as $item) {
+                $prod = is_array($item) ? $item['produto'] : $item->produto;
+                $perc = is_array($item) ? $item['percentual_desconto'] : $item->percentual_desconto;
+                $detalhesMargem .= "   * {$prod} (Desconto aplicado: {$perc}%)\n";
+            }
+        }
+
         $contexto = "Você é o assistente inteligente da loja KN Cosméticos (KN Intelligence).\n"
             ."Abaixo estão os DADOS REAIS da loja para você responder com precisão:\n"
             ."1. Vendas/Faturamento Atual: R$ {$vendas['faturamento']} | Pedidos: {$vendas['pedidos']} | Ticket Médio: R$ {$vendas['ticket_medio']} | Descontos: R$ {$vendas['total_desconto']}\n"
             ."2. Risco de Estoque Baixo: {$estoque['total_itens_criticos']} produtos com estoque abaixo do mínimo.\n"
-            ."3. Vendas com Maiores Descontos: {$margem['total_analisado']} itens analisados.\n\n"
+            .$detalhesEstoque
+            ."3. Vendas com Maiores Descontos: {$margem['total_analisado']} itens analisados.\n"
+            .$detalhesMargem."\n"
             ."Pergunta do usuário: \"{$pergunta}\"\n\n"
-            ."Responda de forma profissional, direta, com formatação limpa e sugestões estratégicas práticas para a loja.";
+            ."Responda de forma profissional, direta, com formatação limpa e sugestões estratégicas práticas para a loja baseando-se nos itens acima se solicitado.";
 
         $respostaIa = $this->geminiProvider->generateContent($contexto);
 

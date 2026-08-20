@@ -25,8 +25,7 @@ class ProdutoEditar extends Component
     public $variacoes = [];
     public $fornecedores = [];
     public $categorias = [];
-    public $origem_nfces =[];
-    public $codigoProduto; // nova propriedade
+    public $origem_nfces = [];
     public $produtoId;
     public $images = [];
     public $produtoImagem = null;
@@ -58,7 +57,6 @@ class ProdutoEditar extends Component
         $produto = Produto::with('variacoes.images','images')->findOrFail($id); //trás o PAI e as varições se tiver
 
         $this->produto = $produto;
-        $this->codigoProduto = $produto->codigo_produto;
         $this->produtoId = $produto->id;
 
         $this->produtos = [

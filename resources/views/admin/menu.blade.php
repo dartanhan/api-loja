@@ -28,6 +28,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
                                 Configurações IA
                             </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'admin.kn_intelligence.diagnostico.estoque' ? 'active' : '' }}" href="{{route('admin.kn_intelligence.diagnostico.estoque')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-stethoscope"></i></div>
+                                Diagnóstico de Estoque
+                            </a>
                         </nav>
                     </div>
 
