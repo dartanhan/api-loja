@@ -68,6 +68,7 @@ class KnIntelligenceDiagnosticController extends Controller
             $dadosTabela[] = [
                 'variacao_id' => $itemService['variacao_id'] ?? 'N/A',
                 'codigo_produto' => $itemService['codigo_produto'],
+                'subcodigo' => $itemService['subcodigo'] ?? '',
                 'descricao' => $itemService['descricao'] ?? '',
                 'variacao' => $itemService['variacao'],
                 'estoque_atual' => $itemService['estoque_atual'],

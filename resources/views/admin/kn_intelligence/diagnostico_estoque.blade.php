@@ -127,8 +127,10 @@
                 <tr style="{{ $row['resultado'] === 'DIVERGÊNCIA' ? 'background: #fef2f2;' : '' }}">
                     <td><code>{{ $row['variacao_id'] }}</code></td>
                     <td>
-                        <strong style="color:#111827;">{{ $row['codigo_produto'] }}</strong><br>
-                        {{ Str::limit($row['variacao'], 25) }}
+                        <strong style="color:#111827;">{{ $row['codigo_produto'] }} - {{ $row['descricao'] }}</strong><br>
+                        @if($row['variacao'] !== 'Produto sem variação')
+                        <small style="color:#6b7280;">{{ $row['subcodigo'] }} - {{ $row['variacao'] }}</small>
+                        @endif
                     </td>
                     <td>
                         {{ $row['estoque_atual'] }} 

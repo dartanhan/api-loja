@@ -57,7 +57,7 @@ class KnIntelligenceController extends Controller
 
         $vendas       = $this->salesService->getPerformanceComercial($inicio, $fim);
         $estoqueRisco = $this->inventoryService->getEstoqueRisco();
-        $margem       = $this->marginService->getAnaliseMargem();
+        $margem       = $this->marginService->getMargemGerencial();
         $insights     = AiInsight::orderBy('created_at', 'desc')->take(5)->get();
 
         // Período anterior (mesmo intervalo, janela anterior) para comparação
