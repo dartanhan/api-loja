@@ -69,6 +69,7 @@ class ProdutoCreate extends Component
         $this->fornecedores = Fornecedor::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->categorias = collect(); // esvazia antes
         $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
+        $this->categorias = Categoria::select('id', 'nome')->where('status',1)->orderBy('nome','asc')->get();
         $this->origens = OrigemNfce::get();
 
         //$this->loadTemporaryFiles();

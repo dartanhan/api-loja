@@ -1,9 +1,9 @@
 /* globals Chart:false, feather:false */
 
-$(document).ready(function() {
+$(document).ready(function () {
     const urlApi = fncUrl();
 
-    let metodo = '', titulo = '', url,fila,id,nome,token,json,status,table,table2;
+    let metodo = '', titulo = '', url, fila, id, nome, token, json, status, table, table2;
 
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -14,44 +14,46 @@ $(document).ready(function() {
     });
 
     table = $('#table').DataTable({
-        "createdRow": function(row, data) {
+        "createdRow": function (row, data) {
             if (data.status === "INATIVO") {
                 $(row).find('td:eq(2)').css('color', '#ff1a1a');
-            }else{
+            } else {
                 $(row).find('td:eq(2)').css('color', '#0a58ca');
             }
             $(row).find('td:eq(2)').css({ "font-weight": "bold" });
         },
-        "ajax":{
+        "ajax": {
             "method": 'get',
             "url": urlApi + "/fornecedor/3",
-            "data":'',
-            "dataSrc":""
+            "data": '',
+            "dataSrc": ""
         },
-        "columns":[
-            {"data": "id"},
-            {"data": "nome"},
-            {"data": "status"},
-            {"data": "created_at"},
-            {"data": "updated_at"},
-            {"defaultContent": "<div class='text-center'>" +
+        "columns": [
+            { "data": "id" },
+            { "data": "nome" },
+            { "data": "status" },
+            { "data": "created_at" },
+            { "data": "updated_at" },
+            {
+                "defaultContent": "<div class='text-center'>" +
                     "<div class='btn-group'>" +
                     "<button class='btn btn-primary btn-sm btnEditar' " +
                     "data-toggle=\"modal\" data-target=\"#divModal\">" +
                     "<i class='material-icons'>edit</i></button>&nbsp;&nbsp;" +
                     "<button class='btn btn-danger btn-sm btnBorrar'><i class='material-icons'>delete</i></button>" +
                     "</div>" +
-                    "</div>"}
-        ] ,
-        "columnDefs": [
-            {
-                "targets": [  ],
-                "visible": false,
-                "searchable":true
+                    "</div>"
             }
         ],
-        "order": [[ 1, "asc" ]]
-        ,	language: {
+        "columnDefs": [
+            {
+                "targets": [],
+                "visible": false,
+                "searchable": true
+            }
+        ],
+        "order": [[1, "asc"]]
+        , language: {
             "url": Helpers.asset("Portuguese-Brasil.json")
         },
     });
@@ -62,7 +64,7 @@ $(document).ready(function() {
      * AÇÃO DE ABRIR O MODAL
      * Novo
      * */
-    $('button[id="btnNuevo"]').on('click', function(event) {
+    $('button[id="btnNuevo"]').on('click', function (event) {
         event.preventDefault();
         $('form[name="form"]')[0].reset();
 
@@ -70,17 +72,17 @@ $(document).ready(function() {
         $("#metodo").val('POST');
         this.blur(); // Manually remove focus from clicked link.
         $('#modal-title').html('<strong>Novo Fornecedor</strong>');
-        $("#fornecedor_new").css("display","none");
+        $("#fornecedor_new").css("display", "none");
     });
 
     /**
      * Editar
      * **/
-    $(document).on("click", ".btnEditar", function(){
+    $(document).on("click", ".btnEditar", function () {
         fila = $(this).closest("tr");
         id = parseInt(fila.find('td:eq(0)').text()); //capturo o ID
         nome = fila.find('td:eq(1)').text();
-        status = fila.find('td:eq(2)').text() === 'ATIVO'? 1 : 0;
+        status = fila.find('td:eq(2)').text() === 'ATIVO' ? 1 : 0;
 
         $("#metodo").val('PUT');
         $("#id").val(id);
@@ -90,7 +92,7 @@ $(document).ready(function() {
         $('#modal-title').html('<strong>Editando Fornecedor</strong>');
         $('#fornecedor_new').attr('disabled', true);
         $('#message-alert-update').attr("hidden", "hidden");
-        $("#fornecedor_new").css("display","block");
+        $("#fornecedor_new").css("display", "block");
     });
 
     /****
@@ -110,36 +112,36 @@ $(document).ready(function() {
             nome: {
                 required: "Informe a Descrição do Fornecedor!"
             }
-        }, submitHandler: function(form,e) {
+        }, submitHandler: function (form, e) {
             e.preventDefault();
 
 
             metodo = $("#metodo").val();
 
-            if(metodo === 'POST'){
+            if (metodo === 'POST') {
                 url = urlApi + "/fornecedor";
                 titulo = "NOVO FORNECEDOR";
 
-            }else if(metodo === 'PUT'){
+            } else if (metodo === 'PUT') {
                 url = urlApi + "/fornecedor/update";
                 titulo = "EDITANDO FORNECEDOR";
             }
 
             $.ajax({
                 url: url,
-                type:metodo,
-                data:$('form[name="form"]').serialize(),
-                dataType:'json',
+                type: metodo,
+                data: $('form[name="form"]').serialize(),
+                dataType: 'json',
                 beforeSend: function () {
 
                     $('#modal-title').html('<strong>Aguarde... <span class=\"spinner-border spinner-border-xs ms-auto\" role=\"status\" aria-hidden=\"true\"></span></strong>');
 
                 },
-                success: function(data) {
+                success: function (data) {
                     // console.log(data);
                     // console.log("passou aquiiiii");
 
-                    if(data.success) {
+                    if (data.success) {
                         swalWithBootstrapButtons.fire({
                             title: titulo,
                             text: data.message,
@@ -151,40 +153,40 @@ $(document).ready(function() {
 
                         //usado para no combo de fornecedor não ficar indo sempre no banco buscar as informações
                         fetch(urlApi + "/fornecedor/1")
-                             .then(function (response) {
-                                 return response.json()
-                             })
-                             .then(function (response){
-                                 //console.log(response);
+                            .then(function (response) {
+                                return response.json()
+                            })
+                            .then(function (response) {
+                                //console.log(response);
 
-                                 // 🔥 Apaga cache antigo
+                                // 🔥 Apaga cache antigo
                                 localStorage.removeItem("data-suppliers");
 
-                              // set local os dados do fornecedor para não ficar indo na api
-                                 localStorage.setItem("data-suppliers", JSON.stringify(response));
+                                // set local os dados do fornecedor para não ficar indo na api
+                                localStorage.setItem("data-suppliers", JSON.stringify(response));
 
-                                 //console.log("localStorage >> " + localStorage.getItem("data-suppliers"));
+                                //console.log("localStorage >> " + localStorage.getItem("data-suppliers"));
                             });
 
                     }
 
                     table.ajax.reload(null, false);
                 },
-                error: function(data){
+                error: function (data) {
                     //console.log(data.responseText);
                     json = $.parseJSON(data.responseText);
-                    $("#modal-title").addClass( "alert alert-danger" );
-                    $('#modal-title').html('<p><strong>'+json.message+'</strong></p>');
+                    $("#modal-title").addClass("alert alert-danger");
+                    $('#modal-title').html('<p><strong>' + json.message + '</strong></p>');
                     Swal.fire(
                         'error!',
                         json.message,
                         'error'
                     )
                 },
-                complete:function(data){
+                complete: function (data) {
                     //console.log(data.responseText);
                     json = $.parseJSON(data.responseText);
-                    if(json.success) {
+                    if (json.success) {
                         window.setTimeout(function () {
                             $('#divModal').modal('hide');
                         }, 1500);
@@ -197,9 +199,9 @@ $(document).ready(function() {
     /**
      * Remover
      * **/
-    $(document).on("click", ".btnBorrar", function(){
+    $(document).on("click", ".btnBorrar", function () {
         fila = $(this).closest("tr");
-        id = parseInt(fila.find('td:eq(0)').text()) ;
+        id = parseInt(fila.find('td:eq(0)').text());
         nome = fila.find('td:eq(1)').text();
         let token = $('form').find('input[name="_token"]').val();
 
@@ -214,10 +216,10 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: urlApi + "/fornecedor/" + id ,
-                    data: {_token: token},
+                    url: urlApi + "/fornecedor/" + id,
+                    data: { _token: token },
                     type: "DELETE",
-                    datatype:"json",
+                    datatype: "json",
                     beforeSend: function () {
                         swalWithBootstrapButtons.fire(
                             'Aguarde..',
@@ -225,8 +227,8 @@ $(document).ready(function() {
                             'info'
                         )
                     },
-                    success: function(data) {
-                        if(data.success) {
+                    success: function (data) {
+                        if (data.success) {
                             swalWithBootstrapButtons.fire({
                                 title: 'Deletado!',
                                 text: data.message,
@@ -237,7 +239,7 @@ $(document).ready(function() {
                             table.ajax.reload(null, false);
                         }
                     },
-                    error: function(data){
+                    error: function (data) {
                         json = $.parseJSON(data.responseText);
                         Swal.fire(
                             'error!',
@@ -251,14 +253,14 @@ $(document).ready(function() {
     });
 });
 
-let fncComboFornecedor =  function(value){
+let fncComboFornecedor = function (value) {
     //console.log(value);
     let id_fornecedor = parseInt($("#id").val());
-    if(parseInt(value) === 0){
+    if (parseInt(value) === 0) {
         //console.log("inativo " + value);
         $('#fornecedor_new').attr('disabled', false);
 
-        $("#fornecedor_new option[value='"+id_fornecedor+"']").remove();
+        $("#fornecedor_new option[value='" + id_fornecedor + "']").remove();
         $("#message-alert-update").removeAttr('hidden');
         $('#message-alert-update').html("<i class=\"fas fa-lg  fa-triangle-exclamation\"></i> Ao desabilitar um fornecedor, você deve migrar os produtos, para outro fornecdor <strong>ATIVO</strong>");
 

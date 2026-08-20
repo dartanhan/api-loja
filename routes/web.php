@@ -16,6 +16,7 @@ use App\Http\Controllers\AuditsController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\MovimentacaoEstoqueController;
 use App\Http\Controllers\KnIntelligenceController;
+use App\Http\Controllers\KnIntelligenceDiagnosticController;
 use App\Http\Livewire\ProdutosVariacoes;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/kn-intelligence/configuracoes', [KnIntelligenceController::class, 'configuracoes'])->name('admin.kn_intelligence.configuracoes');
     Route::post('/kn-intelligence/configuracoes/salvar', [KnIntelligenceController::class, 'salvarConfiguracoes'])->name('admin.kn_intelligence.salvarConfiguracoes');
     Route::post('/kn-intelligence/gerar-insights', [KnIntelligenceController::class, 'gerarInsights'])->name('admin.kn_intelligence.gerar_insights');
+    
+    // Diagnóstico KN Intelligence
+    Route::get('/kn-intelligence/diagnostico/estoque', [KnIntelligenceDiagnosticController::class, 'estoque'])->name('admin.kn_intelligence.diagnostico.estoque');
 
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
     Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');

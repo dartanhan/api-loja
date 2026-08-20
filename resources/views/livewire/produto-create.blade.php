@@ -129,9 +129,7 @@
                             wire:key="pond-produto"
                         />
 
-                    {{-- Lista de arquivos já enviados --}}
                     {{--<ul class="list-group mt-2">
-                        @foreach($temporaryFiles as $f)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ $f->file }}
                                 <button class="btn btn-sm btn-outline-danger"

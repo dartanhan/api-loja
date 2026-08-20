@@ -3,10 +3,10 @@
     * */
         const fncUrl = function() {
         const protocolo = window.location.protocol;
-        const hostname = window.location.hostname;
+        const host = window.location.host;
         const pathname = (window.location.origin+""+window.location.pathname).split("/");
 
-        const url = (protocolo === "https:") ? protocolo +"//"+ hostname + "/admin" : protocolo +"//"+ hostname + "/"+pathname[3]+"" ;
+        const url = (protocolo === "https:") ? protocolo +"//"+ host + "/admin" : protocolo +"//"+ host + "/"+pathname[3]+"" ;
 
         return url;
     }
