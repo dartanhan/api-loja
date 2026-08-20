@@ -48,10 +48,14 @@ class InventoryIntelligenceService
 
         $diasPeriodo = $inicio->diffInDays($fim) ?: 1;
 
-        // Subquery para obter vendas agrupadas por produto e variação no período
+        // Subquery para obter vendas agrupadas por produto e variação no período (Espelho exato do DB BRUTO)
         $subqueryVendas = DB::table('loja_vendas_produtos as vp')
             ->join('loja_vendas as vd', 'vp.venda_id', '=', 'vd.id')
-            ->whereBetween('vd.created_at', [$inicio, $fim])
+            ->whereBetween(DB::raw('DATE(vd.created_at)'), [
+                $dataInicio ? Carbon::parse($dataInicio)->toDateString() : Carbon::now()->startOfMonth()->toDateString(),
+                $dataFim ? Carbon::parse($dataFim)->toDateString() : Carbon::now()->toDateString()
+            ])
+            ->where('vp.troca', false)
             ->select('vp.produto_id', 'vp.variacao_id', DB::raw('SUM(vp.quantidade) as quantidade_vendida'))
             ->groupBy('vp.produto_id', 'vp.variacao_id');
 
@@ -71,6 +75,7 @@ class InventoryIntelligenceService
                 'p.descricao as produto',
                 'p.status as status_pai',
                 'v.id as variacao_id',
+                'v.subcodigo',
                 'v.variacao as descricao_variacao',
                 'v.quantidade as estoque_atual',
                 'v.quantidade_minima',
@@ -126,6 +131,7 @@ class InventoryIntelligenceService
                 'produto_id' => $row->produto_id,
                 'variacao_id' => $row->variacao_id,
                 'codigo_produto' => $row->codigo_produto,
+                'subcodigo' => $row->subcodigo,
                 'descricao' => $row->produto,
                 'variacao' => $row->descricao_variacao ?? 'Produto sem variação',
                 'estoque_atual' => $estoqueAtual,
