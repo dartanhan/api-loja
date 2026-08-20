@@ -40,7 +40,7 @@
                         <div class="form-group mb-3">
                             <label for="api_key" class="font-weight-bold">Chave de API (Gemini API Key)</label>
                             <div class="input-group">
-                                <input type="password" name="api_key" id="api_key" class="form-control" value="{{ $config->api_key ?? 'AIzaSyDmJBY2EfGzshE9r2dj1MRrMbSufHMJcRw' }}" required>
+                                <input type="password" name="api_key" id="api_key" class="form-control" value="{{ $config->api_key ?? '' }}" required>
                                 <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
                                     <i class="fas fa-eye" id="eye-icon"></i>
                                 </button>

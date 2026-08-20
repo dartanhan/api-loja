@@ -14,7 +14,7 @@ class GeminiProvider
     {
         $config = ConfiguracaoIa::where('ativo', true)->where('provedor', 'gemini')->first();
         
-        $this->apiKey = $config ? $config->api_key : env('GEMINI_API_KEY', 'AIzaSyDmJBY2EfGzshE9r2dj1MRrMbSufHMJcRw');
+        $this->apiKey = $config ? $config->api_key : env('GEMINI_API_KEY');
         $this->modelo = $config ? $config->modelo : 'gemini-2.5-flash';
     }
 
