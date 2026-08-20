@@ -1,0 +1,22 @@
+services:
+  api-loja:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-loja
+    user: root
+    restart: unless-stopped
+    ports:
+      - "9006:80"
+    volumes:
+      - ./:/var/www
+    networks:
+      - api-loja-network
+      - mysql-shared-network
+
+networks:
+  api-loja-network:
+    driver: bridge
+  mysql-shared-network:
+    external: true
+    name: erp_erp-network

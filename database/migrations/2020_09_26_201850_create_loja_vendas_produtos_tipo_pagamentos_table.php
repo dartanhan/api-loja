@@ -21,7 +21,7 @@ class CreateLojaVendasProdutosTipoPagamentosTable extends Migration
             $table->foreign('venda_id')->references('id')->on('loja_vendas');
 
             $table->unsignedBigInteger('forma_pagamento_id');
-            $table->foreign('forma_pagamento_id')->references('id')->on('loja_forma_pagamentos');
+            //$table->foreign('forma_pagamento_id')->references('id')->on('loja_forma_pagamentos');
 
             $table->decimal('valor_pgto', 9,2)->default('0.00');
             $table->decimal('taxa', 9,2)->default('0.00');

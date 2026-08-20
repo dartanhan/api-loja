@@ -1,19 +1,21 @@
 <?php
 
-use App\Http\Controllers\AuditsController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FluxoController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PdvController;
-use App\Http\Controllers\ProductBestSellersController;
 use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\ProdutoInativoController;
 use App\Http\Controllers\ProdutoVariacaoController;
+use App\Http\Controllers\ProdutoInativoController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductBestSellersController;
+use App\Http\Controllers\PdvController;
 use App\Http\Controllers\RelatorioController;
-use App\Http\Controllers\ReposicaoController;
-use App\Http\Controllers\SalesController;
+use App\Http\Controllers\FluxoController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\ReposicaoController;
+use App\Http\Controllers\AuditsController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\MovimentacaoEstoqueController;
+use App\Http\Controllers\KnIntelligenceController;
 use App\Http\Livewire\ProdutosVariacoes;
 use Illuminate\Support\Facades\Route;
 
@@ -21,24 +23,23 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
-
-    Route::get('/', 'AuthController@dashboard')->name('admin');
-    Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
-    Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
-
+Route::get('/', 'AuthController@dashboard')->name('admin');
+Route::get('/admin/login', 'AuthController@showLoginForm')->name('admin.login');
+Route::post('/admin/login/do', 'AuthController@login')->name('admin.login.do');
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/home', [HomeController::class,'index'])->name('admin.home');
-
     Route::get('/dashboard', 'AuthController@dashboard')->name('admin.dashboard');
 
+    // Módulo KN Intelligence
+    Route::get('/kn-intelligence', [KnIntelligenceController::class, 'index'])->name('admin.kn_intelligence.dashboard');
+    Route::get('/kn-intelligence/chat', [KnIntelligenceController::class, 'assistant'])->name('admin.kn_intelligence.assistant');
+    Route::post('/kn-intelligence/ask', [KnIntelligenceController::class, 'ask'])->name('admin.kn_intelligence.ask');
+    Route::get('/kn-intelligence/configuracoes', [KnIntelligenceController::class, 'configuracoes'])->name('admin.kn_intelligence.configuracoes');
+    Route::post('/kn-intelligence/configuracoes/salvar', [KnIntelligenceController::class, 'salvarConfiguracoes'])->name('admin.kn_intelligence.salvarConfiguracoes');
+    Route::post('/kn-intelligence/gerar-insights', [KnIntelligenceController::class, 'gerarInsights'])->name('admin.kn_intelligence.gerar_insights');
 
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
     Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');
@@ -54,10 +55,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/produto/produtos-estourados', [ProdutoController::class, 'getProdutosEstourados']);
 
     Route::resource('produto','ProdutoController');
-
     Route::resource('variacao','ProdutoVariacaoController');
     Route::get('/produto/{id}/{tipo}/edit', [ProdutoVariacaoController::class, 'edit'])->name('produto.variacao.edit');
-
 
     Route::get('/produto-ativos', [ProdutoController::class,'produto_ativos'])->name('produtos.produtos_ativos');
     Route::get('/produto-inativos', [ProdutoController::class,'produto_inativos'])->name('produtos.produtos_inativos');
@@ -76,29 +75,18 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('productbestsellers/details/{id}/{data}',[ProductBestSellersController::class,'details']);
     Route::get('productbestsellers/detailsCost/{id}/{data}',[ProductBestSellersController::class,'detailsCost']);
     Route::get('productbestsellers/getListProductsSales/{id}/{data}',[ProductBestSellersController::class,'getListProductsSales'])->name('getListProductsSales');
-
     Route::resource('productbestsellers','ProductBestSellersController');
 
     Route::resource('productSaleDay','ProductSaleDayController');
-
     Route::resource('/estoque','EstoqueController');
-
     Route::resource('/image', 'ProdutoImagemController');
-
     Route::resource('/fornecedor','FornecedorController');
-
     Route::resource('/cor','CorController');
-
     Route::resource('/categoria','CategoriaController');
-
     Route::resource('/usuario','UserSystemController');
-
     Route::resource('/payment','PaymentController');
-
     Route::resource('/forma','FormaEntregaController');
-
     Route::resource('/tipoTroca','TipoTrocaController');
-
     Route::resource('/origem','OrigemNfceController');
 
     Route::get('/pdv', [PdvController::class,'index'])->name('admin.pdv');
@@ -115,50 +103,30 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/relatorio/chartLineGroupYear/{year}',[RelatorioController::class,'chartLineGroupYear']);
     Route::get('/relatorio/chartLineMultiGroupYear',[RelatorioController::class,'chartLineMultiGroupYear']);
     Route::get('/relatorio/chartFunc/{ano}',[RelatorioController::class,'chartFunc']);
-
-
     Route::resource('/relatorio','RelatorioController');
 
     Route::resource('/tarifa','TarifaController');
-
     Route::resource('/cashback','CashbackController');
-
     Route::resource('/conferenciames','ConferenciaController');
-
     Route::post('/gastosfixofiltro', 'GastosFixoController@getFormGasto')->name('gastosfixo.filtro');
     Route::resource('/gastosfixo','GastosFixoController');
 
-    //Route::get('/fluxo/card/{ano}/edit',[FluxoController::class,'card']);
     Route::get('/fluxo/chart/{id}',[FluxoController::class,'chart']);
     Route::resource('/fluxo','FluxoController');
 
-   // Route::resource('/flux',FluxController::class);
-
     Route::resource('/calendario','CalendarioController');
-
     Route::resource('/cliente','ClienteController');
-
-    /*Route::get('/dashbord', function(){
-        return view('admin.dashbord');
-    })->name('admin.dashbord');*/
 
     Route::get('/graficos', function(){
         return view('admin.graficos');
     })->name('admin.chart');
 
-
-    /*Route::get('/usuarios', function(){
-        return view('admin.usuarios');
-    })->name('admin.users');*/
-
     Route::post('/upload/tmp-upload', [UploadController::class, 'tmpUpload'])->name('tmpUpload');
     Route::delete('/upload/tmp-delete', [UploadController::class, 'tmpDelete'])->name('tmpDelete');
-
 
     Route::post('/reposicao/filter', [ReposicaoController::class, 'filter'])->name('admin.reposicaoProduto.filter');
     Route::resource('reposicao','ReposicaoController');
     Route::resource('reposicao-produto','ReposicaoProdutoController');
-
 
     Route::resource('audit','AuditsController');
     Route::get('datatableAuditUpdate',[AuditsController::class,'datatableAuditUpdate'])->name('datatableAuditUpdate');
@@ -175,5 +143,3 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::resource('dre','DreController');
     Route::resource('despesa','DespesaController');
 });
-
-

@@ -17,7 +17,7 @@ class CreateLojaProdutosVariacao extends Migration
             $table->id()->unsigned()->index()->autoIncrement();
 
             $table->bigInteger('products_id')->unsigned();
-            $table->foreign('products_id')->references('id')->on('loja_produtos');
+            $table->foreign('products_id')->references('id')->on('loja_produtos_new');
 
             $table->string('subcodigo');
             $table->string('variacao', 255);
@@ -34,7 +34,7 @@ class CreateLojaProdutosVariacao extends Migration
             $table->date('validade')->default(null);
 
             $table->bigInteger('fornecedor_id')->unsigned();
-            $table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
+            //$table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
 
             $table->integer('estoque',)->default(11);
 

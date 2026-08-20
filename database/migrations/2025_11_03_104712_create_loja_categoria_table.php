@@ -14,7 +14,7 @@ class CreateLojaCategoriaTable extends Migration
     public function up()
     {
         Schema::create('loja_categorias', function (Blueprint $table) {
-            $table->bigInteger()->nullable(false)->autoIncrement();
+            $table->id();
             $table->string('nome')->nullable(false);
             $table->boolean('status')->nullable(false)->default(false);
             $table->string('slug')->nullable(false);
@@ -31,6 +31,6 @@ class CreateLojaCategoriaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('loja_categoria');
+        Schema::dropIfExists('loja_categorias');
     }
 }

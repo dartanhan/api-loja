@@ -7,6 +7,30 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                         Home
                     </a>
+
+                    <!-- Módulo KN Intelligence -->
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseKNIntelligence" aria-expanded="false" aria-controls="collapseKNIntelligence">
+                        <div class="sb-nav-link-icon"><i class="fas fa-brain text-info"></i></div>
+                        KN Intelligence
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseKNIntelligence" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link {{ Route::current()->getName() === 'admin.kn_intelligence.dashboard' ? 'active' : '' }}" href="{{route('admin.kn_intelligence.dashboard')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Painel de IA
+                            </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'admin.kn_intelligence.assistant' ? 'active' : '' }}" href="{{route('admin.kn_intelligence.assistant')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+                                Assistente Chat
+                            </a>
+                            <a class="nav-link {{ Route::current()->getName() === 'admin.kn_intelligence.configuracoes' ? 'active' : '' }}" href="{{route('admin.kn_intelligence.configuracoes')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                                Configurações IA
+                            </a>
+                        </nav>
+                    </div>
+
                     <a class="nav-link {{ Route::current()->getName() === 'dre.index' ? 'active' : '' }}" href="{{route('dre.index')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-bar-chart"></i></div>
                         Dre
@@ -32,141 +56,64 @@
                         Monitoramento
                     </a>
                 @endif
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePages">
-                    <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesProdutos" aria-expanded="false" aria-controls="collapsePagesProdutos">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-bag"></i></div>
                     @if( Auth::user()->is_admin) Gerenciar Produtos @else Menu @endif
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse" id="collapsePagesProdutos" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav p-0">
-                        @if( Auth::user()->is_admin)
-                            <a href="{{ route('produto.produto_create') }}" title="Adicionar Produtos"
-                               class="nav-link p-0 mb-3 {{ request()->routeIs('produto.produto_create') ? 'active' : '' }}">
-                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-add"></i></div>
-                                Adicionar Produtos
-                            </a>
-                            <a href="{{ route('produtos.produtos_ativos') }}" title="Produtos Ativos"
-                                    class="nav-link p-0 mb-3 {{ request()->routeIs('produtos.produtos_ativos') ? 'active' : '' }}">
-                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-box"></i></div>
-                                Listar Ativos
-                            </a>
-
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
-                                Listar Inativos
-                            </a>
-
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>
-                                Produtos Ativos (Antigo)
-                            </a>
-{{--                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produto.indexNew' ? 'active' : '' }}" href="{{route('produto.indexNew')}}">--}}
-{{--                                <div class="sb-nav-link-icon"><i class="fa-solid fa-unlock"></i></div>--}}
-{{--                                Produtos Ativos(New)--}}
-{{--                            </a>--}}
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fa-solid fa-lock"></i></div>
-                                Produtos Inativos (Antigo)
-                            </a>
-                        @endif
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'produtos.baixo_estoque' ? 'active' : '' }}" href="{{route('produtos.baixo_estoque')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
-                                Baixo Estoque
-                            </a>
-
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'product.index' ? 'active' : '' }}" href="{{route('product.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
-                                Produtos
-                            </a>
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'listaCompras.index' ? 'active' : '' }}" href="{{route('listaCompras.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
-                                    Lista de Compras
-                            </a>
-                            <a class="nav-link p-0 mb-3 {{ Route::current()->getName() === 'reposicao.index' ? 'active' : '' }}" href="{{route('reposicao.index')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
-                                Visão Trimestre
-                            </a>
-                    </nav>
-                </div>
-
-                @if( Auth::user()->is_admin)
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesReceitaDespesa" aria-expanded="false" aria-controls="collapsePages">
-                    <div class="sb-nav-link-icon"><i class="fas fa-weight-hanging"></i></div>
-                    @if( Auth::user()->is_admin) Gerenciar Receitas/Despesas @else Menu @endif
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapsePagesReceitaDespesa" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav p-0">
-                        @if( Auth::user()->is_admin)
-                            <a href="{{ route('despesa.index') }}" title="Adicionar Despesa"
-                               class="nav-link p-0 mb-3 {{ request()->routeIs('despesa.index') ? 'active' : '' }}">
-                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-minus-circle"></i></div>
-                                Adicionar Despesas
-                            </a>
-                           {{-- <a href="{{ route('despesa.index') }}" title="Adicionar Receita"
-                               class="nav-link p-0 mb-3 {{ request()->routeIs('despesa.index') ? 'active' : '' }}">
-                                <div class="sb-nav-link-icon"><i class="nav-icon fas fa-add"></i></div>
-                               Adicionar Receita
-                            </a>--}}
-                        @endif
-                    </nav>
-                </div>
-                <div class="sb-sidenav-menu-heading">Interface</div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapseLayouts">
-                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                    Configurações
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-
-                <div class="collapse" id="collapsePagesConfiguracoes" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link {{ Route::current()->getName() === 'cashback.index' ? 'active' : '' }}" href="{{route('cashback.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-money-bill"></i></div>
-                            Cashback
+                        <a class="nav-link {{ Route::current()->getName() === 'produto.index' ? 'active' : '' }}" href="{{route('produto.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                                Produtos
                         </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'categoria.index' ? 'active' : '' }}" href="{{route('categoria.index')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-newspaper"></i></div>
-                            Categorias
+                        <a class="nav-link {{ Route::current()->getName() === 'produtoInativo.index' ? 'active' : '' }}" href="{{route('produtoInativo.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-archive"></i></div>
+                                Produtos Inativos
                         </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'cor.index' ? 'active' : '' }}" href="{{route('cor.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-paint-roller"></i></div>
-                                Cores
-                        </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'payment.index' ? 'active' : '' }}" href="{{route('payment.index')}}">
-                            <div class="sb-nav-link-icon"><i class="far fa-credit-card"></i></div>
-                                Forma de Pagamentos
-                        </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'forma.index' ? 'active' : '' }}" href="{{route('forma.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-motorcycle"></i></div>
-                            Forma de Entrega
+                        <a class="nav-link {{ Route::current()->getName() === 'variacao.index' ? 'active' : '' }}" href="{{route('variacao.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
+                                Variacão de Produtos
                         </a>
                         <a class="nav-link {{ Route::current()->getName() === 'fornecedor.index' ? 'active' : '' }}" href="{{route('fornecedor.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
-                                Fornecedor
+                            <div class="sb-nav-link-icon"><i class="fas fa-people-carry"></i></div>
+                                Fornecedores
                         </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'gastosfixo.index' ? 'active' : '' }}" href="{{route('gastosfixo.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
-                                Gastos Fixos
+                        <a class="nav-link {{ Route::current()->getName() === 'cor.index' ? 'active' : '' }}" href="{{route('cor.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-palette"></i></div>
+                                Cores
                         </a>
-
-                        <a class="nav-link {{ Route::current()->getName() === 'tarifa.index' ? 'active' : '' }}" href="{{route('tarifa.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-percent"></i></div>
-                                Tarifas
-                        </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'tipoTroca.index' ? 'active' : '' }}" href="{{route('tipoTroca.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-recycle"></i></div>
-                            Tipo Troca
+                        <a class="nav-link {{ Route::current()->getName() === 'categoria.index' ? 'active' : '' }}" href="{{route('categoria.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-list-ul"></i></div>
+                                Categorias
                         </a>
                         <a class="nav-link {{ Route::current()->getName() === 'usuario.index' ? 'active' : '' }}" href="{{route('usuario.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-user-plus"></i></div>
                                 Usuários
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'cliente.index' ? 'active' : '' }}" href="{{route('cliente.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-user-plus"></i></div>
+                                Clientes
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'payment.index' ? 'active' : '' }}" href="{{route('payment.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-money-bill-alt"></i></div>
+                                Formas de Pagamentos
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'forma.index' ? 'active' : '' }}" href="{{route('forma.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                                Forma de Entrega
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'tipoTroca.index' ? 'active' : '' }}" href="{{route('tipoTroca.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-sync-alt"></i></div>
+                                Tipo de Troca
                         </a>
                         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages2" aria-expanded="false" aria-controls="collapsePages2">
                         <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                             Dados da NFCe
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapsePages2" aria-labelledby="headingTwo" data-parent="#sidenavAccordion2">
+                        <div class="collapse" id="collapsePages2" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ Route::current()->getName() === 'origem.index' ? 'active' : '' }}" href="{{route('origem.index')}}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
@@ -176,7 +123,50 @@
                         </div>
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesRelatorios" aria-expanded="false" aria-controls="collapsePages">
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesDespesas" aria-expanded="false" aria-controls="collapsePagesDespesas">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-bag"></i></div>
+                    Gerenciar Receitas/Despesas
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapsePagesDespesas" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ Route::current()->getName() === 'despesa.index' ? 'active' : '' }}" href="{{route('despesa.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                Despesas
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="sb-sidenav-menu-heading">INTERFACE</div>
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesConfiguracoes" aria-expanded="false" aria-controls="collapsePagesConfiguracoes">
+                    <div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+                    Configurações
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapsePagesConfiguracoes" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ Route::current()->getName() === 'admin.kn_intelligence.configuracoes' ? 'active' : '' }}" href="{{route('admin.kn_intelligence.configuracoes')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-brain text-info"></i></div>
+                                Configurações de IA (Gemini)
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'usuario.index' ? 'active' : '' }}" href="{{route('usuario.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                                Usuários do Sistema
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'payment.index' ? 'active' : '' }}" href="{{route('payment.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-credit-card"></i></div>
+                                Formas de Pagamento
+                        </a>
+                        <a class="nav-link {{ Route::current()->getName() === 'forma.index' ? 'active' : '' }}" href="{{route('forma.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                                Formas de Entrega
+                        </a>
+                    </nav>
+                </div>
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesRelatorios" aria-expanded="false" aria-controls="collapsePagesRelatorios">
                     <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                         Relatórios
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -207,10 +197,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
                                 Mais Vendidos
                         </a>
-
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePages">
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesResposicao" aria-expanded="false" aria-controls="collapsePagesResposicao">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-sync-alt"></i>
                     </div>
@@ -227,26 +217,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-money-check"></i></div>
                                 Lista de Compras
                         </a>
-                        <!--a class="nav-link {{ Route::current()->getName() === 'estoque.index' ? 'active' : '' }}" href="{{route('estoque.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                                Estoque
-                        </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'fluxo.index' ? 'active' : '' }}" href="{{route('fluxo.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-money-bill"></i></div>
-                                Fluxo de Caixa
-                        </a>
-                        <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
-                                Mais Vendidos por Categorias
-                        </a>
-
-                            <a class="nav-link {{ Route::current()->getName() === 'productbestsellers.index' ? 'active' : '' }}" href="{{route('productbestsellers.index')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-list-alt"></i></div>
-                                Mais Vendidos
-                        </a-->
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesAudits" aria-expanded="false" aria-controls="collapsePages">
+
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesAudits" aria-expanded="false" aria-controls="collapsePagesAudits">
                     <div class="sb-nav-link-icon">
                         <i class="fas fa-check-square"></i>
                     </div>
@@ -261,26 +235,22 @@
                         </a>
                     </nav>
                 </div>
-                <div class="sb-sidenav-menu-heading">Addons</div>
-                    <a class="nav-link" href="charts.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                        Charts
-                    </a>
-                    <a class="nav-link" href="tables.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                        Tables
-                    </a>
-                </div>
-            </div>
-            @endif
 
-            <div class="sb-sidenav-footer">
-                <div class="small">Bem Vindo:
-                    @if(Auth::check()) {{Auth::user()->name}} @endif
-                </div>
-            </div>
+                <div class="sb-sidenav-menu-heading">ADDONS</div>
+                <a class="nav-link" href="charts.html">
+                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                    Charts
+                </a>
+                <a class="nav-link" href="tables.html">
+                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                    Tables
+                </a>
+        </div>
+    </div>
 
+    <div class="sb-sidenav-footer">
+        <div class="small">Bem Vindo:
+            @if(Auth::check()) {{Auth::user()->name}} @endif
+        </div>
+    </div>
 </nav>
-
-
-

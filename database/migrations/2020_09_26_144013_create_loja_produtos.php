@@ -13,7 +13,6 @@ class CreateLojaProdutos extends Migration
      */
     public function up()
     {
-
         Schema::create('loja_produtos_new', function (Blueprint $table) {
            $table->unsignedBigInteger('id')->autoIncrement();
            $table->string('codigo_produto', 25)->unique();
@@ -25,20 +24,16 @@ class CreateLojaProdutos extends Migration
            $table->decimal('percentual', 9,2)->default('99.9');
 
            $table->bigInteger('fornecedor_id')->unsigned()->nullable(true);
-           $table->foreign('fornecedor_id')->references('id')->on('loja_fornecedores');
 
-           $table->bigInteger('categoria_id')->unsigned();
-           $table->foreign('categoria_id')->references('id')->on('loja_categorias');
+           $table->bigInteger('categoria_id')->unsigned()->nullable(true);
 
-           $table->bigInteger('cor_id')->unsigned()->nullable(true);;
-           $table->foreign('cor_id')->references('id')->on('loja_cores');
+           $table->bigInteger('cor_id')->unsigned()->nullable(true);
 
-           $table->bigInteger('origem_id')->unsigned();
-           $table->foreign('origem_id')->references('id')->on('loja_produto_origem_nfces');
+           $table->bigInteger('origem_id')->unsigned()->nullable(true);
 
-           $table->Integer('cest')->nullable(false);
-           $table->Integer('ncm')->nullable(false);
-           $table->string('imagem',250);
+           $table->Integer('cest')->nullable(true);
+           $table->Integer('ncm')->nullable(true);
+           $table->string('imagem',250)->nullable(true);
 
            $table->timestamps();
         });
