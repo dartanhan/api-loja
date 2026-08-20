@@ -32,14 +32,43 @@ class KnIntelligenceController extends Controller
         $this->geminiProvider = $geminiProvider;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $vendas = $this->salesService->getPerformanceComercial();
-        $estoqueRisco = $this->inventoryService->getEstoqueRisco();
-        $margem = $this->marginService->getAnaliseMargem();
-        $insights = AiInsight::orderBy('created_at', 'desc')->take(5)->get();
+        $periodo = $request->get('periodo', '30dias');
 
-        return view('admin.kn_intelligence.dashboard', compact('vendas', 'estoqueRisco', 'margem', 'insights'));
+        switch ($periodo) {
+            case 'hoje':
+                $inicio = now()->startOfDay()->toDateTimeString();
+                $fim    = now()->endOfDay()->toDateTimeString();
+                break;
+            case '7dias':
+                $inicio = now()->subDays(6)->startOfDay()->toDateTimeString();
+                $fim    = now()->endOfDay()->toDateTimeString();
+                break;
+            case 'personalizado':
+                $inicio = $request->get('inicio', now()->startOfMonth()->toDateTimeString());
+                $fim    = $request->get('fim',    now()->endOfDay()->toDateTimeString());
+                break;
+            default:
+                $inicio = now()->startOfMonth()->toDateTimeString();
+                $fim    = now()->endOfDay()->toDateTimeString();
+                break;
+        }
+
+        $vendas       = $this->salesService->getPerformanceComercial($inicio, $fim);
+        $estoqueRisco = $this->inventoryService->getEstoqueRisco();
+        $margem       = $this->marginService->getAnaliseMargem();
+        $insights     = AiInsight::orderBy('created_at', 'desc')->take(5)->get();
+
+        // Período anterior (mesmo intervalo, janela anterior) para comparação
+        $diffDias  = \Carbon\Carbon::parse($inicio)->diffInDays(\Carbon\Carbon::parse($fim)) + 1;
+        $inicioAnt = \Carbon\Carbon::parse($inicio)->subDays($diffDias)->toDateTimeString();
+        $fimAnt    = \Carbon\Carbon::parse($inicio)->subSecond()->toDateTimeString();
+        $vendasAnt = $this->salesService->getPerformanceComercial($inicioAnt, $fimAnt);
+
+        return view('admin.kn_intelligence.dashboard', compact(
+            'vendas', 'vendasAnt', 'estoqueRisco', 'margem', 'insights', 'periodo', 'inicio', 'fim'
+        ));
     }
 
     public function assistant()
@@ -122,5 +151,15 @@ class KnIntelligenceController extends Controller
         );
 
         return redirect()->back()->with('success', 'Configurações de IA do Gemini atualizadas com sucesso!');
+    }
+
+    public function gerarInsights()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('kn-intelligence:generate-insights');
+            return redirect()->back()->with('success', 'Insights de IA atualizados com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erro ao gerar novos insights: ' . $e->getMessage());
+        }
     }
 }

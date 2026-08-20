@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::post('/kn-intelligence/ask', [KnIntelligenceController::class, 'ask'])->name('admin.kn_intelligence.ask');
     Route::get('/kn-intelligence/configuracoes', [KnIntelligenceController::class, 'configuracoes'])->name('admin.kn_intelligence.configuracoes');
     Route::post('/kn-intelligence/configuracoes/salvar', [KnIntelligenceController::class, 'salvarConfiguracoes'])->name('admin.kn_intelligence.salvarConfiguracoes');
+    Route::post('/kn-intelligence/gerar-insights', [KnIntelligenceController::class, 'gerarInsights'])->name('admin.kn_intelligence.gerar_insights');
 
     Route::post('/dashboardDiario/vendasDia',[DashboardController::class,'vendasDia'])->name('admin.dashboardDiario.vendasDia');
     Route::post('/dashboardDiario/totalProdutoVenda',[DashboardController::class,'totalProdutoVenda'])->name('admin.dashboardDiario.totalProdutoVenda');

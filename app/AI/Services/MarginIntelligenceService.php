@@ -14,16 +14,16 @@ class MarginIntelligenceService
         $vendasComDescontoAlto = DB::table('loja_vendas_produtos as vp')
             ->join('loja_vendas as v', 'vp.venda_id', '=', 'v.id')
             ->join('loja_produtos_new as p', 'vp.produto_id', '=', 'p.id')
-            ->where('vp.desconto', '>', 0)
+            ->where('vp.percentual_desconto', '>', 0)
             ->select(
                 'v.id as venda_id',
                 'p.descricao as produto',
-                'vp.valor_unitario',
-                'vp.desconto',
+                'vp.valor_produto',
+                'vp.percentual_desconto',
                 'vp.quantidade',
                 'v.created_at'
             )
-            ->orderBy('vp.desconto', 'desc')
+            ->orderBy('vp.percentual_desconto', 'desc')
             ->limit(10)
             ->get();
 

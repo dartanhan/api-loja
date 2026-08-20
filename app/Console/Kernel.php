@@ -24,7 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Atualização diária dos insights de IA durante a madrugada (03:00)
+        $schedule->command('kn-intelligence:generate-insights')->dailyAt('03:00');
     }
 
     /**

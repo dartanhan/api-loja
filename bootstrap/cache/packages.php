@@ -10,6 +10,17 @@
       0 => 'L5Swagger\\L5SwaggerServiceProvider',
     ),
   ),
+  'facade/ignition' => 
+  array (
+    'aliases' => 
+    array (
+      'Flare' => 'Facade\\Ignition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
+    ),
+  ),
   'fideloper/proxy' => 
   array (
     'providers' => 
@@ -33,6 +44,13 @@
     'providers' => 
     array (
       0 => 'Intervention\\Image\\ImageServiceProvider',
+    ),
+  ),
+  'laracasts/generators' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laracasts\\Generators\\GeneratorsServiceProvider',
     ),
   ),
   'laravel/tinker' => 
@@ -60,11 +78,25 @@
       0 => 'Livewire\\LivewireServiceProvider',
     ),
   ),
+  'lucascudo/laravel-pt-br-localization' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Lucascudo\\LaravelPtBrLocalization\\LaravelPtBrLocalizationServiceProvider',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
     array (
       0 => 'Carbon\\Laravel\\ServiceProvider',
+    ),
+  ),
+  'nunomaduro/collision' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     ),
   ),
   'owen-it/laravel-auditing' => 

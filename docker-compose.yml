@@ -4,11 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: api-loja
+    user: root
     restart: unless-stopped
     ports:
       - "9006:80"
-    env_file:
-      - .env
     volumes:
       - ./:/var/www
     networks:
