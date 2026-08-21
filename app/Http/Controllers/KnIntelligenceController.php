@@ -71,10 +71,20 @@ class KnIntelligenceController extends Controller
         ));
     }
 
-    public function assistant()
+    public function assistant(Request $request)
     {
         $conversations = AiConversation::where('user_id', Auth::id())->orderBy('updated_at', 'desc')->get();
-        return view('admin.kn_intelligence.assistant', compact('conversations'));
+        
+        $currentConversation = null;
+        $messages = [];
+        if ($request->has('c')) {
+            $currentConversation = AiConversation::where('user_id', Auth::id())->where('id', $request->input('c'))->first();
+            if ($currentConversation) {
+                $messages = AiMessage::where('conversation_id', $currentConversation->id)->orderBy('id', 'asc')->get();
+            }
+        }
+
+        return view('admin.kn_intelligence.assistant', compact('conversations', 'currentConversation', 'messages'));
     }
 
     public function ask(Request $request)
@@ -102,7 +112,7 @@ class KnIntelligenceController extends Controller
         // Coleta dados reais do sistema para contextualizar a resposta da IA
         $vendas = $this->salesService->getPerformanceComercial();
         $estoque = $this->inventoryService->getEstoqueRisco();
-        $margem = $this->marginService->getAnaliseMargem();
+        $margem = $this->marginService->getMargemGerencial();
 
         $detalhesEstoque = "";
         if (!empty($estoque['produtos'])) {
@@ -116,21 +126,25 @@ class KnIntelligenceController extends Controller
         }
 
         $detalhesMargem = "";
-        if (!empty($margem['descontos_altos'])) {
-            $detalhesMargem = " - Itens específicos com maiores descontos (potencial baixa margem):\n";
-            foreach($margem['descontos_altos'] as $item) {
+        if (!empty($margem['ranking_menor_margem'])) {
+            $detalhesMargem = " - Produtos com MENORES Margens de Lucro:\n";
+            $count = 0;
+            foreach($margem['ranking_menor_margem'] as $item) {
+                if($count++ >= 5) break; // Mostra apenas os 5 piores
                 $prod = is_array($item) ? $item['produto'] : $item->produto;
-                $perc = is_array($item) ? $item['percentual_desconto'] : $item->percentual_desconto;
-                $detalhesMargem .= "   * {$prod} (Desconto aplicado: {$perc}%)\n";
+                $perc = is_array($item) ? $item['margem_percentual'] : $item->margem_percentual;
+                $detalhesMargem .= "   * {$prod} (Margem: {$perc}%)\n";
             }
         }
+
+        $totalProdutosMargem = count($margem['produtos'] ?? []);
 
         $contexto = "Você é o assistente inteligente da loja KN Cosméticos (KN Intelligence).\n"
             ."Abaixo estão os DADOS REAIS da loja para você responder com precisão:\n"
             ."1. Vendas/Faturamento Atual: R$ {$vendas['faturamento']} | Pedidos: {$vendas['pedidos']} | Ticket Médio: R$ {$vendas['ticket_medio']} | Descontos: R$ {$vendas['total_desconto']}\n"
             ."2. Risco de Estoque Baixo: {$estoque['total_itens_criticos']} produtos com estoque abaixo do mínimo.\n"
             .$detalhesEstoque
-            ."3. Vendas com Maiores Descontos: {$margem['total_analisado']} itens analisados.\n"
+            ."3. Análise de Margem: {$totalProdutosMargem} itens vendidos analisados.\n"
             .$detalhesMargem."\n"
             ."Pergunta do usuário: \"{$pergunta}\"\n\n"
             ."Responda de forma profissional, direta, com formatação limpa e sugestões estratégicas práticas para a loja baseando-se nos itens acima se solicitado.";
