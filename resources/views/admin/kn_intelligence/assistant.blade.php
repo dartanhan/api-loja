@@ -13,6 +13,11 @@
         <li class="breadcrumb-item active">Assistente IA</li>
     </ol>
 
+    <style>
+        .conv-item .btn-delete-conv { display: none; }
+        .conv-item:hover .btn-delete-conv { display: block; }
+    </style>
+
     <div class="row">
         <!-- Sidebar Histórico -->
         <div class="col-md-3">
@@ -23,13 +28,20 @@
                 <div class="card-body p-0" style="overflow-y: auto; max-height: 500px;">
                     <div class="list-group list-group-flush rounded-0 mt-2">
                         @forelse($conversations as $conv)
-                            <a href="{{ route('admin.kn_intelligence.assistant', ['c' => $conv->id]) }}" class="list-group-item list-group-item-action d-flex align-items-center {{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'active bg-primary text-white' : '' }}">
-                                <i class="fas fa-comment-alt {{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'text-white' : 'text-secondary' }} me-3"></i>
-                                <div class="text-truncate" style="max-width: 80%;">
-                                    <small class="d-block fw-bold">{{ $conv->titulo }}</small>
-                                    <small class="{{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'text-light' : 'text-muted' }}" style="font-size: 0.75rem;">{{ $conv->updated_at->diffForHumans() }}</small>
-                                </div>
-                            </a>
+                            <div class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-2 conv-item {{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'active bg-primary text-white' : '' }}">
+                                <a href="{{ route('admin.kn_intelligence.assistant', ['c' => $conv->id]) }}" class="d-flex align-items-center flex-grow-1 text-decoration-none {{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'text-white' : 'text-dark' }}">
+                                    <i class="fas fa-comment-alt {{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'text-white' : 'text-secondary' }} me-3 ms-2"></i>
+                                    <div class="text-truncate" style="max-width: 190px;">
+                                        <small class="d-block fw-bold">{{ $conv->titulo }}</small>
+                                        <small class="{{ isset($currentConversation) && $currentConversation->id == $conv->id ? 'text-light' : 'text-muted' }}" style="font-size: 0.65rem;">
+                                            {{ $conv->updated_at->diffForHumans() }} ({{ $conv->updated_at->format('d/m H:i') }})
+                                        </small>
+                                    </div>
+                                </a>
+                                <button class="btn btn-sm text-danger btn-delete-conv p-1" onclick="deleteConversation({{ $conv->id }}, event)" title="Excluir">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
                         @empty
                             <div class="p-3 text-center text-muted">
                                 <small>Nenhuma conversa anterior.</small>
@@ -106,6 +118,27 @@ window.onload = function() {
     const chatBox = document.getElementById('chat-box');
     chatBox.scrollTop = chatBox.scrollHeight;
 };
+
+function deleteConversation(id, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (confirm('Tem certeza que deseja excluir este histórico?')) {
+        fetch('{{ url("/admin/kn-intelligence/chat") }}/' + id, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                if (currentConversationId == id) {
+                    window.location.href = '{{ route("admin.kn_intelligence.assistant") }}';
+                } else {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+}
 
 function enviarPergunta(e) {
     e.preventDefault();

@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function(){
     Route::get('/kn-intelligence', [KnIntelligenceController::class, 'index'])->name('admin.kn_intelligence.dashboard');
     Route::get('/kn-intelligence/chat', [KnIntelligenceController::class, 'assistant'])->name('admin.kn_intelligence.assistant');
     Route::post('/kn-intelligence/ask', [KnIntelligenceController::class, 'ask'])->name('admin.kn_intelligence.ask');
+    Route::delete('/kn-intelligence/chat/{id}', [KnIntelligenceController::class, 'deleteConversation'])->name('admin.kn_intelligence.chat.delete');
     Route::get('/kn-intelligence/configuracoes', [KnIntelligenceController::class, 'configuracoes'])->name('admin.kn_intelligence.configuracoes');
     Route::post('/kn-intelligence/configuracoes/salvar', [KnIntelligenceController::class, 'salvarConfiguracoes'])->name('admin.kn_intelligence.salvarConfiguracoes');
     Route::post('/kn-intelligence/gerar-insights', [KnIntelligenceController::class, 'gerarInsights'])->name('admin.kn_intelligence.gerar_insights');

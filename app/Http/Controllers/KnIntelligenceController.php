@@ -87,6 +87,17 @@ class KnIntelligenceController extends Controller
         return view('admin.kn_intelligence.assistant', compact('conversations', 'currentConversation', 'messages'));
     }
 
+    public function deleteConversation($id)
+    {
+        $conversation = AiConversation::where('user_id', Auth::id())->findOrFail($id);
+        
+        // As mensagens atreladas devem ser deletadas via cascade ou deletamos manualmente
+        AiMessage::where('conversation_id', $conversation->id)->delete();
+        $conversation->delete();
+
+        return response()->json(['success' => true]);
+    }
+
     public function ask(Request $request)
     {
         $request->validate(['pergunta' => 'required|string']);

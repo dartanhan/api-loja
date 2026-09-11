@@ -62,27 +62,29 @@ class VendaController extends Controller
     protected VendasTroca $vendasTroca;
     protected MovimentacaoEstoque $movimentacaoEstoque;
 
-    public function __construct(Request $request,
-                                Produto $product,
-                                Vendas $vendas,
-                                VendasProdutos $vendasProdutos,
-                                VendasProdutosDesconto $vendasDescontos,
-                                VendasProdutosTipoPagamento $tipoPagamento,
-                                VendasProdutosValorCartao $valorCartao,
-                                VendasProdutosValorDupla $valorDuplo,
-                                ProdutoQuantidade $produtoQuantidade,
-                                TaxaCartao $taxaCartao,
-                                ProdutoVariation $productVariation,
-                                VendasCashBack $cashbackVendas,
-                                Cashback $cashback,
-                                VendasCashBackValor $cashBackValor,
-                                VendasPdv $vendasPdv,
-                                ErrorLogs $errorLogs,
-                                VendasProdutosEntrega $vendasProdutosEntrega,
-                                VendasProdutosTroca $vendasProdutosTroca,
-                                VendasTroca $vendasTroca,
-                                MovimentacaoEstoque $movimentacaoEstoque,
-                                VendaService $vendaService){
+    public function __construct(
+        Request $request,
+        Produto $product,
+        Vendas $vendas,
+        VendasProdutos $vendasProdutos,
+        VendasProdutosDesconto $vendasDescontos,
+        VendasProdutosTipoPagamento $tipoPagamento,
+        VendasProdutosValorCartao $valorCartao,
+        VendasProdutosValorDupla $valorDuplo,
+        ProdutoQuantidade $produtoQuantidade,
+        TaxaCartao $taxaCartao,
+        ProdutoVariation $productVariation,
+        VendasCashBack $cashbackVendas,
+        Cashback $cashback,
+        VendasCashBackValor $cashBackValor,
+        VendasPdv $vendasPdv,
+        ErrorLogs $errorLogs,
+        VendasProdutosEntrega $vendasProdutosEntrega,
+        VendasProdutosTroca $vendasProdutosTroca,
+        VendasTroca $vendasTroca,
+        MovimentacaoEstoque $movimentacaoEstoque,
+        VendaService $vendaService
+    ) {
         $this->request = $request;
         $this->product = $product;
         $this->vendas = $vendas;
@@ -90,8 +92,8 @@ class VendaController extends Controller
         $this->vendasDescontos = $vendasDescontos;
         $this->tipoPagamento = $tipoPagamento;
         $this->valorCartao = $valorCartao;
-        $this->valorDuplo  = $valorDuplo;
-        $this->produtoQuantidade  = $produtoQuantidade;
+        $this->valorDuplo = $valorDuplo;
+        $this->produtoQuantidade = $produtoQuantidade;
         $this->taxaCartao = $taxaCartao;
         $this->productVariation = $productVariation;
         $this->cashbackVendas = $cashbackVendas;
@@ -131,7 +133,7 @@ class VendaController extends Controller
 
         //if ($variations->quantidade == 0) {
         //    return response()->json(['success' => false, 'message' => 'Produto sem Estoque para Venda!'], 201);
-       // }
+        // }
 
         $product = $variations->produtoPai;
 
@@ -140,7 +142,7 @@ class VendaController extends Controller
         }
 
         // Construção do JSON de resposta
-        $storage = url('public','storage');
+        $storage = url('public', 'storage');
 
         $imagePath = !empty($variations->images) && isset($variations->images[0]->path) && Storage::exists($variations->images[0]->path)
             ? $storage . '/' . $variations->images[0]->path
@@ -294,10 +296,10 @@ class VendaController extends Controller
                     'cashback.cliente:id,nome',
                     'entregas.formaEntrega:id,nome'
                 ])
-                ->select('id','codigo_venda', 'loja_id', 'valor_total', 'created_at')
+                ->select('id', 'codigo_venda', 'loja_id', 'valor_total', 'created_at')
                 ->first();
 
-            return Response::json(['success'=>true,"data"=>$products], 200);
+            return Response::json(['success' => true, "data" => $products], 200);
 
             // Monta resposta JSON
             /* return Response::json([
@@ -321,7 +323,7 @@ class VendaController extends Controller
 
 
 
-//            return response()->json($products, 201);
+            //            return response()->json($products, 201);
 //
 //            $products = $this->vendas->join('loja_vendas_produtos', 'loja_vendas.id', '=', 'loja_vendas_produtos.venda_id')
 //                ->where('loja_vendas.codigo_venda', $code_store)
@@ -334,7 +336,7 @@ class VendaController extends Controller
 //                )
 //                ->get();
 
-//            if ($products->isEmpty()) {
+            //            if ($products->isEmpty()) {
 //                return Response::json([
 //                    'success' => false,
 //                    'message' => "Venda não localizada [ {$code_store} ]"
@@ -443,7 +445,7 @@ class VendaController extends Controller
             $this->vendaService->registrarDesconto($dados, $venda->id);
 
             // Cashback
-            $this->vendaService->registrarCashback($dados["clienteModel"], $venda);
+            //$this->vendaService->registrarCashback($dados["clienteModel"], $venda);
 
             DB::commit();
 
@@ -465,7 +467,7 @@ class VendaController extends Controller
         }
     }
 
-//    public function store(Request $request)
+    //    public function store(Request $request)
 //    {
 //
 //        DB::beginTransaction();
@@ -653,16 +655,16 @@ class VendaController extends Controller
             //$product = $this->produtoQuantidade::where('produto_id', '=', $data->id)->where('loja_id', '=', $json[$i]->loja_id)->first();
 
             //Quantidade vendida maior que estoque, erro
-            if($json[$i]->quantidade > $data->quantidade){
+            if ($json[$i]->quantidade > $data->quantidade) {
                 array_push($ret, [
-                    'codigo_produto'   => $data->subcodigo,
-                    'message'   =>  'Produto ['.$data->variacao .'] acima da quantidade em estoque, TOTAL [ '.$data->quantidade.' ]',
+                    'codigo_produto' => $data->subcodigo,
+                    'message' => 'Produto [' . $data->variacao . '] acima da quantidade em estoque, TOTAL [ ' . $data->quantidade . ' ]',
                 ]);
             }
         }
         //$produtos = json_encode($saida);
-        if(count($ret) > 0)
-            return Response::json(array('success' => false,'produtos'=> $ret), 400);
+        if (count($ret) > 0)
+            return Response::json(array('success' => false, 'produtos' => $ret), 400);
 
 
         return Response::json(array('success' => true), 200);
@@ -699,8 +701,8 @@ class VendaController extends Controller
     {
         try {
             //Pega a venda pelo codigo
-            $vendas = $this->vendas::where('id',$id_venda)->first();
-            if($vendas) {
+            $vendas = $this->vendas::where('id', $id_venda)->first();
+            if ($vendas) {
 
                 //Cria a model
                 $this->vendas->id = $vendas->id;
@@ -741,15 +743,15 @@ class VendaController extends Controller
 
                 //$delete = $vendas->delete();
 
-                if($vendas->delete())
-                    return Response::json(array('success' => true, "message" => 'Venda deletada com sucesso!'), 200, [],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if ($vendas->delete())
+                    return Response::json(array('success' => true, "message" => 'Venda deletada com sucesso!'), 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-            }else{
-                return Response::json(array('success' => false, "message" => 'Venda não localizada: [' . $id_venda .']'), 400, [],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            } else {
+                return Response::json(array('success' => false, "message" => 'Venda não localizada: [' . $id_venda . ']'), 400, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
 
-        }catch (Throwable $e){
-            return Response::json(array('success' => false, "message" => $e->getMessage()), 500, [],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        } catch (Throwable $e) {
+            return Response::json(array('success' => false, "message" => $e->getMessage()), 500, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
     }
@@ -758,7 +760,8 @@ class VendaController extends Controller
      * Nova função para o novo PDV WEB
      */
 
-    public function getProducts(){
+    public function getProducts()
+    {
 
         try {
 
@@ -766,21 +769,23 @@ class VendaController extends Controller
             // print_r($request);
 
             $products = DB::table('loja_produtos_variacao')
-                ->join('loja_produtos_new','loja_produtos_variacao.products_id','=','loja_produtos_new.id')
+                ->join('loja_produtos_new', 'loja_produtos_variacao.products_id', '=', 'loja_produtos_new.id')
                 ->leftJoin('loja_produtos_imagens', 'loja_produtos_imagens.produto_variacao_id', '=', 'loja_produtos_variacao.id')
                 ->where('loja_produtos_variacao.subcodigo', 'LIKE', "%$request%")
                 ->orWhere('loja_produtos_variacao.variacao', 'LIKE', "%$request%")
                 ->get();
 
-            if(count($products) ==0)
-                return [[ 'label' => "PRODUTO NÃO LOCALIZADO!", 'value' => $request]];
+            if (count($products) == 0)
+                return [['label' => "PRODUTO NÃO LOCALIZADO!", 'value' => $request]];
 
             $arr = null;
-            foreach ($products as $key => $product){
-                $arr[] = ['label' => $product->variacao ,
+            foreach ($products as $key => $product) {
+                $arr[] = [
+                    'label' => $product->variacao,
                     'value' => $product->subcodigo,
                     'image' => $product->path,
-                    'product' => $product->descricao];
+                    'product' => $product->descricao
+                ];
             }
 
 
@@ -800,7 +805,8 @@ class VendaController extends Controller
     /**
      * Salva itens da venda
      **/
-    public function saveProductSale() {
+    public function saveProductSale()
+    {
         try {
             // Validação de dados
             $validated = $this->request->validate([
@@ -845,7 +851,7 @@ class VendaController extends Controller
 
             return response()->json(['success' => true, 'message' => $msg], 200);
 
-        }catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             // Captura a exceção de validação e retorna o erro em formato JSON
             return response()->json([
                 'success' => false,
@@ -863,30 +869,32 @@ class VendaController extends Controller
     /**
      * @return JsonResponse
      */
-    public function carts(){
+    public function carts()
+    {
         try {
 
-            $user_id =  $this->request->input('user_id');
+            $user_id = $this->request->input('user_id');
             // $cliente_id =  $this->request->input('cliente_id');
-            $status =  $this->request->input('status');
+            $status = $this->request->input('status');
 
-            $carts = Carts::with('variations','clientes','usuario','cashback')
+            $carts = Carts::with('variations', 'clientes', 'usuario', 'cashback')
                 ->where('user_id', $user_id)
                 ->whereIn('status', $status)
-                ->orderBy('id','desc')
+                ->orderBy('id', 'desc')
                 ->get();
 
             if (!$carts->isEmpty())
-                return Response::json(['success' => true,'message' => "sucesso", 'data' => $carts], 200,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                return Response::json(['success' => true, 'message' => "sucesso", 'data' => $carts], 200, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             else
-                return Response::json(['success' => false,'message' => "Carrinho cliente não localizado! ", 'data' => $carts], 201,[],JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                return Response::json(['success' => false, 'message' => "Carrinho cliente não localizado! ", 'data' => $carts], 201, [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         } catch (Throwable $e) {
             return Response::json(array('success' => false, 'message' => $e->getMessage(), 'code' => 500), 500);
         }
     }
 
-    public function getItemsCart(){
+    public function getItemsCart()
+    {
         try {
 
         } catch (Throwable $e) {
